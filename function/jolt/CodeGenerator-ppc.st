@@ -81,8 +81,8 @@ PowerPCCodeGenerator addi4    :d :s	[ self addR: d R: d R: s ]
 PowerPCCodeGenerator addrfp4  :d	[ self mrR: d R: r1 ]
 PowerPCCodeGenerator addrlp4  :d :v	[ self addiR: d R: v base I: v offset ]
 PowerPCCodeGenerator andi4    :d :s	[ self andR: d R: d R: s ]
-PowerPCCodeGenerator asgni1   :s :d	[ self error: 'asgni1' ]
-PowerPCCodeGenerator asgni2   :s :d	[ self error: 'asgni2' ]
+PowerPCCodeGenerator asgni1   :s :d	[ self stbR: s I: 0 R: d ]
+PowerPCCodeGenerator asgni2   :s :d	[ self sthR: s I: 0 R: d ]
 PowerPCCodeGenerator asgni4   :s :d	[ self stwR: s I: 0 R: d ]
 PowerPCCodeGenerator bra      :l	[ self baL: l ]
 PowerPCCodeGenerator brnz     :s :l	[ self cmpwiI: 7 R: s I: 0;  bneI: 7 L: l ]
@@ -94,7 +94,7 @@ PowerPCCodeGenerator eqi4     :d :s	[ self xorR: d R: d R: s;  subficR: r0 R: r3
 PowerPCCodeGenerator gei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 28 I: 28;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
 PowerPCCodeGenerator gti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwinmR: d R: d I: 30 I: 31 I: 31 ]
 PowerPCCodeGenerator indiri1  :d	[ self lbzR: d I: 0 R: d ]
-PowerPCCodeGenerator indiri2  :d	[ self error: 'indiri2' ]
+PowerPCCodeGenerator indiri2  :d	[ self lhzR: d I: 0 R: d ]
 PowerPCCodeGenerator indiri4  :d	[ self lwzR: d I: 0 R: d ]
 PowerPCCodeGenerator label    :l	[ self define: l ]
 PowerPCCodeGenerator lei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 29 I: 29;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
@@ -102,7 +102,7 @@ PowerPCCodeGenerator lti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwin
 PowerPCCodeGenerator modi4    :d :s	[ self divwR: r0 R: d R: s;  mullwR: r0 R: r0 R: s;  subfR: d R: r0 R: d ]
 PowerPCCodeGenerator muli4    :d :s	[ self mullwR: d R: d R: s ]
 PowerPCCodeGenerator negi4    :d	[ self negR: d R: d ]
-PowerPCCodeGenerator nei4     :d :s	[ self xorR: r12 R: d R: s;  addicR: r0 R: r12 I: 0xffff;  subfeR: d R: r0 R: r12 ]
+PowerPCCodeGenerator nei4     :d :s	[ self xorR: r12 R: d R: s;  addicR: r0 R: r12 I: -1;  subfeR: d R: r0 R: r12 ]
 PowerPCCodeGenerator noti4    :d	[ self subficR: r0 R: d I: 0;  addeR: d R: r0 R: d ]
 PowerPCCodeGenerator ori4     :d :s	[ self orR: d R: d R: s ]
 PowerPCCodeGenerator reti4    :s	[ self mrR: r3 R: s; emitEpilogue ]
@@ -149,8 +149,8 @@ PowerPCCodeGenerator finaliseFrame
 
 PowerPCCodeGenerator emitPrologue
 [
-    needsFrame ifTrue: [self mflrR: r0;  stwR: r0 I: 8 R: r1;  stwuR: r1 I: frameSize negated R: r1 ].
-    params doWithIndex: [:param :index | self stwR: (ccrs at: index) I: param offset R: param base].
+    needsFrame ifTrue: [self mflrR: r0;  stwR: r0 I: 8 R: r1;  stwuR: r1 I: frameSize negated R: r1].
+    params doWithIndex: [:param :index | index < 8 ifTrue: [self stwR: (ccrs at: index) I: param offset R: param base]].
     csrs do: [:reg | reg used ifTrue: [self stwR: reg I: reg location offset R: reg location base]].
 ]
 
@@ -178,7 +178,9 @@ PowerPCCodeGenerator calli4 :call
 PowerPCCodeGenerator emit: insn argument: index
 [
     insn reload: self.
-    self mrR: (ccrs at: index) R: insn output.
+    index < 8
+	ifTrue:  [self mrR: (ccrs at: index) R: insn output]
+	ifFalse: [self stwR: insn output I: index * 4 + 24 R: r1]    
 ]
 
 
@@ -200,6 +202,7 @@ StaticPowerPCCodeGenerator define: l		[ StdOut nextPutAll: 'L'; print: l ordinal
 StaticPowerPCCodeGenerator addR: d R: a R: b	[ StdOut nextPutAll: '	add	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator addeR: d R: a R: b	[ StdOut nextPutAll: '	adde	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator addiR: d R: s I: i	[ StdOut nextPutAll: '	addi	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; cr ]
+StaticPowerPCCodeGenerator addicR: d R: s I: i	[ StdOut nextPutAll: '	addic	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; cr ]
 StaticPowerPCCodeGenerator andR: d R: a R: b	[ StdOut nextPutAll: '	and	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator baL: l		[ StdOut
 						      nextPutAll: '	lis	r0,hi16(L';    print: l ordinal; nextPutAll: ')\n';
@@ -215,6 +218,7 @@ StaticPowerPCCodeGenerator cmpwiI: d R: a I: i	[ StdOut nextPutAll: '	cmpwi	cr';
 StaticPowerPCCodeGenerator crnorI: d I: a I: b	[ StdOut nextPutAll: '	crnor	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator divwR: d R: a R: b	[ StdOut nextPutAll: '	divw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator lbzR: d I: i R: s	[ StdOut nextPutAll: '	lbz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
+StaticPowerPCCodeGenerator lhzR: d I: i R: s	[ StdOut nextPutAll: '	lhz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
 StaticPowerPCCodeGenerator lisR: d I_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger value_: _i) >> 16; cr ]
 StaticPowerPCCodeGenerator lwzR: d I: i R: s	[ StdOut nextPutAll: '	lwz	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator mfcrR: d		[ StdOut nextPutAll: '	mfcr	'; print: d; cr ]
@@ -228,10 +232,13 @@ StaticPowerPCCodeGenerator oriR: d R: s I_: _i	[ StdOut nextPutAll: '	ori	'; pri
 StaticPowerPCCodeGenerator rlwinmR: d R: s I: i I: j I: k	[ StdOut nextPutAll: '	rlwinm	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; nextPut: $,; print: j; nextPut: $,; print: k; cr ]
 StaticPowerPCCodeGenerator slwR: d R: a R: b	[ StdOut nextPutAll: '	slw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator srawR: d R: a R: b	[ StdOut nextPutAll: '	sraw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
+StaticPowerPCCodeGenerator stbR: d I: i R: s	[ StdOut nextPutAll: '	stb	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
+StaticPowerPCCodeGenerator sthR: d I: i R: s	[ StdOut nextPutAll: '	sth	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator stwR: d I: i R: s	[ StdOut nextPutAll: '	stw	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator stwuR: d I: i R: s	[ StdOut nextPutAll: '	stwu	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator subR: d R: a R: b	[ StdOut nextPutAll: '	sub	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator subfR: d R: a R: b	[ StdOut nextPutAll: '	subf	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
+StaticPowerPCCodeGenerator subfeR: d R: a R: b	[ StdOut nextPutAll: '	subfe	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator subficR: d R: s I: i	[ StdOut nextPutAll: '	subfic	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; cr ]
 StaticPowerPCCodeGenerator xorR: d R: a R: b	[ StdOut nextPutAll: '	xor	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 
@@ -284,6 +291,7 @@ DynamicPowerPCCodeGenerator addrjp4 :d :l	[ self lisR: d I_: l _address;  oriR: 
 DynamicPowerPCCodeGenerator addR: d R: a R: b	{ ADDrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator addeR: d R: a R: b	{ ADDErrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator addiR: d R: s I: i	{ ADDIrri	(_R(d), _R(s), _I(i)         	); }
+DynamicPowerPCCodeGenerator addicR: d R: s I: i	{ ADDICrri	(_R(d), _R(s), _I(i)         	); }
 DynamicPowerPCCodeGenerator andR: d R: a R: b	{ ANDrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator baL: l		{ LISri		(   0        ,(_A(l) >> 16)     );
 						  ORIrri	(   0 ,    0 ,(_A(l) & 0xffff)  );
@@ -298,6 +306,7 @@ DynamicPowerPCCodeGenerator cmpwiI: d R: a I: i	{ CMPWIiri	(_I(d), _R(a), _I(i) 
 DynamicPowerPCCodeGenerator crnorI: d I: a I: b	{ CRNORiii	(_I(d), _I(a), _I(b)         	); }
 DynamicPowerPCCodeGenerator divwR: d R: a R: b	{ DIVWrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator lbzR: d I: i R: s	{ LBZrm		(_R(d), _I(i), _R(s)		); }
+DynamicPowerPCCodeGenerator lhzR: d I: i R: s	{ LHZrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator lisR: d I_: _i	{ LISri		(_R(d),        _P(i >> 16)   	); }
 DynamicPowerPCCodeGenerator lwzR: d I: i R: s	{ LWZrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator mfcrR: d		{ MFCRr		(_R(d)			     	); }
@@ -310,10 +319,13 @@ DynamicPowerPCCodeGenerator oriR: d R: s I_: _i	{ ORIrri	(_R(d), _R(s), _P(i & 0
 DynamicPowerPCCodeGenerator rlwinmR: d R: s I: i I: j I:k	{ RLWINMrriii	(_R(d), _R(s), _I(i), _I(j), _I(k)); }
 DynamicPowerPCCodeGenerator slwR: d R: a R: b	{ SLWrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator srawR: d R: a R: b	{ SRAWrrr	(_R(d), _R(a), _R(b)         	); }
+DynamicPowerPCCodeGenerator stbR: d I: i R: s	{ STBrm		(_R(d), _I(i), _R(s)		); }
+DynamicPowerPCCodeGenerator sthR: d I: i R: s	{ STHrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator stwR: d I: i R: s	{ STWrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator stwuR: d I: i R: s	{ STWUrm	(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator subR: d R: a R: b	{ SUBrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator subfR: d R: a R: b	{ SUBFrrr	(_R(d), _R(a), _R(b)         	); }
+DynamicPowerPCCodeGenerator subfeR: d R: a R: b	{ SUBFErrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator subficR: d R: s I: i{ SUBFICrri	(_R(d), _R(s), _I(i)         	); }
 DynamicPowerPCCodeGenerator xorR: d R: a R: b	{ XORrrr	(_R(d), _R(a), _R(b)         	); }
 
