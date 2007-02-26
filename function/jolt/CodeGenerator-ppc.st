@@ -77,19 +77,19 @@ PowerPCCodeGenerator allocateTemp: insn
     ^(temps add: (Temporary withBase: r1 offset: temps size * 4)) allocate
 ]
 
-PowerPCCodeGenerator addi4    :d :s	[ self addR: d R: d R: s]
-PowerPCCodeGenerator addrfp4  :d	[ self error: 'addrfp4' ]
-PowerPCCodeGenerator addrlp4  :d :v	[ self error: 'addrlp4' ]
-PowerPCCodeGenerator andi4    :d :s	[ self andR: d R: d R: s]
+PowerPCCodeGenerator addi4    :d :s	[ self addR: d R: d R: s ]
+PowerPCCodeGenerator addrfp4  :d	[ self mrR: d R: r1 ]
+PowerPCCodeGenerator addrlp4  :d :v	[ self addiR: d R: v base I: v offset ]
+PowerPCCodeGenerator andi4    :d :s	[ self andR: d R: d R: s ]
 PowerPCCodeGenerator asgni1   :s :d	[ self error: 'asgni1' ]
 PowerPCCodeGenerator asgni2   :s :d	[ self error: 'asgni2' ]
-PowerPCCodeGenerator asgni4   :s :d	[ self error: 'asgni4' ]
+PowerPCCodeGenerator asgni4   :s :d	[ self stwR: s I: 0 R: d ]
 PowerPCCodeGenerator bra      :l	[ self baL: l ]
 PowerPCCodeGenerator brnz     :s :l	[ self cmpwiI: 7 R: s I: 0;  bneI: 7 L: l ]
 PowerPCCodeGenerator brz      :s :l	[ self cmpwiI: 7 R: s I: 0;  beqI: 7 L: l ]
 PowerPCCodeGenerator cnsti4   :d :v	[ self lisR: d I_: v;  oriR: d R: d I_: v ]
 PowerPCCodeGenerator cnstp4   :d :v	[ self lisR: d I_: v;  oriR: d R: d I_: v ]
-PowerPCCodeGenerator divi4    :d :s	[ self divwR: d R: d R: s]
+PowerPCCodeGenerator divi4    :d :s	[ self divwR: d R: d R: s ]
 PowerPCCodeGenerator eqi4     :d :s	[ self xorR: d R: d R: s;  subficR: r0 R: r3 I: 0;  addeR: d R: r0 R: d ]
 PowerPCCodeGenerator gei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 28 I: 28;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
 PowerPCCodeGenerator gti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwinmR: d R: d I: 30 I: 31 I: 31 ]
@@ -100,26 +100,35 @@ PowerPCCodeGenerator label    :l	[ self define: l ]
 PowerPCCodeGenerator lei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 29 I: 29;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
 PowerPCCodeGenerator lti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwinmR: d R: d I: 29 I: 31 I: 31 ]
 PowerPCCodeGenerator modi4    :d :s	[ self divwR: r0 R: d R: s;  mullwR: r0 R: r0 R: s;  subfR: d R: r0 R: d ]
-PowerPCCodeGenerator muli4    :d :s	[ self mullwR: d R: d R: s]
+PowerPCCodeGenerator muli4    :d :s	[ self mullwR: d R: d R: s ]
 PowerPCCodeGenerator negi4    :d	[ self negR: d R: d ]
 PowerPCCodeGenerator nei4     :d :s	[ self xorR: r12 R: d R: s;  addicR: r0 R: r12 I: 0xffff;  subfeR: d R: r0 R: r12 ]
 PowerPCCodeGenerator noti4    :d	[ self subficR: r0 R: d I: 0;  addeR: d R: r0 R: d ]
-PowerPCCodeGenerator ori4     :d :s	[ self orR: d R: d R: s]
+PowerPCCodeGenerator ori4     :d :s	[ self orR: d R: d R: s ]
 PowerPCCodeGenerator reti4    :s	[ self mrR: r3 R: s; emitEpilogue ]
-PowerPCCodeGenerator subi4    :d :s	[ self subR: d R: d R: s]
-PowerPCCodeGenerator shli4    :d :s	[ self slwR: d R: d R: s]
-PowerPCCodeGenerator shri4    :d :s	[ self srawR: d R: d R: s]
-PowerPCCodeGenerator xori4    :d :s	[ self xorR: d R: d R: s]
-PowerPCCodeGenerator spilli4  :r :t	[ self error: 'spilli4' ]
-PowerPCCodeGenerator reloadi4 :r :t	[ self error: 'reloadi4' ]
+PowerPCCodeGenerator subi4    :d :s	[ self subR: d R: d R: s ]
+PowerPCCodeGenerator shli4    :d :s	[ self slwR: d R: d R: s ]
+PowerPCCodeGenerator shri4    :d :s	[ self srawR: d R: d R: s ]
+PowerPCCodeGenerator xori4    :d :s	[ self xorR: d R: d R: s ]
+PowerPCCodeGenerator spilli4  :r :t	[ self stwR: r I: t offset R: t base ]
+PowerPCCodeGenerator reloadi4 :r :t	[ self lwzR: r I: t offset R: t base ]
 
 PowerPCCodeGenerator finaliseFrame
 [
-    | align |
-    frameSize := 12 + parametersSize.
+    | linkage align |
+    linkage := 24.
+"
+    StdOut
+	nextPutAll: 'linkage '; print: linkage;
+	nextPutAll: ' needsFrame '; print: needsFrame;
+	nextPutAll: ' parametersSize '; print: parametersSize;
+	cr.
+"
+    needsFrame ifTrue: [parametersSize := parametersSize max: 32].	"always leave space for 8 outgoing arg registers"
+    frameSize := linkage + parametersSize.
     csrs do: [:reg | reg used ifTrue: [reg location: (temps add: (Temporary withBase: r1 offset: temps size * 4)) allocate]].
     temps do: [:temp |
-	temp offset: 12 + parametersSize + temp offset.
+	temp offset: linkage + parametersSize + temp offset.
 	frameSize := frameSize + 4.					"temporary space"
 	needsFrame := true].
     needsFrame
@@ -127,13 +136,21 @@ PowerPCCodeGenerator finaliseFrame
 	   [align := (frameSize + 15 bitAnd: -16) - frameSize.
 	    frameSize := frameSize + align].
     needsFrame
-	ifTrue:  [params do: [:param | param offset: param offset + 12]]
-	ifFalse: [params do: [:param | param offset: param offset + 12 + frameSize]].
+	ifTrue:  [params do: [:param | param offset: frameSize + linkage + param offset]]
+	ifFalse: [params do: [:param | param offset:             linkage + param offset]].
+"
+    StdOut
+	nextPutAll: 'linkage '; print: linkage;
+	nextPutAll: ' needsFrame '; print: needsFrame;
+	nextPutAll: ' parametersSize '; print: parametersSize;
+	cr.
+"
 ]
 
 PowerPCCodeGenerator emitPrologue
 [
     needsFrame ifTrue: [self mflrR: r0;  stwR: r0 I: 8 R: r1;  stwuR: r1 I: frameSize negated R: r1 ].
+    params doWithIndex: [:param :index | self stwR: (ccrs at: index) I: param offset R: param base].
     csrs do: [:reg | reg used ifTrue: [self stwR: reg I: reg location offset R: reg location base]].
 ]
 
@@ -176,7 +193,7 @@ StaticPowerPCCodeGenerator emit: tree
 StaticPowerPCCodeGenerator addrgp4  :d :v	[ StdOut
 						      nextPutAll: '	lis	'; print: d; nextPutAll: ',hi16('; print: v; nextPutAll: ')\n';
 						      nextPutAll: '	ori	'; print: d; nextPut: $,; print: d; nextPutAll: ',lo16('; print: v; nextPutAll: ')\n' ]
-StaticPowerPCCodeGenerator addrjp4  :d :v	[ self error: 'addrjp4' ]
+StaticPowerPCCodeGenerator addrjp4  :d :l	[ StdOut nextPutAll: '	movl	$L'; print: l ordinal; nextPut: $,; print: d; cr ]
 
 StaticPowerPCCodeGenerator define: l		[ StdOut nextPutAll: 'L'; print: l ordinal; nextPut: $:; cr ]
 
@@ -262,8 +279,7 @@ DynamicPowerPCCodeGenerator _
 }
 
 DynamicPowerPCCodeGenerator addrgp4 :d :v	[ self lisR: d I_: v _address;  oriR: d R: d I_: v _address ]
-
-DynamicPowerPCCodeGenerator addrjp4 :d :l	[ self error: 'addrjp4' ]
+DynamicPowerPCCodeGenerator addrjp4 :d :l	[ self lisR: d I_: l _address;  oriR: d R: d I_: l _address ]
 
 DynamicPowerPCCodeGenerator addR: d R: a R: b	{ ADDrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator addeR: d R: a R: b	{ ADDErrr	(_R(d), _R(a), _R(b)         	); }
