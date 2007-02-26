@@ -1,0 +1,333 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">	<!-- -*- html -*- -->
+<html>
+<head>
+<title>Efficient sideways composition in Pepsi via 'Lieberman' prototypes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="keywords" content="pepsi">
+<meta name="description" content="Efficient sideways composition in Pepsi via 'Lieberman' prototypes">
+</head>
+<body>
+
+<center>
+<h1>Efficient sideways composition in Pepsi via 'Lieberman' prototypes</h1>
+$Id: prototypes.html.in 2 2007-02-22 16:58:31Z piumarta $
+<br>
+last updated for the idst-5.8 release
+</center>
+
+<br>
+<br>
+
+<b>Contents:</b><br>
+<blockquote>
+<!--toc-->
+</blockquote>
+
+
+<a name="introductix"><h2>Introduction</h2>
+
+This memo describes the addition of sideways composition
+to <a href="pepsi.html">Pepsi</a> in the form of 'Lieberman-style'
+prototypes.
+
+<a name="introductix"><h3>Inheritance and delegation</h3>
+
+Pepsi creates every object as a member of a particular <i>clone
+family</i>.  A clone family provides its clones with their behaviour
+and dictates their internal layout.  Modifying the behaviour of one
+clone within a family causes the new behaviour to be adopted by all
+members of the family.  (Modifying the layout of a clone is
+effectively impossible once the initial 'examplar' of the family has
+been defined.)  Since the layout of a clone is intimately related to
+the methods that are allowed to run 'in' that clone (such as slot
+getters and setters), the patterns of communication between clone
+families within an inheritance hierarchy are rigid and fixed at the
+point of their definition.  This is why inheritance occurs
+between <i>vtables</i> (each a method dictionary shared by all members
+of a family) in Pepsi.
+
+<p> In Lieberman prototypes, delegation occurs between objects (not
+between object behaviours).  Any object can delegate messages to any
+other object at any time.  The entire chain of delegation between any
+number of prototypes is considered a single <i>composite object</i>.
+The meaning of <tt>self</tt> is independent of the number of times a
+message has been delegated between prototypes since the original send.
+Sending to <tt>self</tt> from any prototype within the composite
+object causes the dispatch to begin again in the 'outermost'
+prototype.
+
+<p> Compared to inheritance, delegation is the more flexible and
+general of the two techniques.  However, they both have their place within
+an object model: inheritance for sharing of implementation state (and
+the methods that act upon it) for a single prototype (within a
+hierarchy of related prototype families), and delegation for sideways
+composition of (independent and previously unrelated) prototypes into
+a single logical composite object.  This is the position adopted (and
+implemented) for sideways composition of Pepsi objects.
+
+<a name="implem"><h2>Implementation</h2>
+
+Two central concepts: receiver splitting and multi-dimensional dynamic
+binding.
+
+<h3>Receiver splitting</h3>
+
+The <tt>self</tt> used for sending messages is dissociated from
+the <tt>self</tt> used for accessing state.  The first identifies the
+entire composite object and is always the first prototype in the
+delegation chain regardless of how many times a given message has been
+delegated within that chain.  The second identifies the particular
+prototype (within the delegation chain) associated with the currently
+executing method (physically holding the instance variables visible to
+that method).
+
+<p> Pepsi method signatures are augmented accordingly.  A method
+
+<blockquote>
+FamilyName messageName: arguments... [ ... ]
+</blockquote>
+
+previously declared by the compiler as
+
+<blockquote><pre>
+oop FamilyName__messageName(oop closure, oop self, arguments...) { ... }
+</pre></blockquote>
+
+is now declared as
+
+<blockquote><pre>
+oop FamilyName__messageName(oop closure, oop stateful_self, oop self, arguments...) { ... }
+</pre></blockquote>
+
+Within this method, sends of the form
+
+<blockquote>
+self selector: arguments...
+</blockquote>
+
+are compiled (as usual) as
+
+<blockquote><pre>
+_send(s_selector, self, arguments...)
+</pre></blockquote>
+
+whereas accesses to named instance variables that were previously compiled as
+
+<blockquote><pre>
+self->v_instVarName
+</pre></blockquote>
+
+are now compiled as
+
+<blockquote><pre>
+stateful_self->v_instVarName
+</pre></blockquote>
+
+The Lieberman-style prototypical delegation described above can be
+effected by causing <tt>self</tt> and <tt>stateful_self</tt> to
+diverge.  The former remains constant while the latter moves through
+the delegation chain to record the particular prototype in which
+delegated method lookup succeeded for the currently executing method.
+
+<p> Both <tt>self</tt> and <tt>stateful_self</tt> are treated by the
+compiler as normal method arguments.  If 'self' appears free in a
+lexically-enclosed block then <tt>self</tt> will be assigned a slot in
+the state vector of the block's defining context that is stored in the
+closures created each time control passes the block's point of
+definition in the program.  Similarly, if an instance variable appears
+free in an inner block then <tt>stateful_self</tt> will be assigned to
+a slot in the state vector, and hence captured and stored in all
+closures associated with the block.  This guarantees correct (and
+intuitively expected) behaviour of sends to 'self' and accesses to
+state within arbitrarily-nested blocks of prototypical methods.
+
+
+<h3>Multi-dimensional dynamic bind</h3>
+
+The usual <i>inheritance chain</i> (between clone families) is
+augmented by an orthogonal <i>delegation chain</i> (between arbitrary
+objects).
+
+<p> Message sends were previously implemented by code equivalent to
+
+<blockquote><pre>
+#define _send(MSG, RCV, ARG...) ({		\
+  register oop _r= (RCV);			\
+  struct __closure *_c= _bind((MSG), _r);	\
+  (_c->method)((oop)_c, _r, ##ARG);		\
+})
+</pre></blockquote>
+
+in which <tt>_bind()</tt> returns a single result: the closure in
+which the method's implementation address is stored.  In order to
+support prototypes the <tt>bind()</tt> function is augmented to
+return two results: the closure in which the method implementation is
+stored and the prototype in which the method binding was found.
+
+<blockquote><pre>
+struct __lookup {
+  struct __closure *closure;
+  oop               prototype;
+};
+
+#define _send(MSG, RCV, ARG...) ({					\
+  register oop _r= (RCV);						\
+  struct __lookup _l= _bind((MSG), _r);					\
+  (_l.closure->method)((oop)_l.closure, _l.prototype, _r, ##ARG);	\
+})
+</pre></blockquote>
+
+The last line passes the closure (as before) followed by the prototype
+in which the bind succeeded (which becomes the <tt>stateful_self</tt>
+in the invoked method) and the original receiver (which becomes
+<tt>self</tt> in the invoked method and is the receiver for all sends
+to 'self').
+
+<p> The implementation of <tt>_bind()</tt> is extended from the
+original one-dimensional lookup
+
+<blockquote><pre>
+struct __closure *_bind(oop selector, oop receiver)
+{
+  if (cache[receiver.vtable].selector == selector)
+    return cache[receiver.vtable].closure;
+  assoc := receiver.vtable.lookup(selector);
+  if (assoc == nil)
+    errorDoesNotUnderstand();
+  cache[receiver.vtable].selector= selector;
+  return cache[receiver.vtable].closure= assoc.closure;
+}
+</pre></blockquote>
+
+to search the inheritance chain (as before) for each prototype in the delegation chain:
+
+<blockquote><pre>
+struct __lookup _bind(oop selector, oop receiver)
+{
+  do {
+    if (cache[receiver.vtable].selector == selector)
+      return (struct __lookup){ cache[receiver.vtable].closure, receiver };
+    assoc := receiver.vtable.lookup(selector);
+    if (assoc != nil) {
+      cache[receiver.vtable].selector= selector;
+      cache[receiver.vtable].closure= assoc.closure;
+      return (struct __lookup){ assoc.closure, receiver };
+    }
+    receiver := receiver._delegate();  <i>/* message send */</i>
+  } while (receiver != nil);
+  errorDoesNotUnderstand();
+}
+</pre></blockquote>
+
+Note that the delegate for a given prototype is obtained by sending it
+a '_delegate' message.  The delegation chain can be defined by state
+(have the method answer an instance variable) or by computation (have
+the method compute and answer the desired next prototype object in the
+delegation chain).  The default implementation of '_delegate'
+installed in '_object' simply answers 'nil'.
+
+<p> The overhead (once caches have settled) for this implementation
+strategy is (on average) one method cache probe and one message send
+for each step along the delegation chain.  The overhead for objects
+that do not participate in prototypical delegation is essentially
+zero: their '_delegate' method always returns <tt>nil</tt> and is only
+ever invoked immediately before a guaranteed 'doesNotUnderstand'
+situation.  No state whatsoever is added to these objects.
+
+<p> The implementation overhead was a couple of tens of lines of code.
+
+<a name="example"><h2>A short example</h2>
+
+<blockquote><pre>
+Prototype : Object ( next )
+
+Prototype _delegate [ ^next ]
+
+Prototype withDelegate: anObject
+[
+    self := self new.
+    next := anObject.
+]
+
+A : Prototype ()
+
+A a	[ 'A.a' putln ]
+
+B : Prototype ()
+
+B a	[ 'B.a' putln ]
+B b	[ 'B.b ' put.  self a ]
+
+C : Prototype ()
+
+C c	[ 'C.c ' put.  self a; b ]
+
+[
+    | a |
+    a := A withDelegate: (B withDelegate: C new).
+    '======== a a:\n' put.  a a.
+    '======== a b:\n' put.  a b.
+    '======== a c:\n' put.  a c.
+]
+</pre></blockquote>
+
+Executing the above program generates the following output:
+
+<blockquote><pre>
+======== a a:
+A.a
+======== a b:
+B.b A.a
+======== a c:
+C.c A.a
+B.b A.a
+</pre></blockquote>
+
+
+<a name="semantix"><h2>Caveats</h2>
+
+Assigning to 'self' causes both <tt>self</tt>
+and <tt>stateful_self</tt> to be assigned (the latter is 'tied' to the
+former for the purposes of assignment).  This is necessary to
+guarantee correct behaviour in 'constructor' methods.
+
+<p> The default definition of 'new' clones only the first prototype in
+the delegation chain.  This method must be overridden if all (or some
+arbitrary portion) of the delegation chain is to be duplicated when
+cloning the 'composite object' formed by them.
+
+<p> I haven't (yet) figured out a syntax for 'resend', analagous to
+'super' but for the delegation chain (rather than the inheritance
+chain).
+
+
+<a name="semantix"><h2>Applications</h2>
+
+Sideways composition.  (As described above.)
+
+<p> Bullet-proof proxies, formed by a two-deep delegation chain in
+which the first prototype is the proxy and the second is the object
+'wrapped' by the proxy.  All sends to <tt>self</tt> within methods of
+the wrapped object will be invoked on the enclosing proxy object.
+
+<p> Layers and Context-Oriented Programming.  Supporting these
+effectively was the principal motivation for adding 'Lieberman'
+prototypes to Pepsi.
+
+<p> JavaScript- and Python-like objects.
+
+<p> Using 'here' sends to implement robust proxies (methods that
+cannot be overriden in a more specific prototype within the composite
+object).
+
+<p> 'Perfect' encapsulation: no state whatsoever is visible between
+prototypes.  Message sends are the only form of interaction between
+prototypes.
+
+</body>
+</html>
+<!--
+Local Variables:
+buffer-file-coding-system: iso-latin-1
+End:
+-->

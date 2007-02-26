@@ -1,0 +1,785 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">	<!-- -*- html -*- -->
+<html>
+<head>
+<title>Coke programming guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="keywords" content="pepsi">
+<meta name="description" content="Coke programming guide">
+</head>
+<body>
+
+<center>
+<h1>Coke programming guide</h1>
+$Id: coke.html.in 545 2006-11-06 18:04:41Z piumarta $
+<br>
+corresponds to <tt>examples/jolt</tt> in the idst-5.4 release
+</center>
+
+<br>
+<br>
+
+<b>Contents:</b><br>
+<blockquote>
+<!--toc-->
+</blockquote>
+
+<h2>Introduction</h2>
+
+Jolt is a cardboard cut-out of a Coke: a higher-order, functional
+abstract syntax processor and assembler.  It is included in the
+idst5.4 distribution in the '<tt>examples/jolt</tt>' directory.  The
+main difference between Jolt and Coke is in the back-end: Coke's
+back-end is written in Pepsi/Coke whereas Jolt avoids the problem by
+using the VPU as a portable back-end.
+
+
+<h2>Compiling and installing</h2>
+
+Type <blockquote><pre>make</pre></blockquote> in
+the <tt>examples/jolt</tt> directory of the idst release.  If you want
+to exercise it, type <blockquote><pre>make run</pre></blockquote>
+or run <blockquote><pre>./main</pre></blockquote>
+for an interactive prompt.
+
+<h2>Syntax</h2>
+
+Coke programs are constructed from a small number of syntactic
+elements: constants (numbers, strings), identifiers (for variables and
+user-defined parse node rules), strings (arrays of characters), and
+lists (representing parse tree nodes and their children).
+
+<h3>Numbers</h3>
+
+Integers consist of an optional sign followed by one or more digits.
+Only decimal integers are supported.
+
+<p> Floating-point numbers consist of an optional sign, one or more
+digits, a decimal point, zero or more digits, and an optional exponent
+consisting of a single letter '<tt>e</tt>' and an integer.  Only
+decimal floating-point numbers are supported.
+  
+  <blockquote>
+    Note: Jolt does not currently support floating-point numbers.
+  </blockquote>
+
+<h3>Strings</h3>
+
+Strings begin with a double-quote character '<tt>&quot;</tt>' followed
+by zero or more characters and end with a double-quote character.  The
+initial and final double-quote characters delimit the string but are
+not included in its contents.  Backslash characters introduce 'escape
+sequences' within a string, as follows:
+
+  <blockquote>
+    <table>
+	<tr><td><tt>\a</tt></td><td>'bel' (ASCII code 7)</td></tr>
+	<tr><td><tt>\b</tt></td><td>backspace (ASCII code 8)</td></tr>
+	<tr><td><tt>\e</tt></td><td>escape (ASCII code 27)</td></tr>
+	<tr><td><tt>\f</tt></td><td>form feed (ASCII code 12)</td></tr>
+	<tr><td><tt>\n</tt></td><td>newline (ASCII code 10)</td></tr>
+	<tr><td><tt>\r</tt></td><td>carriage return (ASCII code 13)</td></tr>
+	<tr><td><tt>\t</tt></td><td>horizontal tab (ASCII code 9)</td></tr>
+	<tr><td><tt>\v</tt></td><td>vertical tab (ASCII code 11)</td></tr>
+	<tr><td><tt>\nnn</tt></td><td>octal character nnn (ASCII code 0nnn)</td></tr>
+    </table>
+  </blockquote>
+
+<h3>Identifiers</h3>
+
+Identifiers consist of one or more letters, digits or characters from
+the set <tt>!#$%&*./:<=>?@\^_|~+-</tt> (where the initial character
+cannot be a digit).  Ambiguity between identifiers and numbers are
+resolved in favour of the number.
+
+<h3>Lists</h3>
+
+Lists consist of an initial opening parenthesis '<tt>(</tt>', zero or
+more syntactic elements (as described in this section), and a
+terminating closing parenthesis '<tt>)</tt>'.
+
+<h3>Comments</h3>
+
+A semicolon (appearing outside a string literal) introduces a comment.
+The semicolon and everything following it on the same line is
+discarded by the scanner and ignored.  Comments count as blank space.
+
+<h3>Artificial sweeteners</h3>
+
+Certain operators are so frequently used that they merit dedicated
+abbreviated syntax in the scanner.
+
+<!--h4>Quotation</h4-->
+
+In the following quotation-related 'syntactic sugar', <i>element</i>
+can be any syntactic element described in this section:
+
+  <blockquote>
+    <dl>
+      <dt><tt>'<i>element</i></tt></dt>
+      <dd>(single quote) is equivalent to <tt>(quote <i>element</i>)</tt></dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>`<i>element</i></tt></dt>
+      <dd>(backquote) is equivalent to <tt>(quasiquote <i>element</i>)</tt></dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>,<i>element</i></tt></dt>
+      <dd>(comma) is equivalent to <tt>(unquote <i>element</i>)</tt></dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>,@<i>element</i></tt></dt>
+      <dd>(comma followed by commercial at) is equivalent to <tt>(unquote-splicing <i>element</i>)</tt></dd>
+    </dl>
+  </blockquote>
+
+<!--h4>Message send</h4-->
+
+Interaction with (sending messages to) the objects that describe
+program structures and the compiler environment is supported by the
+following syntactic sugaring:
+
+<blockquote><tt>[ <i>receiver selector [arguments...]</i> ]</tt></blockquote>
+
+is equivalent to
+
+<blockquote><tt>( send (quote <i>selector</i> ) <i>receiver [arguments...]</i> )</tt></blockquote>
+
+(where no attempt is made to impose the correct number of arguments
+for the selector provided).  Note that the syntactic sugar quotes the
+selector for you (if you need to compute the selector, use
+the <tt>send</tt> form directly).  Note also that the <tt>send</tt>
+form and the <tt>[...]</tt> syntax have the receiver and selector in a
+different order.<p>
+
+For keyword selectors one more feature is provided:
+
+<blockquote><tt>[ <i>receiver keyword1: argument1 keyword2: argument2 ...</i> ]</tt></blockquote>
+
+is equivalent to
+
+<blockquote><tt>( send (quote <i>keyword1:keyword2:...</i> ) <i>receiver argument1 argument2 ...</i> )</tt></blockquote>
+
+with the individual <tt>keyword</tt> parts collected into a single
+selector.  This feature makes unary, binary and keyword message syntax
+entirely compatible with traditional Smalltalk syntax.
+
+<h2>Semantics</h2>
+
+Semantics are apparent in the evaluation rules of syntactic elements
+(their run-time meaning or effect) and in the treatment of compound
+forms (lists with particular structure or contents) that have special
+(or user-defined) syntactic or semantic meaning during the compilation
+process.
+
+<h3>Evaluation rules</h3>
+
+Numbers evaluate to the primitive (non-object) representation of their
+value.
+
+<p> Strings evaluate to a primitive (non-object) pointer to an array
+of characters terminated with a nul character.
+
+<p> Identifiers always represent an <i>r-value</i> (some physical
+  location associated with the identifier during the execution of the
+  code in which the identifier appears).  When they appear outside
+  special syntactic forms they evaluate to the
+  associated <i>l-value</i> -- the value stored in the physical
+  location associated with the identifier.
+
+<p> Lists (that are not special syntactic or semantic forms, as
+described below) represent the application of a function value to zero
+or more argument values.  The form
+
+  <blockquote><tt>( <i>function [arguments...]</i> )</tt></blockquote>
+
+evaluates the <i>function</i> and <i>arguments</i> (if present) in an
+<b>unspecified</b> order.  The result of evaluating <i>function</i>
+must be a function (native code) address that is called with the
+evaluated <i>arguments</i>.
+
+<h3>Intrinsic operators</h3>
+
+<p> Certain built-in operators behave like functions but are not
+evaluated as identifiers.  (Their arguments are evaluated exactly as
+descried above.)
+
+<p> The intrinsic arithmetic and relational operators are as follows:
+
+  <blockquote>
+    <table>
+      <tr><td><tt>( + <i>args...</i> )</tt></td><td>addition of two or more arguments</td></tr>
+      <tr><td><tt>( - <i>arg</i> )</tt></td><td>negation of a single argument</td></tr>
+      <tr><td><tt>( - <i>args...</i> )</tt></td><td>subtraction of two or more arguments</td></tr>
+      <tr><td><tt>( * <i>args...</i> )</tt></td><td>multiplication of two or more arguments</td></tr>
+      <tr><td><tt>( / <i>args...</i> )</tt></td><td>division of two or more arguments</td></tr>
+      <tr><td><tt>( % <i>args...</i> )</tt></td><td>remainder after division of two or more arguments</td></tr>
+      <tr><td><tt>( &lt; <i>args...</i> )</tt></td><td>non-zero iff first argument less than second argument</td></tr>
+      <tr><td><tt>&nbsp;&nbsp;&lt;= &gt;= &gt;</tt></td><td>&nbsp;&nbsp;&nbsp;... idem for other (in)equalities</td></tr>
+      <tr><td><tt>( == <i>args...</i> )</tt></td><td>non-zero iff arguments identical</td></tr>
+      <tr><td><tt>( != <i>args...</i> )</tt></td><td>non-zero iff arguments not identical</td></tr>
+    </table>
+  </blockquote>
+
+<p> Pointers behave like (long) integers.  Pointer dereferencing is
+provided for the traditional machine types:
+
+  <blockquote>
+    <tt>( char@  <i>address [index]</i> )</tt><br>
+    <tt>( short@ <i>address [index]</i> )</tt><br>
+    <tt>( int@   <i>address [index]</i> )</tt><br>
+    <tt>( long@  <i>address [index]</i> )</tt></blockquote>
+
+evaluates to the integer (char, short, int or long, sized according to
+local platform conventions) stored at the given <i>address</i> in
+memory.  If the optional <i>index</i> is present, it is first scaled
+by the size of the addressed value (typically by 1, 2, 4 or 8) and
+then added to the base <i>address</i> to yield the effective address
+for the operation.  The related forms
+
+  <blockquote>
+    <tt>( set-char@  <i>address [index] value</i> )</tt><br>
+    <tt>( set-short@ <i>address [index] value</i> )</tt><br>
+    <tt>( set-int@   <i>address [index] value</i> )</tt><br>
+    <tt>( set-long@  <i>address [index] value</i> )</tt></blockquote>
+
+write <i>value</i> into a location whose effective address is
+calculated as just described.  (These 'setter' forms need not be
+written explicitly; see the <tt>set</tt> form described below.)  The
+form as a whole yields <i>value</i> as its result.
+
+<h3>Special forms</h3>
+
+Special forms are list structures that disobey the usual evaluation
+rules for lists, typically by not evaluating (or by evaluating
+unusually) one or more of their elements.
+
+  <blockquote>
+    <dl>
+      <dt><tt>( and <i>args...</i> )</tt></dt>
+      <dd>evaluates each of the <i>args</i> from left to right until
+	one of them yields zero; <i>args</i> to the right of the
+	first zero value are not evaluated.  The result of the
+	overall form is non-zero iff all <i>args</i> yield
+	non-zero.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( or <i>args...</i> )</tt></dt>
+      <dd>evaluates each of the <i>args</i> from left to right until
+	one of them yields non-zero; <i>args</i> to the right of the
+	first non-zero value are not evaluated.  The result of the
+	overall form is zero iff all <i>args</i> yield
+	zero.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( if <i>condition consequent [alternate]</i> )</tt></dt>
+      <dd>evaluates the <i>condition</i> and then either
+	the <i>consequent</i> (if the <i>condition</i> was non-zero)
+	or the <i>alternate</i> (if present).  The result of the
+	overall form is the result of whichever of <i>consquent</i>
+	and <i>alternate</i> is evaluated.  If <i>alternate</i> is
+	not present and <i>condition</i> is zero then the overall
+	result is zero.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( while <i>condition [args...]</i> )</tt></dt>
+      <dd>while the <i>condition</i> evaluates to non-zero, all
+	the <i>args</i> are evaluated in order, left to right.  This
+	process continues until <i>condition</i> evaluates to zero,
+	causing the overall form to yield zero.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( let ( <i>[bindings...]</i> ) <i>[args...]</i> )</tt></dt>
+      <dd>evaluates each of the <i>args</i> in order, left to right,
+	in an environment augmented by the result of evaluating
+	the <i>bindings</i>.  Each <i>binding</i> has the form
+	<blockquote><tt>( <i>identifier</i> <i>value</i> )</tt></blockquote>
+	where <i>value</i> is evaluated according to the usual rules
+	before being bound to <i>identifier</i> during the evaluation
+	of the <i>args</i>.  The identifiers are added to the
+	environment before evaluating and binding their values (which
+	is a bug and will be fixed sometime in the near future).  The
+	overall result is the value of the last of the <i>args</i>; if
+	no <i>args</i> are present then the overall value is
+	zero.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( set <i>identifier value</i> )</tt></dt>
+      <dd>evaluates <i>value</i> and then assigns it to the location
+      associated with the r-value <i>identifier</i>.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( set ( <i>identifier args...</i> ) <i>value</i> )</tt></dt>
+      <dd>does not cause any evaluation.  It simply rewrites itself in
+      the form
+	<blockquote><tt>( set-<i>identifier</i> <i>args... value</i> )</tt></blockquote>
+	and re-evaluates the resulting form.  This permits any field or slot 'getter'
+	to be converted into a corresponding 'setter' by enclosing the getter expression
+	in a <tt>set</tt> form.  For example, the expression
+	<blockquote><tt>( set ( long@ address ) 42 )</tt></blockquote>
+	is rewritten as
+	<blockquote><tt>( set-long@ address 42 )</tt></blockquote> by
+	the compiler and then immediately re-evaluated to effect the assignment.
+      </dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( lambda ( <i>[formal...]</i> ) <i>[expr...]</i> )</tt></dt>
+      <dd>evaluates to the address of a function accepting zero or
+	more <i>formal</i> arguments, where each <i>formal</i> must be
+	an identifier.
+	<p>When applied, the function value of a <tt>lambda</tt>
+	  expression evaluates each of its <i>expr</i>s in order, from
+	  left to right, in an environment in which each <i>formal</i>
+	  names a variable bound to a corresponding actual argument
+	  supplied in the function application.  The value of the applied
+	  function is the value of the final <i>expr</i>; if
+	  no <i>expr</i> is present then the function returns zero.
+	<p>Note: The evaluation of a <tt>lambda</tt> yields a
+	  function that can be applied; the <i>expr</i>s are <b>not</b>
+	  evaluated until the function result of <tt>lambda</tt> is
+	  applied to zero or more actual arguments as explained for the
+	  evaluation of lists above.  A given function value can be
+	  applied any number of times and obeys the local platform's C
+	  ABI conventions; it can therefore be passed as a callback
+	  'function pointer' to statically-compiled library and OS
+	  routines.</dd>
+      <dt><tt>( return <i>value</i> )</tt></dt>
+      <dd>appearing in the body <tt>lambda</tt> function
+	evaluates <i>value</i> and then immediately returns control to
+	the function's caller yielding <i>value</i> as the result of the
+	function application.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( define <i>identifier value</i> )</tt></dt>
+      <dd>evaluates <i>value</i>, creates a variable binding
+	for <i>identifier</i> in the current scope, and assigns the
+	value to the variable.  If the form appears as a top-level
+	expression then the binding is created in the current global
+	environment.  If the form appears within a <tt>let</tt>
+	or <tt>lambda</tt> expression then the binding is created as a
+	local (automatic) variable within that expression.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( syntax <i>identifier function</i> )</tt></dt>
+      <dd>is similar to <tt>define</tt> except that
+	the <i>function</i> value must evaluate to an applicable
+	function address.  The <i>identifier</i> names a new abstract
+	syntax tree node type with the <i>function</i> providing the
+	compilation rules for any node of the newly-created type.
+	(The scoping rules for the binding are identical to those
+	of <tt>define</tt>).  See the section below
+	on <a href="#syntactix">abstract syntax definitions</a> for
+	further explanation of the <i>function</i> argument.</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( quote <i>element</i> )</tt></dt>
+      <dd>evaluates to an object corresponding to the compiler's
+	internal representation for <i>element</i>.  (This object can be
+	incorporated into abstract syntax trees passed to the compiler
+	for evaluation and compilation.)</dd>
+      <dt>&nbsp;</dt>
+      <dt><tt>( send <i>message receiver [args...]</i> )</tt></dt>
+      <dd>evaluates <i>message</i>, <i>receiver</i> and <i>args</i>
+	(if present).  The <i>message</i> must evaluate to an
+	identifier and <i>receiver</i> to a compiler object.  The
+	<i>message</i> identifier is then sent as a message to
+	the <i>receiver</i> object along with any <i>args</i>
+	supplied.  The overall value of the form is the (object)
+	answered by the message send.</dd>
+    </dl>
+  </blockquote>
+
+<a name="primitix"><h2>Primitives</h2>
+
+Primitives appear as applicable function addresses bound in the
+top-level (global) environment.  Only one primitive is provided:
+
+<blockquote><tt>( _dlsym <i>handle symbol</i> )</tt></blockquote>
+
+evaluates <i>symbol</i> to yield a string and <i>handle</i> to yield an
+integer representing a library or process namespace.  The primitive
+returns the address of the code or data location associated with the
+symbol in the namespace.
+
+<p> Which namespaces are searched depends on the handle parameter.
+If <i>handle</i> is zero then every namespace associated with the
+process and its dynamic libraries is searched in the order they were
+loaded.  If <i>handle</i> is associated with a library opened with the
+library function <tt>dlopen</tt> then only that library (and any
+libraries it depends on) are searched for the <i>symbol</i>.
+
+<p> The <tt>_dlsym</tt> primitive returns zero if <i>symbol</i> cannot
+be found, and sets an error condition which may be queried with the
+<tt>dlerror</tt> library function.
+
+<blockquote>Note: the library functions <tt>dlopen</tt>
+and <tt>dlerror</tt> must be imported explicitly.  For example:
+<blockquote><pre>(define _dlopen  (_dlsym 0 "dlopen"))
+(define _dlerror (_dlsym 0 "dlerror"))
+(define printf   (_dlsym 0 "printf"))
+(define exit     (_dlsym 0 "exit"))
+
+(syntax begin
+  (lambda (form)
+    `(let () ,@[form copyFrom: '1])))
+
+(define dlopen
+  (lambda (name)
+    (let ((handle (_dlopen name 0)))
+      (if handle
+          handle
+          (begin
+            (printf "Error: dlopen: %s\n" (dlerror))
+            (exit 1))))))</pre></blockquote></blockquote>
+
+
+<a name="syntactix"><h2>Abstract syntax definitions</h2>
+
+Abstract syntax tree node types defined with the <tt>syntax</tt> form
+cause their associated function to be invoked whenever the compiler
+encounters the corresponding node type during compilation.  The
+function is passed two arguments: the abstract syntax tree <i>node</i>
+that is currently being compiled (necessarily a list beginning with a
+symbol corresponding to the node type name) and the compiler (an
+object) that is compiling it.  A syntax definition therefore typically
+has the following form:
+
+<blockquote><pre>(syntax <i>type</i> (lambda (node compiler) <i>action...</i>))</pre></blockquote>
+
+where <i>type</i> is the name of the defined node type
+and <i>action...</i> are statements/expressions controlling the
+compilation of the node.
+
+<p> The <i>actions</i> are responsible for compiling the node.  Three
+  mechanisms are available to the actions:
+  <ul>
+    <li> They can return an object (or more usually an object
+      structure).  This object is recompiled in place of the original
+      node.  For example:
+      <blockquote><pre>(syntax begin
+  (lambda (node compiler)
+    `(let () ,@[node copyFrom: '1])))</pre></blockquote>
+      defines a <tt>begin</tt> node type providing 'compound expressions'
+      that evaluate several expressions in order and yield the value of
+      their final expression.  The node is rewritten as a <tt>let</tt>
+      and returned to the compiler for re-evaluation.
+      <p> The node is sent <tt>copyFrom:</tt> to extract all but its
+      first element (removing the <tt>begin</tt> from the start of the
+      node) and the <tt>,@</tt> splices the result into a
+      quasiquoted <tt>let</tt> expression.  The argument
+      to <tt>copyFrom:</tt> must be an object (not a primitive value)
+      hence the quoted integer.<p>
+    </li>
+    <li> They can ask any part of the node's substructure to compile
+      itself normally, by sending it the message
+      <blockquote><pre>[<i>anObject</i> compile: compiler]</pre></blockquote>
+      (where <tt>compiler</tt> is the second argument passed to the
+      syntax function).<p>
+    </li>
+    <li> They can emit low-level machine instructions via the
+      compiler's back-end.  The interfaces to the back-ends are
+      described in the next section.
+    </li>
+  </ul>
+
+Any number of the above mechanisms can be combined to achieve the
+desired implementation.  If the function completely generates the code
+required for the ndoe it can return zero to inform the compiler that
+no further compilation is needed for the node.  In this case the
+function <b>must</b> generate (directly or indirectly)
+precisely <b>one</b> value for the node.
+
+<h3>Compiler back-end interfaces</h3>
+
+Several back-end interfaces are available and/or planned.  The Jolt
+prototype uses a VPU-like interface that generates code for PowerPC
+and Intel processors.  The VPU instance generating code for the
+compiler passed to a syntax function can be retrieved by sending
+the <tt>compiler</tt> argument the message <tt>vpu</tt>:
+
+<blockquote><pre>(syntax foo
+  (lambda (node compiler)
+    (let ((vpu [compiler vpu]))
+      ...)))</pre></blockquote>
+
+The vpu implements an abstract machine supporting a superset of C
+semantics.  Three stacks are used.
+<ul>
+  <li> An <b>arithmetic stack</b> holds intermediate results of
+    computations and arguments for function calls.  All operators pop
+    their argument(s) from this stack and push their result onto this
+    stack.
+  <li> A completely seperate <b>variable stack</b> holds the state of
+    local variables.  Local variables are created and destroyed on the
+    top of this stack, and are referred to by integer index relative
+    to the topmost variable.
+  <li> Similarly, a completely seperate <b>label stack</b> holds local
+    labels that can be used as targets for branch instructions.
+    Labels are created and destroyed on the top of this stack, and are
+    referred to by integer index relative to the topmost label.
+</ul>
+
+The vpu presents the following interface:
+
+<blockquote>
+<b>Management</b>
+<dl>
+  <dt><tt>[ vpu new ]</tt></dt>
+  <dd>creates a new instance of a vpu.  (This is normally not of
+    interest, since the vpu passed to the syntax function indirectly
+    through the compiler argument will be the correct instance to use
+    for code generation.)<p>
+  </dd>
+
+  <dt><tt>[ vpu iTmp: <i>numTemps</i> ]</tt></dt>
+  <dt><tt>[ vpu iTmp ]</tt></dt>
+  <dd>pushes <i>numTemps</i> integer-valued temporary variables onto
+    the variable stack.  In the second form, the
+    missing <i>numTemps</i> is assumed to be one.<p>
+  </dd>
+
+  <dt><tt>[ vpu dropTmp: <i>numTemps</i> ]</tt></dt>
+  <dd>removes the topmost <i>numTemps</i> variables from the variable
+    stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu begin: <i>numLabels</i> ]</tt></dt>
+  <dd>pushes <i>numLabels</i> local labels onto the label stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu end: <i>numLabels</i> ]</tt></dt>
+  <dd>removes the topmost <i>numLabels</i> local labels from the label
+    stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu define: <i>n</i> ]</tt></dt>
+  <dd>defines the <i>n</i>th local label (relative to the topmost) in
+    the label stack to refer to the current 'program counter'
+    location.  A local label must not be defined more than once.  A
+    local label can be left undefined provided it is never used as the
+    target of a branch instruction.<p>
+  </dd>
+</dl>
+<b>Function prologue and epilogue</b>
+<dl>
+  <dt><tt>[ vpu iEnter ]</tt></dt>
+  <dd>declares the prologue for an integer-valued function.  This must
+    be the first (non label defining) instruction in a function.<p>
+  </dd>
+
+  <dt><tt>[ vpu iArg: <i>numArgs</i> ]</tt></dt>
+  <dt><tt>[ vpu iArg ]</tt></dt>
+  <dd>declares <i>numArgs</i> integer-valued arguments.  Arguments
+  must be declared immediately after the <tt>iEnter</tt> prologue and
+  before any other instructions in the function body.  In the second
+  form, the missing <i>numArgs</i> is assumed to be one.<p>
+  </dd>
+
+  <dt><tt>[ vpu ret ]</tt></dt>
+  <dd>returns the topmost item on the stack as the result of the
+    function being compiled.  A <tt>ret</tt> always pops one item from
+    the stack (the value returned), can occur any number of times in
+    the body of a function, but must also be the last instruction in
+    the function.<p>
+  </dd>
+</dl>
+<b>Data movement</b>
+<dl>
+  <dt><tt>[ vpu ldInt: <i>integer</i> ]</tt></dt>
+  <dd>pushes <i>integer</i> (which must be an integer object value)
+  onto the arithmetic stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu ldPtr: <i>object</i> ]</tt></dt>
+  <dd>pushes the address of the given <i>object</i> onto the
+  arithmetic stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu ldArg: <i>n</i> ]</tt></dt>
+  <dd>pushes the <i>n</i>th argument of the function being compiled
+  onto the arithmetic stack.  Arguments are numbered from zero.<p>
+  </dd>
+
+  <dt><tt>[ vpu stArg: <i>n</i> ]</tt></dt>
+  <dd>stores the topmost item in the arithmetic stack into
+  the <i>n</i>th argument of the function being compiled.  The item is
+  not removed from the stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu ldTmp: <i>n</i> ]</tt></dt>
+  <dd>pushes the contents of the <i>n</i>th local variable (relative
+  to the top of the variable stack) onto the arithmetic stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu stTmp: <i>n</i> ]</tt></dt>
+  <dd>stores the topmost item in the arithmetic stack into
+  the <i>n</i>th local variable.  The item is not removed from the
+  stack.<p>
+  </dd>
+
+  <dt><tt>[ vpu dup: <i>n</i> ]</tt></dt>
+  <dt><tt>[ vpu dup ]</tt></dt>
+  <dd>pushes a copy of the <i>n</i>th item in the arithmetic stack
+  (relative to the top of the stack before the value is pushed) onto
+  the top of the arithmetic stack.  In the second form, <i>n</i> is
+  implicitly zero (i.e., the topmost item in the stack is
+  duplicated).<p>
+  </dd>
+
+  <dt><tt>[ vpu drop: <i>n</i> ]</tt></dt>
+  <dt><tt>[ vpu drop ]</tt></dt>
+  <dd>pops the topmost <i>n</i> items off the arithmetic stack.  In
+  the second form, <i>n</i> is implicitly one.<p>
+  </dd>
+</dl>
+<b>Arithmetic and relational operators</b>
+<dl>
+  <dt><tt>[ vpu add ]</tt></dt>
+  <dt><tt>[ vpu sub ]</tt></dt>
+  <dt><tt>[ vpu mul ]</tt></dt>
+  <dt><tt>[ vpu div ]</tt></dt>
+  <dt><tt>[ vpu mod ]</tt></dt>
+  <dd>replaces the topmost two items on the arithmetic stack with
+    their sum, difference, product, quotient or remainder
+    (respectively).<p>
+  </dd>
+
+  <dt><tt>[ vpu lt ]</tt></dt>
+  <dt><tt>[ vpu le ]</tt></dt>
+  <dt><tt>[ vpu eq ]</tt></dt>
+  <dt><tt>[ vpu ne ]</tt></dt>
+  <dt><tt>[ vpu ge ]</tt></dt>
+  <dt><tt>[ vpu gt ]</tt></dt>
+  <dd>replaces the topmost two items on the arithmetic stack with zero
+    or one according to whether the topmost item is less than, less or
+    equal to, equal to, not equal to, greater or equal to, or greater
+    than (respectively) the second item.<p>
+  </dd>
+</dl>
+<b>Memory access</b>
+<dl>
+  <dt><tt>[ vpu rdb ]</tt></dt>
+  <dt><tt>[ vpu rdh ]</tt></dt>
+  <dt><tt>[ vpu rdw ]</tt></dt>
+  <dd>replaces the topmost item on the arithmetic stack with the byte,
+  half word or word (respectively) at that address in memory.<p>
+  </dd>
+  <dt><tt>[ vpu wrb ]</tt></dt>
+  <dt><tt>[ vpu wrh ]</tt></dt>
+  <dt><tt>[ vpu wrw ]</tt></dt>
+  <dd>writes the second item on the arithmetic stack into the memory
+    byte, half word or word (respectively) addressed by the topmost item
+    in the stack.  The topmost item is then popped from the arithmetic
+    stack.<p>
+  </dd>
+</dl>
+<b>Control flow</b>
+<dl>
+  <dt><tt>[ vpu br: <i>n</i> ]</tt></dt>
+  <dd>transfers program control to the instruction immediately
+    following the point of definition of the <i>n</i>th local label
+    (relative to the top of the local label stack).<p>
+  </dd>
+  <dt><tt>[ vpu bf: <i>n</i> ]</tt></dt>
+  <dt><tt>[ vpu bt: <i>n</i> ]</tt></dt>
+  <dd>pops the topmost item off the arithmetic stack and conditionally
+    transfers program control to the instruction immediately following
+    the point of definition of the <i>n</i>th local label (relative to
+    the top of the local label stack).  The <tt>bf</tt> instruction
+    transfers control to the label's address only if the topmost item
+    popped from the stack was zero.  The <tt>bt</tt> instruction
+    transfers control to the label's address only if the topmost item
+    popped from the stack was non-zero.<p>
+  </dd>
+  <dt><tt>[ vpu iCall: <i>n</i> label: <i>label</i>]</tt></dt>
+  <dt><tt>[ vpu iCalli: <i>n</i> ]</tt></dt>
+  <dd>pops <i>n</i> actual arguments from the arithmetic stack and
+    calls an integer-valued function, leaving the result of the
+    function call on the top of the arithmetic stack.  In the first
+    form the address to call is retrieved from a global label (see the
+    section on <a href="#labelix">global labels</a> below).  In the
+    second form the address to call is popped off the arithmetic stack
+    before the arguments (i.e., the arguments are pushed followed by
+    the address to call in preparation for an <tt>iCalli</tt>
+    instruction).  Arguments are pushed in 'reverse' order, starting
+    with the last and working towards the first.<p>
+  </dd>
+</dl>
+<b>Compilation and miscellaneous information</b>
+<dl>
+  <dt><tt>[ vpu compile ]</tt></dt>
+  <dd>compiles an entire function, as described by the sequence of
+    message sends previously sent to the receiver, into native code.
+    This message must never be sent more than once to a given instance
+    of the vpu.<p>
+  </dd>
+
+  <dt><tt>[ vpu codeSize ]</tt></dt>
+  <dd>answers an integer object representing the total number of
+    native bytes compiled by any vpu in the current process since the
+    process began executing.<p>
+  </dd>
+
+  <dt><tt>[ vpu versionString ]</tt></dt>
+  <dd>answers a string object containing a human-readable version
+    string for the vpu library linked into the running process.<p>
+  </dd>
+</dl>
+</blockquote>
+
+<a name="labelix"><h4>Global labels</h4>
+
+When sent a <tt>compile</tt> message the vpu answers with the address
+of the first instruction in the native code implementation of its
+function.  However it is much more convenient to define a global label
+associated with the entry point for the function:
+<ul>
+  <li>global labels implement a family of <tt>value</tt> methods that
+    call their associated native code address with zero or more
+    arguments; and
+  </li>
+  <li>global labels can be passed as the <i>label</i> argument in
+    an <tt>iCall:label:</tt> instruction to provide the destination
+    address for the function call; and
+  </li>
+  <li>global labels can be defined by looking up an external native
+    code address in the running process, giving access to arbitray
+    library and operating system functions.
+  </li>
+</ul>
+
+The compiler provides the object type <tt>VPULabel</tt> for this
+purpose.<p>
+
+<blockquote>
+<dl>
+  <dt><tt>[ VPULabel new ]</tt></dt>
+  <dd>answers a new, uninitialised global label.<p>
+  </dd>
+  <dt><tt>[ vpuLabel lookup: <i>symbol</i>]</tt></dt>
+  <dd>defines the receiver as the address associated with the code or
+    data object named by <i>symbol</i> (a string object) looked up in
+    the process global namespace via <tt>_dlsym</tt> (see the section
+    on <a href="#primitix">primitives</a>).<p>
+  </dd>
+  <dt><tt>[ vpu defineLabel: <i>label</i>]</tt></dt>
+  <dd>defines the given global <i>label</i> to refer to the address of
+    the next instruction generated in the receiver.<p>
+  </dd>
+</dl>
+</blockquote>
+
+(See also the <tt>iCall:label:</tt> instruction described earlier.)
+Once defined, the function address associated with a global label can
+be retrieved or invoked as follows:
+
+<blockquote>
+<dl>
+  <dt><tt>[ vpuLabel _labelAddress ]</tt></dt>
+  <dd>answers a primitive pointer equal to the defined address of the
+    receiver.<p>
+  </dd>
+  <dt><tt>[ vpuLabel value ]</tt></dt>
+  <dd>answers the result of calling the defined address of the
+    receiver as a function with no arguments.<p>
+  </dd>
+  <dt><tt>[ vpuLabel value: <i>argument</i> ]</tt></dt>
+  <dd>answers the result of calling the defined address of the
+    receiver as a function with a single <i>argument</i>.<p>
+  </dd>
+</dl>
+</blockquote>
+
+</body>
+</html>
+<!--
+Local Variables:
+buffer-file-coding-system: iso-latin-1
+End:
+-->

@@ -1,0 +1,1414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">	<!-- -*- html -*- -->
+<html>
+<head>
+<title>Pepsi -- not quite The Real Thing</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="keywords" content="pepsi">
+<meta name="description" content="Pepsi -- not quite The Real Thing.">
+</head>
+<body>
+
+<center>
+<h1>Pepsi -- not quite The Real Thing</h1>
+$Id: pepsi.html.in 330 2006-07-22 02:47:43Z piumarta $
+<br>
+corresponds to the idst-5.4 release
+</center>
+
+<br>
+<br>
+
+<b>Contents:</b><br>
+<blockquote>
+<!--toc-->
+</blockquote>
+
+
+<a name="introductix"><h2>Introduction</h2>
+
+This is a cardboard cut-out of a prototype-based language similar to
+Smalltalk.  It is currently a standalone language, code-named 'Pepsi'
+(in deference to The Real Thing, code-named 'Coke', a dynamic
+execution engine on which a replacement for Pepsi will be built).  It
+is intended:
+
+<ul>
+<li> as a malleable space in which to explore possible syntax and
+  semantics for a real Smalltalk-like end-user programming platform to
+  be built in 'Coke'; and
+
+<li> as a space sufficiently simple to allow experimentation with
+  modularity and security all the way down (subsuming
+  the <i>entire</i> implementation) to the metal.
+</ul>
+
+Hopefully it will also serve (at some time or another) to demonstrate
+that:
+
+<ul>
+<li> a late-bound dynamic language can be statically-compiled and
+  implemented in a manner that is 100% compatible with the platform
+  ABI and seamlessly interoperable with it; and (having written a
+  back-end generating assembler source directly) that
+
+<li> a pure object-oriented language can be self-hosting without
+  resorting to generating a single line of horrid C code; and (having
+  written a back-end generating assembler binary directly) that
+
+<li> a dynamically-compiled object-oriented language can be trivially
+  and completely self-hosting by compiling parts of itself statically; that
+
+<li> there is no reason to consider statically-compiled code (from any
+  source) as being any less malleable at runtime than is
+  dynamically-compiled code; and that
+
+<li> the choice of whether to make a particular language/system
+  feature/component dynamic or (effectively) static should be nothing
+  more than a function of personal style, with no implications for
+  malleability or performance.
+</ul>
+
+But mostly I am fed up of battling with C++ (and its ridiculous
+over-educated type system) and want a platform in which 'Coke'
+development can continue unhindered by type 'safety'.  (As of the
+instant the 'Pepsi' compiler successfully compiled itself, I hope
+never to write another line of C++ in my life.)
+
+<p> It would be nice if it ran fast too.  The last time I benchmarked
+it I got about nine times Squeak speed, but this is likely to go down
+(with increased generality and dynamism in the lowest levels of the
+implementation) and up (with the sophistication of the
+implementation), and over the long term things could go either way.
+(The GC will probably have measurable impact on the performance of
+'real'/long-running systems and applications too.  Without profiling
+it I'm not sure how well/badly the current conservative GC is holding
+up.)
+
+
+<a name="compilix"><h2>Compiling and running programs</h2>
+
+The fundamental object and messaging model is called 'Id'.  The Id
+compiler is called '<tt>idc</tt>'.  The hard-wired language of Pepsi
+looks quite like Smalltalk and so the suffix '<tt>.st</tt>' was
+hijacked for source files.  The compiler compiles the files named on
+the command line to create an executable whose name is derived from
+the input files (by removing '<tt>.st</tt>' suffixes).  The command
+
+<blockquote><pre>
+idc foo.st
+</pre></blockquote>
+
+compiles the file <tt>foo.st</tt> to create an executable file
+called <tt>foo</tt>.  The <tt>-o</tt> option overrides the default
+name of the output file, if required.
+
+<p> The search path for imported and included files can be extended
+with the <tt>-I</tt> option (which can appear any number of times).
+The command
+
+<blockquote><pre>
+idc -I../st80 -I.../MyClassLibrary -o bar foo.st
+</pre></blockquote>
+
+builds the program <tt>bar</tt> from the source <tt>foo.st</tt>,
+searching </tt>../st80</tt> and <tt>.../MyClassLibrary</tt> for
+included files.
+
+<h3>Object files and shared libraries</h3>
+
+The default behaviour is to compile a single source file into an
+object file and then link it into an executable program.  The
+<tt>-c</tt> option tells the compiler not to link the executable
+program.  The command
+
+<blockquote><pre>
+idc -c bar.st
+</pre></blockquote>
+
+compiles <tt>bar.st</tt> into the object file <tt>bar.o</tt>.  Any
+number of <tt>.o</tt> files can be linked when compiling an
+executable program.  The command
+
+<blockquote><pre>
+idc foo.st bar.o baz.o
+</pre></blockquote>
+
+compiles <tt>foo.st</tt> into the executable <tt>foo</tt> combining it
+with previously compiled object files <tt>bar.o</tt>
+and <tt>baz.o</tt>.  (The <tt>examples/static</tt> directory
+contains an example of linking multiple object files into a monolithic
+program.)
+
+<p> The <tt>-s</tt> option tells the compiler to generate a shared
+library from the source file.  (The resulting library can be loaded
+into an already-running program.)  The command
+
+<blockquote><pre>
+idc -s bar.st
+</pre></blockquote>
+
+compiles </tt>bar.st</tt> into the object file <tt>bar.so</tt>
+that can be loaded into a running program with the <tt>import:</tt>
+directive.  (The directory <tt>examples/dynamic</tt> contains an
+example of importing shared libraries into a running program.)
+
+<h3>Compiling the compiler</h3>
+
+The compiler source directory contains several directories, as follows:
+
+<blockquote>
+<table>
+<tr><td><tt>boot</tt></td><td>A version of the idc compiler precompiled to C source files, used for bootstrapping the idc compiler.</td></tr>
+<tr><td><tt>doc</tt></td><td>Documentation (including the file you are reading).</td></tr>
+<tr><td><tt>examples&nbsp;&nbsp;</tt></td><td>A collection of small and large example programs.</td></tr>
+<tr><td><tt>gcX.Y</tt></td><td>The conservative garbage collector used by the Id runtime.</td></tr>
+<tr><td><tt>idc</tt></td><td>The source for the idc compiler itself (written entirely in idst).</td></tr>
+<tr><td><tt>lib</tt></td><td>The source for the Id runtime library.</td></tr>
+<tr><td><tt>st80</tt></td><td>A Smalltalk-like 'class' library.</td></tr>
+</table>
+</blockquote>
+
+To build the compiler, type
+<blockquote>
+make
+</blockquote>
+in the top-level directory (the one containing the directories listed
+above).  It should build the GC, runtime library, and then the
+compiler itself.  To install the compiler and runtime libraries,
+become the superuser ('root') and type
+<blockquote>
+make install
+</blockquote>
+
+<p> If all that sounds too complicated, ask me to make you a binary
+distribution.
+
+<p> The compiler has been tested (and is known to work) on:
+<ul>
+<li> Macintosh, OS X 10.4.7.
+<li> Debian GNU/Linux, kernel 2.4.20.
+</ul>
+
+
+<a name="syntactix"><h2>Syntax</h2>
+
+Most of the syntax is the same as Smallalk-80.  Comments are contained
+within double quotes:
+
+<blockquote><pre>
+"this is ignored"
+</pre></blockquote>
+
+The few minor additions to Smalltalk-80 syntax are to accomodate
+compilation from plain text files, variadic blocks (and methods), an
+expanded range of literal types, and direct access to non-printing
+characters in Character and String literals.
+
+<p> Programs are translated one source file (with zero or more
+additional source files being imported) at a time.  To the compiler,
+this body of code is called a <i>translation unit</i>.  The compiler
+always processes one complete translation unit at a time, and
+currently (this is a temporary limitation) a translation unit must
+contain an entire program (all object and method definitions required,
+with no external or unresolved references).
+
+<p> A translation unit consists of a sequence of <i>definitions</i>
+and <i>imperatives</i>.  Definitions either either create a new
+prototype or add a method to an existing prototype.  Imperatives are
+sequences of code that are executed in-order when the program is run.
+
+
+<h3>Imperatives</h3>
+
+A literal block can appear at the top-level (outside any other kind of
+definition):
+
+<blockquote>
+[ <i>statements</i> ]
+</blockquote>
+
+The code within the block is executed at the moment 'control'
+nominally reaches the block within the source file at runtime.  This
+is handy for initialising complex data structures (think of it as a
+means to obtain behaviour similar to class initialisation methods) and
+also for starting the whole program in motion at the end of the source
+(something akin to a 'main' method, if you like).
+
+<p> Top-level imperatives can also take the form
+
+<blockquote>
+{ <i>directive</i> <i>optionalArguments...</i> }
+</blockquote>
+
+to direct the compiler to perform some unusual action.  The most
+commonly used <i>directive</i> is <tt>import:</tt>.  The imperative
+
+<blockquote>
+{ import: <i>name</i> }
+</blockquote>
+
+asks the compiler to search for a file called '<i>name</i>.st' and
+make the global declarations within it available to the importing
+program.  The complete list of supported <i>directive</i>s is given in
+the appendix <a href="#directix">Compiler directives</a>.
+
+<h3>Prototype definitions</h3>
+
+Two top-level forms provide for the creation of new prototypes:
+
+<blockquote>
+<i>name</i> ( <i>listOfSlots</i> )
+</blockquote>
+
+creates a new 'root' prototype (it has no parent, or 'delegate') and
+binds it to <i>name</i>.  The prototype contains zero or more named
+slots, similar to instance variables.  The definition could be read
+as: "<i>name</i> <b>is</b> <i>listOfSlots</i>".
+
+<p> Such a prototype has no useful behaviour (it can't even clone
+itself to create useful application objects).  Adding a minimum of
+primitive behaviour (e.g., cloning) is the first thing you'll want to
+do to such an object.
+
+<p> The second form:
+
+<blockquote>
+<i>name</i> : <i>parent</i> ( <i>listOfSlots</i> )
+</blockquote>
+
+is similar, except the new prototype delegates to the
+named <i>parent</i> object and inherits the <i>parent</i> object's
+slots before adding its own.  Such definitions could be read as:
+"<i>name</i> <b>extends</b> <i>parent</i> with <i>listOfSlots</i>".
+
+<p> (This is every bit as bogus as a single inheritance mechanism
+being used to share state and behaviour, but I'm still trying to
+figure out how to separate delegation from the sharing of state
+without sacrificing performance.  Only allowing slots to be accessed
+by name in their defining prototype, forcing inherited slots to be
+accessed by message send, is probably the way to go.  Better still,
+making all state accesses into message sends -- especially
+assignments.)
+
+
+<h3>Translation unit variables</h3>
+
+The top-level form
+
+<blockquote>
+<i>name</i> := [ <i>expressions</i> ]
+</blockquote>
+
+creates a new variable with the given <i>name</i> and binds it to the
+value of the last <i>expression</i>.  (The <i>expressions</i> are
+separated by periods, causing all but the last to become statements.)
+
+<h3>Method definitions</h3>
+
+Methods are just 'named blocks', tied to a particular prototype only
+by permitting direct access to the state within that prototype.
+(Therein lies yet another reason to abolish direct access to state.)
+This is reflected in the syntax of the top-level form for adding
+methods (named blocks) to a prototype:
+
+<blockquote>
+<i>name</i> <i>pattern</i> [ <i>statements</i> ]
+</blockquote>
+
+where <i>name</i> identifies a prototype object (defined as described
+above), <i>pattern</i> looks (more or less) like a Smallalk-80 message
+pattern, and <i>statements</i> is a block (notice the brackets)
+providing the behaviour for the method.  The <i>pattern</i> component
+can be a unary, binary or keyword message pattern.
+
+<p> Extensions to Smalltalk's fixed-arity messages include additional
+and variadic formal arguments.  Additional formal arguments for unary
+and keyword selectors are written like block arguments and can appear
+before or after the initial opening bracket.  For example, two
+additional formal arguments could be written
+
+<blockquote>
+<i>name</i> <i>selector</i> :<i>arg1</i> :<i>arg2</i> [ <i>statements</i> ]<br>
+<i>name</i> <i>selector</i> [ :<i>arg1</i> :<i>arg2</i> | <i>statements</i> ]
+</blockquote>
+
+(where <i>selector</i> is a unary or keyword selector).  Unary or
+keyword message sends can pass additional actual arguments by
+prefixing each additional argument with a colon.  To ask the receiver
+to <tt>add</tt> two numbers:
+
+<blockquote><pre>
+Object add :x :y
+[
+  ^x + y
+]
+
+[
+  | sum |
+  sum := self add :3 :4.
+]
+</pre></blockquote>
+
+Variadic arguments can be attached to unary or keyword methods.  This
+is indicated by an ellipsis in the message pattern immediately
+following the last named argument.  The <i>pattern</i> for unary and
+keyword syntax therefore also includes:
+
+<blockquote>
+<i>name</i> <i>unarySelector</i> ... [ <i>statements</i> ]<br>
+<i>name</i> <i>keywords: arguments</i> ... [ <i>statements</i> ]<br>
+</blockquote>
+
+<p> (Simply for lack of time, there is currently no friendly syntax to
+recover the 'rest' arguments within the body of a message.  Wizards,
+however, can easily recover these arguments by writing some low-level
+magic inside a method body.)
+
+<h4>Blocks</h4>
+
+Blocks are similar to Smalltalk-80 blocks, but allow for local
+(block-level) temporaries:
+
+<blockquote>
+[ <i>statements</i> ]<br>
+[ <i>:arguments</i> | <i>statements</i> ]<br>
+[ | <i>temporaries</i> | <i>statements</i> ]<br>
+[ <i>:arguments</i> | | <i>temporaries</i> | <i>statements</i> ]<br>
+</blockquote>
+
+Both arguments and temporaries are strictly local to the block and
+will not conflict (other than in name) with similarly-named arguments
+or temporaries in lexically disjoint blocks.  The compiler currently
+disallows the shadowing of names.
+
+<p> (This means that you cannot set a method-level temporary by naming
+it as a block argument.  It also means two blocks in the same method
+that share an argument or temporary name will each refer to a
+completely different value, regardless of the common name.)
+
+<h4>Assignment</h4>
+
+The Smaltalk-80 'left arrow' assignment operator is gone.  The
+corresponding form is:
+
+<blockquote>
+<i>identifier</i> := <i>expression</i>
+</blockquote>
+
+with the ':=' operator having the lowest precedence of any operator
+(including keyword message sends) and associating from left to right.
+
+
+<h4>Message sends</h4>
+
+Are similar to Smalltalk-80: unary, binary and keyword messages have
+the same precedence as in Smalltalk-80 and cascaded messages (with the
+';' operator) work in exactly the same manner.
+
+<blockquote>
+<i>primary</i> <i>unarySelector</i><br>
+<i>unaryMessage</i> <i>binarySelector</i> <i>unaryMessage</i><br>
+<i>binaryMessage</i> <i>keywords:</i> <i>binaryMessages</i><br>
+<i>receiver</i> <i>messageSend</i> ; <i>messageSend</i><br>
+</blockquote>
+
+(Whether or not the binary selectors should be treated differently,
+introducing several levels of implicit precedence based on the
+operator name to provide the traditional arithmetic order of
+evaluation, would also be a possibility.)
+
+<p> An Extension to Smalltalk-80 syntax allows unary and keyword
+message sends to provide additional actual arguments.  (See the
+discussion above on additional and variadic formal arguments.)  The
+simplest possible change that would allow this is to drop the name
+part of a 'keyword' (but keep the colon):
+
+<blockquote>
+<i>receiver</i> <i>unarySelector</i> : <i>anonymousArgument</i><br>
+<i>receiver</i> <i>keywords:</i> <i>arguments</i> : <i>anonymousArgument</i><br>
+</blockquote>
+
+with as many ': <i>argument</i>' pairs as required.  (Anonymous
+arguments can only appear after a unary message or the arguments
+associated with a proper keyword; no further '<i>keyword:
+argument</i>' pairs are allowed after the first
+': <i>anonymousArgument</i>' that occurs in a keyword send.)
+
+<h4>Parentheses</h4>
+
+If you don't like the precedence defined by unary, binary, and keyword
+sends, put parentheses around expressions to force evaluation order.
+
+
+<h4>Literals</h4>
+
+Literals are immutable.  In other words: literals created by the
+compiler cannot be modified by the program.  This was done for two
+reaons:
+
+<ol>
+  <li> It's cleaner, making the semantics simpler to explain (no more
+    confusing behaviour when a program inadvertently modifies a literal
+    causing some method somplace to have behaviour different to that
+    implied by its source code).
+  <li> My C compiler puts literals in a read-only data section, at one
+    point causing me a certain amount of stress while debugging what was
+    ultimately correct code but containing an attempt to write into a
+    read-only location.  If all compiler-generated literals are immutable
+    then this particular platform idiosyncracy ceases to be of any concern
+    whatsoever.
+</ol>
+
+A handful of new classes (ImmutableArray, ImmutableByteArray,
+ImmutableWordArray) are present in the library to accomodate the
+above.
+
+<p> In addition to literal Arrays
+
+<blockquote>
+#( <i>elements...</i> )
+</blockquote>
+
+we also have literal WordArrays
+
+<blockquote>
+#{ <i>integers...</i> }
+</blockquote>
+
+and ByteArrays
+
+<blockquote>
+#[ <i>integers...</i> ]
+</blockquote>
+
+(where each <i>integer</i> must be between 0 and 255).  In Array
+literals, nested Array, ByteArray and WordArray literals can appear
+without the initial '#' (although one can be supplied if you like).
+
+<p> Integer literals themselves are in decimal by default, with the
+usual
+
+<blockquote>
+<i>radixInteger</i> r <i>valueInteger</i>
+</blockquote>
+
+syntax supported.  For the hackers out there, I saw no reason to avoid supporting
+
+<blockquote>
+0x<i>valueInteger</i>
+</blockquote>
+
+for hexadecimal integers too.  Digits greater than '9' in hexadecimal
+literals (in either of the above syntaxes) or in literals of any base
+greater than ten (in the 'r' syntax) can be specified using upper- or
+lower-case letters.
+
+<p> Smalltalk-80 Character literals are supported:
+
+<blockquote>
+$<i>character</i>
+</blockquote>
+
+as are non-printing Characters either by mnemonic or by explicit value
+(following the ANSI 'escape sequence' conventions):
+
+<blockquote>
+<table>
+<tr><td><i>syntax</i></td><td><i>asciiValue</i></td><td><i>ASCII designation</i></td></tr>
+<tr><td>$\a</td><td>7</td><td>bel (alert)</td></tr>
+<tr><td>$\b</td><td>8</td><td>bs (backspace)</td></tr>
+<tr><td>$\t</td><td>9</td><td>ht (horizontal tab)</td></tr>
+<tr><td>$\n</td><td>10</td><td>nl (newline)</td></tr>
+<tr><td>$\v</td><td>11</td><td>vt (vertical tab)</td></tr>
+<tr><td>$\f</td><td>12</td><td>np (new page, or form feed)</td></tr>
+<tr><td>$\r</td><td>13</td><td>cr (carriage return)</td></tr>
+<tr><td>$\e</td><td>27</td><td>esc (escape)</td></tr>
+<tr><td>$\\</td><td>92</td><td>\ (a single backslash character)</td></tr>
+</table>
+</blockquote>
+
+(Extended mnemonic names such as '$\newline' for '$\n' could easily be
+supported too.)  In the event that a non-printing character literal
+not in the above list is required, a generic octal escape is provided:
+
+<blockquote>
+$\<i>octalNumber</i>
+</blockquote>
+
+where <i>octalNumber</i> is precisely three (no more, no less) octal
+digits in the range '000' to '377' specifying the value of the
+Character.  In other words, '$\n' and '$\012' are the same Character,
+and '$\000' is the 'nul' Character (ascii value zero).
+
+<p> String literals obey much the same rules as Smalltalk-80.
+Adjacent String literals:
+
+<blockquote><pre>
+'like''this'
+</pre></blockquote>
+
+are concatenated with an intervening single quote:
+
+<blockquote><pre>
+like'this
+</pre></blockquote>
+
+However, the conventions that apply to '\' in escaping single
+Character literals also apply to characters within a String.  You
+could write a String literal that contains two lines, each terminated
+by a newline with the whole String terminated by a nul Character:
+
+<blockquote><pre>
+'like\nthis\n\000'
+</pre></blockquote>
+
+(I was very, very tempted to make consecutive String literals simply
+concatenate without the implicit intervening single quote, as in other
+languages that support juxtaposed String literals.  I may yet change
+this so that single quotes inside Strings must be escaped
+
+<blockquote><pre>
+'like\'this'
+</pre></blockquote>
+
+to bring them into line with other languages.  (Escaping the embedded
+single quote does already work just fine, but it isn't currently the
+unique means to introduce a single quote into a String -- which is a
+bug.)  If you think that's bad, just consider that it took all my self
+control to avoid making Character literals look like 'a' 'b' and 'c',
+and Strings look like "abc" -- with some necessary change to comments
+too.
+
+<blockquote><b>Note:</b> The 'character escape' rules above apply to
+Symbols too.  If you want to write the literal symbol for the
+'remainder on division' binary message, you have to say
+'<tt>#\\\\</tt>' (since the first and third backslash characters
+escape the second and fourth).  I think this is a bug (character
+escapes should only be recognised if the Symbol is created from a
+String [so '<tt>#'\\\\' == #\\</tt>' would hold]) and intend to fix it
+sometime.  In the meantime: beware!
+</blockquote>
+
+<h4>Anything else...?</h4>
+
+If you find something (either some feature in the sources that I
+wrote, or something you think should work but doesn't, that does not
+seem to be explained here) then please let me know so I can fix this
+document.
+
+
+<a name="semantix"><h2>Semantics</h2>
+
+The semantics are similar to Smalltalk-80, with three main differences:
+
+<ul>
+<li> There is no built-in distinction between classes and instances.
+  There are only objects.  If you want to make some objects behave in
+  a class-like manner, and others in an instance-like manner, that's
+  your choice.  Even the 'Smalltalk kernel' library, used by the
+  Compiler and provided for reuse in your own programs if you want,
+  gets by just fine without classes.  (Although some ideas on how to
+  separate class/instance concerns in a more traditional fashion are
+  given below.)
+
+<li> Blocks are real closures.
+
+<li> Everything with a name (with one exception) is first-class (i.e.,
+  a variable that you can modify).
+</ul>
+
+
+<h3>Blocks</h3>
+
+The restrictions placed on Blocks by Smalltalk-80 have been
+eliminated, and the (end-user) notion of BlockContext has been
+replaced by BlockClosure (in several variations according to
+optimisability).  When you write a block '[...]' in a program, what
+you create is a BlockClosure (and not a partially-crippled,
+half-initialised activation <i>context</i>, as would be the case in
+Smalltalk-80).
+
+<p> Block contexts (activated BlockClosures) have <i>strictly
+local</i> arguments and temporaries.  The value of an argument or
+temporary can never come into contact with, nor be affected in any way
+by, an enclosing lexical context.  They are quite literally
+inaccessible.  You cannot, for example, implictly assign to a method
+temporary by naming it as a block argument.
+
+<p> BlockClosures can 'close-over' local state defined in a
+lexically-enclosing scope.  In such cases, the closed-over state will
+be preserved on exit from the enclosing scope, leaving it accessible
+to future activations of blocks defined within that scope.  Each time
+the defining scope is entered, fresh copies of closed-over state are
+created.  (In other words, block closures 'see' the state associated
+with the <i>activation</i> in which they were created, rather than
+that associated with the <i>closure</i> in which they were created.
+Things like 'fixTemps' are completely unnecessary.)
+
+<p> All BlockClosures are first-class (they can be stored or passed
+upward for activation at a later time) although
+block <i>activations</i> are <i>strictly</i> LIFO, with <i>no</i>
+exceptions.  (Your hardware really, really wants things to be this
+way.)
+
+<p> (For the terminally-curious: closed-over state, corresponding to
+any variables that appear 'free' within a lexically-nested scope, are
+stored in a heap-allocated 'state vector' independent of the defining
+method or block activation context.  These state vectors persist for
+as long as there are reachable block closures that reference them --
+either explicitly, as their defining context, or implicitly, by
+holding a reference to a free variable stored within the vector.)
+
+<h4>Non-local returns</h4>
+
+An explicit return statement inside a block behaves just like in
+Smalltalk-80: the <i>method</i> activation in which the block closure
+was originally created will return the indicated value.
+
+<p> There is currently one limitation: blocks containing non-local
+returns make no attempt to detect whether their defining method
+context has already returned.  Attempting to return from a block whose
+method activation has already exited, rather than resulting in a
+friendly runtime error along the lines 'this block cannot return',
+will most likely provoke a segmentation fault and core dump.  (This is
+really easy to fix; I'm just too lazy to deal with it right now.)
+
+
+<h3>Prototypes and objects</h3>
+
+Well, it's all just objects really.
+
+<p> Objects are created by being <i>cloned</i>, which creates
+an <i>uninitialised</i> shallow copy of the original object.  By
+convention the 'reusable' object that you clone, to make a new object
+to be modified and otherwise abused, is the 'prototype' for its 'clone
+family'.  All members of a clone family share the same behaviour
+(response to messages), including the 'prototype' at the head of the
+clone family.  If you modify the behaviour of the prototype (or any
+other member of its clone family) then the behaviour of <i>all</i>
+members of the clone family (including that of the prototype) is
+modified, identically.  This is something of a compromise between
+Lieberman-style prototypes (much simpler and more general
+oganisational conventions, but very difficult to implement
+efficiently) and class-instance systems (easier to implement
+efficiently, but imposing much more complex organisational conventions
+on their surrounding systems).
+
+<p> In other words, a <i>prototype</i> (in the sense of the present
+discussion) is nothing more than an object that has been:
+
+<ul>
+<li> cloned from some 'parent' prototype object;
+<li> had named slots added to it (according to its prototype
+specification);
+<li> been associated with a fresh (empty) method dictionary, in which
+undound messages are delegated to the 'parent' prototype object; and
+<li> bound to a name by which it is known to further prototype
+specifications and method definitions.
+</ul>
+
+In yet other words, writing:
+
+<blockquote><pre>
+Foo : Point ()
+</pre></blockquote>
+
+is equivalent to:
+
+<blockquote><pre>
+" add 'Foo' to the set of visible named prototypes, then... "
+  Foo := ObjectMemory allocate: Point byteSize + N "size of Foo slots in bytes".
+  Foo methodDictionary: (MethodDictionary new parent: Point methodDictionary).
+</pre></blockquote>
+
+This results in a useful idiom for creating shared structures:
+
+<blockquote><pre>
+BadVisibilityZone : Dictionary ()
+[
+    (BadVisibilityZone := BadVisibilityZone new)
+        at: 'Archer'      put: #below;
+        at: 'Warrior'     put: #below;
+        at: 'Sparrowhawk' put: #above;
+        at: 'Cardinal'    put: #above.
+]
+</pre></blockquote>
+
+(although I'm <i>not</i> suggesting that this is either the best idiom
+nor, by a long way, a secure and desirable one.)
+
+<p>Note 1: the explicit reinitialisation (by sending 'new') of the
+prototype is required since the implicit cloning in the prototype
+specification creates an uninitialised object (in all respect other
+than having a valid method dictionary installed in it).
+
+<p>Note 2: this kind of idiom rapidly grows too verbose and was the
+motivation for translation-unit variables.  The above example can also
+be written:
+
+<blockquote><pre>
+BadVisibilityZone := [ Dictionary new
+    at: 'Archer'      put: #below;
+    at: 'Warrior'     put: #below;
+    at: 'Sparrowhawk' put: #above;
+    at: 'Cardinal'    put: #above;
+    yourself
+]
+</pre></blockquote>
+
+
+<h4>Random thoughts on class-like behaviour</h4>
+
+The easiest thing is just to mix 'meta' and 'application' behviour:
+
+<blockquote><pre>
+Point : Object ( x y )
+
+Point new
+[
+    self := super new.
+    x := 0.
+    y := 0.
+]
+
+Point magnitude
+[
+    ^((x * x) + (y * y)) sqrt
+]
+</pre></blockquote>
+
+The only 'bizarre' (or not, according to your perspective) thing about
+this is that <i>any</i> 'instance' of 'Point' will be able to create
+new 'Points' in response to 'new'.
+
+<p> Another possibility would be to create parallel hierarchies, with
+class behaviour defined in one and instance behaviour in the other.
+
+<blockquote><pre>
+Point : Object ()          "the 'class' side"
+aPoint : anObject ( x y )  "the 'instance' side"
+
+Point new
+[
+    self := aPoint clone.
+    x := 0.
+    y := 0.
+]
+
+aPoint magnitude
+[
+    ^((x * x) + (y * y)) sqrt
+]
+</pre></blockquote>
+
+
+<h3>Everything is first-class</h3>
+
+In case you hadn't already noticed, 'self' is a variable.  (As are
+'nil', 'true', and 'false'.)  If you assign to 'self' inside a method,
+the receiver instantly changes identity and retains the new identity
+through to the end of the method (or the next assignment to 'self'),
+including any implicit return of 'self' at the end of the method.  The
+following have exactly the same behaviour:
+
+<blockquote><pre>
+Point new
+[
+    self := self clone.
+    x := y := 0
+]
+
+Point new
+[
+    ^super new setX: 0 setY: 0
+]
+</pre></blockquote>
+
+(assuming the existence of 'setX:setY:'), although the former is: (a)
+cleaner, (b) more in keeping with 'prototype and clone' style (as
+opposed to 'class and instance' style), and (c) faster.  The
+disadvantage is that 'super new' might not return a Point, after which
+assigning to 'x' and 'y' directly might not be a good idea.  (Yet
+another reason to abolish direct manipluation of 'inherited' state
+within methods...)
+
+<p> The only 'special name' to which you cannot assign is 'super'.
+(Actually, I never tried to assign to super.  I don't think the Parser
+will let you, but you might just be able to assign to 'self' by
+calling it 'super'.  Of course, the correct response to assigning to
+'super' should be to dynamically re-parent 'self', but that's fraught
+with semantic complications -- not to mention problems with
+maintaining consistency in methods that access state directly.  Again,
+a great reason to get rid of it.)
+
+
+<a name="pragmatix"><h2>Pragmatics</h2>
+
+The ABI (executable code conventions) are entirely C-compatible.  The
+intention is to integrate seamlessly with other
+languages/applications, platform libraries and data types, without
+having (in the vast majority of cases) to leave the object-message
+paradigm.
+
+<p> In the meantime, primitive behaviour has to be hand-coded (by a
+wizard) and inserted explicitly into the compiled code at the
+appropriate point.  Code appearing between braces '{...}' is copied
+verbatim to the output.  Such <i>external blocks</i> are legal
+
+<ul>
+  <li> at the top-level (executed in-order during initialisation, along
+    with other definitions, directives, etc.);
+  <li> as the body of a method (the external block is the entire method body);
+  <li> wheverver a statement would be legal (in a top-level 'Smalltalk'
+    code block, in the body of a method, or in the body of a block
+    closure)
+</ul>
+
+<i>provided</i> that the code cannot be confused with a directive
+('{ import ...') or WordArray literal ('#{...}').
+
+<p> Here's a trivial example, showing how to send a 'Character' to the
+'console', answering 'true' or 'false' depending on whether the
+operation succeeded:
+
+<blockquote><pre>
+Character : Object
+(
+  value    "character's value as a Smalltalk integer"
+)
+
+Character putchar
+{
+  return ((long)self->v_value & 1)
+    &&   putchar((long)self->v_value >> 1) >= 0 ? v_self : 0;
+}
+</pre></blockquote>
+
+A few things to note:
+
+<ul>
+<li> receiver, arguments, temporaries and globals are prefixed with
+  'v_'.  A local called 'foo' can be accessed as 'v_foo'.  The
+  receiver can be accessed as 'v_self' and has type 'oop' (generic
+  pointer to object);
+<li> the variable 'self' is also defined within a method body and has
+  the 'correct' type (pointer to object of the type in which the
+  method is being defined);
+<li> instance variables are accessible by dereferencing 'self' and are
+  prefixed as usual by 'v_'.  The 'x' and 'y' fields can be accessed
+  within a method defined in type Point as 'self->v_x' and 'self->v_y';
+<li> a named prototype leaves behind a struct declaration of the same
+  name prefixed with 't_' (so a reference to a 'Foo' can be cast to
+  'struct t_Foo *' for access to the structure members);
+<li> (not shown) free variables are not readily accessible (you have
+  to know the offset within the state vector to which they were assigned
+  by the compiler);
+<li> (not shown) non-local returns are not readily accessible (for a
+  similar reason, but involving knowing where to look for a
+  'reference' to the 'home context').
+</ul>
+
+The above example could be written to raise a 'primitive failed' error
+on failure (more in keeping with traditional Smalltalk-80 primitive
+methods):
+
+<blockquote><pre>
+Character putchar
+[
+    | _code |
+    _code := value _integerValue.
+    {
+      if (putchar((long)v__code) >= 0) return v_self;
+    }.
+    " fall through to failure code... "
+    ^self primitiveFailed
+]
+</pre></blockquote>
+
+<!--
+<p> Finally, here is the 'variadic method' example promised earlier in
+this document:
+
+<blockquote><pre>
+Foo sum: firstArgument ...
+[
+    " Add all arguments until one of them is nil, then stop.  Answer the sum. "
+    | sum next |
+    sum := firstArgument.
+    { va_list ap; va_start(ap, v_firstArgument) }.    " start scanning additional arguments "
+    [{ v_next= va_arg(ap, oop) }.		      " read next argument "
+     next notNil]
+        whileTrue:
+            [total := total + next].
+    { va_end(ap) }.				      " stop scanning arguments "
+    ^sum
+]
+
+[
+    | total |
+    total := Foo sum: 1 : 2 : 3 : nil.	              " leaves 6 in total "
+]
+</pre></blockquote>
+
+If that didn't make much sense, type 'man stdarg' on any Unix-based
+machine.
+-->
+
+<a name="magix"><h2>The runtime system: introspection and intercession</h2>
+
+The only intrinsic runtime operation (in the sense that it is
+inaccessible to user-level programs) is the 'memoized' dynamic binding
+(of selectors to method implementations) that takes place entirely
+within the method cache.  Every other runtime operation (prototype
+creation, cloning objects, method dictionary creation, message lookup,
+etc.) is achieved by sending messages to objects, is expressed in
+entirely in idst, and is therefore accessible, exposed and available
+for arbitrary modification by <i>any</i> user-level program.
+
+<h3>Object layout and object pointers</h3>
+
+Objects have a single header word followed by zero or more bytes
+corresponding to the named slots containing the state of the object.
+
+<p> The header word is a pointer to the object's virtual table.
+Message sends to the object are resolved (when not present in the
+method cache) by sending 'lookup:' to the header object.  This is the
+only explicit relationship between an object and the value stored in
+its header word.
+
+<p> Object pointers correspond to the address in memory of the first
+slot of an object, one word beyond the object's header (_vtbl
+pointer).  In other words, the object header (containing the _vtbl
+pointer) is in the word <i>before</i> the one referenced by the
+object's oop.  This is done to allow 'toll-free bridging' of idst
+objects to C/C++ structs/classes, Objective-C instances, or to native
+objects in any other language that does not use the same convention of
+putting a header in the word before an object's address.  Allocating
+the idst _vtbl pointer before (e.g.) a C/C++/ObjC object effectively
+'wraps' the foreign object in an 'invisible' idst object, whose layout
+is identical to (and whose state is stored at the same address as)
+that expected by the native implementation of the foreign object.
+
+<p> The Id runtime support is manifest in three mechanisms:
+<ul>
+  <li> a few intrinsic objects provide the minimum sufficient framework for describing object behaviour;
+  <li> a few intrinsic methods provide the minimum sufficient support for object creation, messaging and reflection;
+  <li> a few intrinsic functions provide the minimum sufficient support for memory allocation.
+</ul>
+
+<h4>Intrinsic objects</h4>
+
+The intrinsic objects (all of them prototypes, accessible by name with
+global visibility) form a small delegation hierarchy as shown below.
+
+<blockquote><pre>
+_object ()
+  _selector : _object ( _size _elements )
+  _assoc    : _object ( key value )
+  _closure  : _object ( _method data )
+  _vector   : _object ( _size "indexable..." )
+  _vtable   : _object ( _tally bindings delegate )
+</pre></blockquote>
+
+All objects delegate to <tt>_object</tt>.  All <tt>_object</tt>s have
+a virtual table (either implicit or explicitly stored one word before
+the address of the object).  Virtal tables contain <tt>_vector</tt>s
+(one-dimensional fixed-size arrays) containing <tt>_assoc</tt>iations
+between <tt>_selector</tt>s and <tt>_closure</tt>s.
+A <tt>_closure</tt> stores a pointer to a method implementation
+(executable native code) and a pointer to arbitrary data.  The method
+implementation receives the <tt>_closure</tt> in which it appears as
+an 'invisible' first argument.
+
+<p>The initial underscore '<tt>_</tt>' implies that these objects are
+primitive and not necessarily intended to be included in an end-user
+object system.  Many of their slot names have the same prefix,
+implying that they store 'primitive' values useful for their state
+only -- you <b>cannot</b> send message to the values stored in these
+slots.  All other slots (without underscore prefix) contain references
+to real objects to which messages can be sent.
+
+  <ul>
+    <li><b>_object</b><p>
+      is a singleton prototype that defines behaviour common to all
+      objects.  This behaviour includes message lookup (dynamic binding),
+      which is achieved by sending (real) messages to the objects involved.
+      In other words, every single object created must eventually delegate
+      to <tt>_object</tt>, otherwise it would be impossible to interact with
+      (send messages to) that object.  In yet other words, <tt>_object</tt>
+      is <i>necessarily</i> the parent of <i>every</i> other object in the
+      system.  If you write
+      <blockquote><pre>
+	  RootPrototype ()      </pre></blockquote>
+      to create a 'parentless prototype' then the runtime system will
+      tacitly convert this into
+      <blockquote><pre>
+	  RootPrototype : _object ()      </pre></blockquote>
+      to ensure that you (and, more importantly, the system itself) can send
+      messages to <tt>RootPrototype</tt> (and its clones).
+      <p></li>
+
+    <li><b>_vtable</b><p>
+      is a 'virtual table', similar to a <tt>MethodDictionary</tt> in
+      Smalltalk-80.  Virtual tables map selectors to method implementations
+      for a particular clone family (one _vtbl is shared between all clones
+      in a given family).  The <tt>bindings</tt> slot points to a
+      <tt>_vector</tt> of pointers to <tt>_assoc</tt> objects describing the
+      associations between <tt>_selector</tt>s and <tt>_closure</tt>s.  The
+      '<tt>_tally</tt>' slot contains the number of entries
+      in <tt>bindings</tt>.  Finally, '<tt>delegate</tt>' points to another
+      <tt>_vtable</tt> to which all unrecognised messages are delegated.
+      <p></li>
+
+    <li><b>_vector</b><p>
+      is a one-dimensional array of <tt>_size</tt> object pointers.
+      (Note that the storage for the pointers is allocate in-line, in
+      the body of the <tt>_vector</tt> object itself.)
+      <p></li>
+
+    <li><b>_assoc</b><p>
+      associates a <tt>key</tt> (often a <tt>_selector</tt>) with
+      a <tt>value</tt> (often a <tt>_closure</tt> describing the
+      implementation of the method associated with the <tt>key</tt> in
+      a vtable).
+      <p></li>
+
+    <li><b>_selector</b><p>
+      is an interned (unique) string, much like a Smalltalk Symbol.
+      The selector itself is stored as a <tt>size</tt> (in bytes) and a
+      <tt>_name</tt> (a primitive array of bytes; i.e., of C type '<tt>char
+	*</tt>').
+      <p></li>
+
+    <li><b>_closure</b><p>
+      describes the implementation of a method.
+      The <tt>_method</tt> slot contains the address of native code
+      implementing the method's body and the <tt>data</tt>.  This
+      address is called when invoking a method, passing the
+      associated <tt>_closure</tt> as a 'hidden' argument.
+      The <tt>data</tt> slot is available implicitly (via the hidden
+      closure argument) for passing arbitray persistent information to
+      the method being invoked.
+      <p></li>
+  </ul>
+
+
+<h3>Essential protocol of runtime objects</h3>
+
+Compiled code assumes the existence of responses to the following
+messages:
+
+<ul>
+
+<li><tt><b>_object _delegated</b></tt>
+
+  <p> creates a new prototype (with an empty protocol) whose clones
+    delegate unimplemented messages to the receiver's family.  This is the
+    only mechanism for creating a prototype hierarchy, including during
+    object/prototype initialisation at program startup. The source form
+    <blockquote><pre>Foo : Bar ()</pre></blockquote>
+    is equivalent to creating a new name Foo and initialising it with an
+    object delegating to <tt>Bar</tt>:
+    <blockquote><pre>Foo := [ Bar _delegated ]</pre></blockquote>
+    (Note that this equivalence holds only when the new
+    object adds no slots to its delegate.)
+    (The '_delegate' message has an initial underscore to avoid
+    over-polluting the protocol of user prototypes derived from
+    _object.)
+  <p></li>
+
+<li><tt><b>_selector _intern: _cString</b></tt>
+
+  <p> creates a new unique selector whose name is the given C string (a
+    primitive string, of type 'char *' ).  This is the only mechanism for
+    creating new selectors.  (The initial underscore in the selector is a
+    convention indicating that the argument '_cString' is a primitive,
+    non-object type.)<p></li>
+
+<li><tt><b>_object _methodAt: aSelector put: _aMethod</b></tt>
+
+  <p> extends (or modifies) the protocol of the receiver's clone family.
+    Subsequent lookups of aSelector in the receiver's family will be
+    resolved to _aMethod.  This is the only mechanism for adding protocol
+    to a prototype.  The source form
+    <blockquote><pre>Foo bar: baz [ ... ]</pre></blockquote>
+    is equivalent to evaluating:
+    <blockquote><pre>Foo _methodAt: (_selector _intern: <i>"bar:"</i>) put: <i>barMethod</i></pre></blockquote>
+    where <i>"bar:"</i> is a primitive string ('char *')
+    and <i>barMethod</i> is the address of the native code implementing
+    'Foo _bar:'.  (The initial underscore in the selector is to avoid
+    polluting _object's protocol.)<p></li>
+
+<li><tt><b>_vtbl lookup: aSelector</b></tt>
+
+  <p> answers (a raw pointer to the native code of) the method
+    implementing the response to aSelector within the receiver.  This is
+    the only mechanism for performing message lookup (dynamic binding)
+    within the system.  (Note that for performance reasons the results of
+    'lookup:' may be memoized by the runtime system.  There is currently
+    no way to prevent this, meaning that a given _vtbl might only have one
+    chance to influence the meaning of a given message send.  This is a
+    limitation [read: <b>bug</b>] and will be fixed soon.)<p></li>
+
+</ul>
+
+Ambitious applications can therefore (amongst other tricks) redefine
+'_object _methodAt:put:' and/or '_vtbl lookup:' to implement unusual
+dynamic binding behaviour.
+
+<p> The implementation of the above methods (along with several
+potentially useful auxiliary methods in the runtime classes) can be
+found in the file 'Smalltalk/runtime.st'.
+
+
+<h4>Intrinsic methods</h4>
+
+<blockquote>
+<dl>
+  <dt><tt>_vtable   _alloc: _size			</tt><dd> answer a new object in the receiver's clone family with <tt>_size</tt> bytes of free space in the new object's body
+  <dt>&nbsp;</dt>
+  <dt><tt>_object   _beNilType				</tt><dd> designate the vtable of the receiver to be the vtable for nil (the null pointer)
+  <dt>&nbsp;</dt>
+  <dt><tt>_object   _beTagType				</tt><dd> designate the vtable of the receiver to be the vtable for tagged (odd) pointers
+  <dt>&nbsp;</dt>
+  <dt><tt>_object   _delegated				</tt><dd> answer a new object in a new clone family delegating to the receiver's family
+  <dt>&nbsp;</dt>
+  <dt><tt>_vtable   _delegated				</tt><dd> answer a new clone family delegating to the receiver
+  <dt>&nbsp;</dt>
+  <dt><tt>_selector _export: value			</tt><dd> associate the receiver (a name) with <tt>value</tt> in the global namespace (see <tt>_import</tt> below)
+  <dt>&nbsp;</dt>
+  <dt><tt>_vtable   findKeyOrNil: aKey			</tt><dd> answer the <tt>_closure</tt> stored in the receiver at <tt>aKey</tt> (or nil if <tt>aKey</tt> is not found)
+  <dt>&nbsp;</dt>
+  <dt><tt>_vtable   flush				</tt><dd> flush the contents of the global method cache
+  <dt>&nbsp;</dt>
+  <dt><tt>_selector _import				</tt><dd> answer the value named by the receiver in the global namespace (see <tt>_export:</tt> above)
+  <dt>&nbsp;</dt>
+  <dt><tt>_object   _import: _library			</tt><dd> import (load and initialise) the named <tt>_library</tt> (dynamic shared object file)
+  <dt>&nbsp;</dt>
+  <dt><tt>_selector _intern: _cString			</tt><dd> answer a unique selector as named by the primitive <tt>_cString</tt>
+  <dt>&nbsp;</dt>
+  <dt><tt>_vtable   methodAt: aSelector
+		    put: method
+		    with: data				</tt><dd> install <tt>method</tt> as the response to sending <tt>aSelector</tt> to any member of the receiver's family
+  <dt>&nbsp;</dt>
+  <dt><tt>_object   _vtable				</tt><dd> answer the receiver's vtable
+</dl>
+</blockquote>
+
+<h4>Intrinsic functions</h4>
+
+<blockquote>
+  <dl>
+    <dt><tt>void *_palloc(size_t size)</tt></dt>
+    <dd>Returns a pointer to an area of storage with the given size in
+      bytes.  The storage is traced by the garbage collector and is
+      therefore suitable for storing object pointers.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>void *_balloc(size_t size)</tt></dt>
+    <dd>Returns a pointer to an area of storage with the given size in
+      bytes.  The storage is not traced by the garbage collector and is
+      therefore unsuitable for storing object pointers.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>void _nlreturn(void *nonLocalReturn, oop result)</tt></dt>
+    <dd>Invokes the given nonLocalReturn returning the given result to
+      the non-local caller.  Suitable values for nonLocalReturn are
+      stored in the first pointer slot of full closures.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>oop _nlresult(void)</tt></dt>
+    <dd>Recovers the result argument passed to the most recent
+      call to _nlreturn.</dd>
+    <dt>&nbsp;</dt>
+    <dt><tt>oop _bind(oop selector, oop receiver)</tt></dt>
+    <dd>Answers the <tt>_closure</tt> associated with the given selector
+      in the given receiver.</dd>
+  </dl>
+</blockquote>
+
+<h4>Process arguments</h4>
+
+Three global variables are defined during initialisation giving access
+to the command-line arguments and environment of the process:
+
+<blockquote>
+  <dl>
+    <dt><tt>int _argc</tt></dt>
+    <dd> contains a copy of the original value of <tt>argc</tt> passed
+      to the program at startup.</dd>
+    <dt><br></dt>
+    <dt><tt>char **_argv</tt></dt>
+    <dd>contains a copy of the original value of <tt>argv</tt>
+      passed to the program at startup.</dd>
+    <dt><br></dt>
+    <dt><tt>char **_envp</tt></dt>
+    <dd>contains a copy of the original value of <tt>argv</tt>
+      passed to the program at startup.</dd>
+  </dl>
+</blockquote>
+
+For some examples of the above in use, search for '{' within the
+library source code.
+
+
+
+<h3>Runtime examples</h3>
+
+The directory '<tt>examples/reflect</tt>' contains code demonstrating
+how to reimplement much of the runtime support described above with
+equivalent userland implementations.
+
+
+<a name="caveatix"><h2>Caveats and gotchas for Smalltalk programmers</h2>
+
+Numbers are signed (positive or negative) and the scanner is not
+context-sensitive (the syntactic type of each token is uniquely
+determined by its spelling, irrespective of its position).
+
+<ul>
+
+<li>'+1' is legal, being the number '1' with a sign that is ignored.
+(In Smalltalk-80 the sign would not be legal.)</li>
+
+<li>'--1' is legal, with the negative signs cancelling out.
+(Similarly illegal in Smalltalk-80.)</li>
+
+<li>'3+4' is illegal, being the integer literal '3' followed by the
+literal '+4'.  (In Smalltalk-80, the sign would be parsed as a
+selector.)</li>
+
+<li>'6-5' is similarly illegal, being '6' followed by '-5'.  (In
+Smalltalk-80, the sign would be parsed as a selector.)</li>
+
+<li>The symbol '#foo:bar' is illegal, since it is not a well-formed
+keyword.  (Smalltalk-80 happily accepts identifiers in the last
+position of a multi-part keyword symbol.)</li>
+
+<li>There are probably others, but I've yet to stumble across
+them.</li>
+
+</ul>
+
+
+<a name="appendix"><h2>Appendices</h2>
+
+<a name="compilix"><h3>Compiler directives</h3>
+
+In the imperative form
+
+<blockquote>
+{ <i>directive</i> <i>optionalArguments...</i> }
+</blockquote>
+
+the following <i>directive</i>s are recognised:
+
+<ul>
+<li><tt>{ input: <i>fileName</i> }</tt> is replaced by the contents
+  of <tt><i>fileName</i>.st</tt>.
+<li><tt>{ include: <i>fileName</i> }</tt> loads the prototype
+  declarations (ignoring imperatives and method definitions)
+  from <tt><i>fileName</i>.st</tt>, making globally named values
+  available to the including file.
+<li><tt>{ import: <i>fileName</i> }</tt> works like <tt>include:</tt>
+  and additionally loads the shared
+  library <tt><i>fileName</i>.so</tt> into the running program at
+  execution time.
+<li><tt>{ external }</tt> <i>text</i> <tt>{ internal }</tt> processes
+  all declarations within <i>text</i> but ignores method definitions
+  and imperatives.  (Its only practical use is to declare the built-in
+  prototypes provided by the initial runtime library.)
+<li><tt>{ pragma: type <i>compilerType programType</i> }</tt>
+  associates a concrete, program-declared <i>programType</i> with an
+  internal <i>compilerType</i> related to a literal constant or other
+  'constructed' value.  The list of recognised <i>compilerType</i>s is
+  given below.
+<li><tt>{ pragma: include &lt;<i>fileName</i>&gt; }</tt> searches
+  the system include directories for a C header
+  called <i>fileName</i> and makes the declarations and definitions
+  within available subsequently to the program being compiled.
+<li><tt>{ pragma: include "<i>fileName</i>" }</tt> is the same as the
+  previous directory except that it also searches the current
+  directory for the given <i>fileName</i>.  (The search path for
+  included C headers can be extended using the <tt>-J</tt> option to
+  the <tt>idc</tt> compiler.)
+</ul>
+
+<h3>Compiler types</h3>
+
+The following <i>compilerType</i>s must be associated with a concrete
+type using a <tt>{ pragma: type <i>compilerType programType</i> }</tt>
+directive before the first use of the corresponding type of literal:
+
+<ul>
+  <li><tt>character </tt> the type to use for literal characters
+    (<tt>$<i>char</i></tt>).  The associated concrete type is sent the
+    message <tt>value_: <i>int</i></tt> with a primitive
+    (untagged) <i>int</i> argument giving the ASCII value of the
+    character to be constructed.
+
+  <li><tt>integer </tt> the type to use for literal integers.  The
+    associated concrete type is sent the
+    message <tt>value_: <i>int</i></tt> with a primitive
+    (untagged) <i>int</i> argument giving the value of the integer to
+    be constructed.
+
+  <li><tt>float </tt> the type to use for literal floating-point
+    numbers.  The associated concrete type is sent the
+    message <tt>value_: <i>double</i></tt> with a primitive
+    (unboxed) <i>double</i> argument giving the value of the
+    floating-point number to be constructed.
+
+  <li><tt>string </tt> the type to use for literal strings
+    (<tt>'<i>characters</i>'</tt>).  The associated concrete type is
+    sent the message <tt>value_: <i>characters</i>
+    size_: <i>int</i></tt> with a primitive pointer to the
+    8-bit <i>characters</i> to be placed int the string and a
+    primitive <i>int</i> giving the size of the string.
+
+  <li><tt>symbol </tt> the type to use for literal symbols
+    (<tt>#<i>identifier</i></tt> or <tt>#'<i>characters</i>'</tt>).
+    The associated concrete type is sent the
+    message <tt>value_: <i>characters</i> size_: <i>int</i></tt> as
+    for strings, and should return a <i>uniqe</i> symbol for a given
+    sequence of <i>characters</i>.
+
+  <li><tt>objectArray</tt>,
+  <li><tt>wordArray</tt>,
+  <li><tt>byteArray </tt> are the types to use for arrays of objects,
+    platform-width primitive integers, and 8-bit bytes (respectively).
+    The concrete type is sent the message <tt>value_: <i>pointer</i>
+      size_: <i>int</i></tt> with a <i>pointer</i> to <i>int</i> elements.
+
+  <li><tt>fullClosure </tt> is the concrete type representing a
+    'block' (<tt>[<i>deferredCode</i>]</tt>) whose code is evaluated
+    whenever it receives a 'value' message.  To create a block the
+    concrete type is sent the message <tt>function_:
+    <i>implementationAddress</i> arity_: <i>argumentCount</i> outer:
+    <i>outerBlock</i> state: <i>variableArray</i>
+    nlr_: <i>dynamicEnvironment</i></tt> where
+    <ul>
+      <li><i>implementationAddress</i> is a primitive pointer to the
+	entry point of the executable code of the block's body;
+      <li><i>argumentCount</i> is a primitive integer giving the
+	number of arguments expected by the block;
+      <li><i>outerBlock</i> is a pointer to another block (for finding
+	lexical variables) or nil;
+      <li><i>variableArray</i> is an object array of variable values
+	that might be referred to from within a nested block; and
+      <li><i>dynamicEnvironment</i> is a pointer to a primitive
+	execution context (for executing a non-local return).
+    </ul>
+
+  <li><tt>staticClosure </tt> is the concrete type representing an
+    'optimised block' for which two instances are dynamically
+    indistiguishable (no closed-over free variables and no non-local
+    returns).  The type is sent the message <tt>function_:
+    <i>implementationAddress</i> arity_: <i>argumentCount</i></tt> for
+    each static block that occurs in the program, where the arguments
+    are interpreted in the same way as for full closures.
+
+</body>
+</html>
+<!--
+Local Variables:
+buffer-file-coding-system: iso-latin-1
+End:
+-->
