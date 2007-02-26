@@ -1,0 +1,237 @@
+#!/bin/sh
+
+program="$0"
+
+prefix="@PREFIX@"
+libfix="@PREFIX@"
+config=""
+cc="@CC@"
+infile=""
+outfile=""
+idopts=""
+ccopts=""
+ldobjs=""
+idtype="program"
+idmain="false"
+cckill="true"
+_p=""
+
+fatal () {
+    echo "$@" >&2
+    exit 1
+}
+
+checkarg () {
+    [ $# -gt 1 ] || fatal "option '$1' requires an argument"
+}
+
+banner () {
+    echo "Id Compiler version 1.1"
+    echo "Copyright (c) 2005, 2006, 2007 Ian Piumarta"
+}
+
+copyright () {
+    banner
+    echo "All rights reserved"
+    cat <<EOF
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the 'Software'),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, provided that the above copyright notice(s) and this
+permission notice appear in all copies of the Software and that both the
+above copyright notice(s) and this permission notice appear in supporting
+documentation.
+
+THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+EOF
+    exit 1
+}
+
+usage() {
+    banner
+    cat <<EOF
+
+usage: $program [-option ...] filename
+  -B prefix - prepend prefix to compiler files
+  -C arch   - print configured architecture
+  -C os     - print configured operating system
+  -c        - generate an object file
+  -g        - generate debugging information
+  -h        - print help (this message) then exit
+  -H        - print copyright information then exit
+  -I dir    - search dir for id include/input/import files
+  -J dir    - search dir for C header files
+  -k        - keep intermediate compiler files
+  -n        - do not execute compilation commands (useful with '-v')
+  -o file   - place output in file
+  -O        - optimise
+  -Op       - optimise, maximising performance at all costs
+  -p        - profile
+  -s        - generate a shared library
+  -v        - print compilation commands (useful with '-n')
+  -Wi,opt   - pass opt to the Id compiler
+  -Wc,opt   - pass opt to the C compiler
+  -Wl,opt   - pass opt to the linker
+without '-c' or '-s' the default is to generate an executable
+without '-o' the output is called 'filename[.[s]o]'
+EOF
+    exit 1
+}
+
+rm -f .id.ldobjs
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+	-B?*)	prefix="${1#-B}";;
+	-B)	checkarg $@; prefix="$2"; shift;;
+	-C?*)	config="${1#-C}";;
+	-C)	checkarg $@; config="$2"; shift;;
+	-c)	idtype="object";;
+	-f*)	ccopts="$ccopts $1";;
+	-g*)	ccopts="$ccopts $1";;
+	-I?*)	idopts="$idopts -I${1#-I}";;
+	-I)	checkarg $@; idopts="$idopts -I$2"; shift;;
+	-J?*)	ccopts="$ccopts -I${1#-J}";;
+	-J)	checkarg $@; ccopts="$ccopts -I$2"; shift;;
+	-k)	cckill=false;;
+	-L*)	ldobjs="$ldobjs $1";;
+	-l*)	ldobjs="$ldobjs $1";;
+	-m)	idmain=true;;
+	-n)	run="echo";;
+	-o)	checkarg $@; outfile=$2; shift;;
+	-O)	ccopts="$ccopts $1";;
+	-O1)	ccopts="$ccopts $1";;
+	-O2)	ccopts="$ccopts $1";;
+	-O3)	ccopts="$ccopts $1";;
+	-Op)	ccopts="$ccopts -O"; idopts="$idopts -N1";;
+	-p)	ccopts="$ccopts -pg"; _p="_p";;
+	-s)	idtype="shared";;
+	-v)	verbose="set -x";;
+	-Wi,*)	idopts="$idopts ${1#-Wi,}";;
+	-Wc,*)	ccopts="$ccopts ${1#-Wc,}";;
+	-Wl,*)	ccopts="$ccopts $1";;
+	--*)	usage;;
+	-\?*)	usage;;
+	-h*)	usage;;
+	-H*)	copyright;;
+	-*)	fatal "option '$1' not recognised";;
+	*.o)	ldobjs="$ldobjs $1";;
+	*.a)	ldobjs="$ldobjs $1"
+		echo $1 >> .id.ldobjs
+		;;
+	*)	[ -z "$infile" ] || fatal "multiple input files";
+		infile="$1";;
+    esac
+    shift;
+done
+
+case "$config" in
+    "arch")		echo "@SYSARCH@";	exit;;
+    "os")		echo "@SYSOS@";		exit;;
+    "TARGET")		echo "@TARGET@";	exit;;
+    "PREFIX")		echo "@PREFIX@";	exit;;
+    "CC")		echo "@CC@";		exit;;
+    "CFLAGS")		echo "@CFLAGS@";	exit;;
+    "MFLAGS")		echo "@MFLAGS@";	exit;;
+    "OFLAGS")		echo "@OFLAGS@";	exit;;
+    "O3FLAGS")		echo "@O3FLAGS@";	exit;;
+    "CCFLAGS")		echo "@CCFLAGS@";	exit;;
+    "CCFLAGS_O")	echo "@CCFLAGS_O@";	exit;;
+    "CCFLAGS_SO")	echo "@CCFLAGS_SO@";	exit;;
+    "LDFLAGS")		echo "@LDFLAGS@";	exit;;
+    "LDFLAGS_O")	echo "@LDFLAGS_O@";	exit;;
+    "LDFLAGS_SO")	echo "@LDFLAGS_SO@";	exit;;
+    "LDLIBS")		echo "@LDLIBS@";	exit;;
+    "LDLIBS_O")		echo "@LDLIBS_O@";	exit;;
+    "LDLIBS_SO")	echo "@LDLIBS_SO@";	exit;;
+    "OBJEXT")		echo "@OBJEXT@";	exit;;
+    "OBJEXT_O")		echo "@OBJEXT_O@";	exit;;
+    "OBJEXT_SO")	echo "@OBJEXT_SO@";	exit;;
+    "GCDIR")		echo "@GCDIR@";		exit;;
+    "SYSARCH")		echo "@SYSARCH@";	exit;;
+    "SYSOS")		echo "@SYSOS@";		exit;;
+    ?*)			echo "unknown config parameter: $config" >&2;  exit 1;;
+esac
+
+case $idtype in
+    program)
+	idflags="-m"
+	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS@"
+	ldflags="@LDFLAGS@"
+	idlibs="libid$_p.o gc.a"
+	ldlibs="@LDLIBS@ -lm"
+	soext="@OBJEXT@"
+	;;
+    object)
+	idflags="-c"
+	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS_O@"
+	ldflags="@LDFLAGS_O@"
+	ldlibs="@LDLIBS_O@"
+	soext="@OBJEXT_O@"
+	;;
+    shared)
+	idflags=""
+	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS_SO@"
+	ldflags="@LDFLAGS_SO@"
+	idlibs=""
+	ldlibs="@LDLIBS_SO@"
+	soext="@OBJEXT_SO@"
+	;;
+    *)
+	echo "this cannot happen" >&2
+	exit 1
+	;;
+esac
+
+if test -s .id.ldobjs; then
+    while read file; do
+	ldobjs="$ldobjs `nm $file | fgrep __id__init__ | awk '{print \"-u\", $3}'`"
+    done < .id.ldobjs
+fi
+rm -f .id.ldobjs
+
+$idmain && idflags="-m"
+
+if [ -z "$infile" ]; then
+  [ -z "$outfile" ] && fatal "no output file specified"
+else
+  [ -z "$outfile" ] && outfile=${infile%.st}$soext
+  [ "$infile" = "$outfile" ] && fatal "input and output files are the same"
+  ccfile="${outfile}.c"
+fi
+
+if $cckill; then
+  cckill="rm -f"
+else
+  cckill="true"
+fi
+
+trap "$run $cckill $ccfile; exit 1" 2 3 5 6 10 13 15
+
+for lib in $idlibs; do
+  plibs="${plibs} ${prefix}${lib}"
+done
+idlibs="$plibs"
+ccflags="$ccflags -I${prefix}"
+
+[ -z "$prefix" ] || {
+  libfix=${prefix}
+  expr "//$libfix" : '///' >/dev/null || libfix="$PWD/$libfix"
+  LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-${libfix}}
+  export LD_LIBRARY_PATH
+  IDC_LIBDIR=${IDC_LIBDIR:-${libfix}}
+  export IDC_LIBDIR
+}
+
+if [ ! -z "$infile" ]; then
+  $verbose
+  $run ${prefix}idc1 -I$prefix -I. $idopts $idflags $infile -o $ccfile &&
+  $run $cc -I$prefix/include $ccflags $ccopts $ccfile -o $outfile $ldflags $ldobjs $idlibs $ldlibs &&
+  $run $cckill $ccfile
+else
+  $verbose
+  $run $cc -I$prefix/include $ccflags $ccopts -o $outfile $ldflags $ldobjs $idlibs $ldlibs
+fi

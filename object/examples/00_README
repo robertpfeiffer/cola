@@ -1,0 +1,118 @@
+NOTE: These examples will only work if the 'idc' compiler has been
+installed.  To compile them without installing you will have to:
+
+  - point the Makefiles at the uninstalled 'idc' by setting the
+    variable IDC on the command line; 
+
+  - tell 'idc' where to find its own compiled runtime libraries with
+    -the B option; and
+
+  - tell 'idc' where to find the compile-time st80 libraries with the
+    -I option
+
+like this:
+
+	cd hw
+	make IDC="../../../boot/idc -B../../../boot/ -I../../st80"
+	LD_LIBRARY_PATH=$PWD/../../../boot ./hw
+
+NOTE: Compilation can be long on slow hardware because many of the
+examples import 'st80' causing the compiler to scan the source of the
+entire Smalltalk-80 library.  (Most of them would probably work fine
+importing nothing more than Object.)  In no particular order...
+
+avl
+
+    SortedCollection done right.
+
+dispatch
+
+    Examples of selector-based dispatch for virtual machines and/or to
+    replace 'switch()'-like statements.
+
+echo
+
+    Id version of the Unix utility of the same name.
+
+forward
+
+    Ugly proof of concept: transparent message forwarding.
+
+hw
+
+    The traditional 'hello world' program.
+
+ignore
+
+    Providing a default answer for unimplemented methods.
+
+interp
+
+    A cheesey little example of a cheesier little interpreter.
+    Demonstrates how closures in method dictionaries can share a
+    single implementation but have different behaviour depending on
+    the data stored in the closure.
+
+libs1
+
+    Example showing how to build and link against static libraries
+    ('.a' archives).  Note that the linker will be forced to load all
+    'Id' files found in the archive (regardless of whether they are
+    used at runtime) and that the final program can be moved into (or
+    run from) a different directory and it will still work (since all
+    potentially-used libraries are linked statically into the
+    executable).
+
+libs2
+
+    How to build and link against dynamic libraries.  Note that the
+    final program can NOT be moved into (or run from) a different
+    directory since the runtime will no longer be able to find the two
+    libraries.  Either of the libraries can be modified without
+    relinking the main program.
+
+libs3
+
+    How to build and link against a dynamic library constructed from
+    multiple separately-compiled source files.
+
+reflect
+
+    How to fiddle with the lowest level of implementation machinery.
+    For wizards only.
+
+serialize
+
+    Writing and reading objects in 'wire format'.
+
+slots
+
+    Using vtable closures as variables.
+
+sqvm
+
+    An almost complete Squeak (Smalltalk) virtal machine.
+
+system
+
+    How to run OS commands from inside a program.
+
+this
+
+    Sends to self that refuse to descend to a more specific receiver type.
+
+traits
+
+    Simplistic implementation of traits.
+
+typename
+
+    How to convert a String into the prototype named by the String.
+
+weak
+
+    Demonstration of weak Arrays that dutifully forget things.
+
+x11
+
+    Stupid UI example.

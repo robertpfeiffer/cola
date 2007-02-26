@@ -1,0 +1,13 @@
+3200 MHz Pentium 4, gcc 3.4.4
+									(avg)
+Squeak:	291074474 bytecodes/sec;  7425633 sends/sec	1.00	 1.00	1.00
+Pepsi:	399360000 bytecodes/sec; 46636000 sends/sec	1.37	 6.28	3.83		Wed Nov 30 2005
+Id 1.0:	616448000 bytecodes/sec; 71721000 sends/sec	2.12	 9.66	5.89		Tue Nov 29 2005
+	634880000 bytecodes/sec; 73751000 sends/sec	2.18	 9.93	6.06		Wed Dec 14 2005
+
+2000 MHz PPC G5, gcc 4.0.1
+									(avg)
+Squeak:	 70835639 bytecodes/sec;  3446690 sends/sec	1.00	 1.00	1.00
+Pepsi:	216576000 bytecodes/sec; 22759000 sends/sec	3.06	 6.60	4.83		Mon Dec  5 2005
+Id 1.0:	246784000 bytecodes/sec; 32060000 sends/sec	3.48	 9.30	6.39		Mon Dec  5 2005
+	289792000 bytecodes/sec; 38529000 sends/sec	4.09	11.18	7.63		Wed Dec 14 2005

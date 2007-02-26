@@ -1,0 +1,19 @@
+#!/bin/sh
+
+cd /usr/local/bin
+
+usage() {
+  echo "usage: `basename $0` <arch>"
+  echo "available <arch>itectures:"
+  for i in idc-*; do
+    test "$i" = "idc-select" || echo "    ${i#idc-}"
+  done
+  exit 1
+}
+
+test $# -eq 1 || usage
+
+test -f idc-$1 || usage
+
+ln -s -f idc-$1 idc
+ls -l idc

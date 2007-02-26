@@ -1,0 +1,259 @@
+#!/bin/sh
+
+# configure -- compiler/linker configuration for the local platform
+# 
+# Please send bug reports and additions to the author at: firstName@lastName.com
+# For suitable values of 'firstName' and 'lastName', see the following notice.
+
+# Copyright (c) 2005, 2006 Ian Piumarta
+# 
+# All rights reserved.
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the 'Software'),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, provided that the above copyright notice(s) and this
+# permission notice appear in all copies of the Software and that both the
+# above copyright notice(s) and this permission notice appear in supporting
+# documentation.
+# 
+# THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+
+dohelp () {
+    cat <<EOF
+Usage: configure [options ...] filename ...
+
+    --target=cpu-vendor-os - configure for target [guessed]
+    --prefix=path          - install into path/{bin,lib} [/usr/local]
+
+The following environment variables can be set before running configure
+to change the defaults for the Id compiler (a summary of their final
+values is printed during configuration):
+
+    CC          - name of the C compiler
+    CFLAGS      - flags to pass to cc every time
+    MFLAGS      - cc flags identifying target archietcture
+    OFLAGS      - cc flags when optimising
+    O3FLAGS     - cc flags when optimising agressively
+    PGFLAGS     - cc flags when profiling for performance
+    CCFLAGS     - cc flags when compiling executable
+    CCFLAGS_O   - cc flags when compiling object
+    CCFLAGS_SO  - cc flags when compiling shared object
+    LDFLAGS     - ld flags when linking executable
+    LDFLAGS_O   - ld flags when linking object
+    LDFLAGS_SO  - ld flags when linking shared object
+    LDLIBS      - ld libraries when linking executable
+    LDLIBS_O    - ld libraries when linking object
+    LDLIBS_SO   - ld libraries when linking shared object
+    OBJEXT      - executable file extension
+    OBJEXT_O    - object file extension
+    OBJEXT_SO   - shared object file extension
+    GCDIR       - where to look for gc.a and include/gc.h
+    SYSARCH	- architecture
+    SYSOS	- operating system
+
+Note: the compiler uses the installation prefix to find executables and
+      libraries.  Moving configured files to any other location will
+      break the compiler.
+
+NOTE: this is not an 'autoconf'-style configure script.  DO NOT
+      attempt to run it from the command line unless you REALLY
+      know what you are doing.  Use 'make config' instead.
+EOF
+    exit 0
+}
+
+FILES=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+	--prefix=*)	PREFIX="${1#--prefix=}";  shift;;
+	--target=*)	TARGET="${1#--target=}";  shift;;
+	-*)		dohelp;;
+	*)		FILES="$FILES $1"; shift;;
+    esac
+done
+
+[ -z "$FILES" ] && dohelp
+
+TARGET="${TARGET:-`sh ./boot/config.guess`}"
+
+GCDIR=${GCDIR:-"gc6.7"}
+
+ppc () {
+    OFLAGS=${OFLAGS:-"-O"}
+    O3FLAGS=${O3FLAGS:-"-O3 -mcpu=7450"}
+    PGFLAGS=${PGFLAGS:-"-O3 -mcpu=7450"}
+    SYSARCH="ppc"
+}
+
+ia64 () {
+    OFLAGS=${OFLAGS:-"-O"}
+    O3FLAGS=${O3FLAGS:-"-O"}
+    PGFLAGS=${PGFLAGS:-"-O"}
+    SYSARCH="ia64"
+}
+
+i386 () {
+    OFLAGS=${OFLAGS:-"-O"}
+    O3FLAGS=${O3FLAGS:-"-O3 -march=prescott -fomit-frame-pointer -falign-functions=16 -funroll-loops"}
+    PGFLAGS=${PGFLAGS:-"-O3 -march=prescott -falign-functions=16 -funroll-loops"}
+    SYSARCH="i386"
+}
+
+arch_ppc () {
+    MFLAGS="-arch ppc"
+}
+
+arch_386 () {
+    MFLAGS="-arch i486"
+}
+
+darwin () {
+    CC=${CC:-"cc"}
+    PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -fno-common"}
+    OBJEXT_O=${OBJEXT_O:-".o"}
+    CCFLAGS_O=${CCFLAGS_O:-"-c"}
+    LDFLAGS_SO=${LDFLAGS_SO:-"-bundle -flat_namespace -undefined suppress"}
+    OBJEXT_SO=${OBJEXT_SO:-".so"}
+    SYSOS="darwin"
+}
+
+bsd () {
+    CC=${CC:-"cc"}
+    PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1"}
+    LDFLAGS=${LDFLAGS:-"-export-dynamic"}
+    CCFLAGS_O=${CCFLAGS_O:-"-c"}
+    OBJEXT_O=${OBJEXT_O:-".o"}
+    LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
+    OBJEXT_SO=${OBJEXT_SO:-".so"}
+    SYSOS="bsd"
+}
+
+pic () {
+    CCFLAGS_SO="$CCFLAGS_SO -fpic"
+}
+
+cygwin () {
+    CC=${CC:-"gcc"}
+    PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror"}
+    LDFLAGS=${LDFLAGS:-"-Wl,--export-all-symbols"}
+    OBJEXT=${OBJEXT:-".exe"}
+    CCFLAGS_O=${CCFLAGS_O:-"-c"}
+    OBJEXT_O=${OBJEXT_O:-".o"}
+    LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
+    OBJEXT_SO=${OBJEXT_SO:-".so"}
+    SYSOS="win32"
+}
+
+mingw32 () {
+    CC=${CC:-"gcc"}
+    PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -mno-cygwin"}
+    LDFLAGS=${LDFLAGS:-"-Wl,--export-all-symbols"}
+    CCFLAGS_O=${CCFLAGS_O:-"-c"}
+    OBJEXT_O=${OBJEXT_O:-".o"}
+    LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
+    OBJEXT_SO=${OBJEXT_SO:-".so"}
+    SYSOS="win32"
+}
+
+linux () {
+    CC=${CC:-"cc"}
+    PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1"}
+    LDFLAGS=${LDFLAGS:-"-export-dynamic"}
+    LDLIBS=${LDLIBS:-"-ldl"}
+    CCFLAGS_O=${CCFLAGS_O:-"-c"}
+    OBJEXT_O=${OBJEXT_O:-".o"}
+    LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
+    OBJEXT_SO=${OBJEXT_SO:-".so"}
+    SYSOS="linux"
+}
+
+case $TARGET in
+    powerpc-*-darwin*)		ppc;	darwin;	arch_ppc	;;
+    powerpc-*-netbsd*)		ppc;	bsd;	pic		;;
+    powerpc-*-linux-gnu)	ppc;	linux			;;
+    ia64-*-linux-gnu)		ia64;	linux			;;
+    i[3456789]86-*-darwin*)	i386;	darwin;	arch_386	;;
+    i[3456789]86-*-linux*)	i386;	linux;	pic		;;
+    i[3456789]86-*-freebsd*)	i386;	bsd			;;
+    *cygwin)			i386;	cygwin			;;
+    *mingw32)			i386;	mingw32			;;
+    *)
+	echo "Target '$TARGET' is not recognised."
+	echo
+	echo "Please look at the 'configure' script and figure out the compiler and"
+	echo "linker flags appropriate for your platform.  Then add a line for your"
+	echo "platform to the 'case' statement (along with any new functions that it"
+	echo "might need, in the spirit of what's already there).  When everything"
+	echo "seems to be working, please send a copy of your modified 'configure'"
+	echo "file to the original author at: 'firstName@lastName.com'.  (Suitable"
+	echo "values for 'firstName' and 'lastName' can be found by looking at the"
+	echo "beginning of the 'configure' file.)  Thank-you!"
+	exit 1
+	;;
+esac
+
+echo "$TARGET:"
+echo "  TARGET     = $TARGET"
+echo "  PREFIX     = $PREFIX"
+echo "  CC         = $CC"
+echo "  CFLAGS     = $CFLAGS"
+echo "  MFLAGS     = $MFLAGS"
+echo "  OFLAGS     = $OFLAGS"
+echo "  O3FLAGS    = $O3FLAGS"
+echo "  PGFLAGS    = $PGFLAGS"
+echo "  CCFLAGS    = $CCFLAGS"
+echo "  LDFLAGS    = $LDFLAGS"
+echo "  LDLIBS     = $LDLIBS"
+echo "  OBJEXT     = $OBJEXT"
+echo "  CCFLAGS_O  = $CCFLAGS_O"
+echo "  LDFLAGS_O  = $LDFLAGS_O"
+echo "  LDLIBS_O   = $LDLIBS_O"
+echo "  OBJEXT_O   = $OBJEXT_O"
+echo "  CCFLAGS_SO = $CCFLAGS_SO"
+echo "  LDFLAGS_SO = $LDFLAGS_SO"
+echo "  LDLIBS_SO  = $LDLIBS_SO"
+echo "  OBJEXT_SO  = $OBJEXT_SO"
+echo "  GCDIR      = $GCDIR"
+echo "  SYSARCH    = $SYSARCH"
+echo "  SYSOS      = $SYSOS"
+
+for file in $FILES; do
+  if test -f $file.in; then
+    echo "creating $file"
+    sed "
+s:@TARGET@:$TARGET:g;
+s:@PREFIX@:$PREFIX:g;
+s:@CC@:$CC:g;
+s:@CFLAGS@:$CFLAGS:g;
+s:@MFLAGS@:$MFLAGS:g;
+s:@OFLAGS@:$OFLAGS:g;
+s:@O3FLAGS@:$O3FLAGS:g;
+s:@PGFLAGS@:$PGFLAGS:g;
+s:@CCFLAGS@:$CCFLAGS:g;
+s:@CCFLAGS_O@:$CCFLAGS_O:g;
+s:@CCFLAGS_SO@:$CCFLAGS_SO:g;
+s:@LDFLAGS@:$LDFLAGS:g;
+s:@LDFLAGS_O@:$LDFLAGS_O:g;
+s:@LDFLAGS_SO@:$LDFLAGS_SO:g;
+s:@LDLIBS@:$LDLIBS:g;
+s:@LDLIBS_O@:$LDLIBS_O:g;
+s:@LDLIBS_SO@:$LDLIBS_SO:g;
+s:@OBJEXT@:$OBJEXT:g;
+s:@OBJEXT_O@:$OBJEXT_O:g;
+s:@OBJEXT_SO@:$OBJEXT_SO:g;
+s:@GCDIR@:$GCDIR:g;
+s:@SYSARCH@:$SYSARCH:g;
+s:@SYSOS@:$SYSOS:g;
+" < $file.in > $file
+    chmod +x $file
+  fi
+done
