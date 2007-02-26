@@ -140,7 +140,7 @@ PowerPCCodeGenerator emitPrologue
 PowerPCCodeGenerator emitEpilogue
 [
     csrs do: [:reg | reg used ifTrue: [self lwzR: reg I: reg location offset R: reg location base]].
-    needsFrame ifTrue: [self addiR: r1 R: r1 I: frameSize;  lwzR: r0 I: 8 R: r1;  mflrR: r0].
+    needsFrame ifTrue: [self addiR: r1 R: r1 I: frameSize;  lwzR: r0 I: 8 R: r1;  mtlrR: r0].
     self blr.
 ]
 

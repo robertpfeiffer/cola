@@ -800,7 +800,7 @@ Object _eval
 LABEL call
 [
     | _result |
-    CompilerOptions verboseExec ifTrue: [{ printf("call %p ", self->v__address); }].
+    CompilerOptions verboseExec ifTrue: [{ printf("call %p\n", self->v__address); }].
     { v__result= ((oop (*)(void))self->v__address)(); }.
     CompilerOptions verboseExec ifTrue: [{ printf("=> %d\n", (int)v__result); }].
     ^_result
