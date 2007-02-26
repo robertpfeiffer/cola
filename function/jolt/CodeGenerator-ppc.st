@@ -7,46 +7,51 @@
 
 { include "asm-ppc.h" }
 
-PowerPCCodeGenerator : CodeGenerator ( tempsSize r0 r1 r2 r3 r11 r12 )
+PowerPCRegister : Register ( location )
+
+PowerPCRegister location: loc	[ ^location := loc ]
+PowerPCRegister location	[ ^location ]
+
+
+PowerPCCodeGenerator : CodeGenerator ( r0 r1 r2 r3 r11 r12 )
 
 PowerPCCodeGenerator new
 [
     self := super new.
-    tempsSize := 0.
-    r0           := Register withClass: I4 name: 'r0'  encoding:  0.
-    r1           := Register withClass: I4 name: 'r1'  encoding:  1.
-    r2           := Register withClass: I4 name: 'r2'  encoding:  2.
+    r0           := PowerPCRegister withClass: I4 name: 'r0'  encoding:  0.
+    r1           := PowerPCRegister withClass: I4 name: 'r1'  encoding:  1.
+    r2           := PowerPCRegister withClass: I4 name: 'r2'  encoding:  2.
     ccrs
-	add: (r3 := Register withClass: I4 name: 'r3'  encoding:  3);
-	add: (      Register withClass: I4 name: 'r4'  encoding:  4);
-	add: (      Register withClass: I4 name: 'r5'  encoding:  5);
-	add: (      Register withClass: I4 name: 'r6'  encoding:  6);
-	add: (      Register withClass: I4 name: 'r7'  encoding:  7);
-	add: (      Register withClass: I4 name: 'r8'  encoding:  8);
-	add: (      Register withClass: I4 name: 'r9'  encoding:  9);
-	add: (      Register withClass: I4 name: 'r10' encoding: 10).
-    r11          := Register withClass: I4 name: 'r11' encoding: 11.
-    r12          := Register withClass: I4 name: 'r12' encoding: 12.
+	add: (r3 := PowerPCRegister withClass: I4 name: 'r3'  encoding:  3);
+	add: (      PowerPCRegister withClass: I4 name: 'r4'  encoding:  4);
+	add: (      PowerPCRegister withClass: I4 name: 'r5'  encoding:  5);
+	add: (      PowerPCRegister withClass: I4 name: 'r6'  encoding:  6);
+	add: (      PowerPCRegister withClass: I4 name: 'r7'  encoding:  7);
+	add: (      PowerPCRegister withClass: I4 name: 'r8'  encoding:  8);
+	add: (      PowerPCRegister withClass: I4 name: 'r9'  encoding:  9);
+	add: (      PowerPCRegister withClass: I4 name: 'r10' encoding: 10).
+    r11          := PowerPCRegister withClass: I4 name: 'r11' encoding: 11.
+    r12          := PowerPCRegister withClass: I4 name: 'r12' encoding: 12.
     csrs
-	add: (	    Register withClass: I4 name: 'r13' encoding: 13);
-	add: (	    Register withClass: I4 name: 'r14' encoding: 14);
-	add: (	    Register withClass: I4 name: 'r15' encoding: 15);
-	add: (	    Register withClass: I4 name: 'r16' encoding: 16);
-	add: (	    Register withClass: I4 name: 'r17' encoding: 17);
-	add: (	    Register withClass: I4 name: 'r18' encoding: 18);
-	add: (	    Register withClass: I4 name: 'r19' encoding: 19);
-	add: (	    Register withClass: I4 name: 'r20' encoding: 20);
-	add: (	    Register withClass: I4 name: 'r21' encoding: 21);
-	add: (	    Register withClass: I4 name: 'r22' encoding: 22);
-	add: (	    Register withClass: I4 name: 'r23' encoding: 23);
-	add: (	    Register withClass: I4 name: 'r24' encoding: 24);
-	add: (	    Register withClass: I4 name: 'r25' encoding: 25);
-	add: (	    Register withClass: I4 name: 'r26' encoding: 26);
-	add: (	    Register withClass: I4 name: 'r27' encoding: 27);
-	add: (	    Register withClass: I4 name: 'r28' encoding: 28);
-	add: (	    Register withClass: I4 name: 'r29' encoding: 29);
-	add: (	    Register withClass: I4 name: 'r30' encoding: 30);
-	add: (	    Register withClass: I4 name: 'r31' encoding: 31).
+	add: (	    PowerPCRegister withClass: I4 name: 'r13' encoding: 13);
+	add: (	    PowerPCRegister withClass: I4 name: 'r14' encoding: 14);
+	add: (	    PowerPCRegister withClass: I4 name: 'r15' encoding: 15);
+	add: (	    PowerPCRegister withClass: I4 name: 'r16' encoding: 16);
+	add: (	    PowerPCRegister withClass: I4 name: 'r17' encoding: 17);
+	add: (	    PowerPCRegister withClass: I4 name: 'r18' encoding: 18);
+	add: (	    PowerPCRegister withClass: I4 name: 'r19' encoding: 19);
+	add: (	    PowerPCRegister withClass: I4 name: 'r20' encoding: 20);
+	add: (	    PowerPCRegister withClass: I4 name: 'r21' encoding: 21);
+	add: (	    PowerPCRegister withClass: I4 name: 'r22' encoding: 22);
+	add: (	    PowerPCRegister withClass: I4 name: 'r23' encoding: 23);
+	add: (	    PowerPCRegister withClass: I4 name: 'r24' encoding: 24);
+	add: (	    PowerPCRegister withClass: I4 name: 'r25' encoding: 25);
+	add: (	    PowerPCRegister withClass: I4 name: 'r26' encoding: 26);
+	add: (	    PowerPCRegister withClass: I4 name: 'r27' encoding: 27);
+	add: (	    PowerPCRegister withClass: I4 name: 'r28' encoding: 28);
+	add: (	    PowerPCRegister withClass: I4 name: 'r29' encoding: 29);
+	add: (	    PowerPCRegister withClass: I4 name: 'r30' encoding: 30);
+	add: (	    PowerPCRegister withClass: I4 name: 'r31' encoding: 31).
 ]
 
 PowerPCCodeGenerator clobberRegisters: insn	[ insn clobberPowerPC: self ]
@@ -54,9 +59,9 @@ PowerPCCodeGenerator clobberRegisters: insn	[ insn clobberPowerPC: self ]
 Instruction clobberPowerPC: gen	[]
 
 ADDRFP4 clobberPowerPC: gen [ gen requireFrame ]
-Call	clobberPowerPC: gen [ gen clobberCCRs; requireFrame ]
+Call	clobberPowerPC: gen [ gen clobberCall: self; requireFrame ]
 
-PowerPCCodeGenerator clobberCCRs
+PowerPCCodeGenerator clobberCall: insn
 [
     ccrs do: [:ccr | self clobberRegister: ccr]
 ]
@@ -111,35 +116,31 @@ PowerPCCodeGenerator reloadi4 :r :t	[ self error: 'reloadi4' ]
 PowerPCCodeGenerator finaliseFrame
 [
     | align |
-    frameSize := 12.							"linkage"
-    tempsSize := 0.
-    needsFrame ifTrue: [frameSize := frameSize + 4].			"saved frame pointer"
-    csrs do: [:reg | reg used ifTrue: [frameSize := frameSize + 4]].	"callee-saved register"
+    frameSize := 12 + parametersSize.
+    csrs do: [:reg | reg used ifTrue: [reg location: (temps add: (Temporary withBase: r1 offset: temps size * 4)) allocate]].
     temps do: [:temp |
-	tempsSize := tempsSize + 4.					"temporary variable"
-	temp offset: temp offset + parametersSize].
-    tempsSize := tempsSize + parametersSize.				"outgoing parameters"
-    frameSize := frameSize + tempsSize.
+	temp offset: 12 + parametersSize + temp offset.
+	frameSize := frameSize + 4.					"temporary space"
+	needsFrame := true].
     needsFrame
 	ifTrue:
 	   [align := (frameSize + 15 bitAnd: -16) - frameSize.
-	    tempsSize := tempsSize + align.
 	    frameSize := frameSize + align].
     needsFrame
-	ifTrue:  [params do: [:param | param offset: param offset + 8]]
-	ifFalse: [params do: [:param | param offset: param offset + frameSize]].
+	ifTrue:  [params do: [:param | param offset: param offset + 12]]
+	ifFalse: [params do: [:param | param offset: param offset + 12 + frameSize]].
 ]
 
 PowerPCCodeGenerator emitPrologue
 [
-    needsFrame ifTrue: [self mflrR: r0;  stwR: r0 I: 8 R: r1;  stwuR: r1 I: tempsSize negated R: r1 ].
-    csrs do: [:reg | reg used ifTrue: [self error: 'CSR used']].
+    needsFrame ifTrue: [self mflrR: r0;  stwR: r0 I: 8 R: r1;  stwuR: r1 I: frameSize negated R: r1 ].
+    csrs do: [:reg | reg used ifTrue: [self stwR: reg I: reg location offset R: reg location base]].
 ]
 
 PowerPCCodeGenerator emitEpilogue
 [
-    csrs reverseDo: [:reg | reg used ifTrue: [self error: 'CSR used']].
-    needsFrame ifTrue: [self addiR: r1 R: r1 I: tempsSize;  lwzR: r0 I: 8 R: r1;  mflrR: r0].
+    csrs do: [:reg | reg used ifTrue: [self lwzR: reg I: reg location offset R: reg location base]].
+    needsFrame ifTrue: [self addiR: r1 R: r1 I: frameSize;  lwzR: r0 I: 8 R: r1;  mflrR: r0].
     self blr.
 ]
 
@@ -150,19 +151,17 @@ PowerPCCodeGenerator noteCall: call
 
 PowerPCCodeGenerator calli4 :call
 [
-    self emit: call rhs argument: 0.
-    call lhs reload: self.
-    self mtlrR: call lhs output.
+    call arguments reverseDoWithIndex: [:arg :index | self emit: arg argument: index].
+    call function reload: self.
+    self mtlrR: call function output.
     self blrl.
-    self mrR: r3 R: call output.
+    self mrR: call output R: r3.
 ]
 
 PowerPCCodeGenerator emit: insn argument: index
 [
-    insn isNOP ifTrue: [^self].
-    self emit: insn rhs argument: index + 1.
-    insn lhs reload: self.
-    self stwR: insn output I: index * 4 R: r1.
+    insn reload: self.
+    self mrR: (ccrs at: index) R: insn output.
 ]
 
 
@@ -200,7 +199,7 @@ StaticPowerPCCodeGenerator crnorI: d I: a I: b	[ StdOut nextPutAll: '	crnor	'; p
 StaticPowerPCCodeGenerator divwR: d R: a R: b	[ StdOut nextPutAll: '	divw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator lbzR: d I: i R: s	[ StdOut nextPutAll: '	lbz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
 StaticPowerPCCodeGenerator lisR: d I_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger value_: _i) >> 16; cr ]
-StaticPowerPCCodeGenerator lwzR: d I: i R: s	[ StdOut nextPutAll: '	lwz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
+StaticPowerPCCodeGenerator lwzR: d I: i R: s	[ StdOut nextPutAll: '	lwz	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator mfcrR: d		[ StdOut nextPutAll: '	mfcr	'; print: d; cr ]
 StaticPowerPCCodeGenerator mflrR: d		[ StdOut nextPutAll: '	mflr	'; print: d; cr ]
 StaticPowerPCCodeGenerator mrR: d R: s		[ d == s ifFalse: [StdOut nextPutAll: '	mr	'; print: d; nextPut: $,; print: s; cr ] ]

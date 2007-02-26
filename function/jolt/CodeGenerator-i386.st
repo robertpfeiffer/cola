@@ -142,17 +142,15 @@ Intel32CodeGenerator noteCall: call
 
 Intel32CodeGenerator calli4 :call
 [
-    self emit: call rhs argument: 0.
-    call lhs reload: self.
-    self callMb: call lhs output.
+    call arguments reverseDoWithIndex: [:arg :index | self emit: arg argument: index].
+    call function reload: self.
+    self callMb: call function output.
     self movlR: eax R: call output.
 ]
 
 Intel32CodeGenerator emit: insn argument: index
 [
-    insn isNOP ifTrue: [^self].
-    self emit: insn rhs argument: index + 1.
-    insn lhs reload: self.
+    insn reload: self.
     self movlR: insn output Md: index * 4 b: esp.
 ]
 

@@ -272,19 +272,9 @@ Compiler apply: expr
 [
     | call |
     call := CALLI4 new.
+    expr from: 1 do: [:arg | call add: (arg translate: self)].
+    call function: (expr first translate: self).
     ^call
-	arity: expr size - 1;
-	lhs: (expr first translate: self);
-	rhs: (self translateArguments: expr from: 1)
-]
-
-Compiler translateArguments: args from: index
-[
-    ^index == args size
-	ifTrue:  [NOP new]
-	ifFalse: [ARGI4 new
-		      lhs: ((args at: index) translate: self);
-		      rhs: (self translateArguments: args from: index + 1)]
 ]
 
 "----------------------------------------------------------------"

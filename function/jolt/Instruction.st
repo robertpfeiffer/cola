@@ -69,13 +69,23 @@ Binary		: Unary	      ( rhs )	Binary  rhs [ ^rhs ]	Binary  rhs: r	[ rhs := r par
 
 Parameter : Leaf ()
 
+Call : Instruction (
+    function	"function expression"
+    arguments	"argument expressions, leftmost first"
+)
 
-Argument : Binary ()	"lhs is arg value, rhs is arg list terminated by nil"
+Call new
+[
+    self := super new.
+    arguments := OrderedCollection new.
+]
 
-Call : Binary ( arity )	"lhs is function, rhs is arg list terminated by nil"
+Call function: expr	[ ^function := (expr parent: self) ]
+Call add: expr		[ ^arguments add: (expr parent: self) ]
 
-Call arity: anInteger	[ ^arity := anInteger ]
-Call arity		[ ^arity ]
+Call function		[ ^function ]
+Call arguments		[ ^arguments ]
+Call arity		[ ^arguments size ]
 
 
 Spill : Unary  ( location )
@@ -183,8 +193,6 @@ CALLI4	: Call ()	CALLI4	name [ ^#calli4 ]	CALLI4  class	[ ^#I4 ]
 
 PARAMI4	: Parameter ()	PARAMI4	name [ ^#parami4 ]	PARAMI4 class	[ ^#I4 ]
 
-ARGI4	: Argument ()	ARGI4  	name [ ^#argi4 ]	ARGI4   class	[ ^#I4 ]
-
 SPILLI4	: Spill ()	SPILLI4	name [^ #spilli4 ]	SPILLI4 class	[ ^#I4 ]
 
 Address : LeafP4 ( variable )
@@ -203,7 +211,8 @@ Block selectInstructions: gen
 
 Call selectInstructions: gen
 [
-    super selectInstructions: gen.
+    function selectInstructions: gen.
+    arguments do: [:arg | arg selectInstructions: gen].
     gen noteCall: self.
 ]
 
@@ -225,31 +234,14 @@ Block clobberRegisters: codeGenerator
 
 Call clobberRegisters: codeGenerator
 [
-    lhs clobberRegisters: codeGenerator.
-    rhs clobberRegisters: codeGenerator.
-    rhs killAll: codeGenerator.
-    codeGenerator noteDead: lhs.
+    function clobberRegisters: codeGenerator.
+    arguments do: [:arg | arg clobberRegisters: codeGenerator].
+    arguments reverseDo: [:arg | codeGenerator noteDead: arg].
     codeGenerator clobberRegisters: self.
-    codeGenerator noteLive: self.
+    codeGenerator noteDead: function; noteLive: self.
 ]
 
-Argument killAll: codeGenerator
-[
-    rhs killAll: codeGenerator.
-    codeGenerator noteDead: self.
-]
-
-NOP killAll: codeGenerator	[]
-
-Argument clobberRegisters: codeGenerator
-[
-    lhs clobberRegisters: codeGenerator.
-    rhs clobberRegisters: codeGenerator.
-    codeGenerator clobberRegisters: self.
-    "lhs and rhs remain live"
-]
-
-Leaf   clobberRegisters: codeGenerator
+Leaf clobberRegisters: codeGenerator
 [
     codeGenerator noteLive: self; clobberRegisters: self
 ]
@@ -259,7 +251,7 @@ LeafV clobberRegisters: codeGenerator
     codeGenerator clobberRegisters: self.
 ]
 
-Unary  clobberRegisters: codeGenerator
+Unary clobberRegisters: codeGenerator
 [
     lhs clobberRegisters: codeGenerator.
     codeGenerator clobberRegisters: self
@@ -329,27 +321,11 @@ Block allocateRegisters: codeGenerator
 
 Call allocateRegisters: codeGenerator
 [
-    lhs allocateRegisters: codeGenerator.
-    rhs allocateRegisters: codeGenerator.
-    rhs releaseAll: codeGenerator.
-    lhs releaseSpill; releaseRegister.
+    function allocateRegisters: codeGenerator.
+    arguments do: [:arg | arg allocateRegisters: codeGenerator].
+    function releaseSpill; releaseRegister.
+    arguments do: [:arg | arg releaseSpill; releaseRegister].
     ^output := codeGenerator allocateRegister: self.
-]
-
-Argument releaseAll: codeGenerator
-[
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: 'rhs release all '; print: self; cr].
-    rhs releaseAll: codeGenerator.
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: 'lhs releaseSpill; releaseRegister '; print: self; cr].
-    lhs releaseSpill; releaseRegister.
-]
-
-NOP releaseAll: codeGenerator	[]
-
-Argument allocateRegisters: codeGenerator
-[
-    output := lhs allocateRegisters: codeGenerator.
-    rhs allocateRegisters: codeGenerator.
 ]
 
 Leaf allocateRegisters: codeGenerator
@@ -402,22 +378,70 @@ Instruction spillRegisterFor: insn in: gen
     ^parent notNil ifTrue: [parent spillRegisterFor: insn in: gen]
 ]
 
+Instruction canSpillFor: insn
+[
+    (insn clobbers: output)	ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  clobbered\n'].	^nil].
+    (self == insn)		ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is target\n'].	^nil].
+    (output)			ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg is nil\n'].	^nil].
+    (output live)		ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg dead\n'].	^nil].
+    ^output
+]
+
+Spill canSpillFor: insn
+[
+    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is spill\n'].
+    ^false
+]
+
+Block canSpillFor: insn
+[
+    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is block\n'].
+    ^false
+]
+
+Instruction spilledIn: gen
+[
+    | spill |
+    spill := SPILLI4 new.
+    spill
+	output:   output;
+	lhs:      self;
+	location: (gen allocateTemp: spill).
+    ^spill
+]
+
 Binary spillRegisterFor: insn in: gen
 [
     | reg |
     parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
     reg notNil ifTrue: [^reg].
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying '; print: self; nextPutAll: ' -> '; print: lhs; space; print: rhs; cr].
-    (lhs isSpill)		ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is spill\n'].	^nil].
-    (lhs isBlock)		ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is block\n'].	^nil].
-    (insn clobbers: lhs output)	ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  clobbered\n'].	^nil].
-    (lhs == insn)		ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is target\n'].	^nil].
-    (reg := lhs output)		ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg is nil\n'].	^nil].
-    (reg live)			ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg dead\n'].	^nil].
+    CompilerOptions verboseRegs ifTrue:  [StdOut nextPutAll: '  trying '; print: self; nextPutAll: ' -> '; print: lhs; space; print: rhs; cr].
+    (reg := lhs canSpillFor: insn) ifFalse: [^nil].
     CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling '; print: lhs; cr].
-    lhs := SPILLI4 new output: reg; lhs: lhs.
-    lhs location: (gen allocateTemp: lhs).
+    lhs := lhs spilledIn: gen.
     ^reg
+]
+
+Call spillRegisterFor: insn in: gen
+[
+    | reg |
+    parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
+    reg notNil ifTrue: [^reg].
+    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying '; print: self; cr].
+    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying function '; print: function; cr].
+    (reg := function canSpillFor: insn)
+	ifTrue:
+	   [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling function '; print: function; cr].
+	    function := function spilledIn: gen.
+	    ^reg].
+    arguments doWithIndex: [:arg :index |
+	CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying argument '; print: arg; cr].
+	(reg := arg canSpillFor: insn)
+	    ifTrue:
+	       [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling argument '; print: arg; cr].
+		arguments at: index put: (arg spilledIn: gen).
+		^reg]].
+    ^nil
 ]
 
 " Recursively emit concrete insns for an entire abstract insn tree. "
@@ -429,15 +453,9 @@ Block emit: gen
 
 Call emit: gen
 [
-    lhs emit: gen.
-    rhs emit: gen.
+    function emit: gen.
+    arguments do: [:arg | arg emit: gen].
     gen perform: self name with: self
-]
-
-Argument emit: gen
-[
-    lhs emit: gen.
-    rhs emit: gen.
 ]
 
 Leaf emit: gen
@@ -489,6 +507,12 @@ Instruction printOn: aStream indent: i
 ]
 
 Block	printInsnOn: aStream indent: i	[ instructions do: [:insn | insn printOn: aStream indent: i + 1] ]
+
+Call	printInsnOn: aStream indent: i
+[
+    arguments do: [:arg | arg printOn: aStream indent: i + 2].
+    function printOn: aStream indent: i + 1.
+]
 
 Leaf    printInsnOn: aStream indent: i	[ aStream space; print: arg ]
 Unary   printInsnOn: aStream indent: i	[ lhs printOn: aStream indent: i + 1 ]
