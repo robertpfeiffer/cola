@@ -444,5 +444,20 @@
 (let ((x 2))
   (+ x x x x x))
 
+(define strdup  (dlsym "strdup"))
+(define strcmp  (dlsym "strcmp"))
+(define isalpha (dlsym "isalpha"))
+
+(define toupper
+  (lambda (s)
+    (let ((t (strdup s)) (p t) (c 0))
+      (while (set c (char@ p))
+	(if (isalpha c) (set (char@ p) (& c 0xdf)))
+	(set p (+ p 1)))
+      t)))
+
+(assert (strcmp "Hooplah oink! oink!" (toupper "Hooplah oink! oink!")))
+(refute (strcmp "HOOPLAH OINK! OINK!" (toupper "Hooplah oink! oink!")))
+
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "CodeGenerator") versionString] _elements])
