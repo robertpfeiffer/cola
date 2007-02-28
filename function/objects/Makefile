@@ -1,4 +1,4 @@
-IDC		= idc -k # -O
+IDC		= idc -k -O
 IDFLAGS		= -g
 
 OBJEXT          = 
