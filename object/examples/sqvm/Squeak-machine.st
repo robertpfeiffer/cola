@@ -20,7 +20,7 @@ Squeak fastInterpret
 	whileTrue:
 	   [cb := currentBytecode := method fields at: instructionPointer.
 	    instructionPointer := instructionPointer + 1.
-	    { (((_imp_t *)v__imps)[(long)v_cb >> 1])(0, v_self); }]
+	    { (((_imp_t *)v__imps)[(long)v_cb >> 1])(0, v_stateful_self, v_self); }]
 ]
 
 _vtable methodAt: aSelector
