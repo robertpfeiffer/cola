@@ -19,6 +19,6 @@ To build and install, relative to this directory:
 
     cd function
     make
-    sudo make install
+    make test
 
 Examples forthcoming.
