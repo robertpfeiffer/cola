@@ -1,0 +1,24 @@
+The static object compiler (codename Pepsi)
+-------------------------------------------
+
+To build and install, relative to this directory:
+
+    cd object
+    make
+    sudo make install
+
+Examples, relative to this directory:
+
+    see indivdual subdirs in objects/examples
+
+
+The dynamic function compiler (codename Jolt)
+---------------------------------------------
+
+To build and install, relative to this directory:
+
+    cd function
+    make
+    sudo make install
+
+Examples forthcoming.
