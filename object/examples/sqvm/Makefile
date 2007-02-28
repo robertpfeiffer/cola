@@ -19,10 +19,10 @@ SqueakProxy.$o : vmProxy.c
 SqueakIO.$o : $(wildcard io*.c)
 
 SqueakBitBlt.so : SqueakBitBlt.st BitBltPlugin.c
-	$(IDC) -s -Wc,-Wno-error $<
+	$(IDC) -s -Wc,-w $<
 
 SqueakBitBlt.o : SqueakBitBlt.st BitBltPlugin.c
-	$(IDC) -c  -Wc,-Wno-error $<
+	$(IDC) -c  -Wc,-w $<
 
 %.so : %.st
 	$(IDC) -s $<
