@@ -50,7 +50,7 @@ tidy : .FORCE
 	-rm -f *.o *.d *~ .gdb* *.stackdump *.c
 
 clean : tidy
-	-rm -f $(FILES) main$(OBJEXT) VPU.st
+	-rm -f $(FILES) main$(OBJEXT) VPU.st *.sym
 	$(SHELL) -ec 'cd mpint;  $(MAKE) clean' 
 
 distclean spotless : clean
