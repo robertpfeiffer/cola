@@ -15,6 +15,9 @@ LDLIBS		= ../objects/objects.a -lreadline
 
 all : main$(OBJEXT)
 
+test : main$(OBJEXT) .FORCE
+	./main$(OBJEXT) boot.k sanaras.k
+
 .SUFFIXES :
 
 %$(OBJEXT_SO) : %.st
