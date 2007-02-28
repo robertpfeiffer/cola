@@ -137,6 +137,8 @@ typedef unsigned char insn;
 
 #if 1
 
+# undef _B
+
   static int _B(int x) {
     u_int8_t *pc= (u_int8_t *)asm_pc;
     if (asm_pass) *pc= (u_int8_t)x;
@@ -144,6 +146,8 @@ typedef unsigned char insn;
     return x;
   }
  
+# undef _W
+
   static int _W(int x) {
     u_int16_t *pc= (u_int16_t *)asm_pc;
     if (asm_pass) *pc= (u_int16_t)x;
@@ -151,6 +155,8 @@ typedef unsigned char insn;
     return x;
   }
  
+# undef _L
+
   static int _L(int x) {
     u_int32_t *pc= (u_int32_t *)asm_pc;
     if (asm_pass) *pc= (u_int32_t)x;
@@ -161,6 +167,8 @@ typedef unsigned char insn;
 # define _OFF4(D)	((u_int32_t)d - (u_int32_t)asm_pc)
 # define _CKD1(D)	((asm_pass==1) ? _OFF4(D) : _d1(_OFF4(D)))
 
+# undef _D1
+
   static int8_t _D1(int d) {
     int8_t *pc= (int8_t *)asm_pc;
     int8_t off= 0;
@@ -169,6 +177,8 @@ typedef unsigned char insn;
     if (asm_pass) *pc= off;
     return off;
   }
+
+# undef _D4
 
   static int32_t _D4(int d) {
     int32_t *pc= (int32_t *)asm_pc;

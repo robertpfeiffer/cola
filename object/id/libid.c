@@ -396,13 +396,22 @@ static oop _object___beNilType(oop _thunk, oop state, oop self)
   return _libid_nil_vtable= _object___vtable(0, self, self);
 }
 
+#define ID_RTLD_FLAGS	RTLD_LAZY | RTLD_GLOBAL
+
 static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, char *initName)
 {
-  dlhandle_t lib;
-  void *init;
-  lib= dlopen(0, RTLD_LAZY);
-  init= dlsym(lib, initName);
-  dlclose(lib);
+  dlhandle_t lib= 0;
+  void *init= 0;
+  init= dlsym(RTLD_DEFAULT, initName);
+  dprintf("dlsym RTLD_DEFAULT %s -> %p\n", initName, init);
+  if (!init)
+    {
+      lib= dlopen(0, ID_RTLD_FLAGS);
+      dprintf("1  dlopen 0 -> %p\n", lib);
+      init= dlsym(lib, initName);
+      dprintf("2  dlsym %p %s -> %p\n", lib, initName, init);
+      dlclose(lib);
+    }
   if (init)
     {
       dprintf("INTERNAL IMPORT <%s>\n", initName);
@@ -411,25 +420,29 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
     {
       char  path[MAXPATHLEN];
       snprintf(path, MAXPATHLEN, "%s.so", fileName);
-      lib= dlopen(path, RTLD_LAZY);
+      lib= dlopen(path, ID_RTLD_FLAGS);
+      dprintf("3  dlopen %s -> %p\n", path, lib);
       if (!lib)
 	{
 	  snprintf(path, MAXPATHLEN, "./%s.so", fileName);
-	  lib= dlopen(path, RTLD_LAZY);
+	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  dprintf("4  dlopen %s -> %p\n", path, lib);
 	}
       if (!lib)
 	{
 	  char *prefix;
 	  if (!(prefix= getenv("IDC_LIBDIR"))) prefix= PREFIX;
 	  snprintf(path, MAXPATHLEN, "%s%s.so", prefix, fileName);
-	  lib= dlopen(path, RTLD_LAZY);
+	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  dprintf("5  dlopen %s -> %p\n", path, lib);
 #        if defined(WIN32)
 	  if (!lib)
 	    {
 	      char *p;
 	      for (p= path;  *p;  ++p)
 		if ('/' == *p) *p= '\\';
-	      lib= dlopen(path, RTLD_LAZY);
+	      lib= dlopen(path, ID_RTLD_FLAGS);
+	      dprintf("6  dlopen %s -> %p\n", path, lib);
 	      if (!lib)
 		{
 		  perror(path);
@@ -439,6 +452,7 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	}
       if (!lib) fatal("import: %s.so: No such file or directory\n", fileName);
       init= dlsym(lib, "__id__init__");
+      dprintf("7  dlsym %p __id__init__ -> %p\n", lib, init);
       if (!init) fatal("%s: __id__init__: Undefined symbol\n", path);
     }
   dprintf("INIT %s %p %p\n", fileName, lib, init);

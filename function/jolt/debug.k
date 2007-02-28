@@ -65,8 +65,8 @@
 
 (define %top-level-fp (get-current-fp))
 
-(while (get-caller-fp (get-caller-fp %top-level-fp))
-  (set %top-level-fp (get-caller-fp %top-level-fp)))
+;;(while (get-caller-fp (get-caller-fp %top-level-fp))
+;;  (set %top-level-fp (get-caller-fp %top-level-fp)))
 
 (define backtrace
   (lambda (result)

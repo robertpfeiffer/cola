@@ -44,6 +44,12 @@ struct __closure
   oop	 data;
 };
 
+struct __lookup
+{
+  struct t__closure *closure;
+  oop		     state;
+};
+
 void 		   _libid_init    (int *argcp, char ***argvp, char ***envp);
 oop  		   _libid_intern  (const char *string);
 oop  		   _libid_proto   (oop base);
@@ -55,6 +61,7 @@ oop  		  *_libid_palloc  (size_t size);
 void  		  *_libid_balloc  (size_t size);
 void		   _libid_flush   (oop selector);
 struct t__closure *_libid_bind    (oop selector, oop receiver);
+struct  __lookup   _libid_bind2   (oop selector, oop receiver);
 oop                _libid_nlreturn(oop nlr, oop result);
 oop                _libid_nlresult(void);
 
@@ -83,6 +90,7 @@ static oop s__beTagType= 0;
 static oop s__beNilType= 0;
 static oop s__import_= 0;
 static oop s_doesNotUnderstand_= 0;
+static oop s__delegate= 0;
 
 typedef union  t__object   _object_t;
 typedef struct t__selector _selector_t;
@@ -289,6 +297,11 @@ static oop _object___vtable(oop _thunk, oop state, oop self)
   return self ? (((unsigned)self & 1) ? _libid_tag_vtable :  self->_vtable[-1]) : _libid_nil_vtable;
 }
 
+static oop _object___delegate(oop _thunk, oop state, oop self)
+{
+  return 0;
+}
+
 static oop _object___delegated(oop _thunk, oop state, oop self)
 {
   oop obj= _vtable__delegated(0, self->_vtable[-1], self->_vtable[-1]);
@@ -383,13 +396,22 @@ static oop _object___beNilType(oop _thunk, oop state, oop self)
   return _libid_nil_vtable= _object___vtable(0, self, self);
 }
 
+#define ID_RTLD_FLAGS	RTLD_LAZY | RTLD_GLOBAL
+
 static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, char *initName)
 {
-  dlhandle_t lib;
-  void *init;
-  lib= dlopen(0, RTLD_LAZY);
-  init= dlsym(lib, initName);
-  dlclose(lib);
+  dlhandle_t lib= 0;
+  void *init= 0;
+  init= dlsym(RTLD_DEFAULT, initName);
+  dprintf("dlsym RTLD_DEFAULT %s -> %p\n", initName, init);
+  if (!init)
+    {
+      lib= dlopen(0, ID_RTLD_FLAGS);
+      dprintf("1  dlopen 0 -> %p\n", lib);
+      init= dlsym(lib, initName);
+      dprintf("2  dlsym %p %s -> %p\n", lib, initName, init);
+      dlclose(lib);
+    }
   if (init)
     {
       dprintf("INTERNAL IMPORT <%s>\n", initName);
@@ -398,25 +420,29 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
     {
       char  path[MAXPATHLEN];
       snprintf(path, MAXPATHLEN, "%s.so", fileName);
-      lib= dlopen(path, RTLD_LAZY);
+      lib= dlopen(path, ID_RTLD_FLAGS);
+      dprintf("3  dlopen %s -> %p\n", path, lib);
       if (!lib)
 	{
 	  snprintf(path, MAXPATHLEN, "./%s.so", fileName);
-	  lib= dlopen(path, RTLD_LAZY);
+	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  dprintf("4  dlopen %s -> %p\n", path, lib);
 	}
       if (!lib)
 	{
 	  char *prefix;
 	  if (!(prefix= getenv("IDC_LIBDIR"))) prefix= PREFIX;
 	  snprintf(path, MAXPATHLEN, "%s%s.so", prefix, fileName);
-	  lib= dlopen(path, RTLD_LAZY);
+	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  dprintf("5  dlopen %s -> %p\n", path, lib);
 #        if defined(WIN32)
 	  if (!lib)
 	    {
 	      char *p;
 	      for (p= path;  *p;  ++p)
 		if ('/' == *p) *p= '\\';
-	      lib= dlopen(path, RTLD_LAZY);
+	      lib= dlopen(path, ID_RTLD_FLAGS);
+	      dprintf("6  dlopen %s -> %p\n", path, lib);
 	      if (!lib)
 		{
 		  perror(path);
@@ -426,6 +452,7 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	}
       if (!lib) fatal("import: %s.so: No such file or directory\n", fileName);
       init= dlsym(lib, "__id__init__");
+      dprintf("7  dlsym %p __id__init__ -> %p\n", lib, init);
       if (!init) fatal("%s: __id__init__: Undefined symbol\n", path);
     }
   dprintf("INIT %s %p %p\n", fileName, lib, init);
@@ -516,6 +543,7 @@ void _libid_init(int *argcp, char ***argvp, char ***envpp)
   _send(s_methodAt_put_with_, type##_vtable, s_##var, (_imp_t)type##__##var, 0);
 
   method(_selector, "_intern:",   	  _intern_);
+  method(_object,   "_delegate", 	  _delegate);
   method(_object,   "_delegated", 	  _delegated);
   method(_object,   "_vtable",    	  _vtable);
   method(_vtable,   "init",		  init);
@@ -599,6 +627,48 @@ _closure_t *_libid_bind(oop selector, oop receiver)
   entry->closure= &assoc->assoc.value->closure;
 #endif
   return &assoc->assoc.value->closure;
+}
+
+struct __lookup _libid_bind2(oop selector, oop receiver)
+{
+  oop fragment= receiver;
+  static int recursionGuard= 0;
+#if GLOBAL_MCACHE
+  struct __entry *entry= 0;
+#endif
+  oop assoc= 0;
+  do {
+    oop vtable= fragment ? (((unsigned)fragment & 1) ? _libid_tag_vtable : fragment->_vtable[-1]) : _libid_nil_vtable;
+    dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, fragment);
+    if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(fragment));
+#  if GLOBAL_MCACHE
+    entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
+    if (entry->selector == selector && entry->vtable == vtable)
+      return (struct __lookup){ entry->closure, fragment };
+#  endif
+    assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _send(s_lookup_, vtable, selector);
+  /*assoc= _vtable__lookup_(0, vtable, selector);*/
+    --recursionGuard;
+    if (assoc)
+      {
+#      if GLOBAL_MCACHE
+	entry->selector= selector;
+	entry->vtable=   vtable;
+	entry->closure= &assoc->assoc.value->closure;
+#      endif
+	return (struct __lookup){ &assoc->assoc.value->closure, fragment };
+      }
+    fragment= _send(s__delegate, fragment);
+  } while (fragment);
+
+  if (selector != s_doesNotUnderstand_)
+    {
+      oop result= _send(s_doesNotUnderstand_, receiver, selector);
+      if (_object___vtable(0, result, result) == _closure->_vtable[-1])
+	return (struct __lookup){ (_closure_t *)result, receiver };
+    }
+  fatal("primitive error handling failed (%p %p)", receiver, selector);
+  return (struct __lookup){ 0, 0 };
 }
 
 void _libid_flush(oop selector)

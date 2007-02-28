@@ -113,7 +113,7 @@
     (let ((scanner [CokeScanner on: [fileOrString readStream]])
 	  (expr    0))
       (while (set expr [scanner next])
-	;[StdOut print: expr][StdOut cr]
+	;;[StdOut print: expr][StdOut cr]
 	[expr eval]))))
 
 ;; read the contents of a file

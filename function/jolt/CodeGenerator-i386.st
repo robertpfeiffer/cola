@@ -247,6 +247,10 @@ DynamicIntel32CodeGenerator addrjp4 :d :l	[ self movlI_: l _address R: d ]
 DynamicIntel32CodeGenerator _
 {
     (void)_W; (void)_D1; (void)_D4;
+#   undef _P
+#   undef _I
+#   undef _R
+#   undef _A
 #   define _P(v)	((long)v__##v)
 #   define _I(v)	((long)v_##v >> 1)
 #   define _R(v)	((long)(((struct t_Register *)(v_##v))->v__encoding))
