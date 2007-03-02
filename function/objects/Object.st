@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:30:18 by piumarta on emilia
+  Last edited: 2007-03-01 10:45:40 by piumarta on emilia
 "
 
 { import: Objects }
@@ -134,6 +134,12 @@ Object error: reason
 Object shouldNotImplement: aSelector
 [
     StdErr cr; nextPutAll: self debugName; nextPutAll: ' should not implement '; print: aSelector; cr.
+    { exit(1); }.
+]
+
+Object subtypeResponsibility: aSelector
+[
+    StdErr cr; nextPutAll: self debugName; nextPutAll: ' did not override '; print: aSelector; cr.
     { exit(1); }.
 ]
 
