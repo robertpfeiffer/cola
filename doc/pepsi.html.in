@@ -1405,6 +1405,10 @@ directive before the first use of the corresponding type of literal:
     each static block that occurs in the program, where the arguments
     are interpreted in the same way as for full closures.
 
+<h2>Resources</h2>
+
+The COLA mailing list: <a href="http://vpri.org/mailman/listinfo/fonc">http://vpri.org/mailman/listinfo/fonc</a>.
+
 </body>
 </html>
 <!--
