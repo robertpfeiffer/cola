@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:25:08 by piumarta on emilia
+  Last edited: 2007-03-01 16:01:18 by piumarta on emilia
 "
 
 { import: Objects }
@@ -187,7 +187,6 @@ ConsoleFileStream prompt: aString
 
 ConsoleFileStream _atexit
 {
-    stifle_history(1000);
     write_history(".jolt-history");
 }
 
@@ -204,6 +203,7 @@ ConsoleFileStream refill
 	else
 	{
 	    using_history();
+	    stifle_history(1000);
 	    read_history(".jolt-history");
 	    atexit((void (*)(void))ConsoleFileStream___5fatexit);
 	}
