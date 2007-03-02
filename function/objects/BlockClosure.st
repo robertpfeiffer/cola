@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:36:37 by piumarta on emilia
+  Last edited: 2007-03-01 13:03:42 by piumarta on emilia
 "
 
 { import: Objects }
@@ -28,6 +28,11 @@ StaticBlockClosure function_: _implementationAddress arity_: _argumentCount
 ]
 
 StaticBlockClosure arity	[ ^SmallInteger value_: _arity ]
+
+StaticBlockClosure errorArgumentCount: given
+[
+    self error: 'BlockClosure expected ', self arity printString, ' arguments but was given ', given printString
+]
 
 "evaluating"
 
@@ -46,25 +51,25 @@ StaticBlockClosure value: a
 StaticBlockClosure value: a value: b
 [
     { if ((int)self->v__arity == 2) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b); }.
-    ^self errorArgumentCount: 1
+    ^self errorArgumentCount: 2
 ]
 
 StaticBlockClosure value: a value: b value: c
 [
     { if ((int)self->v__arity == 3) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c); }.
-    ^self errorArgumentCount: 1
+    ^self errorArgumentCount: 3
 ]
 
 StaticBlockClosure value: a value: b value: c value: d
 [
     { if ((int)self->v__arity == 4) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d); }.
-    ^self errorArgumentCount: 1
+    ^self errorArgumentCount: 4
 ]
 
 StaticBlockClosure value: a value: b value: c value: d value: e
 [
     { if ((int)self->v__arity == 5) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d, v_e); }.
-    ^self errorArgumentCount: 1
+    ^self errorArgumentCount: 5
 ]
 
 "controling"
