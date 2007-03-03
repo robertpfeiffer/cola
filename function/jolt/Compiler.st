@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:49:37 by piumarta on emilia
+  Last edited: 2007-03-03 13:55:40 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -291,9 +291,8 @@ Compiler performSyntax: aSelector with: form
 Compiler apply: expr
 [
     | call |
-    call := CALLI4 new.
-    expr from: 1 do: [:arg | call add: (arg translate: self)].
-    call function: (expr first translate: self).
+    (call := CALLI4 new) function: (expr first translate: self).
+    expr from: 1 do: [:arg | call addArgument: (arg translate: self)].
     ^call
 ]
 
@@ -783,15 +782,15 @@ Compiler compile: anObject for: codeGeneratorType
     tree isVoid
 	ifTrue:  [block add: tree; add: RETV new]
 	ifFalse: [block add: (RETI4 new lhs: tree)].
-    CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
+    CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen := generatorType withLabels: labels.
     block selectInstructions: gen.
-    CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
+    CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen lastLive ifTrue: [self error: 'compile: codeGen begins with live register: ', gen lastLive printString].
     block clobberRegisters: gen.
     gen lastLive ifTrue: [self error: 'compile: clobber ends with live register: ', gen lastLive printString].
     block allocateRegisters: gen.
-    CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
+    CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen emit: block.
     CompilerOptions verboseRegs ifTrue: [gen dumpResources].
     ^entry

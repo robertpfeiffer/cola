@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:48:28 by piumarta on emilia
+  Last edited: 2007-03-03 15:11:19 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -90,8 +90,7 @@ Binary		: Unary	      ( rhs )	Binary  rhs [ ^rhs ]	Binary  rhs: r	[ rhs := r par
 Parameter : Leaf ()
 
 Call : Instruction (
-    function	"function expression"
-    arguments	"argument expressions, leftmost first"
+    arguments	"function, argument expressions, leftmost first"
 )
 
 Call new
@@ -100,12 +99,13 @@ Call new
     arguments := OrderedCollection new.
 ]
 
-Call function: expr	[ ^function := (expr parent: self) ]
-Call add: expr		[ ^arguments add: (expr parent: self) ]
+Call function: expr	[  arguments add: (expr parent: self) ]
+Call function		[ ^arguments first ]
 
-Call function		[ ^function ]
-Call arguments		[ ^arguments ]
-Call arity		[ ^arguments size ]
+Call addArgument: expr	[  arguments add: (expr parent: self) ]
+Call argumentAt: index	[ ^arguments at: index + 1 ]
+
+Call arity		[ ^arguments size - 1 ]
 
 
 Spill : Unary  ( location )
@@ -231,7 +231,6 @@ Block selectInstructions: gen
 
 Call selectInstructions: gen
 [
-    function selectInstructions: gen.
     arguments do: [:arg | arg selectInstructions: gen].
     gen noteCall: self.
 ]
@@ -254,11 +253,10 @@ Block clobberRegisters: codeGenerator
 
 Call clobberRegisters: codeGenerator
 [
-    function clobberRegisters: codeGenerator.
     arguments do: [:arg | arg clobberRegisters: codeGenerator].
     arguments reverseDo: [:arg | codeGenerator noteDead: arg].
     codeGenerator clobberRegisters: self.
-    codeGenerator noteDead: function; noteLive: self.
+    codeGenerator noteLive: self.
 ]
 
 Leaf clobberRegisters: codeGenerator
@@ -341,9 +339,7 @@ Block allocateRegisters: codeGenerator
 
 Call allocateRegisters: codeGenerator
 [
-    function allocateRegisters: codeGenerator.
     arguments do: [:arg | arg allocateRegisters: codeGenerator].
-    function releaseSpill; releaseRegister.
     arguments do: [:arg | arg releaseSpill; releaseRegister].
     ^output := codeGenerator allocateRegister: self.
 ]
@@ -362,11 +358,11 @@ Unary allocateRegisters: codeGenerator
 
 Binary allocateRegisters: codeGenerator
 [
-    output := lhs allocateRegisters: codeGenerator.
+    lhs allocateRegisters: codeGenerator.
     rhs allocateRegisters: codeGenerator.
     rhs releaseRegister.
     lhs releaseSpill.
-    ^output
+    ^output := lhs output
 ]
 
 Branch allocateRegisters: codeGenerator [ ^nil ]
@@ -379,7 +375,13 @@ ConditionalBranch allocateRegisters: codeGenerator
 
 LABEL allocateRegisters: codeGenerator []
 
-Instruction releaseRegister	[ output ifTrue: [output releaseRegister] ]
+Instruction releaseRegister
+[
+    output
+	ifTrue:
+	   [(CompilerOptions verboseRegs and: [output]) ifTrue: [StdOut nextPutAll: 'release register '; print: self; cr].
+	    output releaseRegister]
+]
 
 Instruction releaseSpill []
 
@@ -400,10 +402,10 @@ Instruction spillRegisterFor: insn in: gen
 
 Instruction canSpillFor: insn
 [
-    (insn clobbers: output)	ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  clobbered\n'].	^nil].
-    (self == insn)		ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is target\n'].	^nil].
     (output)			ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg is nil\n'].	^nil].
     (output live)		ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg dead\n'].	^nil].
+    (self == insn)		ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is target\n'].	^nil].
+    (insn clobbers: output)	ifTrue:  [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  clobbered\n'].	^nil].
     ^output
 ]
 
@@ -448,17 +450,11 @@ Call spillRegisterFor: insn in: gen
     parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
     reg notNil ifTrue: [^reg].
     CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying '; print: self; cr].
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying function '; print: function; cr].
-    (reg := function canSpillFor: insn)
-	ifTrue:
-	   [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling function '; print: function; cr].
-	    function := function spilledIn: gen.
-	    ^reg].
     arguments doWithIndex: [:arg :index |
-	CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying argument '; print: arg; cr].
+	CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  ... trying '; print: arg; cr].
 	(reg := arg canSpillFor: insn)
 	    ifTrue:
-	       [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling argument '; print: arg; cr].
+	       [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling '; print: arg; cr].
 		arguments at: index put: (arg spilledIn: gen).
 		^reg]].
     ^nil
@@ -473,7 +469,6 @@ Block emit: gen
 
 Call emit: gen
 [
-    function emit: gen.
     arguments do: [:arg | arg emit: gen].
     gen perform: self name with: self
 ]
@@ -512,7 +507,15 @@ SPILLI4	    reload: gen	[ gen reloadi4 :output :location ]
 
 "----------------------------------------------------------------"
 
-Instruction printOn: aStream	[ self printOn: aStream indent: 0 ]
+Instruction printOn: aStream
+[
+    aStream print: id; nextPut: $(.
+    type notNil ifTrue: [aStream print: type; nextPut: $ ].
+    super printOn: aStream.
+    output notNil ifTrue: [aStream nextPut: $ ; print: output; nextPut: $,; print: output refCount].
+    aStream nextPut: $).
+    parent ifTrue: [aStream nextPut: $.; print: parent id].
+]
 
 Instruction printOn: aStream indent: i
 [
@@ -530,8 +533,7 @@ Block	printInsnOn: aStream indent: i	[ instructions do: [:insn | insn printOn: a
 
 Call	printInsnOn: aStream indent: i
 [
-    arguments do: [:arg | arg printOn: aStream indent: i + 2].
-    function printOn: aStream indent: i + 1.
+    arguments do: [:arg | arg printOn: aStream indent: i + 1].
 ]
 
 Leaf    printInsnOn: aStream indent: i	[ aStream space; print: arg ]

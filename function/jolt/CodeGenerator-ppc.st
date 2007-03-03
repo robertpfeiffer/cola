@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:50:09 by piumarta on emilia
+  Last edited: 2007-03-03 15:12:45 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -188,21 +188,22 @@ PowerPCCodeGenerator noteCall: call
 
 PowerPCCodeGenerator calli4 :call
 [
-    call arguments reverseDoWithIndex: [:arg :index | self emit: arg argument: index].
-    call function reload: self.
-    self mtlrR: call function output.
+    | func |
+    call arity - 1 downTo: 0 do: [:index | self emit: call argumentAt: index].
+    (func := call function) reload: self.
+    self mtlrR: func output.
     self blrl.
     self mrR: call output R: r3.
 ]
 
-PowerPCCodeGenerator emit: insn argument: index
+PowerPCCodeGenerator emit: call argumentAt: index
 [
-    insn reload: self.
+    | insn |
+    (insn := call argumentAt: index) reload: self.
     index < 8
 	ifTrue:  [self mrR: (ccrs at: index) R: insn output]
-	ifFalse: [self stwR: insn output I: index * 4 + 24 R: r1]    
+	ifFalse: [self stwR: insn output I: index * 4 + 24 R: r1]
 ]
-
 
 StaticPowerPCCodeGenerator : PowerPCCodeGenerator ()
 

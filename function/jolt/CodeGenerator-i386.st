@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:50:15 by piumarta on emilia
+  Last edited: 2007-03-03 15:08:00 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -162,15 +162,17 @@ Intel32CodeGenerator noteCall: call
 
 Intel32CodeGenerator calli4 :call
 [
-    call arguments reverseDoWithIndex: [:arg :index | self emit: arg argument: index].
-    call function reload: self.
-    self callMb: call function output.
+    | func |
+    call arity - 1 downTo: 0 do: [:index | self emit: call argumentAt: index].
+    (func := call function) reload: self.
+    self callMb: func output.
     self movlR: eax R: call output.
 ]
 
-Intel32CodeGenerator emit: insn argument: index
+Intel32CodeGenerator emit: call argumentAt: index
 [
-    insn reload: self.
+    | insn |
+    (insn := call argumentAt: index) reload: self.
     self movlR: insn output Md: index * 4 b: esp.
 ]
 
