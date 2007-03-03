@@ -284,7 +284,7 @@ B.b A.a
 </pre></blockquote>
 
 
-<a name="semantix"><h2>Caveats</h2>
+<a name="caveats"><h2>Caveats</h2>
 
 Assigning to 'self' causes both <tt>self</tt>
 and <tt>stateful_self</tt> to be assigned (the latter is 'tied' to the
@@ -301,7 +301,7 @@ cloning the 'composite object' formed by them.
 chain).
 
 
-<a name="semantix"><h2>Applications</h2>
+<a name="applix"><h2>Applications</h2>
 
 Sideways composition.  (As described above.)
 
@@ -314,15 +314,38 @@ the wrapped object will be invoked on the enclosing proxy object.
 effectively was the principal motivation for adding 'Lieberman'
 prototypes to Pepsi.
 
-<p> JavaScript- and Python-like objects.
+<p> Implementation object for JavaScript, Python and similar languages.
 
-<p> Using 'here' sends to implement robust proxies (methods that
+<p> Using 'here sends' to implement robust proxies (methods that
 cannot be overriden in a more specific prototype within the composite
 object).
 
 <p> 'Perfect' encapsulation: no state whatsoever is visible between
 prototypes.  Message sends are the only form of interaction between
 prototypes.
+
+<p> Mixins and supporting mechanism for traits, multiple inheritance,
+etc.
+
+<a name="thanx"><h2>Acknowledgements</h2>
+
+<a
+href="http://www.hpi.uni-potsdam.de/personen/professoren/hirschfeld.html">Robert
+Hirschfeld</a> and <a
+href="http://www.swa.hpi.uni-potsdam.de/people/haupt/">Michael
+Haupt</a> of the 
+<a href="http://www.hpi.uni-potsdam.de/index.htm">Hasso-Plattner Institute</a>
+contributed significantly to several days of fascinating
+coversation and debate over the implementation requirements for
+'layers' and 'context-oriented programming' that led to the
+implementation described in this memo.
+
+<p>
+<a href="http://web.media.mit.edu/~lieber/">Henry Lieberman</a>'s revolutionary
+<a href="http://web.media.mit.edu/~lieber/Lieberary/OOP/OOP.html">writings</a>
+on
+<a href="http://web.media.mit.edu/~lieber/Lieberary/OOP/Delegation/Delegation.html">composite objects</a>
+provided the simplest and most powerful model that could be adopted.
 
 </body>
 </html>
