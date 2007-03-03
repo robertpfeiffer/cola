@@ -1282,6 +1282,19 @@ Smalltalk-80, the sign would be parsed as a selector.)</li>
 keyword.  (Smalltalk-80 happily accepts identifiers in the last
 position of a multi-part keyword symbol.)</li>
 
+<li>There are no classes or instances -- only prototypes.  Declaring a
+new type creates an initial 'named prototype' which is an exemplar for
+all members (instances) of the same family (all members are will be
+cloned directly or indirectly from this examplar).  Methods added to
+the vtable of this prototype will affect the behaviour of all members
+(instances) of the family simultaneously.</li>
+
+<li>The initial 'named prototype' created when declaring a new type is
+uninitialised.  In fact, if the new type adds fields to its supertype,
+he initial prototype doesn't even have enough storage allocated for
+its payload.  Attempting to reference this non-existent state is not
+recommended.</li>
+
 <li>There are probably others, but I've yet to stumble across
 them.</li>
 

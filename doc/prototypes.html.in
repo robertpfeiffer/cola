@@ -335,9 +335,9 @@ and
 of the
 <a href="http://www.hpi.uni-potsdam.de/index.htm">Hasso-Plattner-Institut</a>
 contributed significantly to several days of fascinating
-coversation and debate over the implementation requirements for
-'layers' and 'context-oriented programming' that led to the
-implementation described in this memo.
+coversation and debate over possible mechanisms for 'layers' and
+'<a href="http://www.swa.hpi.uni-potsdam.de/cop/">context-oriented programming</a>'
+that led to the implementation described in this memo.
 
 <p>
 <a href="http://web.media.mit.edu/~lieber/">Henry Lieberman</a>'s
