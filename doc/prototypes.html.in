@@ -335,17 +335,16 @@ and
 of the
 <a href="http://www.hpi.uni-potsdam.de/index.htm">Hasso-Plattner-Institut</a>
 contributed significantly to several days of fascinating
-coversation and debate over possible mechanisms for 'layers' and
+coversation and debate about mechanisms suitable for supporting 'layers' and
 '<a href="http://www.swa.hpi.uni-potsdam.de/cop/">context-oriented programming</a>'
 that led to the implementation described in this memo.
 
-<p>
 <a href="http://web.media.mit.edu/~lieber/">Henry Lieberman</a>'s
 revolutionary
 <a href="http://web.media.mit.edu/~lieber/Lieberary/OOP/OOP.html">writings</a>
 on
 <a href="http://web.media.mit.edu/~lieber/Lieberary/OOP/Delegation/Delegation.html">composite objects</a>
-provided the simplest and most powerful model that could be adopted.
+provided the simplest and most powerful model that could be adopted as a basis for that support.
 
 </body>
 </html>
