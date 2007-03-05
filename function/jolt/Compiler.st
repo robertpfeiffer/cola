@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-03 13:55:40 by piumarta on emilia.local
+  Last edited: 2007-03-05 12:25:02 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -552,14 +552,33 @@ Compiler xSyntax: form
 
 Compiler xDefine: form
 [
-    | name var value |
-    (form size between: 2 and: 3)	ifFalse: [self errorAgumentCount: form].
-    (name := form second) isSymbol	ifFalse: [self errorSyntax: form].
+    | lvalue |
+    form size >= 2 ifFalse: [self errorSyntax: form].
+    ^(lvalue := form second) isSymbol
+	ifTrue:  [self defineVariable: lvalue from: form]
+	ifFalse: [self defineAccessor: lvalue from: form]
+]
+
+Compiler defineVariable: name from: form
+[
+    | var value |
+    (form size <= 3)			ifFalse: [self errorSyntax: form].
     var := self lookupVariable: name ifAbsent: [self defineVariable: name].
     value := form size == 3
 	ifTrue:  [form third translate: self]
 	ifFalse: [CNSTI4 new arg: nil].
     ^ASGNI4 new lhs: value; rhs: (var translateLvalue: self).
+]
+
+Compiler defineAccessor: accessor from: expr	"(define (foo bar...) baz) -> (set-foo bar... baz)"
+[
+    | setter syntax |
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]]) ifFalse: [self syntaxError: accessor].
+    setter := WriteStream on: (Expression new: 8).
+    setter nextPut: ('define-' , accessor first asString) asSymbol.
+    accessor from: 1 do: [:elt | setter nextPut: elt].
+    expr from: 2 do: [:val | setter nextPut: val].
+    ^setter contents
 ]
 
 Compiler xSet: form
