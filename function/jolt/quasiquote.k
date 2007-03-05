@@ -27,8 +27,9 @@
                   [expr nextPut: [Expression with: 'send with: ''nextPut:    with: '_ with: (qq-object elt)]]))
             (set posn [posn + '1]))
           [expr nextPut: '[_ contents]]
-	  ;;[StdOut nextPutAll: '"  ===> "][StdOut print: [expr contents]][StdOut cr]
-          [expr contents]))))
+	  (let ((result [expr contents]))
+	    ;;[StdOut nextPutAll: '"  QQ-LIST ===> "][StdOut print: result][StdOut cr]
+	    result)))))
 
 (define qq-object
   (lambda (node)
@@ -38,5 +39,7 @@
 (syntax quasiquote
   (lambda (node compiler)
     ;;[StdOut nextPutAll: '"QUASIQUOTE "][StdOut print: node][StdOut cr]
-    (qq-object [node second])))
+    (let ((result (qq-object [node second])))
+      ;;[StdOut nextPutAll: '"QQ ===> "][StdOut print: result][StdOut cr]
+      result)))
 
