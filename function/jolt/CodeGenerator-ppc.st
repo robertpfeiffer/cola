@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 11:34:05 by piumarta on emilia.local
+  Last edited: 2007-03-05 13:16:08 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -91,10 +91,16 @@ PowerPCCodeGenerator allocateParam: insn
     ^(params add: (Temporary withBase: r1 offset: params size * 4)) allocate
 ]
 
+PowerPCCodeGenerator allocateSpill: insn
+[
+    spills do: [:temp | temp live ifFalse: [^temp allocate]].
+    ^(spills add: (Temporary withBase: r1 offset: 0)) allocate
+]
+
 PowerPCCodeGenerator allocateTemp: insn
 [
-    "temps do: [:temp | temp live ifFalse: [^temp allocate]]."
-    ^(temps add: (Temporary withBase: r1 offset: temps size * 4)) allocate
+    temps do: [:temp | temp live ifFalse: [^temp allocate]].
+    ^(temps add: (Temporary withBase: r1 offset: 0)) allocate
 ]
 
 PowerPCCodeGenerator addi4    :d :s	[ self addR: d R: d R: s ]
@@ -135,7 +141,7 @@ PowerPCCodeGenerator reloadi4 :r :t	[ self lwzR: r I: t offset R: t base ]
 
 PowerPCCodeGenerator finaliseFrame
 [
-    | linkage align |
+    | linkage align tempOffset |
     linkage := 24.
 "
     StdOut
@@ -147,9 +153,16 @@ PowerPCCodeGenerator finaliseFrame
     needsFrame ifTrue: [parametersSize := parametersSize max: 32].	"always leave space for 8 outgoing arg registers"
     frameSize := linkage + parametersSize.
     csrs do: [:reg | reg used ifTrue: [reg location: (temps add: (Temporary withBase: r1 offset: temps size * 4)) allocate]].
+    tempOffset := linkage + parametersSize.
     temps do: [:temp |
-	temp offset: linkage + parametersSize + temp offset.
+	temp offset: tempOffset.
 	frameSize := frameSize + 4.					"temporary space"
+	tempOffset := tempOffset + 4.					"temporary space"
+	needsFrame := true].
+    spills do: [:temp |
+	temp offset: tempOffset.
+	frameSize := frameSize + 4.					"temporary space"
+	tempOffset := tempOffset + 4.					"temporary space"
 	needsFrame := true].
     needsFrame
 	ifTrue:

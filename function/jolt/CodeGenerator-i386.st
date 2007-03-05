@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 12:10:50 by piumarta on emilia.local
+  Last edited: 2007-03-05 13:12:54 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -76,10 +76,16 @@ Intel32CodeGenerator allocateParam: insn
     ^(params add: (Temporary withBase: esp offset: params size * 4)) allocate
 ]
 
+Intel32CodeGenerator allocateSpill: insn
+[
+    spills do: [:temp | temp live ifFalse: [^temp allocate]].
+    ^(spills add: (Temporary withBase: esp offset: 0)) allocate
+]
+
 Intel32CodeGenerator allocateTemp: insn
 [
-    "temps do: [:temp | temp live ifFalse: [^temp allocate]]."
-    ^(temps add: (Temporary withBase: esp offset: temps size * 4)) allocate
+    temps do: [:temp | temp live ifFalse: [^temp allocate]].
+    ^(temps add: (Temporary withBase: esp offset: 0)) allocate
 ]
 
 Intel32CodeGenerator addi4    :d :s	[ self addlR: s R: d ]
@@ -126,8 +132,11 @@ Intel32CodeGenerator finaliseFrame
     needsFrame ifTrue: [frameSize := frameSize + 4].			"saved frame pointer"
     csrs do: [:reg | reg used ifTrue: [frameSize := frameSize + 4]].	"callee-saved register"
     temps do: [:temp |
-	tempsSize := tempsSize + 4.					"temporary variable"
-	temp offset: temp offset + parametersSize].
+	temp offset: tempsSize + parametersSize.
+	tempsSize := tempsSize + 4].
+    spills do: [:temp |
+	temp offset: tempsSize + parametersSize.
+	tempsSize := tempsSize + 4].					"temporary variable"
     tempsSize := tempsSize + parametersSize.				"outgoing parameters"
     frameSize := frameSize + tempsSize.
     needsFrame

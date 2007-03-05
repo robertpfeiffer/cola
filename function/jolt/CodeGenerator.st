@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:50:00 by piumarta on emilia
+  Last edited: 2007-03-05 13:10:43 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -24,7 +24,7 @@
 { import: Instruction }
 { import: CompilerOptions }
 
-CodeGenerator : Object ( ccrs csrs temps params lastLive labels needsFrame parametersSize frameSize )
+CodeGenerator : Object ( ccrs csrs spills temps params lastLive labels needsFrame parametersSize frameSize )
 
 CodeGenerator withLabels: labelCollection
 [
@@ -37,6 +37,7 @@ CodeGenerator new
     self := super new.
     ccrs  := RegisterSet new.
     csrs  := RegisterSet new.
+    spills := OrderedCollection new.
     temps := OrderedCollection new.
     params := OrderedCollection new.
     lastLive := nil.
@@ -70,9 +71,10 @@ CodeGenerator requireFrame	[ needsFrame := true ]
 
 CodeGenerator dumpResources
 [
-    ccrs  do: [:reg | StdOut tab; print: reg refCount; tab; print: reg; cr].
-    csrs  do: [:reg | StdOut tab; print: reg refCount; tab; print: reg; cr].
-    temps do: [:tmp | StdOut tab; print: tmp refCount; tab; print: tmp; cr].
+    ccrs   do: [:reg | StdOut tab; print: reg refCount; tab; print: reg; cr].
+    csrs   do: [:reg | StdOut tab; print: reg refCount; tab; print: reg; cr].
+    spills do: [:tmp | StdOut tab; print: tmp refCount; tab; print: tmp; cr].
+    temps  do: [:tmp | StdOut tab; print: tmp refCount; tab; print: tmp; cr].
 ]
 
 CodeGenerator clobberRegister: aRegister

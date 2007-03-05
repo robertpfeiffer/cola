@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 11:33:31 by piumarta on emilia.local
+  Last edited: 2007-03-05 13:08:25 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -333,7 +333,7 @@ Block allocateRegisters: codeGenerator
     output := nil.	"no spill before block complete"
     instructions do: [:insn | insn allocateRegisters: codeGenerator; releaseSpill; releaseRegister].
     reg ifTrue: [output := reg allocate].
-    scope notNil ifTrue: [scope valuesDo: [:var | var location release]].
+    scope notNil ifTrue: [scope valuesReverseDo: [:var | var location release]].
     ^output
 ]
 
@@ -426,7 +426,7 @@ Instruction spilledIn: gen
     spill
 	output:   output;
 	lhs:      self;
-	location: (gen allocateTemp: spill).
+	location: (gen allocateSpill: spill).
     ^spill
 ]
 
