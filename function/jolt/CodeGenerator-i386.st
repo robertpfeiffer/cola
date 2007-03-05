@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-03 15:08:00 by piumarta on emilia.local
+  Last edited: 2007-03-05 12:10:50 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -78,7 +78,7 @@ Intel32CodeGenerator allocateParam: insn
 
 Intel32CodeGenerator allocateTemp: insn
 [
-    temps do: [:temp | temp live ifFalse: [^temp allocate]].
+    "temps do: [:temp | temp live ifFalse: [^temp allocate]]."
     ^(temps add: (Temporary withBase: esp offset: temps size * 4)) allocate
 ]
 
