@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-03 15:12:45 by piumarta on emilia.local
+  Last edited: 2007-03-05 11:34:05 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -93,7 +93,7 @@ PowerPCCodeGenerator allocateParam: insn
 
 PowerPCCodeGenerator allocateTemp: insn
 [
-    temps do: [:temp | temp live ifFalse: [^temp allocate]].
+    "temps do: [:temp | temp live ifFalse: [^temp allocate]]."
     ^(temps add: (Temporary withBase: r1 offset: temps size * 4)) allocate
 ]
 
