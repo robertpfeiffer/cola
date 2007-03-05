@@ -459,5 +459,27 @@
 (assert (strcmp "Hoopla! oink! oink!" (capitalise "Hoopla! oink! oink!")))
 (refute (strcmp "HOOPLA! OINK! OINK!" (capitalise "Hoopla! oink! oink!")))
 
+(assert (== 66 (+ (+ (+ (+ (+ (+ (+ (+ (+ (+ 1 2) 3) 4) 5) 6) 7) 8) 9) 10) 11)))
+(assert (== 66 (+ 1 (+ 2 (+ 3 (+ 4 (+ 5 (+ 6 (+ 7 (+ 8 (+ 9 (+ 10 11))))))))))))
+
+(assert (== 666
+	    (+ (let ((x  1)) (+ x (let ((x  2)) (+ x (let ((x  3)) (+ x (let ((x  4)) (+ x (let ((x  5)) (+ x (let ((x  6)) x)))))))))))
+	       (+ (let ((x  7)) (+ x (let ((x  8)) (+ x (let ((x  9)) (+ x (let ((x 10)) (+ x (let ((x 11)) (+ x (let ((x 12)) x)))))))))))
+		  (+ (let ((x 13)) (+ x (let ((x 14)) (+ x (let ((x 15)) (+ x (let ((x 16)) (+ x (let ((x 17)) (+ x (let ((x 18)) x)))))))))))
+		     (+ (let ((x 19)) (+ x (let ((x 20)) (+ x (let ((x 21)) (+ x (let ((x 22)) (+ x (let ((x 23)) (+ x (let ((x 24)) x)))))))))))
+			(+ (let ((x 25)) (+ x (let ((x 26)) (+ x (let ((x 27)) (+ x (let ((x 28)) (+ x (let ((x 29)) (+ x (let ((x 30)) x)))))))))))
+			   (let ((x 31)) (+ x (let ((x 32)) (+ x (let ((x 33)) (+ x (let ((x 34)) (+ x (let ((x 35)) (+ x (let ((x 36)) x))))))))))))))))))
+
+(printf "objects...\n")
+
+(printf "%p\n" `((1)))
+
+(define-type X Object (foo))
+
+;[StdOut print: `(1 2 ,(+  3 4) foo "bar" (baz))]  [StdOut cr]
+;[StdOut print: `(1 2 ,(/ 21 3) foo "bar" (baz))]  [StdOut cr]
+
+(assert (send '= `(1 2 ,(+ 3 4) foo "bar" (baz)) `(1 2 ,(/ 21 3) foo "bar" (baz))))
+
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "CodeGenerator") versionString] _elements])
