@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 11:23:49 by piumarta on emilia.local
+  Last edited: 2007-03-05 11:33:31 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -259,9 +259,9 @@ Instruction clobberAllRegistersIn: insn
 Call clobberRegisters: codeGenerator
 [
     arguments do: [:arg | arg clobberRegisters: codeGenerator].
-    arguments reverseDo: [:arg | codeGenerator noteDead: arg].
+    arguments from: 1 reverseDo: [:arg | codeGenerator noteDead: arg].
     codeGenerator clobberRegisters: self.
-    codeGenerator noteLive: self.
+    codeGenerator noteDead: arguments first; noteLive: self.
 ]
 
 Leaf clobberRegisters: codeGenerator
