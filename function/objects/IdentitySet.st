@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:33:07 by piumarta on emilia
+  Last edited: 2007-03-05 13:05:17 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -140,6 +140,11 @@ IdentitySet deepen: list at: listOffset
 IdentitySet do: unaryBlock
 [
     lists do: [:list | list notNil ifTrue: [list do: [:elt | elt notNil ifTrue: [unaryBlock value: elt]]]]
+]
+
+IdentitySet reverseDo: unaryBlock
+[
+    lists reverseDo: [:list | list notNil ifTrue: [list reverseDo: [:elt | elt notNil ifTrue: [unaryBlock value: elt]]]]
 ]
 
 IdentitySet includes: anObject

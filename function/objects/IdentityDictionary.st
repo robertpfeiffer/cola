@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:33:25 by piumarta on emilia
+  Last edited: 2007-03-05 13:02:00 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -78,6 +78,11 @@ IdentityDictionary printContentsOn: aStream
 IdentityDictionary valuesDo: aBlock
 [
     self do: [:assoc | aBlock value: assoc value]
+]
+
+IdentityDictionary valuesReverseDo: aBlock
+[
+    self reverseDo: [:assoc | aBlock value: assoc value]
 ]
 
 FastIdentityDictionary : IdentityDictionary ()
