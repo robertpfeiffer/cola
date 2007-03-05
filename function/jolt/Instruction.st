@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-03 15:11:19 by piumarta on emilia.local
+  Last edited: 2007-03-05 11:23:49 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -251,6 +251,11 @@ Block clobberRegisters: codeGenerator
     inputs ifTrue: [codeGenerator noteLive: self]
 ]
 
+Instruction clobberAllRegistersIn: insn
+[
+    clobbered ifTrue: [clobbered do: [:reg | insn clobberRegister: reg]]
+]
+
 Call clobberRegisters: codeGenerator
 [
     arguments do: [:arg | arg clobberRegisters: codeGenerator].
@@ -301,11 +306,6 @@ ConditionalBranch clobberRegisters: codeGenerator
 
 LABEL clobberRegisters: codeGenerator	[]
 
-Instruction clobberAllRegistersIn: insn
-[
-    clobbered ifTrue: [clobbered do: [:reg | insn clobberRegister: reg]]
-]
-
 " Sent from CodeGenerator>>clobberRegisters: for each register
   clobbered by the execution of the receiver. "
 
@@ -323,24 +323,28 @@ Instruction clobbers: aRegister	[ ^clobbered and: [clobbered includes: aRegister
 
 Block allocateRegisters: codeGenerator
 [
+    | reg |
     scope notNil ifTrue: [scope valuesDo: [:var | var allocate: codeGenerator]].
     inputs
 	ifTrue:
-	   [output := codeGenerator allocateRegister: self.
-	    inputs do: [:insn | insn output: output].
-	    self releaseRegister].
-    instructions do: [:insn |
-	insn allocateRegisters: codeGenerator.
-	insn releaseSpill; releaseRegister].
-    output ifTrue: [output allocate].
+	   [reg := codeGenerator allocateRegister: self.
+	    inputs do: [:insn | insn output: reg].
+	    reg release].
+    output := nil.	"no spill before block complete"
+    instructions do: [:insn | insn allocateRegisters: codeGenerator; releaseSpill; releaseRegister].
+    reg ifTrue: [output := reg allocate].
     scope notNil ifTrue: [scope valuesDo: [:var | var location release]].
     ^output
 ]
 
 Call allocateRegisters: codeGenerator
 [
+    | reg |
+    reg := output.
+    output := nil.	"no spill before call complete"
     arguments do: [:arg | arg allocateRegisters: codeGenerator].
     arguments do: [:arg | arg releaseSpill; releaseRegister].
+    output := reg.
     ^output := codeGenerator allocateRegister: self.
 ]
 
@@ -412,12 +416,6 @@ Instruction canSpillFor: insn
 Spill canSpillFor: insn
 [
     CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is spill\n'].
-    ^false
-]
-
-Block canSpillFor: insn
-[
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is block\n'].
     ^false
 ]
 
