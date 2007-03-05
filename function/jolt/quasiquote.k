@@ -4,11 +4,12 @@
 
 (define qq-atom
   (lambda (node)
-    ;[StdOut nextPutAll: '"QQ-ATOM "][StdOut print: node][StdOut cr]
+    ;;[StdOut nextPutAll: '"QQ-ATOM "][StdOut print: node][StdOut cr]
     [Expression with: 'quote with: node]))
 
 (define qq-list
   (lambda (node)
+    ;;[StdOut nextPutAll: '"QQ-LIST "][StdOut print: node][StdOut cr]
     (if (and (== [node size]  '2)
              (== [node first] 'unquote))
         [node second]
@@ -26,14 +27,16 @@
                   [expr nextPut: [Expression with: 'send with: ''nextPut:    with: '_ with: (qq-object elt)]]))
             (set posn [posn + '1]))
           [expr nextPut: '[_ contents]]
-	  ;[StdOut nextPutAll: '" ===> "][StdOut print: [expr contents]][StdOut cr]
+	  ;;[StdOut nextPutAll: '"  ===> "][StdOut print: [expr contents]][StdOut cr]
           [expr contents]))))
 
 (define qq-object
   (lambda (node)
+    ;;[StdOut nextPutAll: '"QQ-OBJECT "][StdOut print: node][StdOut cr]
     ((if [node isArray] qq-list qq-atom) node)))
 
 (syntax quasiquote
   (lambda (node compiler)
+    ;;[StdOut nextPutAll: '"QUASIQUOTE "][StdOut print: node][StdOut cr]
     (qq-object [node second])))
 
