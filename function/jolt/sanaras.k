@@ -482,5 +482,16 @@
 (or (send '= `(1 2 ,(+ 3 4) foo "bar" (baz)) `(1 2 ,(/ 21 3) foo "bar" (baz)))
     (printf "fail\n"))
 
+(syntax addrof
+  (lambda (form comp)
+    (or (and [[form size] = '2]
+	     [[form second] isSymbol])
+	[comp errorSyntax: form])
+    [[comp lookupVariable: [form second]] translateLvalue: comp]))
+
+(assert (== 666 (let ((x 42))
+		  (set (long@ (addrof x)) 333)
+		  (* x 2))))
+
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "CodeGenerator") versionString] _elements])

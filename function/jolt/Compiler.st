@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 12:25:02 by piumarta on emilia.local
+  Last edited: 2007-03-06 14:41:02 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -160,6 +160,11 @@ Compiler lookupVariable: name ifAbsent: defaultBlock
     | var |
     var := environment lookupVariable: name.
     ^var ifNil: defaultBlock
+]
+
+Compiler lookupVariable: name
+[
+    ^self lookupVariable: name ifAbsent: [self errorUndefined: name]
 ]
 
 Compiler defineVariable: name	[ ^environment defineVariable: name ]
