@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 13:08:25 by piumarta on emilia.local
+  Last edited: 2007-03-07 15:22:59 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -46,6 +46,167 @@ Instruction nextLive		[ ^nextLive ]
 
 Instruction isVoid		[ ^self class == #V ]
 
+Instruction selectInstructions:	gen	[ ^self subtypeResponsibility: 'selectInstructions:' ]
+Instruction clobberRegisters:	gen	[ ^self subtypeResponsibility: 'clobberRegisters:' ]
+Instruction allocateRegisters:	gen	[ ^self subtypeResponsibility: 'allocateRegisters:' ]
+Instruction emit:		gen	[ ^self subtypeResponsibility: 'emit:' ]
+
+" Sent from CodeGenerator>>clobberRegisters: for each register
+  clobbered by the execution of the receiver. "
+
+" Allocate an output register if needed.  Release any inputs that are
+  dead after execution of the insn. "
+
+Instruction releaseRegister
+[
+    output
+	ifTrue:
+	   [(CompilerOptions verboseRegs and: [output]) ifTrue: [StdOut nextPutAll: 'release register '; print: self; cr].
+	    output releaseRegister]
+]
+
+"neither generates nor consumes"
+
+Statement : Instruction ()
+
+Statement class				[ ^#V ]
+
+Statement selectInstructions: gen	[ type := #VOID ]
+Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
+Statement allocateRegisters: gen	[ ^nil ]
+Statement emit: gen			[ gen perform: self name with: self ]
+
+"generates a value"
+
+Leaf : Instruction ( arg )
+
+Leaf arg: a	[  arg := a ]
+Leaf arg	[ ^arg ]
+
+Leaf selectInstructions: gen	[ type := #REG ]
+
+Leaf clobberRegisters: codeGenerator
+[
+    codeGenerator noteLive: self; clobberRegisters: self
+]
+
+Leaf allocateRegisters: codeGenerator
+[
+    output := codeGenerator allocateRegister: self.
+    ^output
+]
+
+Leaf emit: gen
+[
+    gen perform: self name with: output with: arg
+]
+
+"generates a value, consumes a value"
+
+Unary : Instruction ( lhs )
+
+Unary lhs: l	[  lhs := l parent: self ]
+Unary lhs	[ ^lhs ]
+
+Unary  selectInstructions: gen
+[
+    type := #REG.
+    lhs selectInstructions: gen.
+]
+
+Unary clobberRegisters: codeGenerator
+[
+    lhs clobberRegisters: codeGenerator.
+    codeGenerator clobberRegisters: self
+]
+
+Unary allocateRegisters: codeGenerator
+[
+    output := lhs allocateRegisters: codeGenerator.
+    ^output
+]
+
+Unary emit: gen
+[
+    lhs emit: gen.
+    gen perform: self name with: lhs output
+]
+
+"generates a value, consumes two values"
+
+Binary : Unary ( rhs )
+
+Binary rhs: r	[  rhs := r parent: self ]
+Binary rhs	[ ^rhs ]
+
+Binary selectInstructions: gen
+[
+    type := #REG.
+    lhs selectInstructions: gen.
+    rhs selectInstructions: gen.
+]
+
+Binary clobberRegisters: codeGenerator
+[
+    lhs clobberRegisters: codeGenerator.
+    rhs clobberRegisters: codeGenerator.
+    codeGenerator clobberRegisters: self; noteDead: rhs
+]
+
+Binary allocateRegisters: codeGenerator
+[
+    lhs allocateRegisters: codeGenerator.
+    rhs allocateRegisters: codeGenerator.
+    rhs releaseRegister.
+    lhs releaseSpill.
+    ^output := lhs output
+]
+
+Binary spillRegisterFor: insn in: gen
+[
+    | reg |
+    parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
+    reg notNil ifTrue: [^reg].
+    CompilerOptions verboseRegs ifTrue:  [StdOut nextPutAll: '  trying '; print: self; nextPutAll: ' -> '; print: lhs; space; print: rhs; cr].
+    (reg := lhs spilledRegisterFor: insn) ifFalse: [^nil].
+    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling '; print: lhs; cr].
+    lhs := lhs spilledIn: gen.
+    ^reg
+]
+
+Binary emit: gen
+[
+    lhs emit: gen.
+    rhs emit: gen.
+    lhs reload: gen.	"in case lhs was spilled"
+    gen perform: self name with: lhs output with: rhs output
+]
+
+"consumes a value"
+
+Sink : Unary ()
+
+Sink class [ ^#V ]
+
+Sink selectInstructions: codeGenerator
+[
+    type := #VOID.
+    lhs selectInstructions: codeGenerator.
+]
+
+Sink allocateRegisters: codeGenerator
+[
+    type := #VOID.
+    lhs allocateRegisters: codeGenerator; releaseRegister.
+]
+
+Sink clobberRegisters: codeGenerator
+[
+    super clobberRegisters: codeGenerator.
+    codeGenerator noteDead: self.
+]
+
+"consumes zero or more values, generates zero or one value"
 
 Block : Instruction (
     scope		"LocalEnvironment"
@@ -81,13 +242,56 @@ Block addInput: insn
     ^inputs add: insn
 ]
 
+Block selectInstructions: gen
+[
+    instructions do: [:insn | insn selectInstructions: gen].
+]
 
+Block clobberRegisters: codeGenerator
+[
+    instructions do: [:insn |
+	insn clobberRegisters: codeGenerator.
+	insn isVoid
+	    ifFalse:
+	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
+		codeGenerator noteDead: insn]].
+    inputs ifTrue: [codeGenerator noteLive: self]
+]
 
-Leaf		: Instruction ( arg )	Leaf    arg [ ^arg ]	Leaf    arg: a	[ arg := a		]
-Unary		: Instruction ( lhs )	Unary   lhs [ ^lhs ]	Unary   lhs: l	[ lhs := l parent: self ]
-Binary		: Unary	      ( rhs )	Binary  rhs [ ^rhs ]	Binary  rhs: r	[ rhs := r parent: self ]
+Instruction clobberAllRegistersIn: insn
+[
+    clobbered ifTrue: [clobbered do: [:reg | insn clobberRegister: reg]]
+]
 
-Parameter : Leaf ()
+Instruction clobberRegister: aRegister
+[
+    clobbered isNil ifTrue: [clobbered := RegisterSet new].
+    clobbered add: aRegister.
+    CompilerOptions verboseRegs ifTrue: [StdOut tab; nextPutAll: '**** CLOBBER '; print: clobbered; nextPutAll: ' IN '; print: self; cr].
+]
+
+Block allocateRegisters: codeGenerator
+[
+    | reg |
+    scope notNil ifTrue: [scope valuesDo: [:var | var allocate: codeGenerator]].
+    inputs
+	ifTrue:
+	   [reg := codeGenerator allocateRegister: self.
+	    inputs do: [:insn | insn output: reg].
+	    reg release].
+    output := nil.	"no spill before block complete"
+    instructions do: [:insn | insn allocateRegisters: codeGenerator; releaseSpill; releaseRegister].
+    reg ifTrue: [output := reg allocate].
+    scope notNil ifTrue: [scope valuesReverseDo: [:var | var location release]].
+    ^output
+]
+
+Block emit: gen
+[
+    instructions do: [:insn | insn emit: gen].
+]
+
+"consumes one or more values, generates one value"
 
 Call : Instruction (
     arguments	"function, argument expressions, leftmost first"
@@ -107,153 +311,10 @@ Call argumentAt: index	[ ^arguments at: index + 1 ]
 
 Call arity		[ ^arguments size - 1 ]
 
-
-Spill : Unary  ( location )
-
-Instruction isSpill	[ ^false ]
-Spill	    isSpill	[ ^true ]
-
-Spill location: aTemp	[ location := aTemp ]
-
-LabelCount := [ 0 ]
-
-LABEL : Instruction ( ordinal _address )	LABEL name [ ^#label ]	LABEL class [ ^#V ]
-
-LABEL new
-[
-    self := super new.
-    ordinal := LabelCount := LabelCount + 1.
-]
-
-LABEL ordinal		[ ^ordinal ]
-
-LABEL address_: _addr	[  _address := _addr ]
-LABEL _address		[ ^_address ]
-
-LABEL relocate_: _addr	{ self->v__address= (oop)((long)self->v__address + (long)v__addr); }
-
-LABEL phaseCheck_: _addr	[ _addr == _address ifFalse: [self error: 'phase error'] ]
-
-Branch : Instruction ( destination )
-
-Branch destination: aLabel	[ destination := aLabel ]
-
-BRA : Branch ()			BRA name [ ^#bra ]	BRA class	[ ^#V ]
-
-ConditionalBranch : Unary ( destination )
-
-ConditionalBranch destination: aLabel	[ destination := aLabel ]
-
-BRZ  : ConditionalBranch ()	BRZ  name [ ^#brz  ]	BRZ  class	[ ^#V ]
-BRNZ : ConditionalBranch ()	BRNZ name [ ^#brnz ]	BRNZ class	[ ^#V ]
-
-NOP : Leaf ()
-
-Instruction isNOP	[ ^false ]
-NOP isNOP		[ ^true ]
-
-NOP class		[ ^#V ]
-
-NOP selectInstructions: gen	[]
-NOP clobberRegisters: gen	[]
-NOP allocateRegisters: gen	[]
-NOP emit: gen	[]
-
-"----------------------------------------------------------------"
-
-" Choose concrete instructions and record each abstract insn's semantic type. "
-
-Leaf   selectInstructions: gen	[ type := #REG ]
-Unary  selectInstructions: gen	[ type := #REG.  lhs selectInstructions: gen ]
-Binary selectInstructions: gen	[ type := #REG.  lhs selectInstructions: gen.  rhs selectInstructions: gen ]
-
-Branch		  selectInstructions: gen	[ type := #VOID ]
-ConditionalBranch selectInstructions: gen	[ type := #VOID.  lhs selectInstructions: gen ]
-LABEL		  selectInstructions: gen	[ type := #VOID ]
-
-LeafV	 : Leaf   ()	LeafV	 class [ ^#V ]
-LeafI4	 : Leaf   ()	LeafI4   class [ ^#I4 ]
-LeafP4	 : Leaf   ()	LeafP4   class [ ^#P4 ]
-UnaryV   : Unary  ()	UnaryV   class [ ^#V  ]
-UnaryI4  : Unary  ()	UnaryI4  class [ ^#I4 ]
-BinaryI4 : Binary ()	BinaryI4 class [ ^#I4 ]
-
-ADDI4   : BinaryI4 ()	ADDI4   name [ ^#addi4 ]
-ANDI4   : BinaryI4 ()	ANDI4   name [ ^#andi4 ]
-ASGNI1  : BinaryI4 ()	ASGNI1  name [ ^#asgni1 ]
-ASGNI2  : BinaryI4 ()	ASGNI2  name [ ^#asgni2 ]
-ASGNI4  : BinaryI4 ()	ASGNI4  name [ ^#asgni4 ]
-CNSTI4  : LeafI4   ()	CNSTI4  name [ ^#cnsti4 ]
-CNSTP4  : LeafP4   ()	CNSTP4  name [ ^#cnstp4 ]
-DIVI4   : BinaryI4 ()	DIVI4   name [ ^#divi4 ]
-DROP    : UnaryV   ()	DROP    name [ ^#drop ]
-ENTER   : LeafV   ()	ENTER   name [ ^#enter ]
-EQI4    : BinaryI4 ()	EQI4    name [ ^#eqi4 ]
-LEI4    : BinaryI4 ()	LEI4    name [ ^#lei4 ]
-LTI4    : BinaryI4 ()	LTI4    name [ ^#lti4 ]
-GEI4    : BinaryI4 ()	GEI4    name [ ^#gei4 ]
-GTI4    : BinaryI4 ()	GTI4    name [ ^#gti4 ]
-INDIRI1	: UnaryI4  ()	INDIRI1	name [ ^#indiri1 ]
-INDIRI2	: UnaryI4  ()	INDIRI2	name [ ^#indiri2 ]
-INDIRI4	: UnaryI4  ()	INDIRI4	name [ ^#indiri4 ]
-MODI4   : BinaryI4 ()	MODI4   name [ ^#modi4 ]
-MULI4   : BinaryI4 ()	MULI4   name [ ^#muli4 ]
-NEGI4   : UnaryI4  ()	NEGI4   name [ ^#negi4 ]
-NEI4    : BinaryI4 ()	NEI4    name [ ^#nei4 ]
-NOTI4   : UnaryI4  ()	NOTI4   name [ ^#noti4 ]
-ORI4    : BinaryI4 ()	ORI4    name [ ^#ori4 ]
-RETV    : LeafV   ()	RETV    name [ ^#retv ]
-RETI4   : UnaryV   ()	RETI4   name [ ^#reti4 ]
-SUBI4   : BinaryI4 ()	SUBI4   name [ ^#subi4 ]
-SHLI4   : BinaryI4 ()	SHLI4   name [ ^#shli4 ]
-SHRI4   : BinaryI4 ()	SHRI4   name [ ^#shri4 ]
-XORI4   : BinaryI4 ()	XORI4   name [ ^#xori4 ]
-
-CALLI4	: Call ()	CALLI4	name [ ^#calli4 ]	CALLI4  class	[ ^#I4 ]
-
-PARAMI4	: Parameter ()	PARAMI4	name [ ^#parami4 ]	PARAMI4 class	[ ^#I4 ]
-
-SPILLI4	: Spill ()	SPILLI4	name [^ #spilli4 ]	SPILLI4 class	[ ^#I4 ]
-
-Address : LeafP4 ( variable )
-
-ADDRFP4 : LeafP4  ()	ADDRFP4 name [ ^#addrfp4 ]
-ADDRGP4 : Address ()	ADDRGP4 name [ ^#addrgp4 ]
-ADDRJP4 : Address ()	ADDRJP4 name [ ^#addrjp4 ]
-ADDRLP4 : Address ()	ADDRLP4 name [ ^#addrlp4 ]
-
-"----------------------------------------------------------------"
-
-Block selectInstructions: gen
-[
-    instructions do: [:insn | insn selectInstructions: gen].
-]
-
 Call selectInstructions: gen
 [
     arguments do: [:arg | arg selectInstructions: gen].
     gen noteCall: self.
-]
-
-" Ask the codeGenerator to clobber registers in the receiver and all
-  its children.  Keep the codeGenerator informed of the birth and
-  death of values so that clobbered registers can be propagated to all
-  affected outputs. "
-
-Block clobberRegisters: codeGenerator
-[
-    instructions do: [:insn |
-	insn clobberRegisters: codeGenerator.
-	insn isVoid
-	    ifFalse:
-	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
-		codeGenerator noteDead: insn]].
-    inputs ifTrue: [codeGenerator noteLive: self]
-]
-
-Instruction clobberAllRegistersIn: insn
-[
-    clobbered ifTrue: [clobbered do: [:reg | insn clobberRegister: reg]]
 ]
 
 Call clobberRegisters: codeGenerator
@@ -262,79 +323,6 @@ Call clobberRegisters: codeGenerator
     arguments from: 1 reverseDo: [:arg | codeGenerator noteDead: arg].
     codeGenerator clobberRegisters: self.
     codeGenerator noteDead: arguments first; noteLive: self.
-]
-
-Leaf clobberRegisters: codeGenerator
-[
-    codeGenerator noteLive: self; clobberRegisters: self
-]
-
-LeafV clobberRegisters: codeGenerator
-[
-    codeGenerator clobberRegisters: self.
-]
-
-Unary clobberRegisters: codeGenerator
-[
-    lhs clobberRegisters: codeGenerator.
-    codeGenerator clobberRegisters: self
-]
-
-UnaryV clobberRegisters: codeGenerator
-[
-    lhs clobberRegisters: codeGenerator.
-    codeGenerator clobberRegisters: self; noteDead: lhs.
-]
-
-Binary clobberRegisters: codeGenerator
-[
-    lhs clobberRegisters: codeGenerator.
-    rhs clobberRegisters: codeGenerator.
-    codeGenerator clobberRegisters: self; noteDead: rhs
-]
-
-Branch clobberRegisters: codeGenerator
-[
-    codeGenerator clobberRegisters: self
-]
-
-ConditionalBranch clobberRegisters: codeGenerator
-[
-    lhs clobberRegisters: codeGenerator.
-    codeGenerator clobberRegisters: self; noteDead: lhs
-]
-
-LABEL clobberRegisters: codeGenerator	[]
-
-" Sent from CodeGenerator>>clobberRegisters: for each register
-  clobbered by the execution of the receiver. "
-
-Instruction clobberRegister: aRegister
-[
-    clobbered isNil ifTrue: [clobbered := RegisterSet new].
-    clobbered add: aRegister.
-    CompilerOptions verboseRegs ifTrue: [StdOut tab; nextPutAll: '**** CLOBBER '; print: clobbered; nextPutAll: ' IN '; print: self; cr].
-]
-
-Instruction clobbers: aRegister	[ ^clobbered and: [clobbered includes: aRegister] ]
-
-" Allocate an output register if needed.  Release any inputs that are
-  dead after execution of the insn. "
-
-Block allocateRegisters: codeGenerator
-[
-    | reg |
-    scope notNil ifTrue: [scope valuesDo: [:var | var allocate: codeGenerator]].
-    inputs
-	ifTrue:
-	   [reg := codeGenerator allocateRegister: self.
-	    inputs do: [:insn | insn output: reg].
-	    reg release].
-    output := nil.	"no spill before block complete"
-    instructions do: [:insn | insn allocateRegisters: codeGenerator; releaseSpill; releaseRegister].
-    reg ifTrue: [output := reg allocate].
-    scope notNil ifTrue: [scope valuesReverseDo: [:var | var location release]].
-    ^output
 ]
 
 Call allocateRegisters: codeGenerator
@@ -348,63 +336,54 @@ Call allocateRegisters: codeGenerator
     ^output := codeGenerator allocateRegister: self.
 ]
 
-Leaf allocateRegisters: codeGenerator
+Call spillRegisterFor: insn in: gen
 [
-    output := codeGenerator allocateRegister: self.
-    ^output
-]
-
-Unary allocateRegisters: codeGenerator
-[
-    output := lhs allocateRegisters: codeGenerator.
-    ^output
-]
-
-Binary allocateRegisters: codeGenerator
-[
-    lhs allocateRegisters: codeGenerator.
-    rhs allocateRegisters: codeGenerator.
-    rhs releaseRegister.
-    lhs releaseSpill.
-    ^output := lhs output
-]
-
-Branch allocateRegisters: codeGenerator [ ^nil ]
-
-ConditionalBranch allocateRegisters: codeGenerator
-[
-    lhs allocateRegisters: codeGenerator; releaseRegister.
+    | reg |
+    parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
+    reg notNil ifTrue: [^reg].
+    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying '; print: self; cr].
+    arguments doWithIndex: [:arg :index |
+	CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  ... trying '; print: arg; cr].
+	(reg := arg spilledRegisterFor: insn)
+	    ifTrue:
+	       [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling '; print: arg; cr].
+		arguments at: index put: (arg spilledIn: gen).
+		^reg]].
     ^nil
 ]
 
-LABEL allocateRegisters: codeGenerator []
-
-Instruction releaseRegister
+Call emit: gen
 [
-    output
-	ifTrue:
-	   [(CompilerOptions verboseRegs and: [output]) ifTrue: [StdOut nextPutAll: 'release register '; print: self; cr].
-	    output releaseRegister]
+    arguments do: [:arg | arg emit: gen].
+    gen perform: self name with: self
 ]
+
+"----------------------------------------------------------------"
+
+Spill : Unary  ( location )
+
+Instruction isSpill	[ ^false ]
+Spill	    isSpill	[ ^true ]
+
+Spill location: aTemp	[ location := aTemp ]
 
 Instruction releaseSpill []
 
-Spill	    releaseSpill
+Spill releaseSpill
 [
     CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: 'release spill '; print: self; cr].
     location release.
     output allocate.
 ]
 
-" Sent from CodeGenerator>>allocateRegister: when all registers are in
-  use.  Choose to spill the highest insn having a suitable register. "
-
 Instruction spillRegisterFor: insn in: gen
 [
     ^parent notNil ifTrue: [parent spillRegisterFor: insn in: gen]
 ]
 
-Instruction canSpillFor: insn
+Instruction clobbers: aRegister	[ ^clobbered and: [clobbered includes: aRegister] ]
+
+Instruction spilledRegisterFor: insn
 [
     (output)			ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg is nil\n'].	^nil].
     (output live)		ifFalse: [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  reg dead\n'].	^nil].
@@ -413,7 +392,7 @@ Instruction canSpillFor: insn
     ^output
 ]
 
-Spill canSpillFor: insn
+Spill spilledRegisterFor: insn
 [
     CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  is spill\n'].
     ^false
@@ -430,65 +409,103 @@ Instruction spilledIn: gen
     ^spill
 ]
 
-Binary spillRegisterFor: insn in: gen
+Spill spilledIn: gen	[ self error: 'Spill.spilledIn: this cannot happen']
+
+Instruction reload: gen	[]
+Spill	    reload: gen	[ self subtypeResponsibility: 'reload:' ]
+Spill	    emit:   gen	[ self subtypeResponsibility: 'emit:' ]
+
+"----------------------------------------------------------------"
+
+Branch : Statement ( destination )
+
+Branch destination: aLabel	[ destination := aLabel ]
+
+Branch emit: gen		[ gen perform: self name with: destination ]
+
+ConditionalBranch : Sink ( destination )
+
+ConditionalBranch destination: aLabel	[ destination := aLabel ]
+
+ConditionalBranch emit: gen		[ lhs emit: gen.  gen perform: self name with: lhs output with: destination ]
+
+"----------------------------------------------------------------"
+
+LabelCount := [ 0 ]
+
+LABEL : Statement ( ordinal _address )	LABEL name [ ^#label ]
+
+LABEL new
 [
-    | reg |
-    parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
-    reg notNil ifTrue: [^reg].
-    CompilerOptions verboseRegs ifTrue:  [StdOut nextPutAll: '  trying '; print: self; nextPutAll: ' -> '; print: lhs; space; print: rhs; cr].
-    (reg := lhs canSpillFor: insn) ifFalse: [^nil].
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling '; print: lhs; cr].
-    lhs := lhs spilledIn: gen.
-    ^reg
+    self := super new.
+    ordinal := LabelCount := LabelCount + 1.
 ]
 
-Call spillRegisterFor: insn in: gen
-[
-    | reg |
-    parent notNil ifTrue: [reg := parent spillRegisterFor: insn in: gen].
-    reg notNil ifTrue: [^reg].
-    CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  trying '; print: self; cr].
-    arguments doWithIndex: [:arg :index |
-	CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  ... trying '; print: arg; cr].
-	(reg := arg canSpillFor: insn)
-	    ifTrue:
-	       [CompilerOptions verboseRegs ifTrue: [StdOut nextPutAll: '  spilling '; print: arg; cr].
-		arguments at: index put: (arg spilledIn: gen).
-		^reg]].
-    ^nil
-]
+LABEL ordinal		[ ^ordinal ]
 
-" Recursively emit concrete insns for an entire abstract insn tree. "
+LABEL address_: _addr	[  _address := _addr ]
+LABEL _address		[ ^_address ]
 
-Block emit: gen
-[
-    instructions do: [:insn | insn emit: gen].
-]
+LABEL relocate_: _addr	{ self->v__address= (oop)((long)self->v__address + (long)v__addr); }
 
-Call emit: gen
-[
-    arguments do: [:arg | arg emit: gen].
-    gen perform: self name with: self
-]
+LABEL phaseCheck_: _addr	[ _addr == _address ifFalse: [self error: 'phase error'] ]
 
-Leaf emit: gen
-[
-    gen perform: self name with: output with: arg
-]
+"----------------------------------------------------------------"
 
-Unary emit: gen
-[
-    lhs emit: gen.
-    gen perform: self name with: lhs output
-]
+LeafI4	 : Leaf   ()	LeafI4   class [ ^#I4 ]
+LeafP4	 : Leaf   ()	LeafP4   class [ ^#P4 ]
+UnaryI4  : Unary  ()	UnaryI4  class [ ^#I4 ]
+BinaryI4 : Binary ()	BinaryI4 class [ ^#I4 ]
 
-Binary emit: gen
-[
-    lhs emit: gen.
-    rhs emit: gen.
-    lhs reload: gen.	"in case lhs was spilled"
-    gen perform: self name with: lhs output with: rhs output
-]
+ADDI4   : BinaryI4 ()	ADDI4   name [ ^#addi4 ]
+ANDI4   : BinaryI4 ()	ANDI4   name [ ^#andi4 ]
+ASGNI1  : BinaryI4 ()	ASGNI1  name [ ^#asgni1 ]
+ASGNI2  : BinaryI4 ()	ASGNI2  name [ ^#asgni2 ]
+ASGNI4  : BinaryI4 ()	ASGNI4  name [ ^#asgni4 ]
+BRA	: Branch ()	BRA name [ ^#bra ]
+BRNZ	: ConditionalBranch ()	BRNZ name [ ^#brnz ]
+BRZ	: ConditionalBranch ()	BRZ  name [ ^#brz  ]
+CNSTI4  : LeafI4   ()	CNSTI4  name [ ^#cnsti4 ]
+CNSTP4  : LeafP4   ()	CNSTP4  name [ ^#cnstp4 ]
+DIVI4   : BinaryI4 ()	DIVI4   name [ ^#divi4 ]
+DROP    : Sink     ()	DROP    name [ ^#drop ]
+ENTER   : Statement ()	ENTER   name [ ^#enter ]
+EQI4    : BinaryI4 ()	EQI4    name [ ^#eqi4 ]
+LEI4    : BinaryI4 ()	LEI4    name [ ^#lei4 ]
+LTI4    : BinaryI4 ()	LTI4    name [ ^#lti4 ]
+GEI4    : BinaryI4 ()	GEI4    name [ ^#gei4 ]
+GTI4    : BinaryI4 ()	GTI4    name [ ^#gti4 ]
+INDIRI1	: UnaryI4  ()	INDIRI1	name [ ^#indiri1 ]
+INDIRI2	: UnaryI4  ()	INDIRI2	name [ ^#indiri2 ]
+INDIRI4	: UnaryI4  ()	INDIRI4	name [ ^#indiri4 ]
+MODI4   : BinaryI4 ()	MODI4   name [ ^#modi4 ]
+MULI4   : BinaryI4 ()	MULI4   name [ ^#muli4 ]
+NEGI4   : UnaryI4  ()	NEGI4   name [ ^#negi4 ]
+NEI4    : BinaryI4 ()	NEI4    name [ ^#nei4 ]
+NOP	: Statement ()	NOP	name [ ^#nop ]
+NOTI4   : UnaryI4  ()	NOTI4   name [ ^#noti4 ]
+ORI4    : BinaryI4 ()	ORI4    name [ ^#ori4 ]
+
+RETV    : Statement ()	RETV    name [ ^#retv ]
+
+RETI4   : Sink     ()	RETI4   name [ ^#reti4 ]
+SUBI4   : BinaryI4 ()	SUBI4   name [ ^#subi4 ]
+SHLI4   : BinaryI4 ()	SHLI4   name [ ^#shli4 ]
+SHRI4   : BinaryI4 ()	SHRI4   name [ ^#shri4 ]
+XORI4   : BinaryI4 ()	XORI4   name [ ^#xori4 ]
+
+CALLI4	: Call ()	CALLI4	name [ ^#calli4 ]	CALLI4  class	[ ^#I4 ]
+
+PARAMI4	: LeafI4 ()	PARAMI4	name [ ^#parami4 ]
+
+SPILLI4	: Spill ()	SPILLI4	name [^ #spilli4 ]	SPILLI4 class	[ ^#I4 ]
+
+ADDRFP4 : LeafP4 ()	ADDRFP4 name [ ^#addrfp4 ]
+ADDRGP4 : LeafP4 ()	ADDRGP4 name [ ^#addrgp4 ]
+ADDRJP4 : LeafP4 ()	ADDRJP4 name [ ^#addrjp4 ]
+ADDRLP4 : LeafP4 ()	ADDRLP4 name [ ^#addrlp4 ]
+
+"----------------------------------------------------------------"
 
 SPILLI4 emit: gen
 [
@@ -496,11 +513,6 @@ SPILLI4 emit: gen
     gen spilli4 :lhs output :location
 ]
 
-Branch		  emit: gen	[ gen perform: self name with: destination ]
-ConditionalBranch emit: gen	[ lhs emit: gen.  gen perform: self name with: lhs output with: destination ]
-LABEL		  emit: gen	[ gen perform: self name with: self ]
-
-Instruction reload: gen	[]
 SPILLI4	    reload: gen	[ gen reloadi4 :output :location ]
 
 "----------------------------------------------------------------"
