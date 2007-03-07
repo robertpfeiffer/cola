@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-07 15:22:59 by piumarta on emilia.local
+  Last edited: 2007-03-07 15:35:34 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -50,12 +50,6 @@ Instruction selectInstructions:	gen	[ ^self subtypeResponsibility: 'selectInstru
 Instruction clobberRegisters:	gen	[ ^self subtypeResponsibility: 'clobberRegisters:' ]
 Instruction allocateRegisters:	gen	[ ^self subtypeResponsibility: 'allocateRegisters:' ]
 Instruction emit:		gen	[ ^self subtypeResponsibility: 'emit:' ]
-
-" Sent from CodeGenerator>>clobberRegisters: for each register
-  clobbered by the execution of the receiver. "
-
-" Allocate an output register if needed.  Release any inputs that are
-  dead after execution of the insn. "
 
 Instruction releaseRegister
 [
@@ -92,8 +86,7 @@ Leaf clobberRegisters: codeGenerator
 
 Leaf allocateRegisters: codeGenerator
 [
-    output := codeGenerator allocateRegister: self.
-    ^output
+    ^output := codeGenerator allocateRegister: self.
 ]
 
 Leaf emit: gen
@@ -122,8 +115,7 @@ Unary clobberRegisters: codeGenerator
 
 Unary allocateRegisters: codeGenerator
 [
-    output := lhs allocateRegisters: codeGenerator.
-    ^output
+    ^output := lhs allocateRegisters: codeGenerator.
 ]
 
 Unary emit: gen
@@ -198,6 +190,7 @@ Sink allocateRegisters: codeGenerator
 [
     type := #VOID.
     lhs allocateRegisters: codeGenerator; releaseRegister.
+    ^nil
 ]
 
 Sink clobberRegisters: codeGenerator
