@@ -28,8 +28,8 @@
 	    (set ,var (+ ,var ,step)))))))
 
 (syntax addrof	; (addrof varName)  =>  address of varName
-  (lambda (form comp)
-    (or (and [[form size] = '2]
-	     [[form second] isSymbol])
-	[comp errorSyntax: form])
-    [[comp lookupVariable: [form second]] translateLvalue: comp]))
+  (lambda (node compiler)
+    (or (and [[node size] = '2]
+	     [[node second] isSymbol])
+	[compiler errorSyntax: node])
+    [[compiler lookupVariable: [node second]] translateLvalue: compiler]))
