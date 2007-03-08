@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-06 14:41:02 by piumarta on emilia.local
+  Last edited: 2007-03-08 13:33:29 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -547,12 +547,13 @@ Compiler xQuote: expr
 
 Compiler xSyntax: form
 [
-    | name var value |
+    | name var _value |
     form size == 3			ifFalse: [self errorSyntax: form].
     (name := form second) isSymbol	ifFalse: [self errorSyntax: form].
+    _value := form third _eval.
     var := "self lookupSyntax: name ifAbsent: ["self defineSyntax: name"]".
-    var value_: form third _eval.
-    ^CNSTP4 new arg: var _value
+    var value_: _value.
+    ^CNSTP4 new arg: _value
 ]
 
 Compiler xDefine: form
