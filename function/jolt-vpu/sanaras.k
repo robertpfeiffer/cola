@@ -459,5 +459,9 @@
 (assert (strcmp "Hoopla! oink! oink!" (capitalise "Hoopla! oink! oink!")))
 (refute (strcmp "HOOPLA! OINK! OINK!" (capitalise "Hoopla! oink! oink!")))
 
+(printf "objects...\n")
+
+(define-type X Object (foo))
+
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "VPU") versionString] _elements])

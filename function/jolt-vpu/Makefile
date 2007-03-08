@@ -21,6 +21,9 @@ ARCH		= $(shell $(IDC) -C arch)
 
 all : VPU.st main$(OBJEXT)
 
+test : all
+	./main$(OBJEXT) boot.k sanaras.k
+
 .SUFFIXES :
 
 %$(OBJEXT_SO) : %.st
