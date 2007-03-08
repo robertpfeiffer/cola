@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 13:33:29 by piumarta on emilia.local
+  Last edited: 2007-03-08 15:08:57 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -568,8 +568,8 @@ Compiler xDefine: form
 Compiler defineVariable: name from: form
 [
     | var value |
-    (form size <= 3)			ifFalse: [self errorSyntax: form].
-    var := self lookupVariable: name ifAbsent: [self defineVariable: name].
+    (form size <= 3)			ifFalse:  [self errorSyntax: form].
+    var := self lookupVariable: name	ifAbsent: [self defineVariable: name].
     value := form size == 3
 	ifTrue:  [form third translate: self]
 	ifFalse: [CNSTI4 new arg: nil].
