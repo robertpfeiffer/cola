@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 14:24:12 by piumarta on emilia.local
+  Last edited: 2007-03-08 15:08:41 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -33,7 +33,7 @@ SequenceableCollection fourth		[ ^self at: 3 		  		]
 SequenceableCollection fourth: anObject	[ ^self at: 3 		  put: anObject	]
 SequenceableCollection fifth		[ ^self at: 4 		  		]
 SequenceableCollection fifth: anObject	[ ^self at: 4 		  put: anObject	]
-SequenceableCollection last		[ ^self at: self size - 1		]	
+SequenceableCollection last		[ ^self at: self size - 1		]
 SequenceableCollection last: anObject	[ ^self at: self size - 1 put: anObject	]
 
 SequenceableCollection asString		[ ^self as: String ]
