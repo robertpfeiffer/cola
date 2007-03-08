@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:28:03 by piumarta on emilia
+  Last edited: 2007-03-08 14:24:12 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -23,17 +23,18 @@
 SequenceableCollection isSequenceableCollection       [ ^true ]
 Object isSequenceableCollection                       [ ^false ]
 
-SequenceableCollection first		[ ^self at: 0			]
-SequenceableCollection first: anObject	[ ^self at: 0 put: anObject	]
-SequenceableCollection second		[ ^self at: 1			]
-SequenceableCollection second: anObject	[ ^self at: 1 put: anObject	]
-SequenceableCollection third		[ ^self at: 2			]
-SequenceableCollection third: anObject	[ ^self at: 2 put: anObject	]
-SequenceableCollection fourth		[ ^self at: 3			]
-SequenceableCollection fourth: anObject	[ ^self at: 3 put: anObject	]
-SequenceableCollection fifth		[ ^self at: 4			]
-SequenceableCollection fifth: anObject	[ ^self at: 4 put: anObject	]
-SequenceableCollection last		[ ^self at: self size - 1	]
+SequenceableCollection first		[ ^self at: 0				]
+SequenceableCollection first: anObject	[ ^self at: 0 		  put: anObject	]
+SequenceableCollection second		[ ^self at: 1 		  		]
+SequenceableCollection second: anObject	[ ^self at: 1 		  put: anObject	]
+SequenceableCollection third		[ ^self at: 2 		  		]
+SequenceableCollection third: anObject	[ ^self at: 2 		  put: anObject	]
+SequenceableCollection fourth		[ ^self at: 3 		  		]
+SequenceableCollection fourth: anObject	[ ^self at: 3 		  put: anObject	]
+SequenceableCollection fifth		[ ^self at: 4 		  		]
+SequenceableCollection fifth: anObject	[ ^self at: 4 		  put: anObject	]
+SequenceableCollection last		[ ^self at: self size - 1		]	
+SequenceableCollection last: anObject	[ ^self at: self size - 1 put: anObject	]
 
 SequenceableCollection asString		[ ^self as: String ]
 
