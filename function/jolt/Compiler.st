@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 15:08:57 by piumarta on emilia.local
+  Last edited: 2007-03-08 15:59:34 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -177,7 +177,7 @@ Compiler endScope	[  environment := environment parent ]
 
 Compiler labels		[ ^labels ]
 
-Compiler newLabel	[ ^labels add: LABEL new ]
+Compiler newLabel	[ ^labels add: Label new ]
 
 SyntaxTable := [
     IdentityDictionary new
@@ -841,7 +841,7 @@ Object _eval
 
 "----------------------------------------------------------------"
 
-LABEL call
+Label call
 [
     | _result |
     CompilerOptions verboseExec ifTrue: [{ printf("call %p\n", self->v__address); }].

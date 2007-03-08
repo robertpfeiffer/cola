@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-07 16:21:46 by piumarta on emilia.local
+  Last edited: 2007-03-08 15:58:42 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -451,22 +451,22 @@ ConditionalBranch emit: gen		[ lhs emit: gen.  gen perform: self name with: lhs 
 
 LabelCount := [ 0 ]
 
-LABEL : Statement ( ordinal _address )	LABEL name [ ^#label ]
+Label : Statement ( ordinal _address )	Label name [ ^#label ]
 
-LABEL new
+Label new
 [
     self := super new.
     ordinal := LabelCount := LabelCount + 1.
 ]
 
-LABEL ordinal		[ ^ordinal ]
+Label ordinal		[ ^ordinal ]
 
-LABEL address_: _addr	[  _address := _addr ]
-LABEL _address		[ ^_address ]
+Label address_: _addr	[  _address := _addr ]
+Label _address		[ ^_address ]
 
-LABEL relocate_: _addr	{ self->v__address= (oop)((long)self->v__address + (long)v__addr); }
+Label relocate_: _addr	{ self->v__address= (oop)((long)self->v__address + (long)v__addr); }
 
-LABEL phaseCheck_: _addr	[ _addr == _address ifFalse: [self error: 'phase error'] ]
+Label phaseCheck_: _addr	[ _addr == _address ifFalse: [self error: 'phase error'] ]
 
 "----------------------------------------------------------------"
 
@@ -562,7 +562,7 @@ Statement  printInsnOn: aStream indent: i	[]
 Branch		  printInsnOn: aStream indent: i	[ aStream space; print: destination ]
 ConditionalBranch printInsnOn: aStream indent: i	[ aStream space; print: destination.  super printInsnOn: aStream indent: i.   ]
 
-LABEL	printInsnOn: aStream indent: i	[ aStream space; print: self ordinal ]
+Label	printInsnOn: aStream indent: i	[ aStream space; print: self ordinal ]
 
 CNSTI4	printInsnOn: aStream indent: i	[ aStream space; print: (SmallInteger value_: arg) ]
 CNSTP4	printInsnOn: aStream indent: i	[ aStream space; print: (SmallInteger value_: arg) ]
