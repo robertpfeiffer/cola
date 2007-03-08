@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 13:49:17 by piumarta on emilia.local
+  Last edited: 2007-03-08 13:53:42 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -772,10 +772,13 @@ Integer fromString: s base: b
     sign  := 1.
     base  := 10.
     value := 0.
-    [chars peek == $-]
-	whileTrue:
-	   [sign := sign * -1.
-	    chars next].
+    chars peek == $+
+	ifTrue:  [chars next]
+	ifFalse:
+	   [chars peek == $-
+		ifTrue:
+		   [sign := -1.
+		    chars next]].
     chars peek == $0
 	ifTrue:
 	   [base := 8.
