@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-07 15:35:34 by piumarta on emilia.local
+  Last edited: 2007-03-07 16:07:01 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -44,7 +44,7 @@ Instruction output		[ ^output ]
 Instruction nextLive: anInsn	[ ^nextLive := anInsn ]
 Instruction nextLive		[ ^nextLive ]
 
-Instruction isVoid		[ ^self class == #V ]
+Instruction isVoid			[ ^self subtypeResponsibility: 'isVoid' ]
 
 Instruction selectInstructions:	gen	[ ^self subtypeResponsibility: 'selectInstructions:' ]
 Instruction clobberRegisters:	gen	[ ^self subtypeResponsibility: 'clobberRegisters:' ]
@@ -63,7 +63,7 @@ Instruction releaseRegister
 
 Statement : Instruction ()
 
-Statement class				[ ^#V ]
+Statement isVoid				[ ^true ]
 
 Statement selectInstructions: gen	[ type := #VOID ]
 Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
@@ -76,6 +76,8 @@ Leaf : Instruction ( arg )
 
 Leaf arg: a	[  arg := a ]
 Leaf arg	[ ^arg ]
+
+Leaf isVoid	[ ^false ]
 
 Leaf selectInstructions: gen	[ type := #REG ]
 
@@ -100,6 +102,8 @@ Unary : Instruction ( lhs )
 
 Unary lhs: l	[  lhs := l parent: self ]
 Unary lhs	[ ^lhs ]
+
+Unary isVoid	[ ^false ]
 
 Unary  selectInstructions: gen
 [
@@ -178,7 +182,7 @@ Binary emit: gen
 
 Sink : Unary ()
 
-Sink class [ ^#V ]
+Sink isVoid	[ ^true ]
 
 Sink selectInstructions: codeGenerator
 [
@@ -205,7 +209,6 @@ Block : Instruction (
     scope		"LocalEnvironment"
     instructions	"statements/expressions within the block"
     inputs		"top-level non-void expressions, candidates for the overall value of the block"
-    class		"machine class of output value"
 )
 
 Instruction isBlock	[ ^false ]
@@ -216,16 +219,13 @@ Block new
     self := super new.
     instructions := OrderedCollection new.
     inputs := nil.    
-    class := #V.
 ]
 
 Block scope: anEnvironment	[ scope := anEnvironment ]
 
-Block class			[ ^class ]
-
 Block add: insn
 [
-    insn isVoid ifFalse: [class := insn class].
+    insn isVoid ifFalse: [inputs := OrderedCollection new].
     ^instructions add: (insn parent: self)
 ]
 
@@ -234,6 +234,8 @@ Block addInput: insn
     inputs ifFalse: [inputs := OrderedCollection new].
     ^inputs add: insn
 ]
+
+Block isVoid	[ ^inputs isNil ]
 
 Block selectInstructions: gen
 [
@@ -248,7 +250,7 @@ Block clobberRegisters: codeGenerator
 	    ifFalse:
 	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
 		codeGenerator noteDead: insn]].
-    inputs ifTrue: [codeGenerator noteLive: self]
+    inputs ifTrue: [codeGenerator noteLive: self].
 ]
 
 Instruction clobberAllRegistersIn: insn
@@ -295,6 +297,8 @@ Call new
     self := super new.
     arguments := OrderedCollection new.
 ]
+
+Call isVoid		[ ^false ]
 
 Call function: expr	[  arguments add: (expr parent: self) ]
 Call function		[ ^arguments first ]
@@ -404,9 +408,10 @@ Instruction spilledIn: gen
 
 Spill spilledIn: gen	[ self error: 'Spill.spilledIn: this cannot happen']
 
+Spill	    emit:   gen	[ self subtypeResponsibility: 'emit:' ]
+
 Instruction reload: gen	[]
 Spill	    reload: gen	[ self subtypeResponsibility: 'reload:' ]
-Spill	    emit:   gen	[ self subtypeResponsibility: 'emit:' ]
 
 "----------------------------------------------------------------"
 
@@ -445,58 +450,47 @@ LABEL phaseCheck_: _addr	[ _addr == _address ifFalse: [self error: 'phase error'
 
 "----------------------------------------------------------------"
 
-LeafI4	 : Leaf   ()	LeafI4   class [ ^#I4 ]
-LeafP4	 : Leaf   ()	LeafP4   class [ ^#P4 ]
-UnaryI4  : Unary  ()	UnaryI4  class [ ^#I4 ]
-BinaryI4 : Binary ()	BinaryI4 class [ ^#I4 ]
-
-ADDI4   : BinaryI4 ()	ADDI4   name [ ^#addi4 ]
-ANDI4   : BinaryI4 ()	ANDI4   name [ ^#andi4 ]
-ASGNI1  : BinaryI4 ()	ASGNI1  name [ ^#asgni1 ]
-ASGNI2  : BinaryI4 ()	ASGNI2  name [ ^#asgni2 ]
-ASGNI4  : BinaryI4 ()	ASGNI4  name [ ^#asgni4 ]
-BRA	: Branch ()	BRA name [ ^#bra ]
-BRNZ	: ConditionalBranch ()	BRNZ name [ ^#brnz ]
-BRZ	: ConditionalBranch ()	BRZ  name [ ^#brz  ]
-CNSTI4  : LeafI4   ()	CNSTI4  name [ ^#cnsti4 ]
-CNSTP4  : LeafP4   ()	CNSTP4  name [ ^#cnstp4 ]
-DIVI4   : BinaryI4 ()	DIVI4   name [ ^#divi4 ]
-DROP    : Sink     ()	DROP    name [ ^#drop ]
-ENTER   : Statement ()	ENTER   name [ ^#enter ]
-EQI4    : BinaryI4 ()	EQI4    name [ ^#eqi4 ]
-LEI4    : BinaryI4 ()	LEI4    name [ ^#lei4 ]
-LTI4    : BinaryI4 ()	LTI4    name [ ^#lti4 ]
-GEI4    : BinaryI4 ()	GEI4    name [ ^#gei4 ]
-GTI4    : BinaryI4 ()	GTI4    name [ ^#gti4 ]
-INDIRI1	: UnaryI4  ()	INDIRI1	name [ ^#indiri1 ]
-INDIRI2	: UnaryI4  ()	INDIRI2	name [ ^#indiri2 ]
-INDIRI4	: UnaryI4  ()	INDIRI4	name [ ^#indiri4 ]
-MODI4   : BinaryI4 ()	MODI4   name [ ^#modi4 ]
-MULI4   : BinaryI4 ()	MULI4   name [ ^#muli4 ]
-NEGI4   : UnaryI4  ()	NEGI4   name [ ^#negi4 ]
-NEI4    : BinaryI4 ()	NEI4    name [ ^#nei4 ]
-NOP	: Statement ()	NOP	name [ ^#nop ]
-NOTI4   : UnaryI4  ()	NOTI4   name [ ^#noti4 ]
-ORI4    : BinaryI4 ()	ORI4    name [ ^#ori4 ]
-
-RETV    : Statement ()	RETV    name [ ^#retv ]
-
-RETI4   : Sink     ()	RETI4   name [ ^#reti4 ]
-SUBI4   : BinaryI4 ()	SUBI4   name [ ^#subi4 ]
-SHLI4   : BinaryI4 ()	SHLI4   name [ ^#shli4 ]
-SHRI4   : BinaryI4 ()	SHRI4   name [ ^#shri4 ]
-XORI4   : BinaryI4 ()	XORI4   name [ ^#xori4 ]
-
-CALLI4	: Call ()	CALLI4	name [ ^#calli4 ]	CALLI4  class	[ ^#I4 ]
-
-PARAMI4	: LeafI4 ()	PARAMI4	name [ ^#parami4 ]
-
-SPILLI4	: Spill ()	SPILLI4	name [^ #spilli4 ]	SPILLI4 class	[ ^#I4 ]
-
-ADDRFP4 : LeafP4 ()	ADDRFP4 name [ ^#addrfp4 ]
-ADDRGP4 : LeafP4 ()	ADDRGP4 name [ ^#addrgp4 ]
-ADDRJP4 : LeafP4 ()	ADDRJP4 name [ ^#addrjp4 ]
-ADDRLP4 : LeafP4 ()	ADDRLP4 name [ ^#addrlp4 ]
+ADDI4   : Binary ()		ADDI4   name [ ^#addi4 ]
+ADDRFP4 : Leaf ()		ADDRFP4 name [ ^#addrfp4 ]
+ADDRGP4 : Leaf ()		ADDRGP4 name [ ^#addrgp4 ]
+ADDRJP4 : Leaf ()		ADDRJP4 name [ ^#addrjp4 ]
+ADDRLP4 : Leaf ()		ADDRLP4 name [ ^#addrlp4 ]
+ANDI4   : Binary ()		ANDI4   name [ ^#andi4 ]
+ASGNI1  : Binary ()		ASGNI1  name [ ^#asgni1 ]
+ASGNI2  : Binary ()		ASGNI2  name [ ^#asgni2 ]
+ASGNI4  : Binary ()		ASGNI4  name [ ^#asgni4 ]
+BRA	: Branch ()		BRA	name [ ^#bra ]
+BRNZ	: ConditionalBranch ()	BRNZ	name [ ^#brnz ]
+BRZ	: ConditionalBranch ()	BRZ	name [ ^#brz  ]
+CALLI4	: Call ()		CALLI4	name [ ^#calli4 ]
+CNSTI4  : Leaf ()		CNSTI4  name [ ^#cnsti4 ]
+CNSTP4  : Leaf ()		CNSTP4  name [ ^#cnstp4 ]
+DIVI4   : Binary ()		DIVI4   name [ ^#divi4 ]
+DROP    : Sink ()		DROP    name [ ^#drop ]
+ENTER   : Statement ()		ENTER   name [ ^#enter ]
+EQI4    : Binary ()		EQI4    name [ ^#eqi4 ]
+GEI4    : Binary ()		GEI4    name [ ^#gei4 ]
+GTI4    : Binary ()		GTI4    name [ ^#gti4 ]
+INDIRI1	: Unary ()		INDIRI1	name [ ^#indiri1 ]
+INDIRI2	: Unary ()		INDIRI2	name [ ^#indiri2 ]
+INDIRI4	: Unary ()		INDIRI4	name [ ^#indiri4 ]
+LEI4    : Binary ()		LEI4    name [ ^#lei4 ]
+LTI4    : Binary ()		LTI4    name [ ^#lti4 ]
+MODI4   : Binary ()		MODI4   name [ ^#modi4 ]
+MULI4   : Binary ()		MULI4   name [ ^#muli4 ]
+NEGI4   : Unary ()		NEGI4   name [ ^#negi4 ]
+NEI4    : Binary ()		NEI4    name [ ^#nei4 ]
+NOP	: Statement ()		NOP	name [ ^#nop ]
+NOTI4   : Unary ()		NOTI4   name [ ^#noti4 ]
+ORI4    : Binary ()		ORI4    name [ ^#ori4 ]
+PARAMI4	: Leaf ()		PARAMI4	name [ ^#parami4 ]
+RETV    : Statement ()		RETV    name [ ^#retv ]
+RETI4   : Sink ()		RETI4   name [ ^#reti4 ]
+SHLI4   : Binary ()		SHLI4   name [ ^#shli4 ]
+SHRI4   : Binary ()		SHRI4   name [ ^#shri4 ]
+SPILLI4	: Spill ()		SPILLI4	name [^ #spilli4 ]
+SUBI4   : Binary ()		SUBI4   name [ ^#subi4 ]
+XORI4   : Binary ()		XORI4   name [ ^#xori4 ]
 
 "----------------------------------------------------------------"
 
@@ -506,7 +500,7 @@ SPILLI4 emit: gen
     gen spilli4 :lhs output :location
 ]
 
-SPILLI4	    reload: gen	[ gen reloadi4 :output :location ]
+SPILLI4 reload: gen	[ gen reloadi4 :output :location ]
 
 "----------------------------------------------------------------"
 
@@ -542,6 +536,8 @@ Call	printInsnOn: aStream indent: i
 Leaf    printInsnOn: aStream indent: i	[ aStream space; print: arg ]
 Unary   printInsnOn: aStream indent: i	[ lhs printOn: aStream indent: i + 1 ]
 Binary  printInsnOn: aStream indent: i	[ lhs printOn: aStream indent: i + 1.  rhs printOn: aStream indent: i + 1 ]
+
+Statement  printInsnOn: aStream indent: i	[]
 
 Branch		  printInsnOn: aStream indent: i	[ aStream space; print: destination ]
 ConditionalBranch printInsnOn: aStream indent: i	[ aStream space; print: destination.  super printInsnOn: aStream indent: i.   ]
