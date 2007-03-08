@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-07 16:07:01 by piumarta on emilia.local
+  Last edited: 2007-03-07 16:21:46 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -46,6 +46,18 @@ Instruction nextLive		[ ^nextLive ]
 
 Instruction isVoid			[ ^self subtypeResponsibility: 'isVoid' ]
 
+Instruction clobberAllRegistersIn: insn
+[
+    clobbered ifTrue: [clobbered do: [:reg | insn clobberRegister: reg]]
+]
+
+Instruction clobberRegister: aRegister
+[
+    clobbered isNil ifTrue: [clobbered := RegisterSet new].
+    clobbered add: aRegister.
+    CompilerOptions verboseRegs ifTrue: [StdOut tab; nextPutAll: '**** CLOBBER '; print: clobbered; nextPutAll: ' IN '; print: self; cr].
+]
+
 Instruction selectInstructions:	gen	[ ^self subtypeResponsibility: 'selectInstructions:' ]
 Instruction clobberRegisters:	gen	[ ^self subtypeResponsibility: 'clobberRegisters:' ]
 Instruction allocateRegisters:	gen	[ ^self subtypeResponsibility: 'allocateRegisters:' ]
@@ -59,6 +71,11 @@ Instruction releaseRegister
 	    output releaseRegister]
 ]
 
+Instruction assertType: aSymbol
+[
+    type == aSymbol ifFalse: [self error: self debugName, ' type ', type printString, ' is not expected type ', aSymbol]
+]
+
 "neither generates nor consumes"
 
 Statement : Instruction ()
@@ -67,7 +84,7 @@ Statement isVoid				[ ^true ]
 
 Statement selectInstructions: gen	[ type := #VOID ]
 Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
-Statement allocateRegisters: gen	[ ^nil ]
+Statement allocateRegisters: gen	[ self assertType: #VOID.  ^nil ]
 Statement emit: gen			[ gen perform: self name with: self ]
 
 "generates a value"
@@ -79,7 +96,7 @@ Leaf arg	[ ^arg ]
 
 Leaf isVoid	[ ^false ]
 
-Leaf selectInstructions: gen	[ type := #REG ]
+Leaf selectInstructions: gen	[ type := #REG: ]
 
 Leaf clobberRegisters: codeGenerator
 [
@@ -88,6 +105,7 @@ Leaf clobberRegisters: codeGenerator
 
 Leaf allocateRegisters: codeGenerator
 [
+    self assertType: #REG:.
     ^output := codeGenerator allocateRegister: self.
 ]
 
@@ -107,7 +125,7 @@ Unary isVoid	[ ^false ]
 
 Unary  selectInstructions: gen
 [
-    type := #REG.
+    type := #REG:.
     lhs selectInstructions: gen.
 ]
 
@@ -119,6 +137,7 @@ Unary clobberRegisters: codeGenerator
 
 Unary allocateRegisters: codeGenerator
 [
+    self assertType: #REG:.
     ^output := lhs allocateRegisters: codeGenerator.
 ]
 
@@ -137,7 +156,7 @@ Binary rhs	[ ^rhs ]
 
 Binary selectInstructions: gen
 [
-    type := #REG.
+    type := #REG:.
     lhs selectInstructions: gen.
     rhs selectInstructions: gen.
 ]
@@ -151,6 +170,7 @@ Binary clobberRegisters: codeGenerator
 
 Binary allocateRegisters: codeGenerator
 [
+    self assertType: #REG:.
     lhs allocateRegisters: codeGenerator.
     rhs allocateRegisters: codeGenerator.
     rhs releaseRegister.
@@ -192,7 +212,7 @@ Sink selectInstructions: codeGenerator
 
 Sink allocateRegisters: codeGenerator
 [
-    type := #VOID.
+    self assertType: #VOID.
     lhs allocateRegisters: codeGenerator; releaseRegister.
     ^nil
 ]
@@ -237,6 +257,12 @@ Block addInput: insn
 
 Block isVoid	[ ^inputs isNil ]
 
+Block setType: aSymbol
+[
+    type ifFalse: [^type := aSymbol].
+    type == aSymbol ifFalse: [self error: 'cannot add input of type ', aSymbol, ' to block of type ', type]
+]
+
 Block selectInstructions: gen
 [
     instructions do: [:insn | insn selectInstructions: gen].
@@ -249,25 +275,17 @@ Block clobberRegisters: codeGenerator
 	insn isVoid
 	    ifFalse:
 	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
-		codeGenerator noteDead: insn]].
-    inputs ifTrue: [codeGenerator noteLive: self].
-]
-
-Instruction clobberAllRegistersIn: insn
-[
-    clobbered ifTrue: [clobbered do: [:reg | insn clobberRegister: reg]]
-]
-
-Instruction clobberRegister: aRegister
-[
-    clobbered isNil ifTrue: [clobbered := RegisterSet new].
-    clobbered add: aRegister.
-    CompilerOptions verboseRegs ifTrue: [StdOut tab; nextPutAll: '**** CLOBBER '; print: clobbered; nextPutAll: ' IN '; print: self; cr].
+		codeGenerator noteDead: insn.
+		self setType: insn type]].
+    inputs
+	ifTrue:  [codeGenerator noteLive: self]
+	ifFalse: [self setType: #VOID]
 ]
 
 Block allocateRegisters: codeGenerator
 [
     | reg |
+    self assertType: (inputs ifTrue: [#REG:] ifFalse: [#VOID]).
     scope notNil ifTrue: [scope valuesDo: [:var | var allocate: codeGenerator]].
     inputs
 	ifTrue:
@@ -316,6 +334,7 @@ Call selectInstructions: gen
 
 Call clobberRegisters: codeGenerator
 [
+    type := #REG:.
     arguments do: [:arg | arg clobberRegisters: codeGenerator].
     arguments from: 1 reverseDo: [:arg | codeGenerator noteDead: arg].
     codeGenerator clobberRegisters: self.
@@ -325,6 +344,7 @@ Call clobberRegisters: codeGenerator
 Call allocateRegisters: codeGenerator
 [
     | reg |
+    self assertType: #REG:.
     reg := output.
     output := nil.	"no spill before call complete"
     arguments do: [:arg | arg allocateRegisters: codeGenerator].
@@ -450,47 +470,47 @@ LABEL phaseCheck_: _addr	[ _addr == _address ifFalse: [self error: 'phase error'
 
 "----------------------------------------------------------------"
 
-ADDI4   : Binary ()		ADDI4   name [ ^#addi4 ]
+ADDI4   : Binary ()		ADDI4   name [ ^#addi4	 ]
 ADDRFP4 : Leaf ()		ADDRFP4 name [ ^#addrfp4 ]
 ADDRGP4 : Leaf ()		ADDRGP4 name [ ^#addrgp4 ]
 ADDRJP4 : Leaf ()		ADDRJP4 name [ ^#addrjp4 ]
 ADDRLP4 : Leaf ()		ADDRLP4 name [ ^#addrlp4 ]
-ANDI4   : Binary ()		ANDI4   name [ ^#andi4 ]
-ASGNI1  : Binary ()		ASGNI1  name [ ^#asgni1 ]
-ASGNI2  : Binary ()		ASGNI2  name [ ^#asgni2 ]
-ASGNI4  : Binary ()		ASGNI4  name [ ^#asgni4 ]
-BRA	: Branch ()		BRA	name [ ^#bra ]
-BRNZ	: ConditionalBranch ()	BRNZ	name [ ^#brnz ]
-BRZ	: ConditionalBranch ()	BRZ	name [ ^#brz  ]
-CALLI4	: Call ()		CALLI4	name [ ^#calli4 ]
-CNSTI4  : Leaf ()		CNSTI4  name [ ^#cnsti4 ]
-CNSTP4  : Leaf ()		CNSTP4  name [ ^#cnstp4 ]
-DIVI4   : Binary ()		DIVI4   name [ ^#divi4 ]
-DROP    : Sink ()		DROP    name [ ^#drop ]
-ENTER   : Statement ()		ENTER   name [ ^#enter ]
-EQI4    : Binary ()		EQI4    name [ ^#eqi4 ]
-GEI4    : Binary ()		GEI4    name [ ^#gei4 ]
-GTI4    : Binary ()		GTI4    name [ ^#gti4 ]
+ANDI4   : Binary ()		ANDI4   name [ ^#andi4	 ]
+ASGNI1  : Binary ()		ASGNI1  name [ ^#asgni1	 ]
+ASGNI2  : Binary ()		ASGNI2  name [ ^#asgni2	 ]
+ASGNI4  : Binary ()		ASGNI4  name [ ^#asgni4	 ]
+BRA	: Branch ()		BRA	name [ ^#bra	 ]
+BRNZ	: ConditionalBranch ()	BRNZ	name [ ^#brnz	 ]
+BRZ	: ConditionalBranch ()	BRZ	name [ ^#brz 	 ]
+CALLI4	: Call ()		CALLI4	name [ ^#calli4	 ]
+CNSTI4  : Leaf ()		CNSTI4  name [ ^#cnsti4	 ]
+CNSTP4  : Leaf ()		CNSTP4  name [ ^#cnstp4	 ]
+DIVI4   : Binary ()		DIVI4   name [ ^#divi4	 ]
+DROP    : Sink ()		DROP    name [ ^#drop	 ]
+ENTER   : Statement ()		ENTER   name [ ^#enter	 ]
+EQI4    : Binary ()		EQI4    name [ ^#eqi4	 ]
+GEI4    : Binary ()		GEI4    name [ ^#gei4	 ]
+GTI4    : Binary ()		GTI4    name [ ^#gti4	 ]
 INDIRI1	: Unary ()		INDIRI1	name [ ^#indiri1 ]
 INDIRI2	: Unary ()		INDIRI2	name [ ^#indiri2 ]
 INDIRI4	: Unary ()		INDIRI4	name [ ^#indiri4 ]
-LEI4    : Binary ()		LEI4    name [ ^#lei4 ]
-LTI4    : Binary ()		LTI4    name [ ^#lti4 ]
-MODI4   : Binary ()		MODI4   name [ ^#modi4 ]
-MULI4   : Binary ()		MULI4   name [ ^#muli4 ]
-NEGI4   : Unary ()		NEGI4   name [ ^#negi4 ]
-NEI4    : Binary ()		NEI4    name [ ^#nei4 ]
-NOP	: Statement ()		NOP	name [ ^#nop ]
-NOTI4   : Unary ()		NOTI4   name [ ^#noti4 ]
-ORI4    : Binary ()		ORI4    name [ ^#ori4 ]
+LEI4    : Binary ()		LEI4    name [ ^#lei4	 ]
+LTI4    : Binary ()		LTI4    name [ ^#lti4	 ]
+MODI4   : Binary ()		MODI4   name [ ^#modi4	 ]
+MULI4   : Binary ()		MULI4   name [ ^#muli4	 ]
+NEGI4   : Unary ()		NEGI4   name [ ^#negi4	 ]
+NEI4    : Binary ()		NEI4    name [ ^#nei4	 ]
+NOP	: Statement ()		NOP	name [ ^#nop	 ]
+NOTI4   : Unary ()		NOTI4   name [ ^#noti4	 ]
+ORI4    : Binary ()		ORI4    name [ ^#ori4	 ]
 PARAMI4	: Leaf ()		PARAMI4	name [ ^#parami4 ]
-RETV    : Statement ()		RETV    name [ ^#retv ]
-RETI4   : Sink ()		RETI4   name [ ^#reti4 ]
-SHLI4   : Binary ()		SHLI4   name [ ^#shli4 ]
-SHRI4   : Binary ()		SHRI4   name [ ^#shri4 ]
+RETV    : Statement ()		RETV    name [ ^#retv	 ]
+RETI4   : Sink ()		RETI4   name [ ^#reti4	 ]
+SHLI4   : Binary ()		SHLI4   name [ ^#shli4	 ]
+SHRI4   : Binary ()		SHRI4   name [ ^#shri4	 ]
 SPILLI4	: Spill ()		SPILLI4	name [^ #spilli4 ]
-SUBI4   : Binary ()		SUBI4   name [ ^#subi4 ]
-XORI4   : Binary ()		XORI4   name [ ^#xori4 ]
+SUBI4   : Binary ()		SUBI4   name [ ^#subi4	 ]
+XORI4   : Binary ()		XORI4   name [ ^#xori4	 ]
 
 "----------------------------------------------------------------"
 
