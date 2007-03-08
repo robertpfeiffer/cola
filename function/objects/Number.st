@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:30:29 by piumarta on emilia
+  Last edited: 2007-03-08 13:49:17 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -759,3 +759,35 @@ Integer ^ aNumber	[ ^self bitXor: aNumber ]
 SmallInteger asLargeInteger	[ ^LargeInteger withValue: self ]
 
 Number sqrt		[ ^self asFloat sqrt ]
+
+Integer fromString: s
+[
+    ^self fromString: s base: 10
+]
+
+Integer fromString: s base: b
+[
+    | chars digit sign base value |
+    chars := s readStream.
+    sign  := 1.
+    base  := 10.
+    value := 0.
+    [chars peek == $-]
+	whileTrue:
+	   [sign := sign * -1.
+	    chars next].
+    chars peek == $0
+	ifTrue:
+	   [base := 8.
+	    chars next.
+	    (chars peek == $x or: [chars peek == $X])
+		ifTrue:
+		   [base := 16.
+		    chars next]].
+    [chars atEnd]
+	whileFalse:
+	   [(digit := chars next digitValue) ifFalse: [^nil].
+	    (digit between: 0 and: base - 1) ifFalse: [^nil].
+	    value := value * base + digit].
+    ^value * sign
+]
