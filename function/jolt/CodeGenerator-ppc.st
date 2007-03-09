@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 13:16:08 by piumarta on emilia.local
+  Last edited: 2007-03-08 16:39:02 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -316,7 +316,7 @@ DynamicPowerPCCodeGenerator _
 #   undef  _I
 #   define _I(v)	((long)v_##v >> 1)
 #   define _R(v)	((long)(((struct t_Register *)(v_##v))->v__encoding))
-#   define _A(v)	((long)(((struct t_LABEL    *)(v_##v))->v__address))
+#   define _A(v)	((long)(((struct t_Label    *)(v_##v))->v__address))
 }
 
 DynamicPowerPCCodeGenerator addrgp4 :d :v	[ self lisR: d I_: v _address;  oriR: d R: d I_: v _address ]
