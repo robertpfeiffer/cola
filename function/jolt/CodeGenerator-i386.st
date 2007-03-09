@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 13:12:54 by piumarta on emilia.local
+  Last edited: 2007-03-08 16:38:22 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -285,7 +285,7 @@ DynamicIntel32CodeGenerator _
 #   define _P(v)	((long)v__##v)
 #   define _I(v)	((long)v_##v >> 1)
 #   define _R(v)	((long)(((struct t_Register *)(v_##v))->v__encoding))
-#   define _A(v)	((long)(((struct t_LABEL    *)(v_##v))->v__address))
+#   define _A(v)	((long)(((struct t_Label    *)(v_##v))->v__address))
 }
 
 DynamicIntel32CodeGenerator addlI: i R: d	{ ADDLir	(_I(i)          ,	_R(d)	 ); }
