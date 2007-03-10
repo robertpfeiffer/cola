@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-04-22 14:49:28 by piumarta on emilia.local
+  Last edited: 2007-03-10 13:53:18 by piumarta on emilia.local
 "
 
 { import: SequenceableCollection }
@@ -92,6 +92,15 @@ OrderedCollection removeLast
     array at: lastIndex put: nil.
     lastIndex := lastIndex - 1.
     ^last
+]
+
+OrderedCollection copyFrom: first to: last
+[
+    | copy |
+    last < first ifTrue: [^self species new: 0].
+    copy := self species new: last + 1 - first.
+    first to: last do: [:index | copy addLast: (self at: index)].
+    ^copy
 ]
 
 OrderedCollection do: unaryBlock
