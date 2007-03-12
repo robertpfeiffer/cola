@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-10 11:36:02 by piumarta on emilia.local
+  Last edited: 2007-03-11 13:07:31 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -29,7 +29,8 @@ InstructionCount := [ 0 ]
 Instruction : Object (
     id		"SmallInteger - my unique identifier"
     parent	"Instruction that consumes the value of (or sequences) me"
-    type	"Symbol - name of my output's storage type"
+    type	"Symbol - name of my output's resource class"
+    source	"Symbol or nil - copy of type iff I allocate my output for the first time"
     output	"Register or Location of my output value"
     clobbered	"RegisterSet of Registers that are clobbered while my output is live"
     nextLive	"Instruction most recently executed whose output is still live"
@@ -43,11 +44,13 @@ Instruction new
     self := super new.
     id := InstructionCount := InstructionCount + 1.
     type := nil.
+    source := nil.
 ]
 
 Instruction parent: anInsn	[  parent := anInsn ]
 Instruction parent		[ ^parent ]
 Instruction type		[ ^type ]
+Instruction source		[ ^source ]
 Instruction output: aRegister	[  output := aRegister ]
 Instruction output		[ ^output ]
 Instruction nextLive: anInsn	[ ^nextLive := anInsn ]
@@ -68,6 +71,7 @@ Instruction clobberRegister: aRegister
 ]
 
 Instruction selectInstructions:	gen	[ ^self subtypeResponsibility: 'selectInstructions:' ]
+Instruction findSources			[ ^self subtypeResponsibility: 'findSources' ]
 Instruction clobberRegisters:	gen	[ ^self subtypeResponsibility: 'clobberRegisters:' ]
 Instruction allocateRegisters:	gen	[ ^self subtypeResponsibility: 'allocateRegisters:' ]
 Instruction emit:		gen	[ ^self subtypeResponsibility: 'emit:' ]
@@ -92,6 +96,7 @@ Statement : Instruction ()
 Statement isVoid				[ ^true ]
 
 Statement selectInstructions: gen	[ type := #VOID ]
+Statement findSources			[ ^nil ]
 Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
 Statement allocateRegisters: gen	[ self assertType: #VOID.  ^nil ]
 Statement emit: gen			[ gen perform: self name with: self ]
@@ -107,14 +112,20 @@ Leaf isVoid	[ ^false ]
 
 Leaf selectInstructions: gen	[ type := #REG ]
 
+Leaf findSources
+[
+    ^type ifTrue: [source := self]
+]
+
 Leaf clobberRegisters: codeGenerator
 [
-    codeGenerator noteLive: self; clobberRegisters: self
+    source ifTrue: [codeGenerator noteLive: self].
+    codeGenerator clobberRegisters: self.
 ]
 
 Leaf allocateRegisters: codeGenerator
 [
-    ^output := codeGenerator perform: type with: self
+    ^source == self ifTrue: [output := codeGenerator allocateRegister: self]
 ]
 
 Leaf emit: gen
@@ -137,16 +148,22 @@ Unary  selectInstructions: gen
     lhs selectInstructions: gen.
 ]
 
+Unary findSources
+[
+    ^source := lhs findSources ifNil: [type ifTrue: [self]]
+]
+
 Unary clobberRegisters: codeGenerator
 [
     lhs clobberRegisters: codeGenerator.
+    source == self ifTrue: [codeGenerator noteLive: self].
     codeGenerator clobberRegisters: self.
 ]
 
 Unary allocateRegisters: codeGenerator
 [
-    (output := lhs allocateRegisters: codeGenerator) ifFalse: [output := codeGenerator perform: type with: self].
-    ^output
+    lhs allocateRegisters: codeGenerator.
+    ^output := source == self ifTrue: [codeGenerator allocateRegister: self] ifFalse: [lhs output]
 ]
 
 Unary emit: gen
@@ -169,11 +186,20 @@ Binary selectInstructions: gen
     rhs selectInstructions: gen.
 ]
 
+Binary findSources
+[
+    source := lhs findSources ifNil: [type ifTrue: [self]].
+    rhs findSources.
+    ^source
+]
+
 Binary clobberRegisters: codeGenerator
 [
     lhs clobberRegisters: codeGenerator.
     rhs clobberRegisters: codeGenerator.
-    codeGenerator clobberRegisters: self; noteDead: rhs
+    codeGenerator clobberRegisters: self.
+    rhs source ifTrue: [codeGenerator noteDead: rhs].
+    source == self ifTrue: [codeGenerator noteLive: self].
 ]
 
 Binary allocateRegisters: codeGenerator
@@ -183,8 +209,7 @@ Binary allocateRegisters: codeGenerator
     rhs allocateRegisters: codeGenerator.
     rhs releaseRegister.
     lhs releaseSpill.
-    (output := lhs output) ifFalse: [output := codeGenerator perform: type with: self].
-    ^output
+    ^output := source == self ifTrue: [codeGenerator allocateRegister: self] ifFalse: [lhs output]
 ]
 
 Binary spillRegisterFor: insn in: gen
@@ -226,10 +251,17 @@ Sink allocateRegisters: codeGenerator
     ^nil
 ]
 
+Sink findSources
+[
+    lhs findSources.
+    ^nil
+]
+
 Sink clobberRegisters: codeGenerator
 [
-    super clobberRegisters: codeGenerator.
-    codeGenerator noteDead: self.
+    lhs clobberRegisters: codeGenerator.
+    codeGenerator clobberRegisters: self.
+    lhs source ifTrue: [codeGenerator noteDead: lhs].
 ]
 
 "consumes zero or more values, generates zero or one value"
@@ -279,6 +311,12 @@ Block selectInstructions: gen
     instructions do: [:insn | insn selectInstructions: gen].
 ]
 
+Block findSources
+[
+    instructions do: [:insn | insn findSources ifTrue: [source := self]].
+    ^source
+]
+
 Block clobberRegisters: codeGenerator
 [
     instructions do: [:insn |
@@ -288,6 +326,8 @@ Block clobberRegisters: codeGenerator
 	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
 		codeGenerator noteDead: insn.
 		self setType: insn type]].
+    (inputs isNil and: [source]) ifTrue: [self error: 'Block inputs and !source'].
+    (source isNil and: [inputs]) ifTrue: [self error: 'Block source and !inputs'].
     inputs
 	ifTrue:  [codeGenerator noteLive: self]
 	ifFalse: [self setType: #VOID]
@@ -296,14 +336,14 @@ Block clobberRegisters: codeGenerator
 Block allocateRegisters: codeGenerator
 [
     | reg |
-    self assertType: (inputs ifTrue: [#REG] ifFalse: [#VOID]).
+    self assertType: (source ifTrue: [#REG] ifFalse: [#VOID]).
     scope notNil ifTrue: [scope valuesDo: [:var | var allocate: codeGenerator]].
     inputs
 	ifTrue:
 	   [reg := codeGenerator perform: type with: self.
 	    inputs do: [:insn | insn output: reg].
 	    reg release].
-    output := nil.	"no spill before block complete"
+    output := nil.	"avoid spill of pre-allocated output until block is complete"
     instructions do: [:insn | insn allocateRegisters: codeGenerator; releaseSpill; releaseRegister].
     reg ifTrue: [output := reg allocate].
     scope notNil ifTrue: [scope valuesReverseDo: [:var | var location release]].
@@ -343,25 +383,32 @@ Call selectInstructions: gen
     gen noteCall: self.
 ]
 
+Call findSources
+[
+    arguments do: [:arg | arg findSources].
+    ^type ifTrue: [source := self]
+]
+
 Call clobberRegisters: codeGenerator
 [
     type := #REG.
     arguments do: [:arg | arg clobberRegisters: codeGenerator].
     arguments from: 1 reverseDo: [:arg | codeGenerator noteDead: arg].
     codeGenerator clobberRegisters: self.
-    codeGenerator noteDead: arguments first; noteLive: self.
+    arguments first source ifTrue: [codeGenerator noteDead: arguments first].
+    source ifTrue: [codeGenerator noteLive: self].
 ]
 
 Call allocateRegisters: codeGenerator
 [
     | reg |
-    self assertType: #REG.
+    self assertType: (source ifTrue: [#REG] ifFalse: [#VOID]).
     reg := output.
-    output := nil.	"no spill before call complete"
+    output := nil.	"avoid spill of pre-allocated output until call is complete"
     arguments do: [:arg | arg allocateRegisters: codeGenerator].
     arguments do: [:arg | arg releaseSpill; releaseRegister].
     output := reg.
-    ^output := codeGenerator allocateRegister: self.
+    ^source ifTrue: [output := codeGenerator allocateRegister: self].
 ]
 
 Call spillRegisterFor: insn in: gen
@@ -541,9 +588,14 @@ SPILLI4 reload: gen	[ gen reloadi4 :output :location ]
 Instruction printOn: aStream
 [
     aStream print: id; nextPut: $(.
-    type notNil ifTrue: [aStream print: type; nextPut: $ ].
+    source == self ifTrue: [aStream nextPutAll: '+++ '] ifFalse: [source ifTrue: [aStream print: source id; nextPutAll: ' => ']].
+    type
+	ifTrue:  [aStream print: type; nextPut: $ ]
+	ifFalse: [aStream nextPutAll: '--- '].
     super printOn: aStream.
-    output notNil ifTrue: [aStream nextPut: $ ; print: output; nextPut: $,; print: output refCount].
+    output
+	ifTrue:  [aStream nextPut: $ ; print: output; nextPut: $,; print: output refCount]
+	ifFalse: [aStream nextPutAll: ' ---'].
     aStream nextPut: $).
     parent ifTrue: [aStream nextPut: $.; print: parent id].
 ]
@@ -553,9 +605,12 @@ Instruction printOn: aStream indent: i
     aStream cr.
     i timesRepeat: [aStream nextPutAll: '| '].
     aStream print: id; nextPut: $(.
-    type notNil ifTrue: [aStream print: type; nextPut: $ ].
+    source == self ifTrue: [aStream nextPutAll: '+++ '] ifFalse: [source ifTrue: [aStream print: source id; nextPutAll: ' => ']].
+    type ifTrue: [aStream print: type; nextPut: $ ] ifFalse: [aStream nextPutAll: '--- '].
     super printOn: aStream.
-    output notNil ifTrue: [aStream nextPut: $ ; print: output; nextPut: $,; print: output refCount].
+    output
+	ifTrue:  [aStream nextPut: $ ; print: output; nextPut: $,; print: output refCount]
+	ifFalse: [aStream nextPutAll: ' ---'].
     self printInsnOn: aStream indent: i.
     aStream nextPut: $).
 ]

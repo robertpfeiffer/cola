@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-01 16:18:33 by piumarta on emilia
+  Last edited: 2007-03-11 17:49:33 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -44,12 +44,13 @@ GrammarProduction printOn: aStream
 
 "----------------------------------------------------------------"
 
-ReductionGrammar : Object ( startSets )
+ReductionGrammar : Object ( startSets insnSets )
 
 ReductionGrammar new
 [
     self := super new.
     startSets := IdentityDictionary new.
+    insnSets := IdentityDictionary new.
 ]
 
 ReductionGrammar startSetAt: startSymbol
@@ -74,11 +75,25 @@ ReductionGrammar at: startSymbol add: pattern do: actionBlock
 
 ReductionGrammar at: startSymbol add: pattern if: predicateBlock do: actionBlock
 [
-    (self at: startSymbol)
-	addFirst: (GrammarProduction withSymbol: startSymbol
-				     pattern: pattern
-				     predicate: predicateBlock
-				     action: actionBlock).
+    | production |
+    production := GrammarProduction withSymbol: startSymbol pattern: pattern predicate: predicateBlock action: actionBlock.
+    (self at: startSymbol) addFirst: production.
+    (pattern isArray and: [pattern first isSymbol]) ifTrue: [(self at: startSymbol at: pattern first) addFirst: production].
+]
+
+ReductionGrammar startSetAt: startSymbol at: insnName
+[
+    | set |
+    set := insnSets at: startSymbol ifAbsent: [self error: 'no start set for ', startSymbol printString].
+    set := set at: insnName ifAbsent: [self error: 'no rule for ', insnName printString, ' in start set for ', startSymbol printString].
+    ^set
+]
+
+ReductionGrammar at: startSymbol at: insnName
+[
+    | set |
+    set := insnSets at: startSymbol ifAbsent: [insnSets at: startSymbol put: IdentityDictionary new].
+    ^set at: insnName ifAbsent: [set at: insnName put: OrderedCollection new].
 ]
 
 ReductionGrammar printOn: aStream

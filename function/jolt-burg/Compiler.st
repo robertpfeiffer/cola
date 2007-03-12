@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-09 11:38:11 by piumarta on emilia.local
+  Last edited: 2007-03-11 13:09:44 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -745,6 +745,7 @@ Compiler compileLambda: form
     CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
     gen := generatorType withLabels: labels.
     gen selectInstructions: block.    "block selectInstructions: gen."
+    block findSources.
     CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
     gen lastLive ifTrue: [self error: 'compileLambda: codeGen begins with live register: ', gen lastLive printString].
     block clobberRegisters: gen.
@@ -810,6 +811,7 @@ Compiler compile: anObject for: codeGeneratorType
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen := generatorType withLabels: labels.
     gen selectInstructions: block.    "block selectInstructions: gen."
+    block findSources.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen lastLive ifTrue: [self error: 'compile: codeGen begins with live register: ', gen lastLive printString].
     block clobberRegisters: gen.

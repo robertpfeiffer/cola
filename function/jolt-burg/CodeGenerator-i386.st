@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-10 11:15:16 by piumarta on emilia.local
+  Last edited: 2007-03-11 18:11:27 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -454,15 +454,16 @@ Intel32Grammar := [
 								    cmplR:  op rhs output R: op lhs output;
 								    setgR:  gen cl;
 								    movlR:  gen ecx	  R: op output ];
-"
+
 	at: #VOID add: #(brz (lti4 (indiri4 (addrlp4))
 			           (cnsti4)))		do: [:op :gen | gen cmplI_:  op lhs rhs arg Md: op lhs lhs lhs arg offset b: op lhs lhs lhs arg base;
 									    jgeL:    op destination ];
+
 	at: #REG  add: #(indiri4 (addrlp4))		do: [:op :gen | gen movlMd:  op lhs arg offset b: op lhs arg base R: op output ];
 	at: #REG  add: #(indiri4 (addrgp4))		do: [:op :gen | gen movlMd_: op lhs arg _address R: op output ];
-	at: #REG  add: #(addi4 REG (cnsti4))		do: [:op :gen | gen addlI_:  op rhs arg R: op lhs output ];
 	at: #REG  add: #(subi4 REG (cnsti4))		do: [:op :gen | gen sublI_:  op rhs arg R: op lhs output ];
-"
+	at: #REG  add: #(addi4 REG (cnsti4))		do: [:op :gen | gen addlI_:  op rhs arg R: op lhs output ];
+
 	yourself
 ]
 
@@ -477,8 +478,8 @@ Intel32CodeGenerator selectInstructions: anInstruction
 
 Instruction reduceTo: aSymbol in: aGrammar for: gen
 [
-    (aGrammar at: aSymbol) do: [:rule |
-        "StdOut print: self; nextPutAll: ' matchPattern: '; print: rule pattern; cr."
+    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    (aGrammar startSetAt: aSymbol at: self name) do: [:rule |
 	(self matchPattern: rule pattern in: aGrammar for: gen)
 	    ifTrue:
 	       ["StdOut print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
@@ -489,20 +490,27 @@ Instruction reduceTo: aSymbol in: aGrammar for: gen
 
 Block reduceTo: aSymbol in: aGrammar for: gen
 [
+    type := nil.
+    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     instructions do: [:insn | insn reduceTo: (insn isVoid ifTrue: [#VOID] ifFalse: [aSymbol]) in: aGrammar for: gen].
+    type := aSymbol.
 ]
 
 Call reduceTo: aSymbol in: aGrammar for: gen
 [
+    type := nil.
+    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     arguments from: 1 do: [:arg | arg reduceTo: #REG in: aGrammar for: gen].
     super reduceTo: aSymbol in: aGrammar for: gen.
     gen noteCall: self.
+    type := aSymbol.
 ]
 
 Instruction matchPattern: aPattern in: aGrammar for: gen
 [
+    "StdOut print: self; nextPutAll: ' matchPattern: '; print: aPattern; cr."
     ^aPattern isSymbol
-	ifTrue:  [self reduceTo: aPattern in: aGrammar for: gen]
+	ifTrue:  [type == aPattern or: [self reduceTo: aPattern in: aGrammar for: gen]]
 	ifFalse: [aPattern first == self name and: [self matchArguments: aPattern in: aGrammar for: gen]]
 ]
 
