@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 16:39:02 by piumarta on emilia.local
+  Last edited: 2007-03-12 16:05:31 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -103,42 +103,6 @@ PowerPCCodeGenerator allocateTemp: insn
     ^(temps add: (Temporary withBase: r1 offset: 0)) allocate
 ]
 
-PowerPCCodeGenerator addi4    :d :s	[ self addR: d R: d R: s ]
-PowerPCCodeGenerator addrfp4  :d	[ self mrR: d R: r1 ]
-PowerPCCodeGenerator addrlp4  :d :v	[ self addiR: d R: v base I: v offset ]
-PowerPCCodeGenerator andi4    :d :s	[ self andR: d R: d R: s ]
-PowerPCCodeGenerator asgni1   :s :d	[ self stbR: s I: 0 R: d ]
-PowerPCCodeGenerator asgni2   :s :d	[ self sthR: s I: 0 R: d ]
-PowerPCCodeGenerator asgni4   :s :d	[ self stwR: s I: 0 R: d ]
-PowerPCCodeGenerator bra      :l	[ self baL: l ]
-PowerPCCodeGenerator brnz     :s :l	[ self cmpwiI: 7 R: s I: 0;  bneI: 7 L: l ]
-PowerPCCodeGenerator brz      :s :l	[ self cmpwiI: 7 R: s I: 0;  beqI: 7 L: l ]
-PowerPCCodeGenerator cnsti4   :d :v	[ self lisR: d I_: v;  oriR: d R: d I_: v ]
-PowerPCCodeGenerator cnstp4   :d :v	[ self lisR: d I_: v;  oriR: d R: d I_: v ]
-PowerPCCodeGenerator divi4    :d :s	[ self divwR: d R: d R: s ]
-PowerPCCodeGenerator eqi4     :d :s	[ self xorR: d R: d R: s;  subficR: r0 R: r3 I: 0;  addeR: d R: r0 R: d ]
-PowerPCCodeGenerator gei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 28 I: 28;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
-PowerPCCodeGenerator gti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwinmR: d R: d I: 30 I: 31 I: 31 ]
-PowerPCCodeGenerator indiri1  :d	[ self lbzR: d I: 0 R: d ]
-PowerPCCodeGenerator indiri2  :d	[ self lhzR: d I: 0 R: d ]
-PowerPCCodeGenerator indiri4  :d	[ self lwzR: d I: 0 R: d ]
-PowerPCCodeGenerator label    :l	[ self define: l ]
-PowerPCCodeGenerator lei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 29 I: 29;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
-PowerPCCodeGenerator lti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwinmR: d R: d I: 29 I: 31 I: 31 ]
-PowerPCCodeGenerator modi4    :d :s	[ self divwR: r0 R: d R: s;  mullwR: r0 R: r0 R: s;  subfR: d R: r0 R: d ]
-PowerPCCodeGenerator muli4    :d :s	[ self mullwR: d R: d R: s ]
-PowerPCCodeGenerator negi4    :d	[ self negR: d R: d ]
-PowerPCCodeGenerator nei4     :d :s	[ self xorR: r12 R: d R: s;  addicR: r0 R: r12 I: -1;  subfeR: d R: r0 R: r12 ]
-PowerPCCodeGenerator noti4    :d	[ self subficR: r0 R: d I: 0;  addeR: d R: r0 R: d ]
-PowerPCCodeGenerator ori4     :d :s	[ self orR: d R: d R: s ]
-PowerPCCodeGenerator reti4    :s	[ self mrR: r3 R: s; emitEpilogue ]
-PowerPCCodeGenerator subi4    :d :s	[ self subR: d R: d R: s ]
-PowerPCCodeGenerator shli4    :d :s	[ self slwR: d R: d R: s ]
-PowerPCCodeGenerator shri4    :d :s	[ self srawR: d R: d R: s ]
-PowerPCCodeGenerator xori4    :d :s	[ self xorR: d R: d R: s ]
-PowerPCCodeGenerator spilli4  :r :t	[ self stwR: r I: t offset R: t base ]
-PowerPCCodeGenerator reloadi4 :r :t	[ self lwzR: r I: t offset R: t base ]
-
 PowerPCCodeGenerator finaliseFrame
 [
     | linkage align tempOffset |
@@ -199,7 +163,7 @@ PowerPCCodeGenerator noteCall: call
     parametersSize := parametersSize max: call arity * 4.
 ]
 
-PowerPCCodeGenerator calli4 :call
+PowerPCCodeGenerator calli4: call
 [
     | func |
     call arity - 1 downTo: 0 do: [:index | self emit: call argumentAt: index].
@@ -218,18 +182,10 @@ PowerPCCodeGenerator emit: call argumentAt: index
 	ifFalse: [self stwR: insn output I: index * 4 + 24 R: r1]
 ]
 
+PowerPCCodeGenerator spilli4:  reg to:   tmp	[ self stwR: reg I: tmp offset R: tmp base ]
+PowerPCCodeGenerator reloadi4: reg from: tmp	[ self lwzR: reg I: tmp offset R: tmp base ]
+
 StaticPowerPCCodeGenerator : PowerPCCodeGenerator ()
-
-StaticPowerPCCodeGenerator emit: tree
-[
-    self finaliseFrame.
-    tree emit: self.
-]
-
-StaticPowerPCCodeGenerator addrgp4  :d :v	[ StdOut
-						      nextPutAll: '	lis	'; print: d; nextPutAll: ',hi16('; print: v; nextPutAll: ')\n';
-						      nextPutAll: '	ori	'; print: d; nextPut: $,; print: d; nextPutAll: ',lo16('; print: v; nextPutAll: ')\n' ]
-StaticPowerPCCodeGenerator addrjp4  :d :l	[ StdOut nextPutAll: '	movl	$L'; print: l ordinal; nextPut: $,; print: d; cr ]
 
 StaticPowerPCCodeGenerator define: l		[ StdOut nextPutAll: 'L'; print: l ordinal; nextPut: $:; cr ]
 
@@ -280,23 +236,6 @@ StaticPowerPCCodeGenerator xorR: d R: a R: b	[ StdOut nextPutAll: '	xor	'; print
 
 DynamicPowerPCCodeGenerator : PowerPCCodeGenerator ()
 
-DynamicPowerPCCodeGenerator emit: tree
-[
-    | _entry |
-    { asm_pass= 0; }.
-    { asm_pc= 0; }.
-    self finaliseFrame.
-    tree emit: self.
-    CompilerOptions verboseExec ifTrue: [{ printf("code size %d bytes\n", (int)asm_pc); }].
-    { asm_pc= (insn *)malloc((long)asm_pc); }.
-    { asm_pass= 2; }.
-    { v__entry= (oop)asm_pc; }.
-    self relocateLabels_: self _asmPC.
-    tree emit: self.
-    CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
-    { iflush((void *)v__entry, (void *)asm_pc); }.
-]
-
 DynamicPowerPCCodeGenerator asmPass	{ return (oop)(asm_pass << 1 | 1); }
 DynamicPowerPCCodeGenerator _asmPC	{ return (oop)(asm_pc); }
 
@@ -318,9 +257,6 @@ DynamicPowerPCCodeGenerator _
 #   define _R(v)	((long)(((struct t_Register *)(v_##v))->v__encoding))
 #   define _A(v)	((long)(((struct t_Label    *)(v_##v))->v__address))
 }
-
-DynamicPowerPCCodeGenerator addrgp4 :d :v	[ self lisR: d I_: v _address;  oriR: d R: d I_: v _address ]
-DynamicPowerPCCodeGenerator addrjp4 :d :l	[ self lisR: d I_: l _address;  oriR: d R: d I_: l _address ]
 
 DynamicPowerPCCodeGenerator addR: d R: a R: b	{ ADDrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator addeR: d R: a R: b	{ ADDErrr	(_R(d), _R(a), _R(b)         	); }
@@ -396,4 +332,121 @@ StaticPowerPCCodeGenerator defineVariable: name
 
 DynamicPowerPCCodeGenerator defineVariable: name
 [
+]
+
+"----------------------------------------------------------------"
+
+{ import: Grammar }
+
+PowerPCCodeGenerator r0		[ ^r0 ]
+PowerPCCodeGenerator r1		[ ^r1 ]
+PowerPCCodeGenerator r3		[ ^r3 ]
+PowerPCCodeGenerator r12	[ ^r12 ]
+
+PowerPCGrammar := [
+    ReductionGrammar new
+	"-------------------------------- baseline --------------------------------"
+	at: #VOID add: #REG			"discard";
+	at: #VOID add: #(label		)	do: [:op :gen | gen define: op ];
+	at: #VOID add: #(enter		)	do: [:op :gen | gen emitPrologue ];
+	at: #VOID add: #(retv		)	do: [:op :gen | gen emitEpilogue ];
+	at: #VOID add: #(reti4 	 REG	)	do: [:op :gen | gen mrR: gen r3 R: op lhs output;  emitEpilogue ];
+	at: #VOID add: #(drop  	 REG	)	do: [:op :gen | ];
+	at: #VOID add: #(brz   	 REG	)	do: [:op :gen | gen cmpwiI:  7 R: op lhs output I: 0;
+								    beqI:    7 L: op destination ];
+	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen cmpwiI:  7 R: op lhs output I: 0;
+								    bneI:    7 L: op destination ];
+	at: #VOID add: #(bra		)	do: [:op :gen | gen baL:     op destination ];
+	at: #REG  add: #(cnsti4	 	)	do: [:op :gen | gen lisR:    op output		   I_: op arg;
+								    oriR:    op output R: op output I_: op arg ];
+	at: #REG  add: #(cnstp4	 	)	do: [:op :gen | gen lisR:    op output		   I_: op arg;
+								    oriR:    op output R: op output I_: op arg ];
+	at: #REG  add: #(parami4 	)	do: [:op :gen | ];
+	at: #REG  add: #(addrfp4 	)	do: [:op :gen | gen mrR:     op output R: gen r1 ];
+	at: #REG  add: #(addrgp4 	)	do: [:op :gen | gen lisR:    op output		   I_: op arg _address;
+								    oriR:    op output R: op output I_: op arg _address ];
+	at: #REG  add: #(addrjp4 	)	do: [:op :gen | gen lisR:    op output		   I_: op arg _address;
+								    oriR:    op output R: op output I_: op arg _address ];
+	at: #REG  add: #(addrlp4 	)	do: [:op :gen | gen addiR:   op output R: op arg base I: op arg offset ];
+	at: #REG  add: #(indiri1 REG	)	do: [:op :gen | gen lbzR:    op output I: 0 R: op lhs output ];
+	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen lhzR:    op output I: 0 R: op lhs output ];
+	at: #REG  add: #(indiri4 REG	)	do: [:op :gen | gen lwzR:    op output I: 0		R: op output ];
+	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen subficR: gen r0    R: op lhs output I: 0;
+								    addeR:   op output R: gen r0	R: op lhs output ];
+	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen negR:    op output R: op lhs output ];
+	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4:  op ];
+	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen stbR:    op lhs output I: 0 R: op rhs output ];
+	at: #REG  add: #(asgni2  REG REG)	do: [:op :gen | gen sthR:    op lhs output I: 0 R: op rhs output ];
+	at: #REG  add: #(asgni4  REG REG)	do: [:op :gen | gen stwR:    op lhs output I: 0 R: op rhs output ];
+	at: #REG  add: #(andi4   REG REG)	do: [:op :gen | gen andR:    op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(ori4    REG REG)	do: [:op :gen | gen orR:     op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(xori4 	 REG REG)	do: [:op :gen | gen xorR:    op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(addi4 	 REG REG)	do: [:op :gen | gen addR:    op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(subi4 	 REG REG)	do: [:op :gen | gen subR:    op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(muli4 	 REG REG)	do: [:op :gen | gen mullwR:  op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(divi4 	 REG REG)	do: [:op :gen | gen divwR:   op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(modi4 	 REG REG)	do: [:op :gen | gen divwR:   gen r0    R: op lhs output R: op rhs output;
+								    mullwR:  gen r0    R: gen r0	R: op rhs output;
+								    subfR:   op output R: gen r0	R: op lhs output ];
+	at: #REG  add: #(shli4 	 REG REG)	do: [:op :gen | gen slwR:    op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(shri4 	 REG REG)	do: [:op :gen | gen srawR:   op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen cmpwI:   7		R: op lhs output R: op rhs output;
+								    mfcrR:   op output;
+								    rlwinmR: op output	R: op output	 I: 29 I: 31 I: 31 ];
+	at: #REG  add: #(lei4 	 REG REG)	do: [:op :gen | gen cmpwI:   7		R: op lhs output R: op rhs output;
+								    crnorI:  30 I: 29 I: 29;
+								    mfcrR:   op output;
+								    rlwinmR: op output R: op output	I: 31 I: 31 I: 31 ];
+	at: #REG  add: #(eqi4 	 REG REG)	do: [:op :gen | gen xorR:    op output R: op lhs output R: op rhs output;
+								    subficR: gen r0    R: gen r3	I: 0;
+								    addeR:   op output R: gen r0	R: op output ];
+	at: #REG  add: #(nei4 	 REG REG)	do: [:op :gen | gen xorR:    gen r12   R: op lhs output R: op rhs output;
+								    addicR:  gen r0    R: gen r12	I: -1;
+								    subfeR:  op output R: gen r0	R: gen r12 ];
+	at: #REG  add: #(gei4 	 REG REG)	do: [:op :gen | gen cmpwI:   7	       R: op lhs output R: op rhs output;
+								    crnorI:  30 I: 28 I: 28;
+								    mfcrR:   op output;
+								    rlwinmR: op output R: op output	I: 31 I: 31 I: 31 ];
+	at: #REG  add: #(gti4 	 REG REG)	do: [:op :gen | gen cmpwI:   7	       R: op lhs output R: op rhs output;
+								    mfcrR:   op output;
+								    rlwinmR: op output R: op output	I: 30 I: 31 I: 31 ];
+	yourself
+]
+
+"----------------------------------------------------------------"
+
+PowerPCRegisterFilter    : RegisterAllocator ()
+PowerPCRegisterAllocator : RegisterAllocator ()
+
+PowerPCRegisterFilter	 REG  :insn	[ ^true ]
+PowerPCRegisterAllocator REG  :insn	[ ^codeGenerator allocateRegister: insn ]
+
+PowerPCCodeGenerator grammar		[ ^PowerPCGrammar ]
+PowerPCCodeGenerator registerFilter	[ ^PowerPCRegisterFilter   "on: self"]
+PowerPCCodeGenerator registerAllocator	[ ^PowerPCRegisterAllocator on: self ]
+
+"----------------------------------------------------------------"
+
+StaticPowerPCCodeGenerator generate: tree
+[
+    self finaliseFrame.
+    tree printOn: StdOut indent: 0.  StdOut cr.
+    tree generate: self.
+]
+
+DynamicPowerPCCodeGenerator generate: tree
+[
+    | _entry |
+    { asm_pass= 0; }.
+    { asm_pc= 0; }.
+    self finaliseFrame.
+    tree generate: self.
+    CompilerOptions verboseExec ifTrue: [{ printf("code size %d bytes\n", (int)asm_pc); }].
+    { asm_pc= (insn *)malloc((long)asm_pc); }.
+    { asm_pass= 2; }.
+    { v__entry= (oop)asm_pc; }.
+    self relocateLabels_: self _asmPC.
+    tree generate: self.
+    CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
+    { iflush((void *)v__entry, (void *)asm_pc); }.
 ]

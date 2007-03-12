@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-11 13:09:28 by piumarta on emilia.local
+  Last edited: 2007-03-12 14:15:29 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -116,3 +116,25 @@ CodeGenerator parami4 :s	[]
 CodeGenerator drop :s		[]
 CodeGenerator argi4 :s		[]
 CodeGenerator retv :s		[ self emitEpilogue ]
+
+"----------------------------------------------------------------"
+
+CodeGenerator selectInstructions: anInstruction
+[
+    anInstruction reduceTo: #VOID in: self grammar for: self.
+]
+
+"----------------------------------------------------------------"
+
+RegisterAllocator : Object ( codeGenerator )
+
+RegisterAllocator on: aCodeGenerator
+[
+    self := self new.
+    codeGenerator := aCodeGenerator.
+]
+
+RegisterAllocator codeGenerator	[ ^codeGenerator ]
+
+RegisterAllocator nil	[ ^nil ]
+RegisterAllocator VOID	[ ^nil ]

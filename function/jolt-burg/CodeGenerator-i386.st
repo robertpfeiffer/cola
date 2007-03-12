@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-11 18:11:27 by piumarta on emilia.local
+  Last edited: 2007-03-12 14:25:07 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -41,10 +41,10 @@ Intel32CodeGenerator new
 	add: (ebx := Register withClass: I4 name: '%ebx' encoding: 0x43);
 	add: (esi := Register withClass: I4 name: '%esi' encoding: 0x46);
 	add: (edi := Register withClass: I4 name: '%edi' encoding: 0x47).
-    esp := Register withClass: P4 name: '%esp' encoding: 0x44.
-    ebp := Register withClass: P4 name: '%ebp' encoding: 0x45.
-    cx  := Register withClass: I2 name: '%cx'  encoding: 0x21.
-    cl  := Register withClass: I1 name: '%cl'  encoding: 0x11.
+    	      esp := Register withClass: P4 name: '%esp' encoding: 0x44.
+    	      ebp := Register withClass: P4 name: '%ebp' encoding: 0x45.
+    	      cx  := Register withClass: I2 name: '%cx'  encoding: 0x21.
+    	      cl  := Register withClass: I1 name: '%cl'  encoding: 0x11.
 ]
 
 Intel32CodeGenerator clobberRegisters: insn	[ insn clobberIntel32: self ]
@@ -87,42 +87,6 @@ Intel32CodeGenerator allocateTemp: insn
     temps do: [:temp | temp live ifFalse: [^temp allocate]].
     ^(temps add: (Temporary withBase: esp offset: 0)) allocate
 ]
-
-Intel32CodeGenerator addi4    :d :s	[ self addlR: s R: d ]
-Intel32CodeGenerator addrfp4  :d	[ self movlR: ebp R: d ]
-Intel32CodeGenerator addrlp4  :d :v	[ self lealMd: v offset b: v base R: d ]
-Intel32CodeGenerator andi4    :d :s	[ self andlR: s R: d ]
-Intel32CodeGenerator asgni1   :s :d	[ self movlR: s R: ecx;  movbR: cl Mb: d ]
-Intel32CodeGenerator asgni2   :s :d	[ self movlR: s R: ecx;  movwR: cx Mb: d ]
-Intel32CodeGenerator asgni4   :s :d	[ self movlR: s Mb: d ]
-Intel32CodeGenerator bra      :l	[ self jmpL: l ]
-Intel32CodeGenerator brnz     :s :l	[ self testlR: s R: s;  jneL: l ]
-Intel32CodeGenerator brz      :s :l	[ self testlR: s R: s;  jeL: l ]
-Intel32CodeGenerator cnsti4   :d :v	[ self movlI_: v R: d ]
-Intel32CodeGenerator cnstp4   :d :v	[ self movlI_: v R: d ]
-Intel32CodeGenerator divi4    :d :s	[ self movlR: d R: eax;  cltd;  idivlR: s;  movlR: eax R: d ]
-Intel32CodeGenerator eqi4     :d :s	[ self xorlR: ecx R: ecx;  cmplR: s R: d;  seteR:  cl;  movlR: ecx R: d ]
-Intel32CodeGenerator gei4     :d :s	[ self xorlR: ecx R: ecx;  cmplR: s R: d;  setgeR: cl;  movlR: ecx R: d ]
-Intel32CodeGenerator gti4     :d :s	[ self xorlR: ecx R: ecx;  cmplR: s R: d;  setgR: cl;  movlR: ecx R: d ]
-Intel32CodeGenerator indiri1  :d	[ self movsblMb: d R: d ]
-Intel32CodeGenerator indiri2  :d	[ self movswlMb: d R: d ]
-Intel32CodeGenerator indiri4  :d	[ self movlMb: d R: d ]
-Intel32CodeGenerator label    :l	[ self define: l ]
-Intel32CodeGenerator lei4     :d :s	[ self xorlR: ecx R: ecx;  cmplR: s R: d;  setleR: cl;  movlR: ecx R: d ]
-Intel32CodeGenerator lti4     :d :s	[ self xorlR: ecx R: ecx;  cmplR: s R: d;  setlR: cl;  movlR: ecx R: d ]
-Intel32CodeGenerator modi4    :d :s	[ self movlR: d R: eax;  cltd;  idivlR: s;  movlR: edx R: d ]
-Intel32CodeGenerator muli4    :d :s	[ self imullR: s R: d ]
-Intel32CodeGenerator negi4    :d	[ self neglR: d ]
-Intel32CodeGenerator nei4     :d :s	[ self xorlR: ecx R: ecx;  cmplR: s R: d;  setneR: cl;  movlR: ecx R: d ]
-Intel32CodeGenerator noti4    :d	[ self xorlR: ecx R: ecx;  cmplI: 0 R: d;  seteR: cl;  movlR: ecx R: d ]
-Intel32CodeGenerator ori4     :d :s	[ self orlR: s R: d ]
-Intel32CodeGenerator reti4    :s	[ self movlR: s R: eax; emitEpilogue ]
-Intel32CodeGenerator subi4    :d :s	[ self sublR: s R: d ]
-Intel32CodeGenerator shli4    :d :s	[ self movlR: s R: ecx;  shllR: cl R: d ]
-Intel32CodeGenerator shri4    :d :s	[ self movlR: s R: ecx;  sarlR: cl R: d ]
-Intel32CodeGenerator xori4    :d :s	[ self xorlR: s R: d ]
-Intel32CodeGenerator spilli4  :r :t	[ self movlR: r Md: t offset b: esp ]
-Intel32CodeGenerator reloadi4 :r :t	[ self movlMd: t offset b: esp R: r ]
 
 Intel32CodeGenerator finaliseFrame
 [
@@ -169,7 +133,7 @@ Intel32CodeGenerator noteCall: call
     parametersSize := parametersSize max: call arity * 4.
 ]
 
-Intel32CodeGenerator calli4 :call
+Intel32CodeGenerator calli4: call
 [
     | func |
     call arity - 1 downTo: 0 do: [:index | self emit: call argumentAt: index].
@@ -185,14 +149,9 @@ Intel32CodeGenerator emit: call argumentAt: index
     self movlR: insn output Md: index * 4 b: esp.
 ]
 
+"----------------------------------------------------------------"
 
 StaticIntel32CodeGenerator : Intel32CodeGenerator ()
-
-StaticIntel32CodeGenerator emit: tree
-[
-    self finaliseFrame.
-    tree emit: self.
-]
 
 StaticIntel32CodeGenerator addrgp4  :d :v	[ StdOut nextPutAll: '	movl	'; nextPut: $$; print: v; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator addrjp4  :d :l	[ StdOut nextPutAll: '	movl	$L'; print: l ordinal; nextPut: $,; print: d; cr ]
@@ -214,6 +173,7 @@ StaticIntel32CodeGenerator jgeL: l		[ StdOut nextPutAll: '	jge	L'; print: l ordi
 StaticIntel32CodeGenerator jmpL: l		[ StdOut nextPutAll: '	jmp	L'; print: l ordinal; cr ]
 StaticIntel32CodeGenerator jneL: l		[ StdOut nextPutAll: '	jne	L'; print: l ordinal; cr ]
 StaticIntel32CodeGenerator lealMd: d b: b R: r	[ StdOut nextPutAll: '	leal	'; print: d; nextPut: $(; print: b; nextPutAll: '),'; print: r; cr]
+StaticIntel32CodeGenerator lealMd_: d b: b R: r	[ StdOut nextPutAll: '	leal	'; print: (SmallInteger value_: d); nextPut: $(; print: b; nextPutAll: '),'; print: r; cr]
 StaticIntel32CodeGenerator movbR: r Mb: b	[ StdOut nextPutAll: '	movb	'; print: r; nextPutAll: ',('; print: b; nextPut: $); cr ]
 StaticIntel32CodeGenerator movlI_: i R: d	[ StdOut nextPutAll: '	movl	'; nextPut: $$; print: (SmallInteger value_: i); nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator movlMb: b R: r	[ StdOut nextPutAll: '	movl	('; print: b; nextPutAll: '),'; print: r; cr]
@@ -244,25 +204,12 @@ StaticIntel32CodeGenerator sublR: s R: d	[ StdOut nextPutAll: '	subl	'; print: s
 StaticIntel32CodeGenerator testlR: s R: d	[ StdOut nextPutAll: '	testl	'; print: s; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator xorlR: s R: d	[ StdOut nextPutAll: '	xorl	'; print: s; nextPut: $,; print: d; cr ]
 
+Intel32CodeGenerator spilli4:  reg to:   tmp	[ self movlR:  reg        Md: tmp offset b: esp ]
+Intel32CodeGenerator reloadi4: reg from: tmp	[ self movlMd: tmp offset  b: esp        R: reg ]
+
 "----------------------------------------------------------------"
 
 DynamicIntel32CodeGenerator : Intel32CodeGenerator ()
-
-DynamicIntel32CodeGenerator emit: tree
-[
-    | _entry |
-    { asm_pass= 0; }.
-    { asm_pc= 0; }.
-    self finaliseFrame.
-    tree emit: self.
-    CompilerOptions verboseExec ifTrue: [{ printf("code size %d bytes\n", (int)asm_pc); }].
-    { asm_pc= (insn *)malloc((long)asm_pc); }.
-    { asm_pass= 2; }.
-    { v__entry= (oop)asm_pc; }.
-    self relocateLabels_: self _asmPC.
-    tree emit: self.
-    CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
-]
 
 DynamicIntel32CodeGenerator asmPass	{ return (oop)(asm_pass << 1 | 1); }
 DynamicIntel32CodeGenerator _asmPC	{ return (oop)(asm_pc); }
@@ -275,10 +222,6 @@ DynamicIntel32CodeGenerator define: l
 	ifTrue:  [l address_: self _asmPC]
 	ifFalse: [l phaseCheck_: self _asmPC]
 ]
-
-DynamicIntel32CodeGenerator addrgp4 :d :v	[ self movlI_: v _address R: d ]
-
-DynamicIntel32CodeGenerator addrjp4 :d :l	[ self movlI_: l _address R: d ]
 
 DynamicIntel32CodeGenerator _
 {
@@ -309,6 +252,7 @@ DynamicIntel32CodeGenerator jgeL: l		  { JGEm	(_A(l),	   0,0,0		 ); }
 DynamicIntel32CodeGenerator jmpL: l		  { JMPm	(_A(l),	   0,0,0		 ); }
 DynamicIntel32CodeGenerator jneL: l		  { JNEm	(_A(l),	   0,0,0		 ); }
 DynamicIntel32CodeGenerator lealMd: d b: b R: r	  { LEALmr	(_I(d),_R(b),0,0,	_R(r)	 ); }
+DynamicIntel32CodeGenerator lealMd_: _d b: b R: r { LEALmr	(_P(d),_R(b),0,0,	_R(r)	 ); }
 DynamicIntel32CodeGenerator movbR: r Mb: b	  { MOVBrm	(      _R(r)	,     0,_R(b),0,0); }
 DynamicIntel32CodeGenerator movlI_: _i R: d	  { MOVLir	(_P(i)		,	_R(d)	 ); }
 DynamicIntel32CodeGenerator movlMb: b R: r	  { MOVLmr	(    0,_R(b),0,0,	_R(r)	 ); }
@@ -385,51 +329,55 @@ Intel32CodeGenerator ebp	[ ^ebp ]
 
 Intel32Grammar := [
     ReductionGrammar new
+	"-------------------------------- baseline --------------------------------"
 	at: #VOID add: #REG			"discard";
 	at: #VOID add: #(label		)	do: [:op :gen | gen define: op ];
 	at: #VOID add: #(enter		)	do: [:op :gen | gen emitPrologue ];
 	at: #VOID add: #(retv		)	do: [:op :gen | gen emitEpilogue ];
-	at: #VOID add: #(reti4 	 REG	)	do: [:op :gen | gen movlR:  op lhs output R: gen eax; emitEpilogue ];
+	at: #VOID add: #(reti4 	 REG	)	do: [:op :gen | gen movlR:    op lhs output   R: gen eax; emitEpilogue ];
 	at: #VOID add: #(drop  	 REG	)	do: [:op :gen | ];
-	at: #VOID add: #(brz   	 REG	)	do: [:op :gen | gen testlR: op lhs output R: op lhs output;  jeL: op destination ];
-	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen testlR: op lhs output R: op lhs output;  jneL: op destination ];
-	at: #VOID add: #(bra		)	do: [:op :gen | gen jmpL:   op destination ];
-	at: #REG  add: #(cnsti4	 	)	do: [:op :gen | gen movlI_: op arg R: op output ];
-	at: #REG  add: #(cnstp4	 	)	do: [:op :gen | gen movlI_: op arg R: op output ];
+	at: #VOID add: #(brz   	 REG	)	do: [:op :gen | gen testlR:   op lhs output   R: op lhs output;  jeL: op destination ];
+	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen testlR:   op lhs output   R: op lhs output;  jneL: op destination ];
+	at: #VOID add: #(bra		)	do: [:op :gen | gen jmpL:     op destination ];
+	at: #REG  add: #(cnsti4	 	)	do: [:op :gen | gen movlI_:   op arg	      R: op output ];
+	at: #REG  add: #(cnstp4	 	)	do: [:op :gen | gen movlI_:   op arg	      R: op output ];
 	at: #REG  add: #(parami4 	)	do: [:op :gen | ];
-	at: #REG  add: #(addrfp4 	)	do: [:op :gen | gen movlR:  gen ebp R: op output ];
-	at: #REG  add: #(addrgp4 	)	do: [:op :gen | gen movlI_: op arg _address R: op output ];
-	at: #REG  add: #(addrjp4 	)	do: [:op :gen | gen movlI_: op arg _address R: op output ];
-	at: #REG  add: #(addrlp4 	)	do: [:op :gen | gen lealMd: op arg offset b: op arg base R: op output ];
-	at: #REG  add: #(indiri1 REG	)	do: [:op :gen | gen movsblMb: op lhs output R: op output ];
-	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen movswlMb: op lhs output R: op output ];
-	at: #REG  add: #(indiri4 REG	)	do: [:op :gen | gen movlMb: op lhs output R: op output ];
-	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen xorlR:  gen ecx R: gen ecx;  cmplI: 0 R: op output;  seteR: gen cl;  movlR: gen ecx R: op output ];
-	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen neglR:  op output ];
-	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4 :op ];
-	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen movlR:  op lhs output R:  gen ecx;
-								    movbR:  gen cl	  Mb: op rhs output ];
-	at: #REG  add: #(asgni2  REG REG)	do: [:op :gen | gen movlR:  op lhs output R:  gen ecx;
-								    movwR:  gen cx	  Mb: op rhs output ];
-	at: #REG  add: #(asgni4  REG REG)	do: [:op :gen | gen movlR:  op lhs output Mb: op rhs output ];
-	at: #REG  add: #(andi4   REG REG)	do: [:op :gen | gen andlR:  op rhs output R:  op output ];
-	at: #REG  add: #(ori4    REG REG)	do: [:op :gen | gen orlR:   op rhs output R:  op output ];
-	at: #REG  add: #(xori4 	 REG REG)	do: [:op :gen | gen xorlR:  op rhs output R:  op output ];
-	at: #REG  add: #(addi4 	 REG REG)	do: [:op :gen | gen addlR:  op rhs output R:  op output ];
-	at: #REG  add: #(subi4 	 REG REG)	do: [:op :gen | gen sublR:  op rhs output R:  op output ];
-	at: #REG  add: #(muli4 	 REG REG)	do: [:op :gen | gen imullR: op rhs output R:  op output ];
-	at: #REG  add: #(divi4 	 REG REG)	do: [:op :gen | gen movlR:  op lhs output R:  gen eax;
+	at: #REG  add: #(addrfp4 	)	do: [:op :gen | gen movlR:    gen ebp	      R: op output ];
+	at: #REG  add: #(addrgp4 	)	do: [:op :gen | gen movlI_:   op arg _address R: op output ];
+	at: #REG  add: #(addrjp4 	)	do: [:op :gen | gen movlI_:   op arg _address R: op output ];
+	at: #REG  add: #(addrlp4 	)	do: [:op :gen | gen lealMd:   op arg offset   b: op arg base R: op output ];
+	at: #REG  add: #(indiri1 REG	)	do: [:op :gen | gen movsblMb: op lhs output   R: op output ];
+	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen movswlMb: op lhs output   R: op output ];
+	at: #REG  add: #(indiri4 REG	)	do: [:op :gen | gen movlMb:   op lhs output   R: op output ];
+	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen xorlR:    gen ecx	      R: gen ecx;
+								    cmplI:    0		      R: op output;
+								    seteR:    gen cl;
+								    movlR:    gen ecx	      R: op output ];
+	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen neglR:    op output ];
+	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4: op ];
+	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen movlR:    op lhs output   R: gen ecx;
+								    movbR:    gen cl	     Mb: op rhs output ];
+	at: #REG  add: #(asgni2  REG REG)	do: [:op :gen | gen movlR:    op lhs output   R: gen ecx;
+								    movwR:    gen cx	     Mb: op rhs output ];
+	at: #REG  add: #(asgni4  REG REG)	do: [:op :gen | gen movlR:    op lhs output  Mb: op rhs output ];
+	at: #REG  add: #(andi4   REG REG)	do: [:op :gen | gen andlR:    op rhs output   R: op output ];
+	at: #REG  add: #(ori4    REG REG)	do: [:op :gen | gen orlR:     op rhs output   R: op output ];
+	at: #REG  add: #(xori4 	 REG REG)	do: [:op :gen | gen xorlR:    op rhs output   R: op output ];
+	at: #REG  add: #(addi4 	 REG REG)	do: [:op :gen | gen addlR:    op rhs output   R: op output ];
+	at: #REG  add: #(subi4 	 REG REG)	do: [:op :gen | gen sublR:    op rhs output   R: op output ];
+	at: #REG  add: #(muli4 	 REG REG)	do: [:op :gen | gen imullR:   op rhs output   R: op output ];
+	at: #REG  add: #(divi4 	 REG REG)	do: [:op :gen | gen movlR:    op lhs output   R: gen eax;
 								    cltd;
 								    idivlR: op rhs output;
-								    movlR:  gen eax R: op output ];
-	at: #REG  add: #(modi4 	 REG REG)	do: [:op :gen | gen movlR:  op lhs output R: gen eax;
+								    movlR:  gen eax	      R: op output ];
+	at: #REG  add: #(modi4 	 REG REG)	do: [:op :gen | gen movlR:  op lhs output     R: gen eax;
 								    cltd;
 								    idivlR: op rhs output;
-								    movlR:  gen edx R: op output ];
+								    movlR:  gen edx	  R: op output ];
 	at: #REG  add: #(shli4 	 REG REG)	do: [:op :gen | gen movlR:  op rhs output R: gen ecx;
-								    shllR:  gen cl  R: op output ];
+								    shllR:  gen cl	  R: op output ];
 	at: #REG  add: #(shri4 	 REG REG)	do: [:op :gen | gen movlR:  op rhs output R: gen ecx;
-								    sarlR:  gen cl  R: op output ];
+								    sarlR:  gen cl	  R: op output ];
 	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen xorlR:  gen ecx	  R: gen ecx;
 								    cmplR:  op rhs output R: op lhs output;
 								    setlR:  gen cl;
@@ -454,7 +402,7 @@ Intel32Grammar := [
 								    cmplR:  op rhs output R: op lhs output;
 								    setgR:  gen cl;
 								    movlR:  gen ecx	  R: op output ];
-
+	"-------------------------------- optimisations --------------------------------"
 	at: #VOID add: #(brz (lti4 (indiri4 (addrlp4))
 			           (cnsti4)))		do: [:op :gen | gen cmplI_:  op lhs rhs arg Md: op lhs lhs lhs arg offset b: op lhs lhs lhs arg base;
 									    jgeL:    op destination ];
@@ -463,80 +411,24 @@ Intel32Grammar := [
 	at: #REG  add: #(indiri4 (addrgp4))		do: [:op :gen | gen movlMd_: op lhs arg _address R: op output ];
 	at: #REG  add: #(subi4 REG (cnsti4))		do: [:op :gen | gen sublI_:  op rhs arg R: op lhs output ];
 	at: #REG  add: #(addi4 REG (cnsti4))		do: [:op :gen | gen addlI_:  op rhs arg R: op lhs output ];
+	at: #REG  add: #(addi4 (cnsti4) REG)		do: [:op :gen | gen lealMd_: op lhs arg b: op rhs output R: op output ];
 
 	yourself
 ]
 
 "----------------------------------------------------------------"
 
-Intel32CodeGenerator selectInstructions: anInstruction
-[
-"    anInstruction printOn: StdOut indent: 0.	StdOut cr."
-    anInstruction reduceTo: #VOID in: Intel32Grammar for: self.
-"    anInstruction printOn: StdOut indent: 0.	StdOut cr."
-]
+Intel32RegisterFilter    : RegisterAllocator ()
+Intel32RegisterAllocator : RegisterAllocator ()
 
-Instruction reduceTo: aSymbol in: aGrammar for: gen
-[
-    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
-    (aGrammar startSetAt: aSymbol at: self name) do: [:rule |
-	(self matchPattern: rule pattern in: aGrammar for: gen)
-	    ifTrue:
-	       ["StdOut print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
-		generator := rule action.
-		^type := aSymbol]].
-    ^self error: 'cannotReduce ', self name, ' to ', aSymbol
-]
+Intel32RegisterFilter	 REG  :insn	[ ^true ]
+Intel32RegisterAllocator REG  :insn	[ ^codeGenerator allocateRegister: insn ]
 
-Block reduceTo: aSymbol in: aGrammar for: gen
-[
-    type := nil.
-    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
-    instructions do: [:insn | insn reduceTo: (insn isVoid ifTrue: [#VOID] ifFalse: [aSymbol]) in: aGrammar for: gen].
-    type := aSymbol.
-]
-
-Call reduceTo: aSymbol in: aGrammar for: gen
-[
-    type := nil.
-    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
-    arguments from: 1 do: [:arg | arg reduceTo: #REG in: aGrammar for: gen].
-    super reduceTo: aSymbol in: aGrammar for: gen.
-    gen noteCall: self.
-    type := aSymbol.
-]
-
-Instruction matchPattern: aPattern in: aGrammar for: gen
-[
-    "StdOut print: self; nextPutAll: ' matchPattern: '; print: aPattern; cr."
-    ^aPattern isSymbol
-	ifTrue:  [type == aPattern or: [self reduceTo: aPattern in: aGrammar for: gen]]
-	ifFalse: [aPattern first == self name and: [self matchArguments: aPattern in: aGrammar for: gen]]
-]
-
-Instruction matchArguments: aPattern in: aGrammar for: gen	[ self subtypeResponsibility: 'matchArgments:in:for:' ]
-
-Statement	  matchArguments: p in: g for: gen	[ ^true ]
-Leaf   		  matchArguments: p in: g for: gen	[ ^true ]
-Unary  		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) ]
-Binary 		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) and: [rhs matchPattern: p third in: g for: gen] ]
-Block  		  matchArguments: p in: g for: gen	[ ^true ]
-Call   		  matchArguments: p in: g for: gen	[ ^self function matchPattern: p second in: g for: gen ]
-
-Instruction generate: gen	[                                         		    generator ifTrue: [generator value: self value: gen] ]
-Unary	    generate: gen	[ lhs generate: gen.                      		    generator ifTrue: [generator value: self value: gen] ]
-Binary	    generate: gen	[ lhs generate: gen.  rhs generate: gen.  lhs reload: gen.  generator ifTrue: [generator value: self value: gen] ]
-Block	    generate: gen	[ instructions do: [:i| i generate: gen].  		    generator ifTrue: [generator value: self value: gen] ]
-Call	    generate: gen	[ arguments    do: [:i| i generate: gen].  		    generator ifTrue: [generator value: self value: gen] ]
-
-Spill	    generate: gen	[ lhs generate: gen.  gen spilli4 : self output : self location ]
+Intel32CodeGenerator grammar		[ ^Intel32Grammar ]
+Intel32CodeGenerator registerFilter	[ ^Intel32RegisterFilter   "on: self"]
+Intel32CodeGenerator registerAllocator	[ ^Intel32RegisterAllocator on: self ]
 
 "----------------------------------------------------------------"
-
-Intel32CodeGenerator REG :insn
-[
-    ^self allocateRegister: insn
-]
 
 StaticIntel32CodeGenerator generate: tree
 [

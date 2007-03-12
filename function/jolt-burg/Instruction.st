@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-11 13:07:31 by piumarta on emilia.local
+  Last edited: 2007-03-12 14:28:14 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -30,7 +30,7 @@ Instruction : Object (
     id		"SmallInteger - my unique identifier"
     parent	"Instruction that consumes the value of (or sequences) me"
     type	"Symbol - name of my output's resource class"
-    source	"Symbol or nil - copy of type iff I allocate my output for the first time"
+    source	"Instruction or nil - the instruction that allocates my output value"
     output	"Register or Location of my output value"
     clobbered	"RegisterSet of Registers that are clobbered while my output is live"
     nextLive	"Instruction most recently executed whose output is still live"
@@ -42,8 +42,8 @@ Instruction id	[ ^id ]
 Instruction new
 [
     self := super new.
-    id := InstructionCount := InstructionCount + 1.
-    type := nil.
+    id     := InstructionCount := InstructionCount + 1.
+    type   := #nil.
     source := nil.
 ]
 
@@ -70,11 +70,9 @@ Instruction clobberRegister: aRegister
     CompilerOptions verboseRegs ifTrue: [StdOut tab; nextPutAll: '**** CLOBBER '; print: clobbered; nextPutAll: ' IN '; print: self; cr].
 ]
 
-Instruction selectInstructions:	gen	[ ^self subtypeResponsibility: 'selectInstructions:' ]
-Instruction findSources			[ ^self subtypeResponsibility: 'findSources' ]
+Instruction findSources: filter		[ ^self subtypeResponsibility: 'findSources:' ]
 Instruction clobberRegisters:	gen	[ ^self subtypeResponsibility: 'clobberRegisters:' ]
-Instruction allocateRegisters:	gen	[ ^self subtypeResponsibility: 'allocateRegisters:' ]
-Instruction emit:		gen	[ ^self subtypeResponsibility: 'emit:' ]
+Instruction allocateRegisters:	alloc	[ ^self subtypeResponsibility: 'allocateRegisters:' ]
 
 Instruction releaseRegister
 [
@@ -95,11 +93,9 @@ Statement : Instruction ()
 
 Statement isVoid				[ ^true ]
 
-Statement selectInstructions: gen	[ type := #VOID ]
-Statement findSources			[ ^nil ]
+Statement findSources: filter		[ ^nil ]
 Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
-Statement allocateRegisters: gen	[ self assertType: #VOID.  ^nil ]
-Statement emit: gen			[ gen perform: self name with: self ]
+Statement allocateRegisters: alloc	[ self assertType: #VOID.  ^nil ]
 
 "generates a value"
 
@@ -110,11 +106,9 @@ Leaf arg	[ ^arg ]
 
 Leaf isVoid	[ ^false ]
 
-Leaf selectInstructions: gen	[ type := #REG ]
-
-Leaf findSources
+Leaf findSources: filter
 [
-    ^type ifTrue: [source := self]
+    ^(filter perform: type) ifTrue: [source := self]
 ]
 
 Leaf clobberRegisters: codeGenerator
@@ -123,14 +117,9 @@ Leaf clobberRegisters: codeGenerator
     codeGenerator clobberRegisters: self.
 ]
 
-Leaf allocateRegisters: codeGenerator
+Leaf allocateRegisters: allocator
 [
-    ^source == self ifTrue: [output := codeGenerator allocateRegister: self]
-]
-
-Leaf emit: gen
-[
-    gen perform: self name with: output with: arg
+    ^source == self ifTrue: [output := allocator perform: type with: self]
 ]
 
 "generates a value, consumes a value"
@@ -142,15 +131,9 @@ Unary lhs	[ ^lhs ]
 
 Unary isVoid	[ ^false ]
 
-Unary  selectInstructions: gen
+Unary findSources: filter
 [
-    type := #REG.
-    lhs selectInstructions: gen.
-]
-
-Unary findSources
-[
-    ^source := lhs findSources ifNil: [type ifTrue: [self]]
+    ^source := (lhs findSources: filter) ifNil: [(filter perform: type) ifTrue: [self]]
 ]
 
 Unary clobberRegisters: codeGenerator
@@ -160,16 +143,10 @@ Unary clobberRegisters: codeGenerator
     codeGenerator clobberRegisters: self.
 ]
 
-Unary allocateRegisters: codeGenerator
+Unary allocateRegisters: allocator
 [
-    lhs allocateRegisters: codeGenerator.
-    ^output := source == self ifTrue: [codeGenerator allocateRegister: self] ifFalse: [lhs output]
-]
-
-Unary emit: gen
-[
-    lhs emit: gen.
-    gen perform: self name with: lhs output
+    lhs allocateRegisters: allocator.
+    ^output := source == self ifTrue: [allocator perform: type with: self] ifFalse: [lhs output]
 ]
 
 "generates a value, consumes two values"
@@ -179,17 +156,10 @@ Binary : Unary ( rhs )
 Binary rhs: r	[  rhs := r parent: self ]
 Binary rhs	[ ^rhs ]
 
-Binary selectInstructions: gen
+Binary findSources: filter
 [
-    type := #REG.
-    lhs selectInstructions: gen.
-    rhs selectInstructions: gen.
-]
-
-Binary findSources
-[
-    source := lhs findSources ifNil: [type ifTrue: [self]].
-    rhs findSources.
+    source := (lhs findSources: filter) ifNil: [(filter perform: type) ifTrue: [self]].
+    rhs findSources: filter.
     ^source
 ]
 
@@ -202,14 +172,14 @@ Binary clobberRegisters: codeGenerator
     source == self ifTrue: [codeGenerator noteLive: self].
 ]
 
-Binary allocateRegisters: codeGenerator
+Binary allocateRegisters: allocator
 [
     "self assertType: #REG."
-    lhs allocateRegisters: codeGenerator.
-    rhs allocateRegisters: codeGenerator.
+    lhs allocateRegisters: allocator.
+    rhs allocateRegisters: allocator.
     rhs releaseRegister.
     lhs releaseSpill.
-    ^output := source == self ifTrue: [codeGenerator allocateRegister: self] ifFalse: [lhs output]
+    ^output := source == self ifTrue: [allocator perform: type with: self] ifFalse: [lhs output]
 ]
 
 Binary spillRegisterFor: insn in: gen
@@ -224,36 +194,22 @@ Binary spillRegisterFor: insn in: gen
     ^reg
 ]
 
-Binary emit: gen
-[
-    lhs emit: gen.
-    rhs emit: gen.
-    lhs reload: gen.	"in case lhs was spilled"
-    gen perform: self name with: lhs output with: rhs output
-]
-
 "consumes a value"
 
 Sink : Unary ()
 
 Sink isVoid	[ ^true ]
 
-Sink selectInstructions: codeGenerator
-[
-    type := #VOID.
-    lhs selectInstructions: codeGenerator.
-]
-
-Sink allocateRegisters: codeGenerator
+Sink allocateRegisters: allocator
 [
     self assertType: #VOID.
-    lhs allocateRegisters: codeGenerator; releaseRegister.
+    lhs allocateRegisters: allocator; releaseRegister.
     ^nil
 ]
 
-Sink findSources
+Sink findSources: filter
 [
-    lhs findSources.
+    lhs findSources: filter.
     ^nil
 ]
 
@@ -302,18 +258,13 @@ Block isVoid	[ ^inputs isNil ]
 
 Block setType: aSymbol
 [
-    type ifFalse: [^type := aSymbol].
+    type == #nil ifTrue: [^type := aSymbol].
     type == aSymbol ifFalse: [self error: 'cannot add input of type ', aSymbol, ' to block of type ', type].
 ]
 
-Block selectInstructions: gen
+Block findSources: filter
 [
-    instructions do: [:insn | insn selectInstructions: gen].
-]
-
-Block findSources
-[
-    instructions do: [:insn | insn findSources ifTrue: [source := self]].
+    instructions do: [:insn | (insn findSources: filter) ifTrue: [source := self]].
     ^source
 ]
 
@@ -333,26 +284,21 @@ Block clobberRegisters: codeGenerator
 	ifFalse: [self setType: #VOID]
 ]
 
-Block allocateRegisters: codeGenerator
+Block allocateRegisters: allocator
 [
     | reg |
     self assertType: (source ifTrue: [#REG] ifFalse: [#VOID]).
-    scope notNil ifTrue: [scope valuesDo: [:var | var allocate: codeGenerator]].
+    scope notNil ifTrue: [scope valuesDo: [:var | var allocate: allocator codeGenerator]].
     inputs
 	ifTrue:
-	   [reg := codeGenerator perform: type with: self.
+	   [reg := allocator perform: type with: self.
 	    inputs do: [:insn | insn output: reg].
 	    reg release].
     output := nil.	"avoid spill of pre-allocated output until block is complete"
-    instructions do: [:insn | insn allocateRegisters: codeGenerator; releaseSpill; releaseRegister].
+    instructions do: [:insn | insn allocateRegisters: allocator; releaseSpill; releaseRegister].
     reg ifTrue: [output := reg allocate].
     scope notNil ifTrue: [scope valuesReverseDo: [:var | var location release]].
     ^output
-]
-
-Block emit: gen
-[
-    instructions do: [:insn | insn emit: gen].
 ]
 
 "consumes one or more values, generates one value"
@@ -377,16 +323,10 @@ Call argumentAt: index	[ ^arguments at: index + 1 ]
 
 Call arity		[ ^arguments size - 1 ]
 
-Call selectInstructions: gen
+Call findSources: filter
 [
-    arguments do: [:arg | arg selectInstructions: gen].
-    gen noteCall: self.
-]
-
-Call findSources
-[
-    arguments do: [:arg | arg findSources].
-    ^type ifTrue: [source := self]
+    arguments do: [:arg | arg findSources: filter].
+    ^(filter perform: type) ifTrue: [source := self]
 ]
 
 Call clobberRegisters: codeGenerator
@@ -399,16 +339,16 @@ Call clobberRegisters: codeGenerator
     source ifTrue: [codeGenerator noteLive: self].
 ]
 
-Call allocateRegisters: codeGenerator
+Call allocateRegisters: allocator
 [
     | reg |
     self assertType: (source ifTrue: [#REG] ifFalse: [#VOID]).
     reg := output.
     output := nil.	"avoid spill of pre-allocated output until call is complete"
-    arguments do: [:arg | arg allocateRegisters: codeGenerator].
+    arguments do: [:arg | arg allocateRegisters: allocator].
     arguments do: [:arg | arg releaseSpill; releaseRegister].
     output := reg.
-    ^source ifTrue: [output := codeGenerator allocateRegister: self].
+    ^source ifTrue: [output := allocator perform: type with: self].
 ]
 
 Call spillRegisterFor: insn in: gen
@@ -425,12 +365,6 @@ Call spillRegisterFor: insn in: gen
 		arguments at: index put: (arg spilledIn: gen).
 		^reg]].
     ^nil
-]
-
-Call emit: gen
-[
-    arguments do: [:arg | arg emit: gen].
-    gen perform: self name with: self
 ]
 
 "----------------------------------------------------------------"
@@ -578,10 +512,67 @@ XORI4   : Binary ()		XORI4   name [ ^#xori4	 ]
 SPILLI4 emit: gen
 [
     lhs emit: gen.
-    gen spilli4 :lhs output :location
+    gen spilli4: lhs output to: location
 ]
 
-SPILLI4 reload: gen	[ gen reloadi4 :output :location ]
+SPILLI4 reload: gen	[ gen reloadi4: output from: location ]
+
+"----------------------------------------------------------------"
+
+Instruction reduceTo: aSymbol in: aGrammar for: gen
+[
+    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    (aGrammar startSetAt: aSymbol at: self name) do: [:rule |
+	(self matchPattern: rule pattern in: aGrammar for: gen)
+	    ifTrue:
+	       ["StdOut print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
+		generator := rule action.
+		^type := aSymbol]].
+    ^self error: 'cannotReduce ', self name, ' to ', aSymbol
+]
+
+Block reduceTo: aSymbol in: aGrammar for: gen
+[
+    type := #nil.
+    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    instructions do: [:insn | insn reduceTo: (insn isVoid ifTrue: [#VOID] ifFalse: [aSymbol]) in: aGrammar for: gen].
+    type := aSymbol.
+]
+
+Call reduceTo: aSymbol in: aGrammar for: gen
+[
+    type := #nil.
+    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    arguments from: 1 do: [:arg | arg reduceTo: #REG in: aGrammar for: gen].
+    super reduceTo: aSymbol in: aGrammar for: gen.
+    gen noteCall: self.
+    type := aSymbol.
+]
+
+Instruction matchPattern: aPattern in: aGrammar for: gen
+[
+    "StdOut print: self; nextPutAll: ' matchPattern: '; print: aPattern; cr."
+    ^aPattern isSymbol
+	ifTrue:  [type == aPattern or: [self reduceTo: aPattern in: aGrammar for: gen]]
+	ifFalse: [aPattern first == self name and: [self matchArguments: aPattern in: aGrammar for: gen]]
+]
+
+Instruction matchArguments: aPattern in: aGrammar for: gen	[ self subtypeResponsibility: 'matchArgments:in:for:' ]
+
+Statement	  matchArguments: p in: g for: gen	[ ^true ]
+Leaf   		  matchArguments: p in: g for: gen	[ ^true ]
+Unary  		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) ]
+Binary 		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) and: [rhs matchPattern: p third in: g for: gen] ]
+Block  		  matchArguments: p in: g for: gen	[ ^true ]
+Call   		  matchArguments: p in: g for: gen	[ ^self function matchPattern: p second in: g for: gen ]
+
+Instruction generate: gen	[                                         		    generator ifTrue: [generator value: self value: gen] ]
+Unary	    generate: gen	[ lhs generate: gen.                      		    generator ifTrue: [generator value: self value: gen] ]
+Binary	    generate: gen	[ lhs generate: gen.  rhs generate: gen.  lhs reload: gen.  generator ifTrue: [generator value: self value: gen] ]
+Block	    generate: gen	[ instructions do: [:i| i generate: gen].  		    generator ifTrue: [generator value: self value: gen] ]
+Call	    generate: gen	[ arguments    do: [:i| i generate: gen].  		    generator ifTrue: [generator value: self value: gen] ]
+
+Spill	    generate: gen	[ lhs generate: gen.  gen spilli4: self output to: self location ]
 
 "----------------------------------------------------------------"
 
@@ -606,7 +597,7 @@ Instruction printOn: aStream indent: i
     i timesRepeat: [aStream nextPutAll: '| '].
     aStream print: id; nextPut: $(.
     source == self ifTrue: [aStream nextPutAll: '+++ '] ifFalse: [source ifTrue: [aStream print: source id; nextPutAll: ' => ']].
-    type ifTrue: [aStream print: type; nextPut: $ ] ifFalse: [aStream nextPutAll: '--- '].
+    type == #nil ifTrue: [aStream nextPutAll: '--- '] ifFalse: [aStream print: type; nextPut: $ ].
     super printOn: aStream.
     output
 	ifTrue:  [aStream nextPut: $ ; print: output; nextPut: $,; print: output refCount]
