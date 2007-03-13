@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 14:25:07 by piumarta on emilia.local
+  Last edited: 2007-03-12 17:13:58 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -330,6 +330,7 @@ Intel32CodeGenerator ebp	[ ^ebp ]
 Intel32Grammar := [
     ReductionGrammar new
 	"-------------------------------- baseline --------------------------------"
+
 	at: #VOID add: #REG			"discard";
 	at: #VOID add: #(label		)	do: [:op :gen | gen define: op ];
 	at: #VOID add: #(enter		)	do: [:op :gen | gen emitPrologue ];
@@ -402,7 +403,9 @@ Intel32Grammar := [
 								    cmplR:  op rhs output R: op lhs output;
 								    setgR:  gen cl;
 								    movlR:  gen ecx	  R: op output ];
+
 	"-------------------------------- optimisations --------------------------------"
+
 	at: #VOID add: #(brz (lti4 (indiri4 (addrlp4))
 			           (cnsti4)))		do: [:op :gen | gen cmplI_:  op lhs rhs arg Md: op lhs lhs lhs arg offset b: op lhs lhs lhs arg base;
 									    jgeL:    op destination ];

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 16:05:31 by piumarta on emilia.local
+  Last edited: 2007-03-12 18:22:34 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -24,6 +24,10 @@
 { import: Instruction }
 { import: CompilerOptions }
 { import: CodeGenerator }
+
+SmallInteger lo16_: _i	{ unsigned long i= (unsigned long)v__i;  return (oop)((               i & 0xffff                   ) << 1 | 1); }
+SmallInteger hi16_: _i	{ unsigned long i= (unsigned long)v__i;  return (oop)(((i >> 16)                                   ) << 1 | 1); }
+SmallInteger ha16_: _i	{ unsigned long i= (unsigned long)v__i;  return (oop)(((i >> 16) + (((i & 0xffff) > 32767) ? 1 : 0)) << 1 | 1); }
 
 { include "asm-ppc.h" }
 
@@ -200,6 +204,7 @@ StaticPowerPCCodeGenerator baL: l		[ StdOut
 						      nextPutAll: '	mtctr	r0\n';
 						      nextPutAll: '	bctr\n']
 StaticPowerPCCodeGenerator beqI: c L: l		[ StdOut nextPutAll: '	bne	cr'; print: c; nextPutAll: ',.+20\n'.  self baL: l ]
+StaticPowerPCCodeGenerator bgeI: c L: l		[ StdOut nextPutAll: '	blt	cr'; print: c; nextPutAll: ',.+20\n'.  self baL: l ]
 StaticPowerPCCodeGenerator blr			[ StdOut nextPutAll: '	blr\n' ]
 StaticPowerPCCodeGenerator blrl			[ StdOut nextPutAll: '	blrl\n' ]
 StaticPowerPCCodeGenerator bneI: c L: l		[ StdOut nextPutAll: '	beq	cr'; print: c; nextPutAll: ',.+20\n'.  self baL: l ]
@@ -209,7 +214,8 @@ StaticPowerPCCodeGenerator crnorI: d I: a I: b	[ StdOut nextPutAll: '	crnor	'; p
 StaticPowerPCCodeGenerator divwR: d R: a R: b	[ StdOut nextPutAll: '	divw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator lbzR: d I: i R: s	[ StdOut nextPutAll: '	lbz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
 StaticPowerPCCodeGenerator lhzR: d I: i R: s	[ StdOut nextPutAll: '	lhz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
-StaticPowerPCCodeGenerator lisR: d I_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger value_: _i) >> 16; cr ]
+StaticPowerPCCodeGenerator lisR: d I_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger hi16_: _i); cr ]
+StaticPowerPCCodeGenerator lisR: d Iha_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger ha16_: _i); cr ]
 StaticPowerPCCodeGenerator lwzR: d I: i R: s	[ StdOut nextPutAll: '	lwz	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator mfcrR: d		[ StdOut nextPutAll: '	mfcr	'; print: d; cr ]
 StaticPowerPCCodeGenerator mflrR: d		[ StdOut nextPutAll: '	mflr	'; print: d; cr ]
@@ -230,6 +236,7 @@ StaticPowerPCCodeGenerator subR: d R: a R: b	[ StdOut nextPutAll: '	sub	'; print
 StaticPowerPCCodeGenerator subfR: d R: a R: b	[ StdOut nextPutAll: '	subf	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator subfeR: d R: a R: b	[ StdOut nextPutAll: '	subfe	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator subficR: d R: s I: i	[ StdOut nextPutAll: '	subfic	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; cr ]
+StaticPowerPCCodeGenerator subiR: d R: a I: i	[ StdOut nextPutAll: '	subi	'; print: d; nextPut: $,; print: a; nextPut: $,; print: i; cr ]
 StaticPowerPCCodeGenerator xorR: d R: a R: b	[ StdOut nextPutAll: '	xor	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 
 "----------------------------------------------------------------"
@@ -238,8 +245,6 @@ DynamicPowerPCCodeGenerator : PowerPCCodeGenerator ()
 
 DynamicPowerPCCodeGenerator asmPass	{ return (oop)(asm_pass << 1 | 1); }
 DynamicPowerPCCodeGenerator _asmPC	{ return (oop)(asm_pc); }
-
-SmallInteger _int	{ return (oop)((long)self >> 1); }
 
 DynamicPowerPCCodeGenerator define: l
 [
@@ -256,6 +261,7 @@ DynamicPowerPCCodeGenerator _
 #   define _I(v)	((long)v_##v >> 1)
 #   define _R(v)	((long)(((struct t_Register *)(v_##v))->v__encoding))
 #   define _A(v)	((long)(((struct t_Label    *)(v_##v))->v__address))
+#   define _ha16(v)	(((unsigned long)v_##v >> 16) + ((((unsigned long)v_##v & 0xffff) > 32767) ? 1 : 0))
 }
 
 DynamicPowerPCCodeGenerator addR: d R: a R: b	{ ADDrrr	(_R(d), _R(a), _R(b)         	); }
@@ -268,6 +274,7 @@ DynamicPowerPCCodeGenerator baL: l		{ LISri		(   0        ,(_A(l) >> 16)     );
 						  MTCTRr	(0				);
 						  BCTR		(); }
 DynamicPowerPCCodeGenerator beqI: c L: l	[{BNEii		(_I(c),        (long)asm_pc + 20);}.  self baL: l ]
+DynamicPowerPCCodeGenerator bgeI: c L: l	[{BLTii		(_I(c),        (long)asm_pc + 20);}.  self baL: l ]
 DynamicPowerPCCodeGenerator blr			{ BLR		(); }
 DynamicPowerPCCodeGenerator blrl		{ BLRL		(); }
 DynamicPowerPCCodeGenerator bneI: c L: l	[{BEQii		(_I(c),        (long)asm_pc + 20);}.  self baL: l ]
@@ -278,6 +285,7 @@ DynamicPowerPCCodeGenerator divwR: d R: a R: b	{ DIVWrrr	(_R(d), _R(a), _R(b)   
 DynamicPowerPCCodeGenerator lbzR: d I: i R: s	{ LBZrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator lhzR: d I: i R: s	{ LHZrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator lisR: d I_: _i	{ LISri		(_R(d),        _P(i >> 16)   	); }
+DynamicPowerPCCodeGenerator lisR: d Iha_: _i	{ LISri		(_R(d),        _ha16(_i)   	); }
 DynamicPowerPCCodeGenerator lwzR: d I: i R: s	{ LWZrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator mfcrR: d		{ MFCRr		(_R(d)			     	); }
 DynamicPowerPCCodeGenerator mflrR: d		{ MFLRr		(_R(d)			     	); }
@@ -297,6 +305,7 @@ DynamicPowerPCCodeGenerator subR: d R: a R: b	{ SUBrrr	(_R(d), _R(a), _R(b)     
 DynamicPowerPCCodeGenerator subfR: d R: a R: b	{ SUBFrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator subfeR: d R: a R: b	{ SUBFErrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator subficR: d R: s I: i{ SUBFICrri	(_R(d), _R(s), _I(i)         	); }
+DynamicPowerPCCodeGenerator subiR: d R: a I: i	{ SUBIrri	(_R(d), _R(a), _I(i)         	); }
 DynamicPowerPCCodeGenerator xorR: d R: a R: b	{ XORrrr	(_R(d), _R(a), _R(b)         	); }
 
 DynamicPowerPCCodeGenerator mrR: d R: s		{ if (_R(d) != _R(s))   MRrr(_R(d), _R(s)); }
@@ -346,6 +355,7 @@ PowerPCCodeGenerator r12	[ ^r12 ]
 PowerPCGrammar := [
     ReductionGrammar new
 	"-------------------------------- baseline --------------------------------"
+
 	at: #VOID add: #REG			"discard";
 	at: #VOID add: #(label		)	do: [:op :gen | gen define: op ];
 	at: #VOID add: #(enter		)	do: [:op :gen | gen emitPrologue ];
@@ -410,6 +420,26 @@ PowerPCGrammar := [
 	at: #REG  add: #(gti4 	 REG REG)	do: [:op :gen | gen cmpwI:   7	       R: op lhs output R: op rhs output;
 								    mfcrR:   op output;
 								    rlwinmR: op output R: op output	I: 30 I: 31 I: 31 ];
+
+	"-------------------------------- optimisations --------------------------------"
+
+	at: #I16 add: #(cnsti4)			if: [:op | (SmallInteger value_: op arg) between: -32768 and: 32767];
+
+	at: #VOID add: #(brz (lti4 (indiri4 (addrlp4))
+			           I16))	do: [:op :gen | gen lwzR:   gen r0 I: op lhs lhs lhs arg offset R: op lhs lhs lhs arg base;
+								    cmpwiI: 7	   R: gen r0			I: (SmallInteger lo16_: op lhs rhs arg);
+								    bgeI:   7	   L: op destination ];
+
+	at: #REG  add: #(indiri4 (addrgp4))	do: [:op :gen | gen lisR:  op output Iha_: op lhs arg _address;
+								    lwzR:  op output I: (SmallInteger lo16_: op lhs arg _address) R: op output ];
+
+	at: #REG  add: #(indiri4 (addrlp4))	do: [:op :gen | gen lwzR:  op output I: op lhs arg offset R: op lhs arg base ];
+
+	at: #REG  add: #(addi4 I16 REG)		do: [:op :gen | gen addiR: op output R: op rhs output I: (SmallInteger value_: op lhs arg) ];
+	at: #REG  add: #(addi4 REG I16)		do: [:op :gen | gen addiR: op output R: op lhs output I: (SmallInteger value_: op rhs arg) ];
+	at: #REG  add: #(subi4 I16 REG)		do: [:op :gen | gen addiR: op output R: op rhs output I: (SmallInteger value_: op lhs arg) negated ];
+	at: #REG  add: #(subi4 REG I16)		do: [:op :gen | gen subiR: op output R: op lhs output I: (SmallInteger value_: op rhs arg) ];
+
 	yourself
 ]
 
@@ -420,6 +450,9 @@ PowerPCRegisterAllocator : RegisterAllocator ()
 
 PowerPCRegisterFilter	 REG  :insn	[ ^true ]
 PowerPCRegisterAllocator REG  :insn	[ ^codeGenerator allocateRegister: insn ]
+
+PowerPCRegisterFilter	 I16  :insn	[ ^false ]
+PowerPCRegisterAllocator I16  :insn	[ ^nil ]
 
 PowerPCCodeGenerator grammar		[ ^PowerPCGrammar ]
 PowerPCCodeGenerator registerFilter	[ ^PowerPCRegisterFilter   "on: self"]

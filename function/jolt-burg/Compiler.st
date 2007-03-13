@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 13:03:24 by piumarta on emilia.local
+  Last edited: 2007-03-12 17:32:53 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -742,16 +742,16 @@ Compiler compileLambda: form
 	ifTrue:  [block add: last; add: RETV new]
 	ifFalse: [block add: (RETI4 new lhs: last)].
     self endScope.
-    CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
+    CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen := generatorType withLabels: labels.
     gen selectInstructions: block.    "block selectInstructions: gen."
     block findSources: gen registerFilter.
-    CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
+    CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen lastLive ifTrue: [self error: 'compileLambda: codeGen begins with live register: ', gen lastLive printString].
     block clobberRegisters: gen.
     gen lastLive ifTrue: [self error: 'compileLambda: clobber ends with live register: ', gen lastLive printString].
     block allocateRegisters: gen registerAllocator.
-    CompilerOptions verboseTree ifTrue: [StdOut print: block; cr].
+    CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen generate: block.    "gen emit: block."
     CompilerOptions verboseRegs ifTrue: [gen dumpResources].
     ^entry
