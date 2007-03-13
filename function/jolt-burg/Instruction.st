@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-13 00:53:46 by piumarta on margaux.piumarta.com
+  Last edited: 2007-03-13 01:39:08 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -527,6 +527,7 @@ Instruction reduceTo: aSymbol in: aGrammar for: gen
 	    ifTrue:
 	       ["StdOut print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
 		generator := rule action.
+		"self coverPattern: rule pattern."
 		^type := aSymbol]].
     ^nil
 ]
@@ -565,6 +566,14 @@ Unary  		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g
 Binary 		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) and: [rhs matchPattern: p third in: g for: gen] ]
 Block  		  matchArguments: p in: g for: gen	[ ^true ]
 Call   		  matchArguments: p in: g for: gen	[ ^self function matchPattern: p second in: g for: gen ]
+
+"
+Instruction	coverPattern: aPattern	[ aPattern isSymbol ifFalse: [type := #nil.  self coverArguments: aPattern] ]
+Instruction	coverArguments: p	[ ]
+Unary  		coverArguments: p	[ lhs coverPattern: p second ]
+Binary 		coverArguments: p	[ lhs coverPattern: p second.  rhs coverPattern: p third ]
+Call   		coverArguments: p	[ ^self function coverPattern: p second ]
+"
 
 Instruction generate: gen	[                                         		    generator ifTrue: [generator value: self value: gen] ]
 Unary	    generate: gen	[ lhs generate: gen.                      		    generator ifTrue: [generator value: self value: gen] ]
