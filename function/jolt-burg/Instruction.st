@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 14:28:14 by piumarta on emilia.local
+  Last edited: 2007-03-12 17:40:54 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -523,12 +523,12 @@ Instruction reduceTo: aSymbol in: aGrammar for: gen
 [
     "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     (aGrammar startSetAt: aSymbol at: self name) do: [:rule |
-	(self matchPattern: rule pattern in: aGrammar for: gen)
+	((self matchPattern: rule pattern in: aGrammar for: gen) and: [rule predicate value: self])
 	    ifTrue:
 	       ["StdOut print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
 		generator := rule action.
 		^type := aSymbol]].
-    ^self error: 'cannotReduce ', self name, ' to ', aSymbol
+    ^nil
 ]
 
 Block reduceTo: aSymbol in: aGrammar for: gen
@@ -542,9 +542,9 @@ Block reduceTo: aSymbol in: aGrammar for: gen
 Call reduceTo: aSymbol in: aGrammar for: gen
 [
     type := #nil.
+    (super reduceTo: aSymbol in: aGrammar for: gen) ifFalse: [^nil].
     "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     arguments from: 1 do: [:arg | arg reduceTo: #REG in: aGrammar for: gen].
-    super reduceTo: aSymbol in: aGrammar for: gen.
     gen noteCall: self.
     type := aSymbol.
 ]

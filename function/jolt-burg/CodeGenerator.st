@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 14:15:29 by piumarta on emilia.local
+  Last edited: 2007-03-12 17:27:30 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -121,7 +121,7 @@ CodeGenerator retv :s		[ self emitEpilogue ]
 
 CodeGenerator selectInstructions: anInstruction
 [
-    anInstruction reduceTo: #VOID in: self grammar for: self.
+    (anInstruction reduceTo: #VOID in: self grammar for: self) ifFalse: [self error: 'cannot reduce ', anInstruction printString, ' to VOID']
 ]
 
 "----------------------------------------------------------------"

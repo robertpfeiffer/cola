@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-11 17:49:33 by piumarta on emilia.local
+  Last edited: 2007-03-12 17:21:06 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -73,6 +73,11 @@ ReductionGrammar at: startSymbol add: pattern do: actionBlock
     self at: startSymbol add: pattern if: [:x | true] do: actionBlock
 ]
 
+ReductionGrammar at: startSymbol add: pattern if: predicateBlock
+[
+    self at: startSymbol add: pattern if: predicateBlock do: [:x :y | nil]
+]
+
 ReductionGrammar at: startSymbol add: pattern if: predicateBlock do: actionBlock
 [
     | production |
@@ -84,8 +89,8 @@ ReductionGrammar at: startSymbol add: pattern if: predicateBlock do: actionBlock
 ReductionGrammar startSetAt: startSymbol at: insnName
 [
     | set |
-    set := insnSets at: startSymbol ifAbsent: [self error: 'no start set for ', startSymbol printString].
-    set := set at: insnName ifAbsent: [self error: 'no rule for ', insnName printString, ' in start set for ', startSymbol printString].
+    set := insnSets at: startSymbol ifAbsent: [self error: 'no start set for ', startSymbol printString, ' -> ', insnName printString].
+    set := set at: insnName ifAbsent: [self startSetAt: startSymbol].
     ^set
 ]
 
