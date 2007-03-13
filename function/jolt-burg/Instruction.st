@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 17:40:54 by piumarta on emilia.local
+  Last edited: 2007-03-13 00:27:29 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -91,7 +91,7 @@ Instruction assertType: aSymbol
 
 Statement : Instruction ()
 
-Statement isVoid				[ ^true ]
+Statement isVoid			[ ^true ]
 
 Statement findSources: filter		[ ^nil ]
 Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
@@ -237,7 +237,7 @@ Block new
 [
     self := super new.
     instructions := OrderedCollection new.
-    inputs := nil.    
+    inputs := nil.
 ]
 
 Block scope: anEnvironment	[ scope := anEnvironment ]
@@ -277,8 +277,8 @@ Block clobberRegisters: codeGenerator
 	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
 		codeGenerator noteDead: insn.
 		self setType: insn type]].
-    (inputs isNil and: [source]) ifTrue: [self error: 'Block inputs and !source'].
-    (source isNil and: [inputs]) ifTrue: [self error: 'Block source and !inputs'].
+    (source isNil and: [inputs]) ifTrue: [self printOn: StdOut indent: 0.  self error: 'Block inputs and !source'].
+    (inputs isNil and: [source]) ifTrue: [self error: 'Block source and !inputs'].
     inputs
 	ifTrue:  [codeGenerator noteLive: self]
 	ifFalse: [self setType: #VOID]
