@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 18:22:34 by piumarta on emilia.local
+  Last edited: 2007-03-13 00:46:33 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -25,9 +25,9 @@
 { import: CompilerOptions }
 { import: CodeGenerator }
 
-SmallInteger lo16_: _i	{ unsigned long i= (unsigned long)v__i;  return (oop)((               i & 0xffff                   ) << 1 | 1); }
-SmallInteger hi16_: _i	{ unsigned long i= (unsigned long)v__i;  return (oop)(((i >> 16)                                   ) << 1 | 1); }
-SmallInteger ha16_: _i	{ unsigned long i= (unsigned long)v__i;  return (oop)(((i >> 16) + (((i & 0xffff) > 32767) ? 1 : 0)) << 1 | 1); }
+SmallInteger lo16_: _i	{ short i= (long)v__i;  return (oop)(((long)i) << 1 | 1); }
+SmallInteger hi16_: _i	{ unsigned long  i= (unsigned long)v__i;  return (oop)(((i >> 16)                                   ) << 1 | 1); }
+SmallInteger ha16_: _i	{ unsigned long  i= (unsigned long)v__i;  return (oop)(((i >> 16) + (((i & 0xffff) > 32767) ? 1 : 0)) << 1 | 1); }
 
 { include "asm-ppc.h" }
 

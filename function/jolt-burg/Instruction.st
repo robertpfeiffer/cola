@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-13 00:27:29 by piumarta on emilia.local
+  Last edited: 2007-03-13 00:53:46 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -535,7 +535,7 @@ Block reduceTo: aSymbol in: aGrammar for: gen
 [
     type := #nil.
     "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
-    instructions do: [:insn | insn reduceTo: (insn isVoid ifTrue: [#VOID] ifFalse: [aSymbol]) in: aGrammar for: gen].
+    instructions do: [:insn | (insn reduceTo: (insn isVoid ifTrue: [#VOID] ifFalse: [aSymbol]) in: aGrammar for: gen) ifFalse: [^nil]].
     type := aSymbol.
 ]
 
