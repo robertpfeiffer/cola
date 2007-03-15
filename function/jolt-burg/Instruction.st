@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-13 01:39:08 by piumarta on margaux.piumarta.com
+  Last edited: 2007-03-13 17:32:35 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -560,19 +560,19 @@ Instruction matchPattern: aPattern in: aGrammar for: gen
 
 Instruction matchArguments: aPattern in: aGrammar for: gen	[ self subtypeResponsibility: 'matchArgments:in:for:' ]
 
-Statement	  matchArguments: p in: g for: gen	[ ^true ]
-Leaf   		  matchArguments: p in: g for: gen	[ ^true ]
-Unary  		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) ]
-Binary 		  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) and: [rhs matchPattern: p third in: g for: gen] ]
-Block  		  matchArguments: p in: g for: gen	[ ^true ]
-Call   		  matchArguments: p in: g for: gen	[ ^self function matchPattern: p second in: g for: gen ]
+Statement matchArguments: p in: g for: gen	[ ^true ]
+Leaf   	  matchArguments: p in: g for: gen	[ ^true ]
+Unary  	  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) ]
+Binary 	  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) and: [rhs matchPattern: p third in: g for: gen] ]
+Block  	  matchArguments: p in: g for: gen	[ ^true ]
+Call   	  matchArguments: p in: g for: gen	[ ^self function matchPattern: p second in: g for: gen ]
 
 "
 Instruction	coverPattern: aPattern	[ aPattern isSymbol ifFalse: [type := #nil.  self coverArguments: aPattern] ]
 Instruction	coverArguments: p	[ ]
 Unary  		coverArguments: p	[ lhs coverPattern: p second ]
 Binary 		coverArguments: p	[ lhs coverPattern: p second.  rhs coverPattern: p third ]
-Call   		coverArguments: p	[ ^self function coverPattern: p second ]
+Call   		coverArguments: p	[ self function coverPattern: p second ]
 "
 
 Instruction generate: gen	[                                         		    generator ifTrue: [generator value: self value: gen] ]
