@@ -1,7 +1,7 @@
 LIBS	= lib1.so lib2.so
 PROGRAM	= $(LIBS) main
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

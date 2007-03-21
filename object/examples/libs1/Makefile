@@ -1,6 +1,6 @@
 PROGRAM	= main
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

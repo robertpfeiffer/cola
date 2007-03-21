@@ -1,6 +1,6 @@
 PROGRAM = forward
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

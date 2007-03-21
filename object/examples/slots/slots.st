@@ -1,4 +1,4 @@
-{ import: Object }	"Gets the built-in types (SmallInteger, Symbol, etc.)"
+{ import: st80 }	"Gets the built-in types (SmallInteger, Symbol, etc.)"
 
 "----------------------------------------------------------------"
 

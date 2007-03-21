@@ -1,6 +1,6 @@
 PROGRAM = system1 system2
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

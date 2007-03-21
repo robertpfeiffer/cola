@@ -1,6 +1,6 @@
 PROGRAM	= avl
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

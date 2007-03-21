@@ -7,7 +7,7 @@ LDOBJS  = File.$o String-paths.$o \
 LDLIBS  = -L/usr/X11R6/lib -lX11
 SHOBJS	= 
 
-IDC = idc
+IDC = ../idc
 
 all : $(SHOBJS) $(LDOBJS) $(PROGRAM) io-test
 

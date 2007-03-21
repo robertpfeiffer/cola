@@ -1,7 +1,7 @@
 LIBS	= xwin.so Event.so Surface.so
 PROGRAM = events main
 
-IDC = idc
+IDC = ../idc
 
 all : $(LIBS) $(PROGRAM)
 

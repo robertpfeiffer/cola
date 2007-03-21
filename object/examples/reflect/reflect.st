@@ -3,7 +3,7 @@
   When me you fly I am the wings.
 "
 
-{ import: st80 }	"Gets the built-in types (SmallInteger, Symbol, etc.)"
+{ import: st80 }
 
 "----------------------------------------------------------------"
 

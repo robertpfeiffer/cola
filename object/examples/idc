@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if test -x ../../stage2/idc; then
+  exec ../../stage2/idc -B ../../stage2/ -I../../st80 $*
+else
+  exec idc $*
+fi

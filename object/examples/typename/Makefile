@@ -1,6 +1,6 @@
 PROGRAM = typename
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

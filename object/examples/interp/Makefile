@@ -1,6 +1,6 @@
 PROGRAM = interp
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

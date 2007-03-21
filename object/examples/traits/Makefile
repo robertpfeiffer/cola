@@ -1,6 +1,6 @@
 PROGRAM = simple complex
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

@@ -1,6 +1,6 @@
 PROGRAM = prototype
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

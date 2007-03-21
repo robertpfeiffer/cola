@@ -1,6 +1,6 @@
 PROGRAM = ignore
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

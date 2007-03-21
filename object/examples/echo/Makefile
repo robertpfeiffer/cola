@@ -1,6 +1,6 @@
 PROGRAM = echo
 
-IDC = idc
+IDC = ../idc
 
 all : $(PROGRAM)
 

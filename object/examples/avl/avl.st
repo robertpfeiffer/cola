@@ -1,4 +1,4 @@
-{ import: st80-imports }
+{ import: st80 }
 
 [
     | words tree |

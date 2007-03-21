@@ -4,7 +4,7 @@ LDOBJS  =
 LDLIBS  = 
 SHOBJS	= 
 
-IDC = idc
+IDC = ../idc
 
 all : $(SHOBJS) $(LDOBJS) $(PROGRAM)
 
