@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 20:50:01 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-03-21 15:56:15 by piumarta on emilia.local
 "
 
 { import: CodeGenerator }
@@ -337,6 +337,23 @@ CCodeGenerator initialiseInteger: tag constructor: constructor with: anInteger
 	genSelector: constructor value; gen: ', ';
 	genVariable: constructor key; gen: ', ';
 	print: anInteger; genl: ');'.
+]
+
+CCodeGenerator initialiseLargeInteger: tag constructor: constructor with: anInteger
+[
+    self
+	gen: '  '; genLiteral: tag; gen: '= _send(';
+	genSelector: constructor value; gen: ', ';
+	genVariable: constructor key; gen: ', ';
+	print: anInteger digitLength; gen: ', "'.
+    anInteger bytes
+	do: [:byte |
+	    self
+		put: $\\;
+		put: (Character digitValue: byte // 64 \\ 8);
+		put: (Character digitValue: byte //  8 \\ 8);
+		put: (Character digitValue: byte       \\ 8)].
+    self genl: '");'.
 ]
 
 CCodeGenerator defineFloat: tag withValue: aString

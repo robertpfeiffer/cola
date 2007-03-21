@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-09-30 12:44:04 by piumarta on emilia.local
+  Last edited: 2007-03-21 16:05:34 by piumarta on emilia.local
 "
 
 { import: Object }
@@ -64,21 +64,23 @@ Compiler initialize
     imports := Set new.
     externalFlags := OrderedCollection new.
     intrinsicTypes := (Dictionary new: 64)	"trade some space for speed"
-	at: 'object'	    put: '_object'	  -> nil;
-	at: 'nil'	    put: '_nil'		  -> nil;
-	at: 'true'	    put: '_true'	  -> nil;
-	at: 'false'	    put: '_false'	  -> nil;
-	at: 'integer'	    put: '_integer'	  -> 'value_:';
-	at: 'float'	    put: '_float'	  -> 'value_:';
-	at: 'character'     put: '_character'	  -> 'value_:';
-	at: 'vector'	    put: '_vector'	  -> 'new_:';
-	at: 'symbol'	    put: '_symbol'	  -> 'size_:value_:';
-	at: 'string'	    put: '_string'	  -> 'size_:value_:';
-	at: 'byteArray'     put: '_byteArray'	  -> 'size_:value_:';
-	at: 'wordArray'     put: '_wordArray'	  -> 'size_:value_:';
-	at: 'objectArray'   put: '_objectArray'	  -> 'size_:value_:';
-	at: 'staticClosure' put: '_staticClosure' -> 'function_:arity_:';
-	at: 'fullClosure'   put: '_fullClosure'	  -> 'function_:arity_:outer:state:nlr_:';
+	at: 'object'	    	    put: '_object'	  	  -> nil;
+	at: 'nil'	    	    put: '_nil'		  	  -> nil;
+	at: 'true'	    	    put: '_true'	  	  -> nil;
+	at: 'false'	    	    put: '_false'	  	  -> nil;
+	at: 'integer'	    	    put: '_integer'	  	  -> 'value_:';
+	at: 'largePositiveInteger'  put: '_largePositiveInteger'  -> 'size_:value_:';
+	at: 'largeNegativeInteger'  put: '_largeNegativeInteger'  -> 'size_:value_:';
+	at: 'float'	    	    put: '_float'	  	  -> 'value_:';
+	at: 'character'     	    put: '_character'	  	  -> 'value_:';
+	at: 'vector'	    	    put: '_vector'	  	  -> 'new_:';
+	at: 'symbol'	    	    put: '_symbol'	  	  -> 'size_:value_:';
+	at: 'string'	    	    put: '_string'	  	  -> 'size_:value_:';
+	at: 'byteArray'     	    put: '_byteArray'	  	  -> 'size_:value_:';
+	at: 'wordArray'     	    put: '_wordArray'	  	  -> 'size_:value_:';
+	at: 'objectArray'   	    put: '_objectArray'	  	  -> 'size_:value_:';
+	at: 'staticClosure' 	    put: '_staticClosure' 	  -> 'function_:arity_:';
+	at: 'fullClosure'   	    put: '_fullClosure'	  	  -> 'function_:arity_:outer:state:nlr_:';
 	yourself.
 ]
 

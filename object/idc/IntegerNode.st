@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2005-12-21 20:56:44 by piumarta on emilia.local
+  Last edited: 2007-03-21 16:04:46 by piumarta on emilia.local
 "
 
 { import: LiteralNode }
@@ -35,14 +35,23 @@ IntegerNode fromString: aString position: aPosition
 
 IntegerNode encode: encoder
 [
-    constructor := encoder requireType: 'integer' at: position.
+    constructor := encoder
+	requireType: (value isSmallInteger
+			ifTrue:  ['integer']
+			ifFalse: [value negative ifTrue: ['largeNegativeInteger'] ifFalse: ['largePositiveInteger']])
+	at: position.
     tag := encoder encodeLiteral: self.
     location := encoder push.
 ]
 
 IntegerNode generate: gen		[ gen loadLiteral: tag to: location ]
 
-IntegerNode genInitialisation: gen	[ gen initialiseInteger: tag constructor: constructor with: value ]
+IntegerNode genInitialisation: gen
+[
+    value isSmallInteger
+	ifTrue:  [gen initialiseInteger:      tag constructor: constructor with: value]
+	ifFalse: [gen initialiseLargeInteger: tag constructor: constructor with: value]
+]
 
 IntegerNode println: indent
 [

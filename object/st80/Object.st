@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 21:28:31 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-03-21 16:06:43 by piumarta on emilia.local
 "
 
 { import: _object }
@@ -33,8 +33,8 @@ Object ()
       Float : Number ()						{ pragma: type float Float }
       Integer : Number ()
         SmallInteger : Integer ()				{ pragma: type integer SmallInteger }
-        LargePositiveInteger : Integer ( bytes )
-          LargeNegativeInteger : LargePositiveInteger ()
+        LargePositiveInteger : Integer ( bytes )		{ pragma: type largePositiveInteger LargePositiveInteger }
+          LargeNegativeInteger : LargePositiveInteger ()	{ pragma: type largeNegativeInteger LargeNegativeInteger }
   Collection : Object ()
     SequenceableCollection : Collection ()
       ArrayedCollection : SequenceableCollection ( size )

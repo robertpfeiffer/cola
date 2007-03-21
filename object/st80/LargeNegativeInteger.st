@@ -15,12 +15,17 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-04-25 16:20:59 by piumarta on emilia.local
+  Last edited: 2007-03-21 16:06:28 by piumarta on emilia.local
 "
 
 { import: LargePositiveInteger }
 
 LargeNegativeInteger : LargePositiveInteger ()
+
+LargeNegativeInteger size_: _size value_: _bytes
+[
+    ^self withBytes: (ByteArray size_: _size value_: _bytes)
+]
 
 LargeNegativeInteger normalize
 [

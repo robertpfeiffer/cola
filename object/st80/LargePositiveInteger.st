@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-04-25 17:28:39 by piumarta on emilia.local
+  Last edited: 2007-03-21 16:00:08 by piumarta on emilia.local
 "
 
 { import: Integer }
@@ -38,6 +38,11 @@ LargePositiveInteger withBytes: aByteArray
 [
     self := super new.
     bytes := aByteArray.
+]
+
+LargePositiveInteger size_: _size value_: _bytes
+[
+    ^self withBytes: (ByteArray size_: _size value_: _bytes)
 ]
 
 LargePositiveInteger value_: _word
