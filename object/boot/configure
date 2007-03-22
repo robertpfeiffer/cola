@@ -89,6 +89,13 @@ ppc () {
     SYSARCH="ppc"
 }
 
+arm () {
+     OFLAGS=${OFLAGS:-"-O"}
+     O3FLAGS=${O3FLAGS:-"-O3"}
+     PGFLAGS=${PGFLAGS:-"-O3"}
+     SYSARCH="arm"
+}
+
 ia64 () {
     OFLAGS=${OFLAGS:-"-O"}
     O3FLAGS=${O3FLAGS:-"-O"}
@@ -180,6 +187,7 @@ case $TARGET in
     powerpc-*-darwin*)		ppc;	darwin;	arch_ppc	;;
     powerpc-*-netbsd*)		ppc;	bsd;	pic		;;
     powerpc-*-linux-gnu)	ppc;	linux			;;
+    arm-*-linux-gnu)		arm;	linux			;;
     ia64-*-linux-gnu)		ia64;	linux			;;
     i[3456789]86-*-darwin*)	i386;	darwin;	arch_386	;;
     i[3456789]86-*-linux*)	i386;	linux;	pic		;;
