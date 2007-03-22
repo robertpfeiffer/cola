@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-12-06 10:06:04 by piumarta on emilia.local
+  Last edited: 2007-03-22 16:26:40 by piumarta on emilia
 "
 
 { import: ParseNode }
@@ -571,6 +571,6 @@ ParseNode tagCheckFor: aNode	[ ^aNode tagCheckFromObject ]
 ParseNode tagCheckFromObject	[ ^#both ]
 ParseNode tagCheckFromInteger	[ ^#right ]
 
-IntegerNode tagCheckFor: aNode	[ ^aNode tagCheckFromInteger ]
-IntegerNode tagCheckFromObject	[ ^#left ]
-IntegerNode tagCheckFromInteger	[ ^#none ]
+IntegerNode tagCheckFor: aNode	[ ^value isSmallInteger ifTrue: [aNode tagCheckFromInteger] ifFalse: [super tagCheckFor: aNode] ]
+IntegerNode tagCheckFromObject	[ ^value isSmallInteger ifTrue: [#left] ifFalse: [#both] ]
+IntegerNode tagCheckFromInteger	[ ^value isSmallInteger ifTrue: [#none] ifFalse: [#right] ]

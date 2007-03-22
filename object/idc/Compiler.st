@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-21 16:05:34 by piumarta on emilia.local
+  Last edited: 2007-03-22 10:35:45 by piumarta on emilia
 "
 
 { import: Object }
@@ -163,7 +163,8 @@ Compiler pragma: text				"{ pragma: directive ... }"
     args := text tokenized: ' '.
     args size >= 2
 	ifTrue:
-	   [(args second = 'type' and: [args size >= 4]) ifTrue:  [^self pragmaType: args]].
+	   [(args second = 'type'  and: [args size == 4]) ifTrue:  [^self pragmaType:  args].
+	   "(args second = 'entry' and: [args size == 5]) ifTrue:  [^self pragmaEntry: args]"].
     self warn: 'unknown pragma: ', text at: parser position.
 ]
 
@@ -175,6 +176,11 @@ Compiler pragmaType: args			"{ pragma: type builtInName userDefinedType }"
     constructor key: args fourth.
     args size > 4 ifTrue: [constructor value: args fifth].
 ]
+
+"Compiler pragmaEntry: args"			"{ pragma: entry entry_name Receiver message }"
+"[
+    self error: 'ENTRY ', args third, ' => ', args fourth, '.', args fifth
+]"
 
 Compiler addExtern: externNode			"{ ...anything... }"
 [
