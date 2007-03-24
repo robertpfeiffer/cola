@@ -15,7 +15,7 @@
  *
  * See the file COPYING for more details.
  *
- * Last edited: 2003-01-20 12:38:53 by piumarta on emilia.local.
+ * Last edited: 2007-03-23 18:27:44 by piumarta on ubuntu
  */
 
 #ifndef __ccg_asm_cache_h
@@ -96,6 +96,26 @@
       }
       /* [SPARC Architecture Manual v8, page 139, implementation note #5] */
       asm volatile ("nop; nop; nop; nop; nop");
+    }
+# else
+#   define _ASM_NOCOMP
+# endif
+
+#elif defined(__arm__)									/**** ARM ****/
+
+# if defined(__GNUC__)
+#   include <asm/unistd.h>
+    static void iflush(insn *start, insn *end)
+    {
+      asm volatile (
+	"mov r0, %0\n"	/* start	*/
+	"mov r1, %1\n"	/* end		*/
+	"mov r2, #0\n"	/* VMA flags	*/
+	"swi "__sys1(__ARM_NR_cacheflush)"\n"
+	: /* no return value */
+	: "r" ((long)start), "r" ((long)end)
+	: "r0","r1","r2"
+      );
     }
 # else
 #   define _ASM_NOCOMP

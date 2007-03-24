@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:48:03 by piumarta on emilia
+  Last edited: 2007-03-23 18:53:54 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -49,6 +49,7 @@ Register withClass: aClass name: aString encoding: anInteger
 Register class		[ ^class ]
 
 Register _reg		[ ^_encoding ]
+Register encoding	[ ^SmallInteger value_: _encoding ]
 
 Resource releaseRegister	[]
 Register releaseRegister	[ self release ]
