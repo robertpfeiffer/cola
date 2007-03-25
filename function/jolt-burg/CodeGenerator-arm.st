@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-24 14:43:22 by piumarta on ubuntu
+  Last edited: 2007-03-24 18:21:32 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -100,7 +100,7 @@ ARMCodeGenerator finaliseFrame
 	    registerList := registerList bitOr: 1 << reg encoding]].
     needsFrame
 	ifTrue:
-	   [frameSize := frameSize + 4.					"saved link register"
+	   [frameSize := frameSize + 8.					"saved LR, SP"
 	    align := (frameSize + 15 bitAnd: -16) - frameSize.
 	    tempsSize := tempsSize + align.
 	    frameSize := frameSize + align].
@@ -115,7 +115,7 @@ ARMCodeGenerator emitPrologue
 [
     | mask |
     mask := registerList bitOr: 15.					"incoming args"
-    needsFrame ifTrue: [mask := mask bitOr: 0x4000].			"lr"
+    needsFrame ifTrue: [mask := mask bitOr: 0x6000].			"lr+sp"
     mask == 0 ifFalse: [self stmfdW: sp L: mask].
     tempsSize > 0 ifTrue: [self subR: sp R: sp r: 0 I: tempsSize].
 ]
@@ -124,7 +124,7 @@ ARMCodeGenerator emitEpilogue
 [
     | mask |
     mask := registerList.
-    needsFrame ifTrue: [mask := mask bitOr: 0x8000].			"pc"
+    needsFrame ifTrue: [mask := mask bitOr: 0xa000].			"pc+sp"
     self addR: sp R: sp r: 30 I: tempsSize + 16 >> 2.			"temps + incoming args"
     mask == 0
 	ifTrue:  [self movR: pc R: lr]
@@ -170,6 +170,7 @@ StaticARMCodeGenerator define: l		[ StdOut nextPutAll: 'L'; print: l ordinal; ne
 
 StaticARMCodeGenerator addR: d R: a	 R: b	[ StdOut nextPutAll: '	add	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticARMCodeGenerator addR: d R: s r: r I: i	[ StdOut nextPutAll: '	add	'; print: d; nextPut: $,; print: s; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
+StaticARMCodeGenerator cmpR: d		 I: i	[ StdOut nextPutAll: '	cmp	'; print: d; nextPutAll: ',#'; print: i; cr ]
 StaticARMCodeGenerator cmpR: d	    r: r I: i	[ StdOut nextPutAll: '	cmp	'; print: d; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
 StaticARMCodeGenerator cmpR: d		 R: s	[ StdOut nextPutAll: '	cmp	'; print: d; nextPut: $,; print: s; cr ]
 StaticARMCodeGenerator bL: l			[ StdOut nextPutAll: '	b	L'; print: l ordinal; cr ]
@@ -195,7 +196,12 @@ StaticARMCodeGenerator ldmfdW: d	 L: l
 StaticARMCodeGenerator movR: d		 R: s	[ d == s ifFalse: [StdOut nextPutAll: '	mov	'; print: d; nextPut: $,; print: s; cr] ]
 StaticARMCodeGenerator movR: d	    r: r I: i	[ StdOut nextPutAll: '	mov	'; print: d; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
 StaticARMCodeGenerator moveqR: d	 I: i	[ StdOut nextPutAll: '	moveq	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator movgeR: d	 I: i	[ StdOut nextPutAll: '	movge	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator movgtR: d	 I: i	[ StdOut nextPutAll: '	movgt	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator movleR: d	 I: i	[ StdOut nextPutAll: '	movle	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator movltR: d	 I: i	[ StdOut nextPutAll: '	movlt	'; print: d; nextPutAll: ',#'; print: i; cr ]
 StaticARMCodeGenerator movneR: d	 I: i	[ StdOut nextPutAll: '	movne	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator mulR: d R: a	 R: b	[ StdOut nextPutAll: '	mul	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticARMCodeGenerator orrR: d R: s r: r I: i	[ StdOut nextPutAll: '	orr	'; print: d; nextPut: $,; print: s; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
 
 StaticARMCodeGenerator stmfdW: d L: l
@@ -214,6 +220,7 @@ StaticARMCodeGenerator stmfdW: d L: l
 StaticARMCodeGenerator strR: r     Mb: b	[ StdOut nextPutAll: '	str	'; print: r; nextPutAll: ',['; print: b; nextPutAll: ']\n' ]
 StaticARMCodeGenerator strR: r     Mb: b d: d	[ StdOut nextPutAll: '	str	'; print: r; nextPutAll: ',['; print: b; nextPutAll: ',#'; print: d; nextPutAll: ']\n' ]
 StaticARMCodeGenerator subR: d R: s r: r I: i	[ StdOut nextPutAll: '	sub	'; print: d; nextPutAll: ',#'; print: s; nextPut: $,; print: i; nextPutAll: ' ROR #'; print: r; cr ]
+StaticARMCodeGenerator subR: d R: a	 R: b	[ StdOut nextPutAll: '	sub	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 
 "----------------------------------------------------------------"
 
@@ -250,6 +257,7 @@ DynamicARMCodeGenerator bL: l			{ Bi	(14,			       _A(l)); }
 DynamicARMCodeGenerator beqL: l			{ Bi	(00,			       _A(l)); }
 DynamicARMCodeGenerator blxR: r			{ BLXr	(14,			       _R(r)); }
 DynamicARMCodeGenerator bneL: l			{ Bi	(01,			       _A(l)); }
+DynamicARMCodeGenerator cmpR: d		   I: i	{ CMPri	(14,    _R(d),	            0, _I(i)); }
 DynamicARMCodeGenerator cmpR: d	     r: r  I: i	{ CMPri	(14,    _R(d),	      _I(r)/2, _I(i)); }
 DynamicARMCodeGenerator cmpR: d		   R: s	{ CMPrr	(14,    _R(d),		       _R(s)); }
 DynamicARMCodeGenerator ldmfdW: d	   L: l	{ LDMwl	(14, 1, _R(d), _I(l), 0); }
@@ -258,12 +266,18 @@ DynamicARMCodeGenerator ldrR: r	    Mb: b  d: d	{ LDRrmpf(14, 0, 0, _R(r), _R(b)
 DynamicARMCodeGenerator movR: d		   R: s	{ if (_R(d) != _R(s)) MOVrr(14, 0, _R(d), _R(s)); }
 DynamicARMCodeGenerator movR: d	     r: r  I: i	{ MOVri	(14, 0, _R(d),	      _I(r)/2, _I(i)); }
 DynamicARMCodeGenerator moveqR: d	   I: i	{ MOVri	(00, 0, _R(d),		    0, _I(i)); }
+DynamicARMCodeGenerator movgeR: d	   I: i	{ MOVri	(10, 0, _R(d),		    0, _I(i)); }
+DynamicARMCodeGenerator movgtR: d	   I: i	{ MOVri	(12, 0, _R(d),		    0, _I(i)); }
+DynamicARMCodeGenerator movleR: d	   I: i	{ MOVri	(13, 0, _R(d),		    0, _I(i)); }
+DynamicARMCodeGenerator movltR: d	   I: i	{ MOVri	(11, 0, _R(d),		    0, _I(i)); }
 DynamicARMCodeGenerator movneR: d	   I: i	{ MOVri	(01, 0, _R(d),		    0, _I(i)); }
+DynamicARMCodeGenerator mulR: d R: a	   R: b	{ MULrrr(14, 0, _R(d), _R(a),	       _R(b)); }
 DynamicARMCodeGenerator orrR: d R: s r: r  I: i	{ ORRrri(14, 0, _R(d), _R(s), _I(r)/2, _I(i)); }
 DynamicARMCodeGenerator stmfdW: d	   L: l	{ STMwl	(14, 2, _R(d), _I(l), 0); }
 DynamicARMCodeGenerator strR: r	    Mb: b	{ STRrm	(14, 0, 0, _R(r), _R(b), 0); }
 DynamicARMCodeGenerator strR: r	    Mb: b  d: d	{ STRrmpf(14, 0, 0, _R(r), _R(b), 1, _I(d), 0); }
 DynamicARMCodeGenerator subR: d R: s r: r  I: i	{ SUBrri(14, 0, _R(d), _R(s), _I(r)/2, _I(i)); }
+DynamicARMCodeGenerator subR: d R: a	   R: b	{ SUBrrr(14, 0, _R(d), _R(a),	       _R(b)); }
 
 "----------------------------------------------------------------"
 
@@ -302,10 +316,9 @@ DynamicARMCodeGenerator defineVariable: name
 
 { import: Grammar }
 
-ARMCodeGenerator r0	[ ^r0 ]
-ARMCodeGenerator sp	[ ^sp ]
-
-ARMCodeGenerator bogus	[ StdErr nextPutAll: 'bogus\n' ]
+ARMCodeGenerator r0		[ ^r0 ]
+ARMCodeGenerator sp		[ ^sp ]
+ARMCodeGenerator frameSize	[ ^frameSize ]
 
 ARMGrammar := [
     ReductionGrammar new
@@ -329,7 +342,7 @@ ARMGrammar := [
 								    orrR: op output R: op output r: 16 I: (SmallInteger value_: op arg shr: 16 and: 255);
 								    orrR: op output R: op output r:  8 I: (SmallInteger value_: op arg shr: 24 and: 255)];
 	at: #REG  add: #(parami4 	)	do: [:op :gen | ];
-	at: #REG  add: #(addrfp4 	)	do: [:op :gen | gen error: 'addrfp4';	movlR:    gen ebp	      R: op output ];
+	at: #REG  add: #(addrfp4 	)	do: [:op :gen | gen addR: op output R: gen sp r: 30 I: gen frameSize / 4 ];
 	at: #REG  add: #(addrgp4 	)	do: [:op :gen | gen movR: op output		 r:  0 I: (SmallInteger value_: op arg _address shr:  0 and: 255);
 								    orrR: op output R: op output r: 24 I: (SmallInteger value_: op arg _address shr:  8 and: 255);
 								    orrR: op output R: op output r: 16 I: (SmallInteger value_: op arg _address shr: 16 and: 255);
@@ -342,10 +355,9 @@ ARMGrammar := [
 	at: #REG  add: #(indiri1 REG	)	do: [:op :gen | gen error: 'indiri1';	movsblMb: op lhs output   R: op output ];
 	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen error: 'indiri2';	movswlMb: op lhs output   R: op output ];
 	at: #REG  add: #(indiri4 REG	)	do: [:op :gen | gen ldrR: op output   Mb: op lhs output ];
-	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen error: 'noti4';	xorlR:    gen ecx	      R: gen ecx;
-								    cmplI:    0		      R: op output;
-								    seteR:    gen cl;
-								    movlR:    gen ecx	      R: op output ];
+	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen cmpR:  op lhs output I: 0;
+								    movneR: op output I: 0;
+								    moveqR: op output I: 1];
 	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen error: 'negi4';	neglR:    op output ];
 	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4: op ];
 	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen error: 'asgni1';	movlR:    op lhs output   R: gen ecx;
@@ -357,8 +369,8 @@ ARMGrammar := [
 	at: #REG  add: #(ori4    REG REG)	do: [:op :gen | gen error: 'ori4';	orlR:     op rhs output   R: op output ];
 	at: #REG  add: #(xori4 	 REG REG)	do: [:op :gen | gen error: 'xori4';	xorlR:    op rhs output   R: op output ];
 	at: #REG  add: #(addi4 	 REG REG)	do: [:op :gen | gen addR: op output R: op lhs output R: op rhs output ];
-	at: #REG  add: #(subi4 	 REG REG)	do: [:op :gen | gen error: 'subi4';	sublR:    op rhs output   R: op output ];
-	at: #REG  add: #(muli4 	 REG REG)	do: [:op :gen | gen error: 'muli4';	imullR:   op rhs output   R: op output ];
+	at: #REG  add: #(subi4 	 REG REG)	do: [:op :gen | gen subR: op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(muli4 	 REG REG)	do: [:op :gen | gen mulR:   op output   R: op lhs output R: op rhs output ];
 	at: #REG  add: #(divi4 	 REG REG)	do: [:op :gen | gen error: 'divi4';	movlR:    op lhs output   R: gen eax;
 								    cltd;
 								    idivlR: op rhs output;
@@ -371,29 +383,24 @@ ARMGrammar := [
 								    shllR:  gen cl	  R: op output ];
 	at: #REG  add: #(shri4 	 REG REG)	do: [:op :gen | gen error: 'shri4';	movlR:  op rhs output R: gen ecx;
 								    sarlR:  gen cl	  R: op output ];
-	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen error: 'lti4';	xorlR:  gen ecx	  R: gen ecx;
-								    cmplR:  op rhs output R: op lhs output;
-								    setlR:  gen cl;
-								    movlR:  gen ecx	  R: op output ];
-	at: #REG  add: #(lei4 	 REG REG)	do: [:op :gen | gen error: 'lei4';	xorlR:  gen ecx	  R: gen ecx;
-								    cmplR:  op rhs output R: op lhs output;
-								    setleR: gen cl;
-								    movlR:  gen ecx	  R: op output ];
-	at: #REG  add: #(eqi4 	 REG REG)	do: [:op :gen | gen cmpR:  op rhs output R: op lhs output;
+	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen cmpR:  op lhs output R: op rhs output;
+								    movgeR: op output I: 0;
+								    movltR: op output I: 1];
+	at: #REG  add: #(lei4 	 REG REG)	do: [:op :gen | gen cmpR:  op lhs output R: op rhs output;
+								    movgtR: op output I: 0;
+								    movleR: op output I: 1];
+	at: #REG  add: #(eqi4 	 REG REG)	do: [:op :gen | gen cmpR:  op lhs output R: op rhs output;
 								    movneR: op output I: 0;
 								    moveqR: op output I: 1];
-	at: #REG  add: #(nei4 	 REG REG)	do: [:op :gen | gen error: 'nei4';	xorlR:  gen ecx	  R: gen ecx;
-								    cmplR:  op rhs output R: op lhs output;
-								    setneR: gen cl;
-								    movlR:  gen ecx	  R: op output ];
-	at: #REG  add: #(gei4 	 REG REG)	do: [:op :gen | gen error: 'gei4';	xorlR:  gen ecx	  R: gen ecx;
-								    cmplR:  op rhs output R: op lhs output;
-								    setgeR: gen cl;
-								    movlR:  gen ecx	  R: op output ];
-	at: #REG  add: #(gti4 	 REG REG)	do: [:op :gen | gen error: 'gti4';	xorlR:  gen ecx	  R: gen ecx;
-								    cmplR:  op rhs output R: op lhs output;
-								    setgR:  gen cl;
-								    movlR:  gen ecx	  R: op output ];
+	at: #REG  add: #(nei4 	 REG REG)	do: [:op :gen | gen cmpR:  op lhs output R: op rhs output;
+								    moveqR: op output I: 0;
+								    movneR: op output I: 1];
+	at: #REG  add: #(gei4 	 REG REG)	do: [:op :gen | gen cmpR:  op lhs output R: op rhs output;
+								    movltR: op output I: 0;
+								    movgeR: op output I: 1];
+	at: #REG  add: #(gti4 	 REG REG)	do: [:op :gen | gen cmpR:  op lhs output R: op rhs output;
+								    movleR: op output I: 0;
+								    movgtR: op output I: 1];
 
 	"-------------------------------- optimisations --------------------------------"
 "
