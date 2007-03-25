@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-24 00:02:16 by piumarta on ubuntu
+  Last edited: 2007-03-24 14:43:22 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -154,12 +154,15 @@ ARMCodeGenerator emit: call argumentAt: index
 	ifFalse: [self strR: insn output Mb: sp d: index - 4 * 4]
 ]
 
+ARMCodeGenerator spilli4:  reg to:   tmp	[ self strR: reg Mb: tmp base d: tmp offset ]
+ARMCodeGenerator reloadi4: reg from: tmp	[ self ldrR: reg Mb: tmp base d: tmp offset ]
+
+"----------------------------------------------------------------"
+
 SmallInteger value_: _int shr: shift and: mask
 {
     return (oop)((((long)v__int >> ((long)v_shift >> 1)) & ((long)v_mask >> 1)) << 1 | 1);
 }
-
-"----------------------------------------------------------------"
 
 StaticARMCodeGenerator : ARMCodeGenerator ()
 
@@ -167,8 +170,14 @@ StaticARMCodeGenerator define: l		[ StdOut nextPutAll: 'L'; print: l ordinal; ne
 
 StaticARMCodeGenerator addR: d R: a	 R: b	[ StdOut nextPutAll: '	add	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticARMCodeGenerator addR: d R: s r: r I: i	[ StdOut nextPutAll: '	add	'; print: d; nextPut: $,; print: s; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
+StaticARMCodeGenerator cmpR: d	    r: r I: i	[ StdOut nextPutAll: '	cmp	'; print: d; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
+StaticARMCodeGenerator cmpR: d		 R: s	[ StdOut nextPutAll: '	cmp	'; print: d; nextPut: $,; print: s; cr ]
+StaticARMCodeGenerator bL: l			[ StdOut nextPutAll: '	b	L'; print: l ordinal; cr ]
+StaticARMCodeGenerator beqL: l			[ StdOut nextPutAll: '	beq	L'; print: l ordinal; cr ]
 StaticARMCodeGenerator blxR: r			[ StdOut nextPutAll: '	blx	'; print: r; cr ]
-StaticARMCodeGenerator ldrR: d		Mb: b	[ StdOut nextPutAll: '	ldr	'; print: d; nextPutAll: ',['; print: b; nextPutAll: ']\n' ]
+StaticARMCodeGenerator bneL: l			[ StdOut nextPutAll: '	bne	L'; print: l ordinal; cr ]
+StaticARMCodeGenerator ldrR: r	   Mb: b	[ StdOut nextPutAll: '	ldr	'; print: r; nextPutAll: ',['; print: b; nextPutAll: ']\n' ]
+StaticARMCodeGenerator ldrR: r	   Mb: b d: d	[ StdOut nextPutAll: '	ldr	'; print: r; nextPutAll: ',['; print: b; nextPutAll: ',#'; print: d; nextPutAll: ']\n' ]
 
 StaticARMCodeGenerator ldmfdW: d	 L: l
 [
@@ -185,6 +194,8 @@ StaticARMCodeGenerator ldmfdW: d	 L: l
 
 StaticARMCodeGenerator movR: d		 R: s	[ d == s ifFalse: [StdOut nextPutAll: '	mov	'; print: d; nextPut: $,; print: s; cr] ]
 StaticARMCodeGenerator movR: d	    r: r I: i	[ StdOut nextPutAll: '	mov	'; print: d; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
+StaticARMCodeGenerator moveqR: d	 I: i	[ StdOut nextPutAll: '	moveq	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator movneR: d	 I: i	[ StdOut nextPutAll: '	movne	'; print: d; nextPutAll: ',#'; print: i; cr ]
 StaticARMCodeGenerator orrR: d R: s r: r I: i	[ StdOut nextPutAll: '	orr	'; print: d; nextPut: $,; print: s; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
 
 StaticARMCodeGenerator stmfdW: d L: l
@@ -200,7 +211,8 @@ StaticARMCodeGenerator stmfdW: d L: l
     StdOut nextPutAll: '}\n'
 ]
 
-StaticARMCodeGenerator strR: d		Mb: b	[ StdOut nextPutAll: '	str	'; print: d; nextPutAll: ',['; print: b; nextPutAll: ']\n' ]
+StaticARMCodeGenerator strR: r     Mb: b	[ StdOut nextPutAll: '	str	'; print: r; nextPutAll: ',['; print: b; nextPutAll: ']\n' ]
+StaticARMCodeGenerator strR: r     Mb: b d: d	[ StdOut nextPutAll: '	str	'; print: r; nextPutAll: ',['; print: b; nextPutAll: ',#'; print: d; nextPutAll: ']\n' ]
 StaticARMCodeGenerator subR: d R: s r: r I: i	[ StdOut nextPutAll: '	sub	'; print: d; nextPutAll: ',#'; print: s; nextPut: $,; print: i; nextPutAll: ' ROR #'; print: r; cr ]
 
 "----------------------------------------------------------------"
@@ -234,14 +246,23 @@ DynamicARMCodeGenerator _
 
 DynamicARMCodeGenerator addR: d R: a	   R: b	{ ADDrrr(14, 0, _R(d), _R(a),	       _R(b)); }
 DynamicARMCodeGenerator addR: d R: s r: r  I: i	{ ADDrri(14, 0, _R(d), _R(s), _I(r)/2, _I(i)); }
+DynamicARMCodeGenerator bL: l			{ Bi	(14,			       _A(l)); }
+DynamicARMCodeGenerator beqL: l			{ Bi	(00,			       _A(l)); }
 DynamicARMCodeGenerator blxR: r			{ BLXr	(14,			       _R(r)); }
+DynamicARMCodeGenerator bneL: l			{ Bi	(01,			       _A(l)); }
+DynamicARMCodeGenerator cmpR: d	     r: r  I: i	{ CMPri	(14,    _R(d),	      _I(r)/2, _I(i)); }
+DynamicARMCodeGenerator cmpR: d		   R: s	{ CMPrr	(14,    _R(d),		       _R(s)); }
 DynamicARMCodeGenerator ldmfdW: d	   L: l	{ LDMwl	(14, 1, _R(d), _I(l), 0); }
-DynamicARMCodeGenerator ldrR: d		  Mb: b	{ LDRrm	(14, 0, 0, _R(d), _R(b), 0); }
+DynamicARMCodeGenerator ldrR: r	    Mb: b	{ LDRrm	(14, 0, 0, _R(r), _R(b), 0); }
+DynamicARMCodeGenerator ldrR: r	    Mb: b  d: d	{ LDRrmpf(14, 0, 0, _R(r), _R(b), 1, _I(d), 0); }
 DynamicARMCodeGenerator movR: d		   R: s	{ if (_R(d) != _R(s)) MOVrr(14, 0, _R(d), _R(s)); }
 DynamicARMCodeGenerator movR: d	     r: r  I: i	{ MOVri	(14, 0, _R(d),	      _I(r)/2, _I(i)); }
+DynamicARMCodeGenerator moveqR: d	   I: i	{ MOVri	(00, 0, _R(d),		    0, _I(i)); }
+DynamicARMCodeGenerator movneR: d	   I: i	{ MOVri	(01, 0, _R(d),		    0, _I(i)); }
 DynamicARMCodeGenerator orrR: d R: s r: r  I: i	{ ORRrri(14, 0, _R(d), _R(s), _I(r)/2, _I(i)); }
 DynamicARMCodeGenerator stmfdW: d	   L: l	{ STMwl	(14, 2, _R(d), _I(l), 0); }
-DynamicARMCodeGenerator strR: d		  Mb: b	{ STRrm	(14, 0, 0, _R(d), _R(b), 0); }
+DynamicARMCodeGenerator strR: r	    Mb: b	{ STRrm	(14, 0, 0, _R(r), _R(b), 0); }
+DynamicARMCodeGenerator strR: r	    Mb: b  d: d	{ STRrmpf(14, 0, 0, _R(r), _R(b), 1, _I(d), 0); }
 DynamicARMCodeGenerator subR: d R: s r: r  I: i	{ SUBrri(14, 0, _R(d), _R(s), _I(r)/2, _I(i)); }
 
 "----------------------------------------------------------------"
@@ -296,9 +317,9 @@ ARMGrammar := [
 	at: #VOID add: #(retv		)	do: [:op :gen | gen emitEpilogue ];
 	at: #VOID add: #(reti4 	 REG	)	do: [:op :gen | gen movR: gen r0 R: op lhs output; emitEpilogue ];
 	at: #VOID add: #(drop  	 REG	)	do: [:op :gen | ];
-	at: #VOID add: #(brz   	 REG	)	do: [:op :gen | gen error: 'brz';	testlR:   op lhs output   R: op lhs output;  jeL:  op destination];
-	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen error: 'brnz';	testlR:   op lhs output   R: op lhs output;  jneL: op destination];
-	at: #VOID add: #(bra		)	do: [:op :gen | gen error: 'bra';	jmpL:     op destination ];
+	at: #VOID add: #(brz   	 REG	)	do: [:op :gen | gen cmpR: op lhs output r: 0 I: 0;  beqL: op destination];
+	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen cmpR: op lhs output r: 0 I: 0;  bneL: op destination];
+	at: #VOID add: #(bra		)	do: [:op :gen | gen bL:     op destination ];
 	at: #REG  add: #(cnsti4	 	)	do: [:op :gen | gen movR: op output		 r:  0 I: (SmallInteger value_: op arg shr:  0 and: 255);
 								    orrR: op output R: op output r: 24 I: (SmallInteger value_: op arg shr:  8 and: 255);
 								    orrR: op output R: op output r: 16 I: (SmallInteger value_: op arg shr: 16 and: 255);
@@ -358,10 +379,9 @@ ARMGrammar := [
 								    cmplR:  op rhs output R: op lhs output;
 								    setleR: gen cl;
 								    movlR:  gen ecx	  R: op output ];
-	at: #REG  add: #(eqi4 	 REG REG)	do: [:op :gen | gen error: 'eqi4';	xorlR:  gen ecx	  R: gen ecx;
-								    cmplR:  op rhs output R: op lhs output;
-								    seteR:  gen cl;
-								    movlR:  gen ecx	  R: op output ];
+	at: #REG  add: #(eqi4 	 REG REG)	do: [:op :gen | gen cmpR:  op rhs output R: op lhs output;
+								    movneR: op output I: 0;
+								    moveqR: op output I: 1];
 	at: #REG  add: #(nei4 	 REG REG)	do: [:op :gen | gen error: 'nei4';	xorlR:  gen ecx	  R: gen ecx;
 								    cmplR:  op rhs output R: op lhs output;
 								    setneR: gen cl;
@@ -386,6 +406,11 @@ ARMGrammar := [
 	at: #REG  add: #(subi4 REG (cnsti4))		do: [:op :gen | gen sublI_:  op rhs arg R: op lhs output ];
 	at: #REG  add: #(addi4 REG (cnsti4))		do: [:op :gen | gen addlI_:  op rhs arg R: op lhs output ];
 	at: #REG  add: #(addi4 (cnsti4) REG)		do: [:op :gen | gen lealMd_: op lhs arg b: op rhs output R: op output ];
+""
+	at: #REG  add: #(indiri4 (addrgp4))	do: [:op :gen | gen lisR:  op output Iha_: op lhs arg _address;
+								    lwzR:  op output I: (SmallInteger lo16_: op lhs arg _address) R: op output ];
+
+	at: #REG  add: #(indiri4 (addrlp4))	do: [:op :gen | gen lwzR:  op output I: op lhs arg offset R: op lhs arg base ];
 "
 	yourself
 ]
@@ -428,5 +453,5 @@ DynamicARMCodeGenerator generate: tree
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
     { iflush((void *)v__entry, (void *)asm_pc); }.
-    { disassemble((void *)v__entry, (void *)asm_pc); }.
+    CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }].
 ]
