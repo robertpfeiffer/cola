@@ -63,6 +63,8 @@
 (define CokeScanner		(import "CokeScanner"))
 (define Expression		(import "Expression"))
 (define Compiler		(import "Compiler"))
+(define CompilerOptions		(import "CompilerOptions"))
+(define Options			(import "Options"))
 (define File			(import "File"))
 (define ReadStream		(import "ReadStream"))
 (define WriteStream		(import "WriteStream"))
@@ -113,7 +115,8 @@
     (let ((scanner [CokeScanner on: [fileOrString readStream]])
 	  (expr    0))
       (while (set expr [scanner next])
-	;;[StdOut print: expr][StdOut cr]
+	(if [Options verbose] (let () [StdOut print: expr][StdOut cr]))
+	(if [Options compile] (let () [expr compile]))
 	[expr eval]))))
 
 ;; read the contents of a file
