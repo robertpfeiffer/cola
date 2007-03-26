@@ -1,48 +1,5 @@
 (define getenv (dlsym "getenv"))
 
-;; (define _dlopen (dlsym "dlopen"))
-;; (define dlerror (dlsym "dlerror"))
-;; (define dlclose (dlsym "dlclose"))
-
-;; (define %dlopen-prefixes
-;;   (let ((table (malloc 64)))
-;;     (set (long@ table 0) "/usr/lib/")
-;;     (set (long@ table 1) "/usr/local/lib/")
-;;     (set (long@ table 2) "/usr/X11R6/lib/")
-;;     (set (long@ table 3) "/usr/lib/X11/")
-;;     (set (long@ table 4) "")
-;;     (set (long@ table 5) 0)
-;;     table))
-
-;; (define %dlopen-suffixes
-;;   (let ((table (malloc 64)))
-;;     (set (long@ table 0) ".so")
-;;     (set (long@ table 1) ".dylib")
-;;     (set (long@ table 2) "")
-;;     (set (long@ table 3) 0)
-;;     table))
-
-;; (define dlopen
-;;   (lambda (name)
-;;     (let ((path   (malloc 1024))
-;; 	  (prefix 0))
-;;       (while (long@ %dlopen-prefixes prefix)
-;; 	(let ((suffix 0))
-;; 	  (while (long@ %dlopen-suffixes suffix)
-;; 	    (sprintf path "%s%s%s" (long@ %dlopen-prefixes prefix) name (long@ %dlopen-suffixes suffix))
-;; 	    (let ((handle (_dlopen path (or _RTLD_NOW _RTLD_GLOBAL))))
-;; 	      (if handle
-;; 		  (let ()
-;; 		    (herald path)
-;; 		    (free path)
-;; 		    (return handle))))
-;; 	      (set suffix (+ 1 suffix))))
-;; 	(set prefix (+ 1 prefix)))
-;;       (free path))
-;;     (error (dlerror))))
-
-"----------------------------------------------------------------"
-
 (or (getenv "DISPLAY")
     (error "set your `DISPLAY' variable and try again"))
 
@@ -75,8 +32,12 @@
 (define XSync			(dlsym "XSync"))
 (define XMapWindow		(dlsym "XMapWindow"))
 (define XDestroyWindow		(dlsym "XDestroyWindow"))
+(define XClearArea		(dlsym "XClearArea"))
+(define XDrawLines		(dlsym "XDrawLines"))
+(define XFillPolygon		(dlsym "XFillPolygon"))
 (define XDrawString		(dlsym "XDrawString"))
 (define XLoadFont		(dlsym "XLoadFont"))
+(define XPending		(dlsym "XPending"))
 (define XNextEvent		(dlsym "XNextEvent"))
 (define XChangeGC		(dlsym "XChangeGC"))
 (define XSetWindowBackground	(dlsym "XSetWindowBackground"))
@@ -84,51 +45,67 @@
 
 (dlclose libX11)
 
-(define event-names
-  (let ((table (malloc 1024)))
-    (set (long@ table  0) "undefined")
-    (set (long@ table  1) "undefined")
-    (set (long@ table  2) "KeyPress")
-    (set (long@ table  3) "KeyRelease")
-    (set (long@ table  4) "ButtonPress")
-    (set (long@ table  5) "ButtonRelease")
-    (set (long@ table  6) "MotionNotify")
-    (set (long@ table  7) "EnterNotify")
-    (set (long@ table  8) "LeaveNotify")
-    (set (long@ table  9) "FocusIn")
-    (set (long@ table 10) "FocusOut")
-    (set (long@ table 11) "KeymapNotify")
-    (set (long@ table 12) "Expose")
-    (set (long@ table 13) "GraphicsExpose")
-    (set (long@ table 14) "NoExpose")
-    (set (long@ table 15) "VisibilityNotify")
-    (set (long@ table 16) "CreateNotify")
-    (set (long@ table 17) "DestroyNotify")
-    (set (long@ table 18) "UnmapNotify")
-    (set (long@ table 19) "MapNotify")
-    (set (long@ table 20) "MapRequest")
-    (set (long@ table 21) "ReparentNotify")
-    (set (long@ table 22) "ConfigureNotify")
-    (set (long@ table 23) "ConfigureRequest")
-    (set (long@ table 24) "GravityNotify")
-    (set (long@ table 25) "ResizeRequest")
-    (set (long@ table 26) "CirculateNotify")
-    (set (long@ table 27) "CirculateRequest")
-    (set (long@ table 28) "PropertyNotify")
-    (set (long@ table 29) "SelectionClear")
-    (set (long@ table 30) "SelectionRequest")
-    (set (long@ table 31) "SelectionNotify")
-    (set (long@ table 32) "ColormapNotify")
-    (set (long@ table 33) "ClientMessage")
-    (set (long@ table 34) "MappingNotify")
-    table))
+(syntax XPoint-new	(lambda (form compiler) `(malloc 4)))
+(syntax XPoint-x	(lambda (form compiler) `(short@ ,[form second] 0)))
+(syntax XPoint-y	(lambda (form compiler) `(short@ ,[form second] 1)))
+
+(define %gcv (malloc 92))
+
+(define XGC-setForeground	(lambda (dpy gc pixel) (set (int@ %gcv 2) pixel) (XChangeGC dpy gc  4 %gcv)))
+(define XGC-setBackground	(lambda (dpy gc pixel) (set (int@ %gcv 3) pixel) (XChangeGC dpy gc  8 %gcv)))
+(define XGC-setLineWidth	(lambda (dpy gc width) (set (int@ %gcv 4) width) (XChangeGC dpy gc 16 %gcv)))
+
+(load "trig.k")
+
+(define XPoint-setPolar
+  (lambda (p r a)
+    (let ((ca (cos a))
+	  (sa (sin a)))
+      (set (short@ p 0) (- (mul16 r ca) (mul16 r sa)))
+      (set (short@ p 1) (+ (mul16 r sa) (mul16 r ca))))
+    p))
+
+(define polygon
+  (let ((points (malloc 1024)))
+    (XPoint-setPolar (+ points  0) 150   0)
+    (XPoint-setPolar (+ points  4)  60  36)
+    (XPoint-setPolar (+ points  8) 150  72)
+    (XPoint-setPolar (+ points 12)  60 108)
+    (XPoint-setPolar (+ points 16) 150 144)
+    (XPoint-setPolar (+ points 20)  60 180)
+    (XPoint-setPolar (+ points 24) 150 216)
+    (XPoint-setPolar (+ points 28)  60 252)
+    (XPoint-setPolar (+ points 32) 150 288)
+    (XPoint-setPolar (+ points 36)  60 324)
+    (XPoint-setPolar (+ points 40) 150   0)
+    points))
+
+(translate polygon polygon 200 200 11)
+
+(define polygon2 (malloc 1024))
+
+(define angle 0)
+
+(define draw
+  (lambda (dpy win gc)
+    ;;(XDrawString dpy win gc 4 28 "unmap (iconify)" 15)
+    ;;(XDrawString dpy win gc 4 42 "  me to exit.  " 15)
+    (XClearArea dpy win 0 0 600 400 0)
+    (rotate polygon2 polygon angle 200 200 11)
+    (set angle (+ angle 1))
+    (XGC-setLineWidth dpy gc 8)
+    (XGC-setForeground dpy gc 0xff0000)
+    (XDrawLines dpy win gc polygon2 11 0)
+    (XGC-setForeground dpy gc 0xffff00)
+    (XFillPolygon dpy win gc polygon2 11 0 0)
+    (XSync dpy 0)))
 
 (define doit
   (lambda (dname)
     (let ((dpy  (XOpenDisplay dname))
 	  (root (XDefaultRootWindow dpy))
 	  (win  (XCreateSimpleWindow dpy root
-				     0 0 100 100
+				     0 0 600 400
 				     5
 				     0 ; 0 arg count
 				     ))
@@ -140,17 +117,13 @@
       (XMapWindow dpy win)
       (XSync dpy 0)
       (let ((evt (malloc 96)))
-	(while
-	  (begin
-	    (XNextEvent dpy evt)
-	    (let ((type (int@ evt)))
-	      (and (== 12 type)
-		   (begin
-		     (XDrawString dpy win gc 4 28 "unmap (iconify)" 15)
-		     (XDrawString dpy win gc 4 42 "  me to exit.  " 15)
-		     (XSync dpy 0)))
-	      (printf "%3d %s\n" type (long@ event-names type))
-	      (!= 18 type)))))
+	(while 1
+	  (if (XPending dpy)
+	      (begin
+		(XNextEvent dpy evt)
+		(let ((type (int@ evt)))
+		  (if (== 2 type) (return 0))))
+	      (draw dpy win gc))))
       (XDestroyWindow dpy win)
       (XFlush dpy))))
 
