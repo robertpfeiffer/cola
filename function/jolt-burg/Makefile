@@ -7,11 +7,12 @@ OBJEXT_SO       = .so
 
 ARCH		= $(shell $(IDC) -C arch)
 
-FILES		= ../objects/objects.a \
-		  Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
+LIBS		= ../objects/objects.a jolt.a
+
+FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o
 
-LDLIBS		= ../objects/objects.a -lreadline -ltermcap # -lopcodes -lbfd -liberty
+LDLIBS		= jolt.a -lreadline
 
 all : main$(OBJEXT)
 
@@ -29,11 +30,15 @@ test : main$(OBJEXT) .FORCE
 %$(OBJEXT) : %.st
 	$(IDC) $(IDFLAGS) $< -o $@
 
-main$(OBJEXT) : main.st $(FILES)
-	$(IDC) $(IDFLAGS) main.st $(FILES) $(LDLIBS) -o $@
+main$(OBJEXT) : main.st $(LIBS)
+	$(IDC) $(IDFLAGS) main.st $(LDLIBS) -o $@
+
+jolt.a : $(FILES) ../objects/objects.a
+	ar rc $@.new $(FILES) ../objects/*.o ../objects/mpint/*.o
+	mv $@.new $@
 
 ../objects/objects.a : .FORCE
-	$(SHELL) -ec 'cd ../objects;  $(MAKE)' 
+	$(SHELL) -ec 'cd ../objects;  $(MAKE)'
 
 CodeGenerator-local.st : .FORCE
 	-rm -f $@
@@ -43,7 +48,7 @@ tidy : .FORCE
 	-rm -f *.o *.d *~ .gdb* *.stackdump *.o.c main.c
 
 clean : tidy
-	-rm -f $(FILES) main$(OBJEXT) CodeGenerator-local.st
+	-rm -f $(FILES) jolt.a main$(OBJEXT) CodeGenerator-local.st
 	-rm -f bench-id bench-c
 
 distclean spotless : clean
