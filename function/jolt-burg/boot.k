@@ -22,6 +22,7 @@
 (define usleep			(dlsym "usleep"))
 
 (define _dlopen			(dlsym "dlopen"))
+(define dlclose			(dlsym "dlclose"))
 
 (define %%dlopen
   (lambda (dir lib ext)
@@ -47,11 +48,10 @@
       (or handle (set handle (%dlopen ""                lib)))
       (or handle (set handle (%dlopen "/usr/local/lib/" lib)))
       (or handle (set handle (%dlopen "/usr/X11R6/lib/" lib)))
-      (if handle
-	  handle
-	  (let ()
-	    (printf "%s: cannot load library\n" lib)
-	    (exit 1))))))
+      (or handle (let ()
+		   (printf "%s: cannot load library\n" lib)
+		   (exit 1)))
+      handle)))
 
 ;; import/export to/from the object namespace
 
@@ -60,11 +60,10 @@
 
 (define Object			(import "Object"))
 (define OS			(import "OS"))
+(define Options			(import "Options"))
 (define CokeScanner		(import "CokeScanner"))
 (define Expression		(import "Expression"))
 (define Compiler		(import "Compiler"))
-(define CompilerOptions		(import "CompilerOptions"))
-(define Options			(import "Options"))
 (define File			(import "File"))
 (define ReadStream		(import "ReadStream"))
 (define WriteStream		(import "WriteStream"))
@@ -116,8 +115,8 @@
 	  (expr    0))
       (while (set expr [scanner next])
 	(if [Options verbose] (let () [StdOut print: expr][StdOut cr]))
-	(if [Options compile] (let () [expr compile]))
-	[expr eval]))))
+	(set expr [expr eval])
+	(if [Options verbose] (let () [StdOut nextPutAll: '"  => "][StdOut print: expr][StdOut cr]))))))
 
 ;; read the contents of a file
 
@@ -140,7 +139,8 @@
 
 (define load
   (lambda (path)
-    (let ((file [File open: [String value_: path]]))
+    (let ((file [File openIfPresent: [String value_: path]]))
+      (or file (set file [File openIfPresent: [[[Options libdir] , '"/"] , [String value_: path]]]))
       (if file
 	  (let ()
 	    (herald path)
