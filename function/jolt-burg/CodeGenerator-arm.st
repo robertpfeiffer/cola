@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-24 22:43:33 by piumarta on ubuntu
+  Last edited: 2007-03-24 23:02:48 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -59,6 +59,7 @@ Instruction clobberARM: gen	[]
 
 Call	clobberARM: gen [ gen clobberCall: self; requireFrame ]
 DIVI4	clobberARM: gen [ gen clobberCall: self; requireFrame ]
+MODI4	clobberARM: gen [ gen clobberCall: self; requireFrame ]
 
 ARMCodeGenerator clobberCall: insn	[ ccrs do: [:ccr | self clobberRegister: ccr] ]
 ARMCodeGenerator clobberR0: insn	[ self clobberRegister: r0 ]
@@ -401,7 +402,7 @@ ARMGrammar := [
 								    movR:   gen r1 	   R: op rhs output;
 								    movR:   gen ip      I32_: gen __aeabi_idivmod;
 								    blxR:   gen ip;
-								    movR:   op output 	   R: gen r0];
+								    movR:   op output 	   R: gen r1];
 	at: #REG  add: #(shli4 	 REG REG)	do: [:op :gen | gen movR:   op output 	   R: op lhs output lslR: op rhs output];
 	at: #REG  add: #(shri4 	 REG REG)	do: [:op :gen | gen movR:   op output 	   R: op lhs output asrR: op rhs output];
 	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen cmpR:   op lhs output  R: op rhs output;  movgeR: op output I: 0;  movltR: op output I: 1];
