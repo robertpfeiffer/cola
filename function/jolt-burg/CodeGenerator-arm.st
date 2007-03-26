@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-24 23:02:48 by piumarta on ubuntu
+  Last edited: 2007-03-24 23:13:52 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -453,7 +453,9 @@ StaticARMCodeGenerator generate: tree
     tree generate: self.
 ]
 
+"
 { include "dis-arm.c" }
+"
 
 DynamicARMCodeGenerator generate: tree
 [
@@ -470,5 +472,7 @@ DynamicARMCodeGenerator generate: tree
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
     { iflush((void *)v__entry, (void *)asm_pc); }.
+"
     CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }].
+"
 ]
