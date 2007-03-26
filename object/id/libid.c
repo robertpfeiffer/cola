@@ -28,6 +28,11 @@
 #define USE_GC		1
 #define DEBUG_ALL	0
 
+#if EMULATION
+# undef	 USE_GC
+# define USE_GC		0
+#endif
+
 #if DEBUG_ALL
 # define dprintf(fmt, args...)  fprintf(stdout, fmt, ##args)
 #else

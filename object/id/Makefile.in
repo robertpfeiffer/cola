@@ -1,5 +1,5 @@
-CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\"
-PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\"
+CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
+PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
 PREFIX = @PREFIX@
 
 all : $(BIN)libid.o $(BIN)libid_p.o
