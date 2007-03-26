@@ -1,6 +1,6 @@
 /* Dynamic assembler for ARM
  *
- * Last edited: 2007-03-23 20:44:19 by piumarta on ubuntu
+ * Last edited: 2007-03-24 22:07:52 by piumarta on ubuntu
  */
 
 #ifndef __ccg_asm_arm_h
@@ -107,11 +107,11 @@ typedef unsigned int insn;
 #define LDMwl(CC, PU, RN, RL, S)			 _mm(CC, PU, S, 1, 1, RN, RL)
 #define LDMwi(CC, PU, RN, MT, RL)			 _mm(CC, PU, 0, 1, 1, RN, RL)
 
-#define LDRhrm(CC, B, T, S, H, RD, RN, W)		 _mhs(CC, 1, 1, 1, W, 1, RN, RD,		   0, S, H,	      0)
-#define LDRhrmf(CC, B, T, S, H, RD, RN, W, U, OFF)	 _mhs(CC, 0, U, 1, W, 1, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
-#define LDRhrmo(CC, B, T, S, H, RD, RN, W, U, RM)	 _mhs(CC, 0, U, 0, W, 1, RN, RD,		   0, S, H,	     RM)
-#define LDRhrmpf(CC, B, T, S, H, RD, RN, U, OFF, W)	 _mhs(CC, 1, U, 1, W, 1, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
-#define LDRhrmpo(CC, B, T, S, H, RD, RN, U, RM, W)	 _mhs(CC, 1, U, 0, W, 1, RN, RD,		   0, S, H,	     RM)
+#define LDRHrm(CC, B, T, S, H, RD, RN, W)		 _mhs(CC, 1, 1, 1, W, 1, RN, RD,		   0, S, H,	      0)
+#define LDRHrmf(CC, B, T, S, H, RD, RN, W, U, OFF)	 _mhs(CC, 0, U, 1, W, 1, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
+#define LDRHrmo(CC, B, T, S, H, RD, RN, W, U, RM)	 _mhs(CC, 0, U, 0, W, 1, RN, RD,		   0, S, H,	     RM)
+#define LDRHrmpf(CC, B, T, S, H, RD, RN, U, OFF, W)	 _mhs(CC, 1, U, 1, W, 1, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
+#define LDRHrmpo(CC, B, T, S, H, RD, RN, U, RM, W)	 _mhs(CC, 1, U, 0, W, 1, RN, RD,		   0, S, H,	     RM)
 
 #define LDRrm(CC, B, T, RD, RN, W)			 _mwubl(CC, 0, 1, 1, B, W, 1, RN, RD,          0)
 #define LDRrmf(CC, B, T, RD, RN, W, U, OFF)		 _mwubl(CC, 0, 0, U, B, T, 1, RN, RD,        OFF)
@@ -162,11 +162,11 @@ typedef unsigned int insn;
 #define STMwl(CC, PU, RN, RL, S)			 _mm(CC, PU, S, 1, 0, RN, RL)
 #define STMwi(CC, PU, RN, MT, RL)			 _mm(CC, PU, 0, 1, 0, RN, RL)
 
-#define STRhrm(CC, B, T, S, H, RD, RN, W)		 _mhs(CC, 1, 1, 1, W, 0, RN, RD,                   0, S, H,           0)
-#define STRhrmf(CC, B, T, S, H, RD, RN, W, U, OFF)	 _mhs(CC, 0, U, 1, W, 0, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
-#define STRhrmo(CC, B, T, S, H, RD, RN, W, U, RM)	 _mhs(CC, 0, U, 0, W, 0, RN, RD,                   0, S, H,          RM)
-#define STRhrmpf(CC, B, T, S, H, RD, RN, U, OFF, W)	 _mhs(CC, 1, U, 1, W, 0, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
-#define STRhrmpo(CC, B, T, S, H, RD, RN, U, RM, W)	 _mhs(CC, 1, U, 0, W, 0, RN, RD,                   0, S, H,          RM)
+#define STRHrm(CC, B, T, S, H, RD, RN, W)		 _mhs(CC, 1, 1, 1, W, 0, RN, RD,                   0, S, H,           0)
+#define STRHrmf(CC, B, T, S, H, RD, RN, W, U, OFF)	 _mhs(CC, 0, U, 1, W, 0, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
+#define STRHrmo(CC, B, T, S, H, RD, RN, W, U, RM)	 _mhs(CC, 0, U, 0, W, 0, RN, RD,                   0, S, H,          RM)
+#define STRHrmpf(CC, B, T, S, H, RD, RN, U, OFF, W)	 _mhs(CC, 1, U, 1, W, 0, RN, RD, ((OFF) >> 4) & 0xff, S, H, (OFF) & 0xf)
+#define STRHrmpo(CC, B, T, S, H, RD, RN, U, RM, W)	 _mhs(CC, 1, U, 0, W, 0, RN, RD,                   0, S, H,          RM)
 
 #define STRrm(CC, B, T, RD, RN, W)			 _mwubl(CC, 0, 1, 1, B, W, 0, RN, RD,          0)
 #define STRrmf(CC, B, T, RD, RN, W, U, OFF)		 _mwubl(CC, 0, 0, U, B, T, 0, RN, RD,        OFF)
