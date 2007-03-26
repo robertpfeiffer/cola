@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 17:32:53 by piumarta on emilia.local
+  Last edited: 2007-03-26 10:46:47 by piumarta on emilia
 "
 
 { import: Objects }
@@ -131,6 +131,7 @@ Symbol _dlsym_: _string	{ return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
     { v__value= (oop)RTLD_DEFAULT; }.  TheGlobalEnvironment defineVariable: #_RTLD_DEFAULT value_: _value.
     { v__value= (oop)RTLD_LAZY;    }.  TheGlobalEnvironment defineVariable: #_RTLD_LAZY    value_: _value.
     { v__value= (oop)RTLD_NOW;     }.  TheGlobalEnvironment defineVariable: #_RTLD_NOW     value_: _value.
+    { v__value= (oop)RTLD_GLOBAL;  }.  TheGlobalEnvironment defineVariable: #_RTLD_GLOBAL  value_: _value.
     TheGlobalEnvironment defineVariable: #_dlsym value_: #dlsym _dlsym.
 ]
 
@@ -239,7 +240,7 @@ Compiler translateInteger: anInteger
 
 Compiler translateString: aString
 [
-    ^CNSTP4 new arg: aString _bytes
+    ^CNSTP4 new arg: aString _strdup
 ]
 
 Compiler translateSymbol: aSymbol
