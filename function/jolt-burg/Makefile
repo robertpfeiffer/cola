@@ -11,7 +11,7 @@ FILES		= ../objects/objects.a \
 		  Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o
 
-LDLIBS		= ../objects/objects.a -lreadline
+LDLIBS		= ../objects/objects.a -lreadline -ltermcap # -lopcodes -lbfd -liberty
 
 all : main$(OBJEXT)
 
