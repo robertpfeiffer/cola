@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:48:17 by piumarta on emilia
+  Last edited: 2007-03-26 10:41:23 by piumarta on emilia
 "
 
 { import: Object }
@@ -25,11 +25,13 @@
 { import: CodeGenerator }
 { import: CodeGenerator-local }
 
-Options : Object ( verbose compile list )
+Options : Object ( verbose compile list libdir )
 
-Options verbose	[ ^verbose ]
-Options compile	[ ^compile ]
-Options list	[ ^list ]
+Options verbose		[ ^verbose ]
+Options compile		[ ^compile ]
+Options list		[ ^list ]
+Options libdir: aString	[  libdir := aString ]
+Options libdir		[ ^libdir ]
 
 Options new
 [
@@ -39,9 +41,10 @@ Options new
 
 Options parseOption: aString
 [
-    aString = '-v'	ifTrue: [^verbose := true].
-    aString = '-c'	ifTrue: [^compile := true].
-    aString = '-S'	ifTrue: [^list := true].
+    aString = '-v'		ifTrue: [^verbose := true].
+    aString = '-c'		ifTrue: [^compile := true].
+    aString = '-S'		ifTrue: [^list	  := true].
+    (aString beginsWith: '-L')	ifTrue: [^libdir  := aString copyFrom: 2].
     ^false
 ]
 
@@ -57,10 +60,13 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
     | echo args file scanner expr interactive |
     interactive := false.
     (args := OS arguments) isEmpty ifTrue: [args := Array with: '-'].
+    Options libdir: (OS argumentAt: 0) dirname.
     args do: [:path |
 	((Options parseOption: path) or: [CompilerOptions parseOption: path])
 	    ifFalse:
-	       [file := (path = '-') ifTrue: [StdIn] ifFalse: [File open: path].
+	       [(path = '-')
+		    ifTrue:  [file := StdIn]
+		    ifFalse: [(file := File openIfPresent: path) ifFalse: [file := (File open: Options libdir, '/', path)]].
 		file isNil ifTrue: [path error: path, ': No such file or directory'].
 		file isInteractive ifTrue: [interactive := true].
 		OSArgumentFiles addLast: file]].
