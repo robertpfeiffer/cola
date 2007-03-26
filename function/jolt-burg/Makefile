@@ -12,7 +12,7 @@ LIBS		= ../objects/objects.a jolt.a
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o
 
-LDLIBS		= jolt.a -lreadline
+LDLIBS		= jolt.a -lreadline -ltermcap
 
 all : main$(OBJEXT)
 
