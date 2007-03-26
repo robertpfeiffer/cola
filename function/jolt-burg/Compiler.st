@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-26 10:46:47 by piumarta on emilia
+  Last edited: 2007-03-26 12:39:15 by piumarta on emilia
 "
 
 { import: Objects }
@@ -514,10 +514,17 @@ Compiler xSetShort: expr
 
 Compiler xSetInt: expr
 [
-    expr size == 3 ifFalse: [self errorArgumentCount: expr].
-    ^ASGNI4 new
-	lhs: (expr third  translate: self);
-	rhs: (expr second translate: self)
+    expr size == 3 ifTrue: [^ASGNI4 new
+				lhs: (expr third  translate: self);
+				rhs: (expr second translate: self)].
+    expr size == 4 ifTrue: [^ASGNI4 new
+				lhs: (expr fourth translate: self);
+				rhs: (ADDI4 new
+					  lhs: (expr second translate: self);
+					  rhs: (MULI4 new
+						    lhs: (CNSTI4 new arg: 4 _integerValue);
+						    rhs: (expr third translate: self)))].
+    self errorArgumentCount: expr.
 ]
 
 Compiler xSetLong: expr
@@ -580,7 +587,7 @@ Compiler defineVariable: name from: form
 Compiler defineAccessor: accessor from: expr	"(define (foo bar...) baz) -> (set-foo bar... baz)"
 [
     | setter syntax |
-    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]]) ifFalse: [self syntaxError: accessor].
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]]) ifFalse: [self errorSyntax: accessor].
     setter := WriteStream on: (Expression new: 8).
     setter nextPut: ('define-' , accessor first asString) asSymbol.
     accessor from: 1 do: [:elt | setter nextPut: elt].
@@ -606,8 +613,11 @@ Compiler setVariable: name from: expr
 
 Compiler setAccessor: accessor from: expr	"(set (foo bar...) baz) -> (set-foo bar... baz)"
 [
-    | setter syntax |
-    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]]) ifFalse: [self syntaxError: accessor].
+    | head op setter syntax |
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]])	ifFalse: [self errorSyntax: accessor].
+    head := accessor first.
+    (op := environment lookupSyntax: head) ifTrue:  [accessor := self applySyntax: op with: accessor].
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]])	ifFalse: [self errorSyntax: expr].
     setter := WriteStream on: (Expression new: 8).
     setter nextPut: ('set-' , accessor first asString) asSymbol.
     accessor from: 1 do: [:elt | setter nextPut: elt].
