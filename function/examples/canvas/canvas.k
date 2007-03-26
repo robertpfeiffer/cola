@@ -122,7 +122,9 @@
 	      (begin
 		(XNextEvent dpy evt)
 		(let ((type (int@ evt)))
-		  (if (== 2 type) (return 0))))
+		  (if (== 2 type) (return 0))
+		  (if (== 4 type) (return 0))
+		  0))
 	      (draw dpy win gc))))
       (XDestroyWindow dpy win)
       (XFlush dpy))))
