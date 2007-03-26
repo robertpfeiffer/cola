@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-24 23:13:52 by piumarta on ubuntu
+  Last edited: 2007-03-24 23:21:10 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -101,7 +101,7 @@ ARMCodeGenerator finaliseFrame
 	    registerList := registerList bitOr: 1 << reg encoding]].
     needsFrame
 	ifTrue:
-	   [frameSize := frameSize + 8.					"saved LR, SP"
+	   [frameSize := frameSize + 4.					"saved LR[,SP]"
 	    align := (frameSize + 15 bitAnd: -16) - frameSize.
 	    tempsSize := tempsSize + align.
 	    frameSize := frameSize + align].
@@ -116,7 +116,7 @@ ARMCodeGenerator emitPrologue
 [
     | mask |
     mask := registerList bitOr: 15.					"incoming args"
-    needsFrame ifTrue: [mask := mask bitOr: 0x6000].			"lr+sp"
+    needsFrame ifTrue: [mask := mask bitOr: 0x4000].			"lr[+sp]"
     mask == 0 ifFalse: [self stmfdW: sp L: mask].
     tempsSize > 0 ifTrue: [self subR: sp R: sp r: 0 I: tempsSize].
 ]
@@ -125,7 +125,7 @@ ARMCodeGenerator emitEpilogue
 [
     | mask |
     mask := registerList.
-    needsFrame ifTrue: [mask := mask bitOr: 0xa000].			"pc+sp"
+    needsFrame ifTrue: [mask := mask bitOr: 0x8000].			"pc[+sp]"
     self addR: sp R: sp r: 30 I: tempsSize + 16 >> 2.			"temps + incoming args"
     mask == 0
 	ifTrue:  [self movR: pc R: lr]
@@ -454,7 +454,7 @@ StaticARMCodeGenerator generate: tree
 ]
 
 "
-{ include "dis-arm.c" }
+{ include ""dis-arm.c"" }
 "
 
 DynamicARMCodeGenerator generate: tree
