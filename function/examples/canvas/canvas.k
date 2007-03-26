@@ -43,6 +43,11 @@
 (define XSetWindowBackground	(_dlsym libX11 "XSetWindowBackground"))
 (define XChangeWindowAttributes	(_dlsym libX11 "XChangeWindowAttributes"))
 
+(define libXext (dlopen "libXext"))
+
+(define XdbeAllocateBackBufferName	(_dlsym libXext "XdbeAllocateBackBufferName"))
+(define XdbeSwapBuffers			(_dlsym libXext "XdbeSwapBuffers"))
+
 (syntax XPoint-new	(lambda (form compiler) `(malloc 4)))
 (syntax XPoint-x	(lambda (form compiler) `(short@ ,[form second] 0)))
 (syntax XPoint-y	(lambda (form compiler) `(short@ ,[form second] 1)))
@@ -86,14 +91,12 @@
 
 (define draw
   (lambda (dpy win gc)
-    ;;(XDrawString dpy win gc 4 28 "unmap (iconify)" 15)
-    ;;(XDrawString dpy win gc 4 42 "  me to exit.  " 15)
-    (XClearArea dpy win 0 0 600 400 0)
+    ;;(XClearArea dpy win 0 0 600 400 0)
     (rotate polygon2 polygon angle 200 200 11)
     (set angle (+ angle 1))
-    (XGC-setLineWidth dpy gc 8)
-    (XGC-setForeground dpy gc 0xff0000)
-    (XDrawLines dpy win gc polygon2 11 0)
+    ;(XGC-setLineWidth dpy gc 8)
+    ;(XGC-setForeground dpy gc 0xff0000)
+    ;(XDrawLines dpy win gc polygon2 11 0)
     (XGC-setForeground dpy gc 0xffff00)
     (XFillPolygon dpy win gc polygon2 11 0 0)
     (XSync dpy 0)))
@@ -107,6 +110,7 @@
 				     5
 				     0 ; 0 arg count
 				     ))
+	  (buf  (XdbeAllocateBackBufferName dpy win 1))
 	  (gc   (XDefaultGC dpy))
 	  (xwa  (malloc 60)))
       (set (int@ (+ xwa 40)) 0x1ffffff)	; event mask
@@ -114,7 +118,10 @@
       (XSetWindowBackground dpy win -1)
       (XMapWindow dpy win)
       (XSync dpy 0)
-      (let ((evt (malloc 96)))
+      (let ((evt  (malloc 96))
+	    (info (malloc 8)))
+	(set (int@ info 0) win)
+	(set (int@ info 1) 1)	; XdbeBackground
 	(while 1
 	  (if (XPending dpy)
 	      (begin
@@ -123,11 +130,15 @@
 		  (if (== 2 type) (return 0))
 		  (if (== 4 type) (return 0))
 		  0))
-	      (draw dpy win gc))))
+	      (begin
+		(draw dpy buf gc)
+		(XdbeSwapBuffers dpy info 1)))))
+      (XDestroyWindow dpy buf)
       (XDestroyWindow dpy win)
       (XFlush dpy))))
 
 (doit 0)	; 0 => value of DISPLAY variable
 
 
+(dlclose libXext)
 (dlclose libX11)
