@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:24:42 by piumarta on emilia
+  Last edited: 2007-03-26 10:45:06 by piumarta on emilia
 "
 
 { import: Objects }
@@ -49,6 +49,11 @@ String _stringValue
     return (oop)self->v__bytes;
 }
 
+String _strdup
+{
+    return (oop)strdup((char *)self->v__bytes);
+}
+
 String beginsWith: aString
 [
     self size < aString size ifTrue: [^false].
@@ -73,3 +78,17 @@ String putln
 {
     puts((char *)self->v__bytes);
 }
+
+String dirname
+[
+    (self includes: $/) ifFalse: [^'.'].
+    self := self copy.
+    [size > 0 and: [self last ~~ $/]]
+	whileTrue:
+	   [self at: size - 1 put: 0.
+	    size := size - 1].
+    (size > 0 and: [self last == $/])
+	ifTrue:
+	   [self at: size - 1 put: 0.
+	    size := size - 1].
+]
