@@ -2,17 +2,23 @@
 ;;; 
 ;;; Handy definitions for all coke programs.
 
-(define printf			(_dlsym _RTLD_DEFAULT "printf"))
-(define exit			(_dlsym _RTLD_DEFAULT "exit"))
+(define __dlsym _dlsym)
+
+(define printf			(__dlsym _RTLD_DEFAULT "printf"))
+(define exit			(__dlsym _RTLD_DEFAULT "exit"))
+
+(define _dlsym
+  (lambda (lib name)
+    (let ((addr (__dlsym lib name)))
+      (or addr
+	  (let ()
+	    (printf "%s: symbol lookup failed\n" name)
+	    (exit 1)))
+      addr)))
 
 (define dlsym
   (lambda (name)
-    (let ((addr (_dlsym _RTLD_DEFAULT name)))
-      (if addr
-	  addr
-	  (let ()
-	    (printf "%s: symbol lookup failed\n" name)
-	    (exit 1))))))
+    (_dlsym _RTLD_DEFAULT name)))
 
 (define sprintf			(dlsym "sprintf"))
 (define malloc			(dlsym "malloc"))
@@ -28,7 +34,7 @@
   (lambda (dir lib ext)
     (let ((buf (malloc 1024)))
       (sprintf buf "%s%s%s" dir lib ext)
-      (let ((handle (_dlopen buf _RTLD_NOW)))
+      (let ((handle (_dlopen buf (or _RTLD_NOW _RTLD_GLOBAL))))
 	(free buf)
 	handle))))
 

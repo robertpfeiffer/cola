@@ -5,45 +5,43 @@
 
 (define libX11 (dlopen "libX11"))
 
-(define XOpenDisplay		(dlsym "XOpenDisplay"))
-(define XCreateSimpleWindow	(dlsym "XCreateSimpleWindow"))
-(define XDefaultRootWindow	(dlsym "XDefaultRootWindow"))
-(define XDefaultScreen		(dlsym "XDefaultScreen"))
+(define XOpenDisplay		(_dlsym libX11 "XOpenDisplay"))
+(define XCreateSimpleWindow	(_dlsym libX11 "XCreateSimpleWindow"))
+(define XDefaultRootWindow	(_dlsym libX11 "XDefaultRootWindow"))
+(define XDefaultScreen		(_dlsym libX11 "XDefaultScreen"))
 
-(define %x-default-depth	(dlsym "XDefaultDepth"))
+(define %x-default-depth	(_dlsym libX11 "XDefaultDepth"))
 
 (define XDefaultDepth
   (lambda (dpy)
     (%x-default-depth dpy (XDefaultScreen dpy))))
 
-(define %x-default-visual	(dlsym "XDefaultVisual"))
+(define %x-default-visual	(_dlsym libX11 "XDefaultVisual"))
 
 (define XDefaultVisual
   (lambda (dpy)
     (%x-default-visual dpy (XDefaultScreen dpy))))
 
-(define %x-default-gc		(dlsym "XDefaultGC"))
+(define %x-default-gc		(_dlsym libX11 "XDefaultGC"))
 
 (define XDefaultGC
   (lambda (dpy)
     (%x-default-gc dpy (XDefaultScreen dpy))))
 
-(define XFlush			(dlsym "XFlush"))
-(define XSync			(dlsym "XSync"))
-(define XMapWindow		(dlsym "XMapWindow"))
-(define XDestroyWindow		(dlsym "XDestroyWindow"))
-(define XClearArea		(dlsym "XClearArea"))
-(define XDrawLines		(dlsym "XDrawLines"))
-(define XFillPolygon		(dlsym "XFillPolygon"))
-(define XDrawString		(dlsym "XDrawString"))
-(define XLoadFont		(dlsym "XLoadFont"))
-(define XPending		(dlsym "XPending"))
-(define XNextEvent		(dlsym "XNextEvent"))
-(define XChangeGC		(dlsym "XChangeGC"))
-(define XSetWindowBackground	(dlsym "XSetWindowBackground"))
-(define XChangeWindowAttributes	(dlsym "XChangeWindowAttributes"))
-
-(dlclose libX11)
+(define XFlush			(_dlsym libX11 "XFlush"))
+(define XSync			(_dlsym libX11 "XSync"))
+(define XMapWindow		(_dlsym libX11 "XMapWindow"))
+(define XDestroyWindow		(_dlsym libX11 "XDestroyWindow"))
+(define XClearArea		(_dlsym libX11 "XClearArea"))
+(define XDrawLines		(_dlsym libX11 "XDrawLines"))
+(define XFillPolygon		(_dlsym libX11 "XFillPolygon"))
+(define XDrawString		(_dlsym libX11 "XDrawString"))
+(define XLoadFont		(_dlsym libX11 "XLoadFont"))
+(define XPending		(_dlsym libX11 "XPending"))
+(define XNextEvent		(_dlsym libX11 "XNextEvent"))
+(define XChangeGC		(_dlsym libX11 "XChangeGC"))
+(define XSetWindowBackground	(_dlsym libX11 "XSetWindowBackground"))
+(define XChangeWindowAttributes	(_dlsym libX11 "XChangeWindowAttributes"))
 
 (syntax XPoint-new	(lambda (form compiler) `(malloc 4)))
 (syntax XPoint-x	(lambda (form compiler) `(short@ ,[form second] 0)))
@@ -130,3 +128,6 @@
       (XFlush dpy))))
 
 (doit 0)	; 0 => value of DISPLAY variable
+
+
+(dlclose libX11)
