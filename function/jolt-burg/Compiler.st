@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-26 12:39:15 by piumarta on emilia
+  Last edited: 2007-03-26 18:53:51 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -472,8 +472,15 @@ Compiler xShort: expr
 
 Compiler xInt: expr
 [
-    expr size == 2 ifFalse: [self errorArgumentCount: expr].
-    ^INDIRI4 new lhs: (expr second translate: self)
+    expr size == 2 ifTrue: [^INDIRI4 new
+				lhs: (expr second translate: self)].
+    expr size == 3 ifTrue: [^INDIRI4 new
+				lhs: (ADDI4 new
+					  lhs: (expr second translate: self);
+					  rhs: (MULI4 new
+						    lhs: (CNSTI4 new arg: 4 _integerValue);
+						    rhs: (expr third translate: self)))].
+    self errorArgumentCount: expr.
 ]
 
 Compiler xLong: expr
