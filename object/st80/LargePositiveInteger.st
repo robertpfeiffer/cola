@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-21 16:00:08 by piumarta on emilia.local
+  Last edited: 2007-03-27 14:59:46 by piumarta on emilia.local
 "
 
 { import: Integer }
@@ -70,6 +70,11 @@ LargePositiveInteger _integerValue
 		+	(((unsigned char *)v__bytes)[3] << 24) );
 
     }.
+]
+
+LargePositiveInteger at: index put: aByte
+[
+    ^bytes at: index put: aByte
 ]
 
 LargePositiveInteger digitLength

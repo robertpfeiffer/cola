@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-10-09 19:46:10 by piumarta on emilia.local
+  Last edited: 2007-03-27 15:04:27 by piumarta on emilia.local
 "
 
 { import: Integer }
@@ -161,6 +161,16 @@ SmallInteger bitAnd: anInteger
         return (oop)(((int)v_self & (int)v_anInteger) | 1); }.
     self >= 0 ifTrue: [^anInteger bitAnd: self].
     ^(self bitInvert bitOr: anInteger bitInvert) bitInvert
+]
+
+SmallInteger bitOr: anInteger
+[
+    { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))
+        return (oop)(((int)v_self | (int)v_anInteger) | 1); }.
+    self >= 0 ifTrue: [^anInteger bitOr: self].
+    ^anInteger < 0
+	ifTrue:  [(self bitInvert bitAnd: anInteger bitInvert) bitInvert]
+	ifFalse: [(self bitInvert bitClear: anInteger) bitInvert]
 ]
 
 SmallInteger bitShift: displacement

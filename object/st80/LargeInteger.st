@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-21 15:59:42 by piumarta on emilia.local
+  Last edited: 2007-03-27 15:06:34 by piumarta on emilia.local
 "
 
 { import: Integer }
@@ -35,6 +35,11 @@ Integer lastDigit
 Integer growTo: n
 [
     ^self copyTo: (self new: n)
+]
+
+Integer growBy: n
+[
+    ^self growTo: self digitLength + n
 ]
 
 Integer copyTo: x
@@ -65,7 +70,7 @@ Integer digitAdd: arg
 	sum digitAt: i put: (accum bitAnd: 255)].
     accum > 255
 	ifTrue: 
-	   [sum := sum growby: 1.
+	   [sum := sum growBy: 1.
 	    sum at: sum digitLength put: (accum bitShift: -8)].
     ^sum
 ]
@@ -270,6 +275,23 @@ Integer bitAnd: n
 	op: #bitAnd:
 	length: (self digitLength max: norm digitLength)
 ]
+
+Integer bitOr: n 
+[
+    | norm |
+    norm := n normalize.
+    ^self
+	digitLogic: norm
+	op: #bitOr:
+	length: (self digitLength max: norm digitLength)
+]
+
+Integer bitClear: n
+[
+    ^(self bitOr: n) - n
+]
+
+Integer bitInvert	[ ^-1 - self ]
 
 Integer digitLogic: arg op: op length: len
 [
