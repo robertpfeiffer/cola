@@ -68,22 +68,28 @@
       (set (short@ p 1) (+ (mul16 r sa) (mul16 r ca))))
     p))
 
+(define outer 300)	;(define outer 200)
+(define inner 120)	;(define inner  80)
+
 (define polygon
   (let ((points (malloc 1024)))
-    (XPoint-setPolar (+ points  0) 150   0)
-    (XPoint-setPolar (+ points  4)  60  36)
-    (XPoint-setPolar (+ points  8) 150  72)
-    (XPoint-setPolar (+ points 12)  60 108)
-    (XPoint-setPolar (+ points 16) 150 144)
-    (XPoint-setPolar (+ points 20)  60 180)
-    (XPoint-setPolar (+ points 24) 150 216)
-    (XPoint-setPolar (+ points 28)  60 252)
-    (XPoint-setPolar (+ points 32) 150 288)
-    (XPoint-setPolar (+ points 36)  60 324)
-    (XPoint-setPolar (+ points 40) 150   0)
+    (XPoint-setPolar (+ points  0) outer   0)
+    (XPoint-setPolar (+ points  4) inner  36)
+    (XPoint-setPolar (+ points  8) outer  72)
+    (XPoint-setPolar (+ points 12) inner 108)
+    (XPoint-setPolar (+ points 16) outer 144)
+    (XPoint-setPolar (+ points 20) inner 180)
+    (XPoint-setPolar (+ points 24) outer 216)
+    (XPoint-setPolar (+ points 28) inner 252)
+    (XPoint-setPolar (+ points 32) outer 288)
+    (XPoint-setPolar (+ points 36) inner 324)
+    (XPoint-setPolar (+ points 40) outer   0)
     points))
 
-(translate polygon polygon 200 200 11)
+(define pos-x 200)
+(define pos-y 200)
+
+(translate polygon polygon pos-x pos-y 11)
 
 (define polygon2 (malloc 1024))
 
@@ -92,14 +98,40 @@
 (define draw
   (lambda (dpy win gc)
     ;;(XClearArea dpy win 0 0 600 400 0)
-    (rotate polygon2 polygon angle 200 200 11)
+    (rotate polygon2 polygon angle pos-x pos-y 11)
     (set angle (+ angle 1))
-    ;(XGC-setLineWidth dpy gc 8)
+    ;(XGC-setLineWidth dpy gc 4)
     ;(XGC-setForeground dpy gc 0xff0000)
     ;(XDrawLines dpy win gc polygon2 11 0)
     (XGC-setForeground dpy gc 0xffff00)
     (XFillPolygon dpy win gc polygon2 11 0 0)
     (XSync dpy 0)))
+
+(define mouse-x 0)
+(define mouse-y 0)
+(define tracking 0)
+
+(define mouse-down
+  (lambda (x y)
+    (set mouse-x x)
+    (set mouse-y y)
+    (set tracking 1)))
+
+(define mouse-up
+  (lambda (x y)
+    (set tracking 0)))
+
+(define mouse-move
+  (lambda (x y)
+    (if tracking
+	(begin
+	  (let ((dx (- x mouse-x))
+		(dy (- y mouse-y)))
+	    (set mouse-x x)
+	    (set mouse-y y)
+	    (translate polygon polygon dx dy 11)
+	    (set pos-x (+ pos-x dx))
+	    (set pos-y (+ pos-y dy)))))))
 
 (define doit
   (lambda (dname)
@@ -113,7 +145,32 @@
 	  (buf  (XdbeAllocateBackBufferName dpy win 1))
 	  (gc   (XDefaultGC dpy))
 	  (xwa  (malloc 60)))
-      (set (int@ (+ xwa 40)) 0x1ffffff)	; event mask
+      (set (int@ (+ xwa 40))	;; event mask
+	   (| (<< 1  0)		;; KeyPressMask
+	      (<< 1  1) 	;; KeyReleaseMask
+	      (<< 1  2) 	;; ButtonPressMask
+	      (<< 1  3) 	;; ButtonReleaseMask
+	      (<< 0  4) 	;; EnterWindowMask
+	      (<< 0  5) 	;; LeaveWindowMask
+	      (<< 1  6) 	;; PointerMotionMask
+	      (<< 0  7) 	;; PointerMotionHintMask
+	      (<< 0  8) 	;; Button1MotionMask
+	      (<< 0  9) 	;; Button2MotionMask
+	      (<< 0 10)		;; Button3MotionMask
+	      (<< 0 11)		;; Button4MotionMask
+	      (<< 0 12)		;; Button5MotionMask
+	      (<< 0 13)		;; ButtonMotionMask
+	      (<< 0 14)		;; KeymapStateMask
+	      (<< 1 15)		;; ExposureMask
+	      (<< 1 16)		;; VisibilityChangeMask
+	      (<< 0 17)		;; StructureNotifyMask
+	      (<< 0 18)		;; ResizeRedirectMask
+	      (<< 0 19)		;; SubstructureNotifyMask
+	      (<< 0 20)		;; SubstructureRedirectMask
+	      (<< 0 21)		;; FocusChangeMask
+	      (<< 0 22)		;; PropertyChangeMask
+	      (<< 0 23)		;; ColormapChangeMask
+	      (<< 0 24)))	;; OwnerGrabButtonMask
       (XChangeWindowAttributes dpy win 2048 xwa)
       (XSetWindowBackground dpy win -1)
       (XMapWindow dpy win)
@@ -128,7 +185,9 @@
 		(XNextEvent dpy evt)
 		(let ((type (int@ evt)))
 		  (if (== 2 type) (return 0))
-		  (if (== 4 type) (return 0))
+		  (if (== 4 type) (mouse-down (int@ evt 8) (int@ evt 9)))
+		  (if (== 5 type) (mouse-up   (int@ evt 8) (int@ evt 9)))
+		  (if (== 6 type) (mouse-move (int@ evt 8) (int@ evt 9)))
 		  0))
 	      (begin
 		(draw dpy buf gc)
