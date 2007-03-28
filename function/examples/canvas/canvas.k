@@ -1,96 +1,20 @@
-; primCanvas.beginPath()
-; primCanvas.createClippingCanvas(x, y, width, height)
-; primCanvas.createTextBox(textString)
-; primCanvas.drawEllipse(x, y, width, height)
-; primCanvas.fill()
-; primCanvas.fillEllipse(x, y, width, height)
-; primCanvas.lineTo(y, y)
-; primCanvas.moveTo(x, y)
-; primCanvas.renderText(textBox, x, y, compositionWidth)
-; primCanvas.repaint()
-; primCanvas.setClippingRectangle(x,y,width,height)
-; primCanvas.setFillStyle(fillStyle)
-; primCanvas.setLineWidth(borderWidth)
-; primCanvas.stroke()
+(syntax Canvas-dpy	(lambda (node compiler) `(long@ ,[node second]  )))
+(syntax Canvas-win	(lambda (node compiler) `(long@ ,[node second] 1)))
+(syntax Canvas-buf	(lambda (node compiler) `(long@ ,[node second] 2)))
+(syntax Canvas-gc	(lambda (node compiler) `(long@ ,[node second] 3)))
+(syntax Canvas-path	(lambda (node compiler) `(long@ ,[node second] 4)))
 
-(load "xlib.k")
-(load "trig.k")
-(load "point.k")
-(load "polygon.k")
-
-(define outer 300)	;(define outer 200)
-(define inner 120)	;(define inner  80)
-
-(define polygon
-  (let ((p (XPolygon-new 11)))
-    (XPoint-setPolar (XPolygon-at p  0) outer   0)
-    (XPoint-setPolar (XPolygon-at p  1) inner  36)
-    (XPoint-setPolar (XPolygon-at p  2) outer  72)
-    (XPoint-setPolar (XPolygon-at p  3) inner 108)
-    (XPoint-setPolar (XPolygon-at p  4) outer 144)
-    (XPoint-setPolar (XPolygon-at p  5) inner 180)
-    (XPoint-setPolar (XPolygon-at p  6) outer 216)
-    (XPoint-setPolar (XPolygon-at p  7) inner 252)
-    (XPoint-setPolar (XPolygon-at p  8) outer 288)
-    (XPoint-setPolar (XPolygon-at p  9) inner 324)
-    (XPoint-setPolar (XPolygon-at p 10) outer   0)
-    p))
-
-(define pos-x 200)
-(define pos-y 200)
-
-(XPolygon-translate polygon polygon pos-x pos-y)
-
-(define polygon2 (XPolygon-new (XPolygon-size polygon)))
-
-(define angle 0)
-
-(define draw
-  (lambda (dpy win gc)
-    ;;(XClearArea dpy win 0 0 600 400 0)
-    (XPolygon-rotate polygon2 polygon pos-x pos-y angle)
-    (set angle (+ angle 1))
-    ;(XGC-setLineWidth dpy gc 4)
-    ;(XGC-setForeground dpy gc 0xff0000)
-    ;(XDrawLines dpy win gc (XPolygon-points polygon2) (XPolygon-size polygon2) 0)
-    (XGC-setForeground dpy gc 0xffff00)
-    (XFillPolygon dpy win gc (XPolygon-points polygon2) (XPolygon-size polygon2) 0 0)
-    (XSync dpy 0)))
-
-(define mouse-x 0)
-(define mouse-y 0)
-(define tracking 0)
-
-(define mouse-down
-  (lambda (x y)
-    (set mouse-x x)
-    (set mouse-y y)
-    (set tracking 1)))
-
-(define mouse-up
-  (lambda (x y)
-    (set tracking 0)))
-
-(define mouse-move
-  (lambda (x y)
-    (if tracking
-	(begin
-	  (let ((dx (- x mouse-x))
-		(dy (- y mouse-y)))
-	    (set mouse-x x)
-	    (set mouse-y y)
-	    (XPolygon-translate polygon polygon dx dy)
-	    (set pos-x (+ pos-x dx))
-	    (set pos-y (+ pos-y dy)))))))
-
-(define doit
-  (lambda (dname)
-    (let ((dpy  (XOpenDisplay dname))
+(define Canvas-new
+  (lambda ()
+    (let ((canv (malloc 20))
+	  (dpy  (XOpenDisplay 0))
 	  (root (XDefaultRootWindow dpy))
 	  (win  (XCreateSimpleWindow dpy root 0 0 600 400 5 0 0))
 	  (buf  (if (and XdbeQueryExtension
-			 (let ((x 0)(y 0))
-			   (XdbeQueryExtension dpy (addrof x) (addrof y))))
+			 (let ((x 0) (y 0)
+			       (q (XdbeQueryExtension dpy (addrof x) (addrof y))))
+			   (or q (printf "dbe disabled (server version %d.%d)\n" x y))
+			   q))
 		    (XdbeAllocateBackBufferName dpy win 1)
 		    win))
 	  (gc   (XDefaultGC dpy))
@@ -125,31 +49,169 @@
       (XChangeWindowAttributes dpy win 2048 xwa)
       (XSetWindowBackground dpy win -1)
       (XMapWindow dpy win)
-      (XSync dpy 0)
-      (let ((evt  (malloc 96))
-	    (info (malloc 8)))
-	(set (int@ info 0) win)
-	(set (int@ info 1) 1)	; XdbeBackground
-	(while 1
-	  (if (XPending dpy)
-	      (begin
-		(XNextEvent dpy evt)
-		(let ((type (int@ evt)))
-		  (if (== 2 type) (return 0))
-		  (if (== 4 type) (mouse-down (int@ evt 8) (int@ evt 9)))
-		  (if (== 5 type) (mouse-up   (int@ evt 8) (int@ evt 9)))
-		  (if (== 6 type) (mouse-move (int@ evt 8) (int@ evt 9)))
-		  0))
-	      (begin
-		(if (== win buf) (XClearArea dpy win 0 0 600 400 0))
-		(draw dpy buf gc)
-		(if (!= win buf) (XdbeSwapBuffers dpy info 1))))))
-      (XDestroyWindow dpy buf)
-      (XDestroyWindow dpy win)
-      (XFlush dpy))))
+      (set (Canvas-dpy  canv) dpy)
+      (set (Canvas-win  canv) win)
+      (set (Canvas-buf  canv) buf)
+      (set (Canvas-gc   canv) gc)
+      (set (Canvas-path canv) (XPolygon-new 32))
+      (XFlush dpy)
+      canv)))
 
-(doit 0)	; 0 => value of DISPLAY variable
+(define GC_malloc	(dlsym "GC_malloc"))
 
+(syntax Event-x		(lambda (node compiler) `(int@ ,[node second] 0)))
+(syntax Event-y		(lambda (node compiler) `(int@ ,[node second] 1)))
+(syntax Event-detail1	(lambda (node compiler) `(int@ ,[node second] 2)))
+(syntax Event-detail2	(lambda (node compiler) `(int@ ,[node second] 3)))
 
-(dlclose libXext)
-(dlclose libX11)
+(define Event-new	(lambda (x y a b)
+			  (let ((e (GC_malloc 16)))
+			    (set (Event-x	e) x)
+			    (set (Event-y	e) y)
+			    (set (Event-detail1 e) a)
+			    (set (Event-detail2 e) b)
+			    e)))
+
+(syntax XEvent-type		(lambda (node compiler) `(int@ ,[node second])))
+
+(syntax XKeyEvent-x		(lambda (node compiler) `(int@ ,[node second]  8)))
+(syntax XKeyEvent-y		(lambda (node compiler) `(int@ ,[node second]  9)))
+(syntax XKeyEvent-state		(lambda (node compiler) `(int@ ,[node second] 12)))
+(syntax XKeyEvent-keycode	(lambda (node compiler) `(int@ ,[node second] 13)))
+
+(syntax XButtonEvent-x		(lambda (node compiler) `(int@ ,[node second]  8)))
+(syntax XButtonEvent-y		(lambda (node compiler) `(int@ ,[node second]  9)))
+(syntax XButtonEvent-state	(lambda (node compiler) `(int@ ,[node second] 12)))
+(syntax XButtonEvent-button	(lambda (node compiler) `(int@ ,[node second] 13)))
+
+(define Event-fromXKeyEvent	(lambda (e) (Event-new (XKeyEvent-x    e) (XKeyEvent-y    e) (XKeyEvent-state    e) (XKeyEvent-keycode   e))))
+(define Event-fromXButtonEvent	(lambda (e) (Event-new (XButtonEvent-x e) (XButtonEvent-y e) (XButtonEvent-state e) (XButtonEvent-button e))))
+
+(define %Canvas-evt (malloc 96))
+
+(define Canvas-handleEvents
+  (lambda (c)
+    (while (XPending (Canvas-dpy c))
+      (begin
+	(XNextEvent (Canvas-dpy c) %Canvas-evt)
+	(let ((type (XEvent-type %Canvas-evt)))
+	  (if (== 2 type) (document.onkeydown   (Event-fromXKeyEvent    %Canvas-evt)))
+	  (if (== 3 type) (document.onkeyup     (Event-fromXKeyEvent    %Canvas-evt)))
+	  (if (== 4 type) (document.onmousedown (Event-fromXButtonEvent %Canvas-evt)))
+	  (if (== 5 type) (document.onmouseup   (Event-fromXButtonEvent %Canvas-evt)))
+	  (if (== 6 type) (document.onmousemove (Event-fromXButtonEvent %Canvas-evt))))))))
+
+(define Canvas-clear
+  (lambda (c)
+    (if (== (Canvas-win c) (Canvas-buf c))
+	(XClearWindow (Canvas-dpy c) (Canvas-win c)))
+    (XPolygon-clear (Canvas-path c))))
+
+(define %Canvas-x 0)
+(define %Canvas-y 0)
+
+; primCanvas.beginPath()
+
+(define Canvas-beginPath
+  (lambda (c)
+    (XPolygon-clear (Canvas-path c))))
+
+; primCanvas.createClippingCanvas(x, y, width, height)
+
+(define Canvas-createClippingCanvas
+  (lambda (c x y w h)
+    (printf "Canvas-createClippingCanvas %d %d %d %d\n" x y w h)
+    c))
+
+; primCanvas.createTextBox(textString)
+
+(define Canvas-createTextBox
+  (lambda (c s)
+    s))
+
+; primCanvas.drawEllipse(x, y, width, height)
+
+(define Canvas-drawEllipse
+  (lambda (c x y w h)
+    (XDrawArc (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) x y w h 0 23040)))
+
+; primCanvas.fill()
+
+(define Canvas-fill
+  (lambda (c)
+    (let ((path (Canvas-path c)))
+      (XFillPolygon (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) (XPolygon-points path) (XPolygon-size path) 0 0)
+      (XPolygon-clear path))))
+
+; primCanvas.fillEllipse(x, y, width, height)
+
+(define Canvas-fillEllipse
+  (lambda (c x y w h)
+    (XFillArc (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) x y w h 0 23040)))
+
+; primCanvas.lineTo(y, y)
+
+(define Canvas-lineTo
+  (lambda (c x y)
+    (let ((path (Canvas-path c))
+	  (size (XPolygon-size path)))
+      (if (== 0 size)
+	  (XPolygon-add-xy path %Canvas-x %Canvas-y))
+      (XPolygon-add-xy path (set %Canvas-x x) (set %Canvas-y y)))))
+
+; primCanvas.moveTo(x, y)
+
+(define Canvas-moveTo
+  (lambda (c x y)
+    (set %Canvas-x x)
+    (set %Canvas-y y)))
+
+; primCanvas.renderText(textBox, x, y, compositionWidth)
+
+(define strlen (dlsym "strlen"))
+
+(define Canvas-renderText
+  (lambda (c b x y w)
+    (XDrawString (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) x y b (strlen b))))
+
+; primCanvas.repaint()
+
+(define Canvas-repaint
+  (lambda (c)
+    (if (!= (Canvas-buf c) (Canvas-win c))
+	(let ((info (malloc 8)))
+	  (set (int@ info 0) (Canvas-win c))
+	  (set (int@ info 1) 1)	; XdbeBackground
+	  (XdbeSwapBuffers (Canvas-dpy c) info 1)))
+    (XSync (Canvas-dpy c) 0)))
+
+; primCanvas.setClippingRectangle(x,y,width,height)
+
+(define Canvas-setClippingRectangle
+  (lambda (c x y w h)
+    (printf "Canvas-setClippingRectangle %d %d %d %d\n" x y w h)))
+
+; primCanvas.setFillStyle(fillStyle)
+
+(define %Canvas-exact  (XColor-new))
+(define %Canvas-screen (XColor-new))
+
+(define Canvas-fillStyle
+  (lambda (c spec)
+    (if (XAllocNamedColor (Canvas-dpy c) (XDefaultColormap (Canvas-dpy c)) spec %Canvas-screen %Canvas-exact)
+	  (XGC-setForeground (Canvas-dpy c) (Canvas-gc c) (XColor-pixel %Canvas-screen))
+	  (printf "could not allocate color %s\n" spec))))
+
+; primCanvas.setLineWidth(borderWidth)
+
+(define Canvas-setLineWidth
+  (lambda (c w)
+    (XGC-setLineWidth (Canvas-dpy c) (Canvas-gc c) w)))
+
+; primCanvas.stroke()
+
+(define Canvas-stroke
+  (lambda (c)
+    (let ((path (Canvas-path c)))
+      (XDrawLines (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) (XPolygon-points path) (XPolygon-size path) 0)
+      (XPolygon-clear path))))

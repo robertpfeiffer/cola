@@ -1,7 +1,7 @@
 JOLT = ../../jolt-burg/main
 
 test : .FORCE
-	$(JOLT) boot.k canvas.k
+	$(JOLT) boot.k main.k
 
 clean : .FORCE
 	rm -f *~
