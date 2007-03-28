@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-27 15:06:34 by piumarta on emilia.local
+  Last edited: 2007-03-27 18:53:26 by piumarta on ubuntu
 "
 
 { import: Integer }
@@ -283,6 +283,16 @@ Integer bitOr: n
     ^self
 	digitLogic: norm
 	op: #bitOr:
+	length: (self digitLength max: norm digitLength)
+]
+
+Integer bitXor: n 
+[
+    | norm |
+    norm := n normalize.
+    ^self
+	digitLogic: norm
+	op: #bitXor:
 	length: (self digitLength max: norm digitLength)
 ]
 

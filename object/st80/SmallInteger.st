@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-27 15:04:27 by piumarta on emilia.local
+  Last edited: 2007-03-27 18:52:00 by piumarta on ubuntu
 "
 
 { import: Integer }
@@ -170,6 +170,16 @@ SmallInteger bitOr: anInteger
     self >= 0 ifTrue: [^anInteger bitOr: self].
     ^anInteger < 0
 	ifTrue:  [(self bitInvert bitAnd: anInteger bitInvert) bitInvert]
+	ifFalse: [(self bitInvert bitClear: anInteger) bitInvert]
+]
+
+SmallInteger bitXor: anInteger
+[
+    { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))
+        return (oop)(((int)v_self ^ (int)v_anInteger) | 1); }.
+    self >= 0 ifTrue: [^anInteger bitXor: self].
+    ^anInteger < 0
+	ifTrue:  [self bitInvert bitXor: anInteger bitInvert]
 	ifFalse: [(self bitInvert bitClear: anInteger) bitInvert]
 ]
 
