@@ -91,83 +91,26 @@
 
 ;;;----------------------------------------------------------------
 
-;; (syntax XPoint-points		(lambda (form compiler)	`(long@ ,[form second]  )))
-;; (syntax XPoint-size		(lambda (form compiler)	`(long@ ,[form second] 1)))
-;; (syntax XPoint-capacity	(lambda (form compiler)	`(long@ ,[form second] 2)))
-;; (syntax XPoint-at		(lambda (form compiler)	`(+ (XPoint-points ,[form second]) (* 4 ,[form third]))))
 
-;; (syntax XPoint-clear
-;;   (lambda (form compiler)
-;;     `(set (XPoint-size ,[form second]) 0)))
+(define GC_malloc	(dlsym "GC_malloc"))
 
-;; (define XPoint-grow
-;;   (lambda (pg x y)
-;;     (let ((ps (* 2 (XPoint-size pg)))
-;; 	  (pp (realloc (XPoint-points pg) (* 4 ps))))
-;;       (set (XPoint-points pg) pp)
-;;       (set (XPoint-size   pg) ps))
-;;     pg))
+(syntax XRectangle-x		(lambda (form compiler)	`(short@ ,[form second] 0)))
+(syntax XRectangle-y		(lambda (form compiler)	`(short@ ,[form second] 1)))
+(syntax XRectangle-width	(lambda (form compiler)	`(short@ ,[form second] 2)))
+(syntax XRectangle-height	(lambda (form compiler)	`(short@ ,[form second] 3)))
 
-;; (define XPoint-add-xy
-;;   (lambda (pg x y)
-;;     (let ((ps (XPoint-size pg)))
-;;       (and (== ps (XPoint-capacity pg))
-;; 	   (XPoint-grow pg))
-;;       (set (XPoint-x (XPoint-at pg ps)) x)
-;;       (set (XPoint-y (XPoint-at pg ps)) y)
-;;       (set (XPoint-size pg) (+ 1 ps)))
-;;     pg))
+(syntax XRectangle-origin	(lambda (form compiler)	`(+ ,[form second] 0)))
 
-;; (define XPoint-xAt	(lambda (p i) (XPoint-x (XPoint-at p i))))
-;; (define XPoint-yAt	(lambda (p i) (XPoint-y (XPoint-at p i))))
+(define XRectangle-translate-xy
+  (lambda (r x y)
+    (set (XRectangle-x r) (+ (XRectangle-x r) x))
+    (set (XRectangle-y r) (+ (XRectangle-y r) y))))
 
-;; (define XPoint-new
-;;   (lambda (s)
-;;     (let ((m (malloc (+ 4 (* 4 s))))
-;; 	  (p (malloc 12)))
-;;       (set (XPoint-points   p) m)
-;;       (set (XPoint-size     p) s)
-;;       (set (XPoint-capacity p) s)
-;;       p)))
-
-
-
-;; (syntax XRectangle-points		(lambda (form compiler)	`(long@ ,[form second]  )))
-;; (syntax XRectangle-size		(lambda (form compiler)	`(long@ ,[form second] 1)))
-;; (syntax XRectangle-capacity	(lambda (form compiler)	`(long@ ,[form second] 2)))
-;; (syntax XRectangle-at		(lambda (form compiler)	`(+ (XRectangle-points ,[form second]) (* 4 ,[form third]))))
-
-;; (syntax XRectangle-clear
-;;   (lambda (form compiler)
-;;     `(set (XRectangle-size ,[form second]) 0)))
-
-;; (define XRectangle-grow
-;;   (lambda (pg x y)
-;;     (let ((ps (* 2 (XRectangle-size pg)))
-;; 	  (pp (realloc (XRectangle-points pg) (* 4 ps))))
-;;       (set (XRectangle-points pg) pp)
-;;       (set (XRectangle-size   pg) ps))
-;;     pg))
-
-;; (define XRectangle-add-xy
-;;   (lambda (pg x y)
-;;     (let ((ps (XRectangle-size pg)))
-;;       (and (== ps (XRectangle-capacity pg))
-;; 	   (XRectangle-grow pg))
-;;       (set (XPoint-x (XRectangle-at pg ps)) x)
-;;       (set (XPoint-y (XRectangle-at pg ps)) y)
-;;       (set (XRectangle-size pg) (+ 1 ps)))
-;;     pg))
-
-;; (define XRectangle-xAt	(lambda (p i) (XPoint-x (XRectangle-at p i))))
-;; (define XRectangle-yAt	(lambda (p i) (XPoint-y (XRectangle-at p i))))
-
-;; (define XRectangle-new
-;;   (lambda (s)
-;;     (let ((m (malloc (+ 4 (* 4 s))))
-;; 	  (p (malloc 12)))
-;;       (set (XRectangle-points   p) m)
-;;       (set (XRectangle-size     p) s)
-;;       (set (XRectangle-capacity p) s)
-;;       p)))
-
+(define XRectangle-new
+  (lambda (x y w h)
+    (let ((r (GC_malloc 8)))
+      (set (XRectangle-x      r) x)
+      (set (XRectangle-y      r) y)
+      (set (XRectangle-width  r) w)
+      (set (XRectangle-height r) h)
+      r)))

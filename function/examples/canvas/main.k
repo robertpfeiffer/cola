@@ -11,6 +11,7 @@
 (load "trig.k")
 (load "point.k")
 (load "polygon.k")
+(load "text.k")
 (load "canvas.k")
 
 (define polygon
@@ -42,45 +43,7 @@
 (define text (malloc 1024))
 (define textBox 0)
 
-(syntax Text-string	(lambda (node compiler) `(long@ ,[node second] 0)))
-(syntax Text-start	(lambda (node compiler) `(long@ ,[node second] 1)))
-(syntax Text-count	(lambda (node compiler) `(long@ ,[node second] 2)))
-(syntax Text-charWidth	(lambda (node compiler) `(long@ ,[node second] 3)))
-(syntax Text-charHeight	(lambda (node compiler) `(long@ ,[node second] 4)))
-
-(syntax Text-new	(lambda (node compiler) `(GC_malloc 20)))
-
-; primCanvas.createTextBox(string, startIndex, charCount) -> textBox on [startIndex, startIndex + charCount] in string
-
-(define Canvas-createTextBox
-  (lambda (c string startIndex charCount)
-    (let ((t (Text-new)))
-      (set (Text-string     t) string)
-      (set (Text-start      t) startIndex)
-      (set (Text-count      t) charCount)
-      (set (Text-charWidth  t)  6)	; default
-      (set (Text-charHeight t) 13)	; default
-      t)))
-
-; primCanvas.renderText(textBox, x, y) paints textBox in [startIndex, startIndex + charCount] on the screen at (x, y)
-
-(define Canvas-renderText
-  (lambda (c box x y)
-    (XDrawString (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) x y (Text-string box) (Text-count box))))
-
-; textBox.getBounds(offset) -> bounding rectangle for char at startIndex + offset (or nil if offset >= charCount)
-
-;; (define Text-getBounds
-;;   (lambda (t offset)
-;;     (if (and (< 0 offset) (< offset (Text-count t)))
-;; 	(let ((w (Text-charWidth  t))
-;; 	      (h (Text-charHeight t)))
-;; 	  (XRectangle-new (* w offset) (* h offset) (* w (+ 1 offset)) (* h (+ 1 offset))))
-;; 	0)))
-
-; textBox.getIndex(point) -> index of char in [ startIndex , startIndex + charCount ] nearest to point
-
-; textBox.stopIndex(textBox, pixelWidth) -> indexOfLastChar in [ startIndex, startIndex + charCount ]  < pixelWidth
+(define strlen (dlsym "strlen"))
 
 (define draw
   (lambda (c)
@@ -99,7 +62,13 @@
     (Canvas-fill c)
     (sprintf text "(%d,%d)" pos-x pos-y)
     (Canvas-fillStyle c "black")
-    (Canvas-renderText c (Canvas-createTextBox c text 0 (strlen text)) pos-x pos-y)
+    (let ((box (Canvas-createTextBox c text 0 (strlen text))))
+      (Canvas-renderText c box pos-x pos-y)
+      (Canvas-setLineWidth c 1)
+      (Canvas-fillStyle c "red")
+      (let ((r (Text-getBounds box 2)))
+	(XRectangle-translate-xy r pos-x pos-y)
+	(Canvas-drawEllipse c (XRectangle-x r) (XRectangle-y r) (XRectangle-width r) (XRectangle-height r))))
     (Canvas-repaint c)))
 
 (define mouse-x  0)

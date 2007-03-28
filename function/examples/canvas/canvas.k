@@ -123,11 +123,17 @@
     (printf "Canvas-createClippingCanvas %d %d %d %d\n" x y w h)
     c))
 
-; primCanvas.createTextBox(textString)
+; primCanvas.createTextBox(string, startIndex, charCount) -> textBox on [startIndex, startIndex + charCount] in string
 
 (define Canvas-createTextBox
-  (lambda (c s)
-    s))
+  (lambda (c string startIndex charCount)
+    (let ((t (Text-new)))
+      (set (Text-string     t) string)
+      (set (Text-start      t) startIndex)
+      (set (Text-count      t) charCount)
+      (set (Text-charWidth  t)  6)	; default
+      (set (Text-charHeight t) 13)	; default
+      t)))
 
 ; primCanvas.drawEllipse(x, y, width, height)
 
@@ -166,13 +172,11 @@
     (set %Canvas-x x)
     (set %Canvas-y y)))
 
-; primCanvas.renderText(textBox, x, y, compositionWidth)
-
-(define strlen (dlsym "strlen"))
+; primCanvas.renderText(textBox, x, y) paints textBox in [startIndex, startIndex + charCount] on the screen at (x, y)
 
 (define Canvas-renderText
-  (lambda (c b x y w)
-    (XDrawString (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) x y b (strlen b))))
+  (lambda (c box x y)
+    (XDrawString (Canvas-dpy c) (Canvas-buf c) (Canvas-gc c) x (+ -1 y (Text-charHeight box)) (Text-string box) (Text-count box))))
 
 ; primCanvas.repaint()
 
