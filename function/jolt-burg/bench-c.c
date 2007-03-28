@@ -7,6 +7,15 @@ int nfibs(int n)
 
 int main()
 {
-  printf("%d\n", nfibs(38));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
+  printf("%d\n", nfibs(35));
   return 0;
 }

@@ -45,6 +45,7 @@
 
 (define libXext (dlopen "libXext"))
 
+(define XdbeQueryExtension		(_dlsym libXext "XdbeQueryExtension"))
 (define XdbeAllocateBackBufferName	(_dlsym libXext "XdbeAllocateBackBufferName"))
 (define XdbeSwapBuffers			(_dlsym libXext "XdbeSwapBuffers"))
 
@@ -142,7 +143,11 @@
 				     5
 				     0 ; 0 arg count
 				     ))
-	  (buf  (XdbeAllocateBackBufferName dpy win 1))
+	  (buf  (if (and XdbeQueryExtension
+			 (let ((x 0)(y 0))
+			   (XdbeQueryExtension dpy (addrof x) (addrof y))))
+		    (XdbeAllocateBackBufferName dpy win 1)
+		    win))
 	  (gc   (XDefaultGC dpy))
 	  (xwa  (malloc 60)))
       (set (int@ (+ xwa 40))	;; event mask
@@ -190,8 +195,9 @@
 		  (if (== 6 type) (mouse-move (int@ evt 8) (int@ evt 9)))
 		  0))
 	      (begin
+		(if (== win buf) (XClearArea dpy win 0 0 600 400 0))
 		(draw dpy buf gc)
-		(XdbeSwapBuffers dpy info 1)))))
+		(if (!= win buf) (XdbeSwapBuffers dpy info 1))))))
       (XDestroyWindow dpy buf)
       (XDestroyWindow dpy win)
       (XFlush dpy))))

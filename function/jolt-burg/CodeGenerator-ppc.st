@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-13 00:46:33 by piumarta on margaux.piumarta.com
+  Last edited: 2007-03-27 18:22:31 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -213,7 +213,7 @@ StaticPowerPCCodeGenerator cmpwiI: d R: a I: i	[ StdOut nextPutAll: '	cmpwi	cr';
 StaticPowerPCCodeGenerator crnorI: d I: a I: b	[ StdOut nextPutAll: '	crnor	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator divwR: d R: a R: b	[ StdOut nextPutAll: '	divw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator lbzR: d I: i R: s	[ StdOut nextPutAll: '	lbz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
-StaticPowerPCCodeGenerator lhzR: d I: i R: s	[ StdOut nextPutAll: '	lhz	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
+StaticPowerPCCodeGenerator lhaR: d I: i R: s	[ StdOut nextPutAll: '	lha	'; print: d; nextPut: $,; print: i; nextPut: $,; print: s; cr ]
 StaticPowerPCCodeGenerator lisR: d I_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger hi16_: _i); cr ]
 StaticPowerPCCodeGenerator lisR: d Iha_: _i	[ StdOut nextPutAll: '	lis	'; print: d; nextPut: $,; print: (SmallInteger ha16_: _i); cr ]
 StaticPowerPCCodeGenerator lwzR: d I: i R: s	[ StdOut nextPutAll: '	lwz	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
@@ -283,7 +283,7 @@ DynamicPowerPCCodeGenerator cmpwiI: d R: a I: i	{ CMPWIiri	(_I(d), _R(a), _I(i) 
 DynamicPowerPCCodeGenerator crnorI: d I: a I: b	{ CRNORiii	(_I(d), _I(a), _I(b)         	); }
 DynamicPowerPCCodeGenerator divwR: d R: a R: b	{ DIVWrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator lbzR: d I: i R: s	{ LBZrm		(_R(d), _I(i), _R(s)		); }
-DynamicPowerPCCodeGenerator lhzR: d I: i R: s	{ LHZrm		(_R(d), _I(i), _R(s)		); }
+DynamicPowerPCCodeGenerator lhaR: d I: i R: s	{ LHArm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator lisR: d I_: _i	{ LISri		(_R(d),        _P(i >> 16)   	); }
 DynamicPowerPCCodeGenerator lisR: d Iha_: _i	{ LISri		(_R(d),        _ha16(_i)   	); }
 DynamicPowerPCCodeGenerator lwzR: d I: i R: s	{ LWZrm		(_R(d), _I(i), _R(s)		); }
@@ -379,7 +379,7 @@ PowerPCGrammar := [
 								    oriR:    op output R: op output I_: op arg _address ];
 	at: #REG  add: #(addrlp4 	)	do: [:op :gen | gen addiR:   op output R: op arg base I: op arg offset ];
 	at: #REG  add: #(indiri1 REG	)	do: [:op :gen | gen lbzR:    op output I: 0 R: op lhs output ];
-	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen lhzR:    op output I: 0 R: op lhs output ];
+	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen lhaR:    op output I: 0 R: op lhs output ];
 	at: #REG  add: #(indiri4 REG	)	do: [:op :gen | gen lwzR:    op output I: 0		R: op output ];
 	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen subficR: gen r0    R: op lhs output I: 0;
 								    addeR:   op output R: gen r0	R: op lhs output ];
