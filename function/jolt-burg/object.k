@@ -66,4 +66,4 @@
 	  (type     [form third])
 	  (args     [form copyFrom: '3 to: [[form size] - '2]])
 	  (expr     [form last]))
-      `(add-method ,type ,selector (lambda (_closure self ,@args) ,expr)))))
+      `(add-method ,type ,selector (lambda (_closure _self self ,@args) ,expr)))))
