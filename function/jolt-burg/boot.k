@@ -34,7 +34,7 @@
   (lambda (dir lib ext)
     (let ((buf (malloc 1024)))
       (sprintf buf "%s%s%s" dir lib ext)
-      (let ((handle (_dlopen buf (or _RTLD_NOW _RTLD_GLOBAL))))
+      (let ((handle (_dlopen buf (| _RTLD_NOW _RTLD_GLOBAL))))
 	(free buf)
 	handle))))
 

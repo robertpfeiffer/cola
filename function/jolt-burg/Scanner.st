@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:47:29 by piumarta on emilia
+  Last edited: 2007-03-29 21:25:28 by piumarta on emilia
 "
 
 { import: Objects }
@@ -148,7 +148,7 @@ CokeScanner xString
 
 CokeScanner xDigit
 [
-    | radix dv |
+    | radix dv multiplier |
     radix := 10.
     tokenValue := nextChar digitValue.
     self nextChar.
@@ -159,11 +159,20 @@ CokeScanner xDigit
 		ifFalse: [nextChar == $b
 			      ifTrue: [radix := 2.
 				       self nextChar]
-			      ifFalse: [radix := 8]]].
+			      ifFalse: [nextChar == $. ifFalse: [radix := 8]]]].
     [(dv := nextChar digitValue) notNil and: [dv < radix]]
 	whileTrue:
 	   [tokenValue := tokenValue * radix + dv.
 	    self nextChar].
+    nextChar == $.
+	ifTrue:
+	   [self nextChar.
+	    multiplier := 1.0.
+	    [(dv := nextChar digitValue) notNil and: [dv < radix]]
+		whileTrue:
+		   [multiplier := multiplier / radix.
+		    tokenValue := tokenValue + (multiplier * dv).
+		    self nextChar]].
     ^#number
 ]
 

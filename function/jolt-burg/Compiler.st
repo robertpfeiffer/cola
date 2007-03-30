@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-26 18:53:51 by piumarta on ubuntu
+  Last edited: 2007-03-29 16:46:05 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -230,12 +230,18 @@ SyntaxTable := [
 Expression   translate: aCompiler	[ ^aCompiler translateExpression: self ]
 SmallInteger translate: aCompiler	[ ^aCompiler translateInteger:    self ]
 LargeInteger translate: aCompiler	[ ^aCompiler translateInteger:    self ]
+Float	     translate: aCompiler	[ ^aCompiler translateFloat:      self ]
 String	     translate: aCompiler	[ ^aCompiler translateString:     self ]
 Symbol	     translate: aCompiler	[ ^aCompiler translateSymbol:     self ]
 
 Compiler translateInteger: anInteger
 [
     ^CNSTI4 new arg: anInteger _integerValue
+]
+
+Compiler translateFloat: aFloat
+[
+    ^CNSTP4 new arg: aFloat
 ]
 
 Compiler translateString: aString
