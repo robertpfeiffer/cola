@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:27:16 by piumarta on emilia
+  Last edited: 2007-03-31 11:21:53 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -112,6 +112,14 @@ SlotDictionary at: aKey put: aValue
 }
 
 SlotDictionary size	[ ^SmallInteger value_: _tally ]
+
+SlotDictionary keys
+[
+    | keysArray _keysArray |
+    _keysArray := (keysArray := Array new: self size) _elements.
+    { memcpy(v__keysArray, self->v__keys, sizeof(oop) * (long)self->v__tally); }.
+    ^keysArray
+]
 
 SlotDictionary at: aKey ifAbsent: errorBlock
 [
