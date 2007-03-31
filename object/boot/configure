@@ -90,8 +90,8 @@ ppc () {
 }
 
 arm () {
-     OFLAGS=${OFLAGS:-"-O"}
-     O3FLAGS=${O3FLAGS:-"-O3"}
+     OFLAGS=${OFLAGS:-"-O -mcpu=arm1136j-s -mfpu=vfp -mfloat-abi=softfp"}
+     O3FLAGS=${O3FLAGS:-"-O3 -mcpu=arm1136j-s -mfpu=vfp -mfloat-abi=softfp"}
      PGFLAGS=${PGFLAGS:-"-O3"}
      SYSARCH="arm"
 }
