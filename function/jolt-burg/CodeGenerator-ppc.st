@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-27 18:22:31 by piumarta on margaux.piumarta.com
+  Last edited: 2007-04-02 13:04:01 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -408,7 +408,7 @@ PowerPCGrammar := [
 								    mfcrR:   op output;
 								    rlwinmR: op output R: op output	I: 31 I: 31 I: 31 ];
 	at: #REG  add: #(eqi4 	 REG REG)	do: [:op :gen | gen xorR:    op output R: op lhs output R: op rhs output;
-								    subficR: gen r0    R: gen r3	I: 0;
+								    subficR: gen r0    R: op output	I: 0;
 								    addeR:   op output R: gen r0	R: op output ];
 	at: #REG  add: #(nei4 	 REG REG)	do: [:op :gen | gen xorR:    gen r12   R: op lhs output R: op rhs output;
 								    addicR:  gen r0    R: gen r12	I: -1;
