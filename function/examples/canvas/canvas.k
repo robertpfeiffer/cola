@@ -107,15 +107,6 @@
 	(XClearWindow (Canvas-dpy c) (Canvas-win c)))
     (XPolygon-clear (Canvas-path c))))
 
-(define Canvas-setClipRectangle
-  (lambda (c x y w h)
-    (let ((r (XRectangle-new)))
-      (set (XRectangle-x      r) x)
-      (set (XRectangle-y      r) y)
-      (set (XRectangle-width  r) w)
-      (set (XRectangle-height r) h)
-      (XSetClipRectangles (Canvas-dpy c) (Canvas-gc c) 0 0 r 1 0))))
-
 (define %Canvas-x 0)
 (define %Canvas-y 0)
 
@@ -202,7 +193,12 @@
 
 (define Canvas-setClippingRectangle
   (lambda (c x y w h)
-    (printf "Canvas-setClippingRectangle %d %d %d %d\n" x y w h)))
+    (let ((r (XRectangle-new)))
+      (set (XRectangle-x      r) x)
+      (set (XRectangle-y      r) y)
+      (set (XRectangle-width  r) w)
+      (set (XRectangle-height r) h)
+      (XSetClipRectangles (Canvas-dpy c) (Canvas-gc c) 0 0 r 1 0))))
 
 ; primCanvas.setFillStyle(fillStyle)
 
