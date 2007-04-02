@@ -56,6 +56,7 @@
 (define XLookupColor		(_dlsym libX11 "XLookupColor"))
 (define XParseColor		(_dlsym libX11 "XParseColor"))
 (define XAllocNamedColor	(_dlsym libX11 "XAllocNamedColor"))
+(define XSetClipRectangles	(_dlsym libX11 "XSetClipRectangles"))
 
 (define libXext (dlopen "libXext"))
 

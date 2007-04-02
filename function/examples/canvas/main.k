@@ -6,8 +6,8 @@
 (define document.onkeydown   no-op)
 (define document.onkeyup     (lambda (evt) (exit 0)))
 
-(load "list.k")
 (load "xlib.k")
+(load "list.k")
 (load "trig.k")
 (load "point.k")
 (load "polygon.k")
@@ -54,6 +54,7 @@
     ;(XGC-setForeground dpy gc 0xff0000)
     ;(XDrawLines dpy win gc (XPolygon-points polygon2) (XPolygon-size polygon2) 0)
     (Canvas-clear c)
+    (Canvas-setClipRectangle c 100 100 400 200)
     (Canvas-fillStyle c "yellow")
     (Canvas-beginPath c)
     (Canvas-moveTo c (XPolygon-xAt polygon2 0) (XPolygon-yAt polygon2 0))
