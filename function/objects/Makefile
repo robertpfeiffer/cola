@@ -44,7 +44,7 @@ tidy : .FORCE
 	-rm -f *.o *.d *~ .gdb* *.stackdump *.c *.new
 
 clean : tidy
-	-rm -f $(FILES) objects.a
+	-rm -f $(FILES) objects.a test
 	$(SHELL) -ec 'cd mpint;  $(MAKE) clean' 
 
 distclean spotless : clean
