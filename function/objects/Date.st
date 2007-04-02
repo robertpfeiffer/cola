@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:35:17 by piumarta on emilia
+  Last edited: 2007-04-02 10:41:09 by piumarta on alan-kays-computer.local
 "
 
 { import: Object }
@@ -31,7 +31,7 @@ Date new
 
 Date initialize
 {
-#if 1
+#if 0
     struct tms tms;
     times(&tms);
     self->v__seconds= (oop)(tms.tms_utime / CLOCKS_PER_SEC);
@@ -44,6 +44,6 @@ Date initialize
 #endif
 }
 
-Date seconds		[ ^SmallInteger value_: _seconds ]
+Date seconds		[ ^Integer value_: _seconds ]
 Date microseconds	[ ^SmallInteger value_: _microseconds ]
 Date milliseconds	[ ^self microseconds // 1000 ]
