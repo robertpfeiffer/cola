@@ -194,7 +194,7 @@
     (if (!= (Canvas-buf c) (Canvas-win c))
 	(let ((info (malloc 8)))
 	  (set (int@ info 0) (Canvas-win c))
-	  (set (int@ info 1) 1)	; XdbeBackground
+	  (set (int@ info 1) 1)	; XdbeUntouched
 	  (XdbeSwapBuffers (Canvas-dpy c) info 1)))
     (XSync (Canvas-dpy c) 0)))
 
