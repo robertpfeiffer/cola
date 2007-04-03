@@ -52,7 +52,8 @@
 (define get-frame-ip
   (cond
    ((== 0 (strcmp %sysarch "i386"))	(lambda (fp) (long@ fp 1)))
-   ((== 0 (strcmp %sysarch "ppc"))	(lambda (fp) (long@ (get-caller-fp) 2)))
+   ((== 0 (strcmp %sysarch "ppc"))	(lambda (fp) (long@ (get-caller-fp fp) 2)))
+   ((== 0 (strcmp %sysarch "arm"))	(lambda (fp) (long@ (get-caller-fp fp) -2)))
    (1					(error "architecture not supported"))))
 
 (define get-function-name

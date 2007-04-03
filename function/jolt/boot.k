@@ -2,17 +2,23 @@
 ;;; 
 ;;; Handy definitions for all coke programs.
 
-(define printf			(_dlsym _RTLD_DEFAULT "printf"))
-(define exit			(_dlsym _RTLD_DEFAULT "exit"))
+(define __dlsym _dlsym)
+
+(define printf			(__dlsym _RTLD_DEFAULT "printf"))
+(define exit			(__dlsym _RTLD_DEFAULT "exit"))
+
+(define _dlsym
+  (lambda (lib name)
+    (let ((addr (__dlsym lib name)))
+      (or addr
+	  (let ()
+	    (printf "%s: symbol lookup failed\n" name)
+	    (exit 1)))
+      addr)))
 
 (define dlsym
   (lambda (name)
-    (let ((addr (_dlsym _RTLD_DEFAULT name)))
-      (if addr
-	  addr
-	  (let ()
-	    (printf "%s: symbol lookup failed\n" name)
-	    (exit 1))))))
+    (_dlsym _RTLD_DEFAULT name)))
 
 (define sprintf			(dlsym "sprintf"))
 (define malloc			(dlsym "malloc"))
@@ -22,12 +28,13 @@
 (define usleep			(dlsym "usleep"))
 
 (define _dlopen			(dlsym "dlopen"))
+(define dlclose			(dlsym "dlclose"))
 
 (define %%dlopen
   (lambda (dir lib ext)
     (let ((buf (malloc 1024)))
       (sprintf buf "%s%s%s" dir lib ext)
-      (let ((handle (_dlopen buf _RTLD_NOW)))
+      (let ((handle (_dlopen buf (| _RTLD_NOW _RTLD_GLOBAL))))
 	(free buf)
 	handle))))
 
@@ -47,11 +54,10 @@
       (or handle (set handle (%dlopen ""                lib)))
       (or handle (set handle (%dlopen "/usr/local/lib/" lib)))
       (or handle (set handle (%dlopen "/usr/X11R6/lib/" lib)))
-      (if handle
-	  handle
-	  (let ()
-	    (printf "%s: cannot load library\n" lib)
-	    (exit 1))))))
+      (or handle (let ()
+		   (printf "%s: cannot load library\n" lib)
+		   (exit 1)))
+      handle)))
 
 ;; import/export to/from the object namespace
 
@@ -60,6 +66,7 @@
 
 (define Object			(import "Object"))
 (define OS			(import "OS"))
+(define Options			(import "Options"))
 (define CokeScanner		(import "CokeScanner"))
 (define Expression		(import "Expression"))
 (define Compiler		(import "Compiler"))
@@ -113,8 +120,9 @@
     (let ((scanner [CokeScanner on: [fileOrString readStream]])
 	  (expr    0))
       (while (set expr [scanner next])
-	;;[StdOut print: expr][StdOut cr]
-	[expr eval]))))
+	(if [Options verbose] (let () [StdOut print: expr][StdOut cr]))
+	(set expr [expr eval])
+	(if [Options verbose] (let () [StdOut nextPutAll: '"  => "][StdOut print: expr][StdOut cr]))))))
 
 ;; read the contents of a file
 
@@ -137,7 +145,8 @@
 
 (define load
   (lambda (path)
-    (let ((file [File open: [String value_: path]]))
+    (let ((file [File openIfPresent: [String value_: path]]))
+      (or file (set file [File openIfPresent: [[[Options libdir] , '"/"] , [String value_: path]]]))
       (if file
 	  (let ()
 	    (herald path)
