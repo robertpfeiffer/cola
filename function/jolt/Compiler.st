@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 11:37:27 by piumarta on ubuntu
+  Last edited: 2007-04-02 11:43:03 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -131,6 +131,7 @@ Symbol _dlsym_: _string	{ return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
     { v__value= (oop)RTLD_DEFAULT; }.  TheGlobalEnvironment defineVariable: #_RTLD_DEFAULT value_: _value.
     { v__value= (oop)RTLD_LAZY;    }.  TheGlobalEnvironment defineVariable: #_RTLD_LAZY    value_: _value.
     { v__value= (oop)RTLD_NOW;     }.  TheGlobalEnvironment defineVariable: #_RTLD_NOW     value_: _value.
+    { v__value= (oop)RTLD_GLOBAL;  }.  TheGlobalEnvironment defineVariable: #_RTLD_GLOBAL  value_: _value.
     TheGlobalEnvironment defineVariable: #_dlsym value_: #dlsym _dlsym.
 ]
 
