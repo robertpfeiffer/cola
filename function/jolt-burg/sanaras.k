@@ -484,11 +484,14 @@
 
 (syntax addrof
   (lambda (form comp)
+    (or (and [[form size] = '2]
+	     [[form second] isSymbol])
+	[comp errorSyntax: form])
     [[comp lookupVariable: [form second]] translateLvalue: comp]))
 
-(printf "%d\n" (let ((x 42))
-		 (set (long@ (addrof x)) 333)
-		 (* x 2)))
+(assert (== 666 (let ((x 42))
+		  (set (long@ (addrof x)) 333)
+		  (* x 2))))
 
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "CodeGenerator") versionString] _elements])
