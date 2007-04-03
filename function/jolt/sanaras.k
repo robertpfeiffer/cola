@@ -493,5 +493,17 @@
 		  (set (long@ (addrof x)) 333)
 		  (* x 2))))
 
+(syntax long1
+  (lambda (node compiler)
+    `(long@ ,[node second] 1)))
+
+(let ((mem (malloc 8)))
+  (set (long@ mem 1) 42)
+  (assert (==  42 (long@ mem 1)))
+  (assert (==  42 (long1 mem)))
+  (set (long1 mem) 666)
+  (assert (== 666 (long@ mem 1)))
+  (assert (== 666 (long1 mem))))
+
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "CodeGenerator") versionString] _elements])

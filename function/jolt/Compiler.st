@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 11:43:03 by piumarta on ubuntu
+  Last edited: 2007-04-02 12:06:08 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -607,8 +607,11 @@ Compiler setVariable: name from: expr
 
 Compiler setAccessor: accessor from: expr	"(set (foo bar...) baz) -> (set-foo bar... baz)"
 [
-    | setter syntax |
-    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]]) ifFalse: [self syntaxError: accessor].
+    | head op setter syntax |
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]])	ifFalse: [self errorSyntax: accessor].
+    head := accessor first.
+    (op := environment lookupSyntax: head) ifTrue:  [accessor := self applySyntax: op with: accessor].
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]])	ifFalse: [self errorSyntax: expr].
     setter := WriteStream on: (Expression new: 8).
     setter nextPut: ('set-' , accessor first asString) asSymbol.
     accessor from: 1 do: [:elt | setter nextPut: elt].
