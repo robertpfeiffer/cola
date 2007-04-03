@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 12:06:08 by piumarta on ubuntu
+  Last edited: 2007-04-02 12:51:48 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -241,7 +241,7 @@ Compiler translateInteger: anInteger
 
 Compiler translateString: aString
 [
-    ^CNSTP4 new arg: aString _bytes
+    ^CNSTP4 new arg: aString _strdup
 ]
 
 Compiler translateSymbol: aSymbol
@@ -473,8 +473,15 @@ Compiler xShort: expr
 
 Compiler xInt: expr
 [
-    expr size == 2 ifFalse: [self errorArgumentCount: expr].
-    ^INDIRI4 new lhs: (expr second translate: self)
+    expr size == 2 ifTrue: [^INDIRI4 new
+				lhs: (expr second translate: self)].
+    expr size == 3 ifTrue: [^INDIRI4 new
+				lhs: (ADDI4 new
+					  lhs: (expr second translate: self);
+					  rhs: (MULI4 new
+						    lhs: (CNSTI4 new arg: 4 _integerValue);
+						    rhs: (expr third translate: self)))].
+    self errorArgumentCount: expr.
 ]
 
 Compiler xLong: expr
@@ -515,10 +522,17 @@ Compiler xSetShort: expr
 
 Compiler xSetInt: expr
 [
-    expr size == 3 ifFalse: [self errorArgumentCount: expr].
-    ^ASGNI4 new
-	lhs: (expr third  translate: self);
-	rhs: (expr second translate: self)
+    expr size == 3 ifTrue: [^ASGNI4 new
+				lhs: (expr third  translate: self);
+				rhs: (expr second translate: self)].
+    expr size == 4 ifTrue: [^ASGNI4 new
+				lhs: (expr fourth translate: self);
+				rhs: (ADDI4 new
+					  lhs: (expr second translate: self);
+					  rhs: (MULI4 new
+						    lhs: (CNSTI4 new arg: 4 _integerValue);
+						    rhs: (expr third translate: self)))].
+    self errorArgumentCount: expr.
 ]
 
 Compiler xSetLong: expr
