@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:38:06 by piumarta on emilia
+  Last edited: 2007-04-03 18:34:40 by piumarta on alan-kays-computer.local
 "
 
 { import: Object }
@@ -182,6 +182,17 @@ StArg with: anInteger
 StArg printArgumentsOn: aStream	[ aStream nextPut: $(; print: index; nextPutAll: ' => '; print: argLocation; nextPut: $) ]
 
 
+AddrArg : Insn ( index argLocation )
+
+AddrArg with: anInteger
+[
+    self := self new.
+    index := anInteger
+]
+
+AddrArg printArgumentsOn: aStream	[ aStream nextPut: $(; print: index; nextPutAll: ' => '; print: argLocation; nextPut: $) ]
+
+
 LdTmp : Insn ( index tmpLocation )
 
 LdTmp with: anInteger
@@ -202,6 +213,17 @@ StTmp with: anInteger
 ]
 
 StTmp printArgumentsOn: aStream	[ aStream nextPut: $(; print: index; nextPutAll: ' => '; print: tmpLocation; nextPut: $) ]
+
+
+AddrTmp : Insn ( index tmpLocation )
+
+AddrTmp with: anInteger
+[
+    self := self new.
+    index := anInteger
+]
+
+AddrTmp printArgumentsOn: aStream	[ aStream nextPut: $(; print: index; nextPutAll: ' => '; print: tmpLocation; nextPut: $) ]
 
 
 Dup : Insn ( index )
@@ -426,8 +448,10 @@ VPU ldPtr: p		[ program addLast: (LdPtr with: p) ]
 
 VPU ldArg: n		[ program addLast: (LdArg with: n) ]
 VPU stArg: n		[ program addLast: (StArg with: n) ]
+VPU addrArg: n		[ program addLast: (AddrArg with: n) ]
 VPU ldTmp: n		[ program addLast: (LdTmp with: n) ]
 VPU stTmp: n		[ program addLast: (StTmp with: n) ]
+VPU addrTmp: n		[ program addLast: (AddrTmp with: n) ]
 
 VPU dup			[ self dup: 0 ]
 VPU dup: n		[ program addLast: (Dup with: n) ]
@@ -545,6 +569,7 @@ IArg		makeLabels: vpu	[ index := vpu pushArg ]
 ITmp		makeLabels: vpu	[ index := vpu pushTmp ]
 LdTmp		makeLabels: vpu	[ index := vpu tempDepth - 1 - index ]
 StTmp		makeLabels: vpu	[ index := vpu tempDepth - 1 - index ]
+AddrTmp		makeLabels: vpu	[ index := vpu tempDepth - 1 - index ]
 
 DropTmp		makeLabels: vpu	[ vpu popTmp ]
 ICall		makeLabels: vpu	[ vpu noteParams: arity ]
@@ -618,8 +643,10 @@ LdInt		makeStack: vpu	[ location := vpu pushStack ]
 LdPtr		makeStack: vpu	[ location := vpu pushStack ]
 LdArg		makeStack: vpu	[ location := vpu pushStack ]
 StArg		makeStack: vpu	[ location := vpu stackTop ]
+AddrArg		makeStack: vpu	[ location := vpu pushStack ]
 LdTmp		makeStack: vpu	[ location := vpu pushStack ]
 StTmp		makeStack: vpu	[ location := vpu stackTop ]
+AddrTmp		makeStack: vpu	[ location := vpu pushStack ]
 Dup		makeStack: vpu	[ location := vpu pushStack ]
 Drop		makeStack: vpu	[ location := vpu popStack ]
 Rdb		makeStack: vpu	[ location := vpu stackTop ]
@@ -717,9 +744,11 @@ Insn  allocate: vpu	[ location := 4 * location + vpu stackBase.							]
 IArg  allocate: vpu	[						argLocation := 4 * index + vpu   argBase.	]
 LdArg allocate: vpu	[ location := 4 * location + vpu stackBase.	argLocation := 4 * index + vpu   argBase.	]
 StArg allocate: vpu	[ location := 4 * location + vpu stackBase.	argLocation := 4 * index + vpu   argBase.	]
+AddrArg allocate: vpu	[ location := 4 * location + vpu stackBase.	argLocation := 4 * index + vpu   argBase.	]
 ITmp  allocate: vpu	[						tmpLocation := 4 * index + vpu  tempBase.	]
 LdTmp allocate: vpu	[ location := 4 * location + vpu stackBase.	tmpLocation := 4 * index + vpu  tempBase.	]
 StTmp allocate: vpu	[ location := 4 * location + vpu stackBase.	tmpLocation := 4 * index + vpu  tempBase.	]
+AddrTmp allocate: vpu	[ location := 4 * location + vpu stackBase.	tmpLocation := 4 * index + vpu  tempBase.	]
 
 "----------------------------------------------------------------"
 
@@ -773,3 +802,9 @@ End	emit: vpu []
 IArg	emit: vpu []	"may be overridden to save registers"
 DropTmp	emit: vpu []
 Drop	emit: vpu []
+
+"----------------------------------------------------------------"
+
+CodeGenerator : Object ()
+
+CodeGenerator versionString	[ ^VPU targetString ]

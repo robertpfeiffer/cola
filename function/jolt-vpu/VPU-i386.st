@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:39:39 by piumarta on emilia
+  Last edited: 2007-04-03 18:34:10 by piumarta on alan-kays-computer.local
 "
 
 { input: VPU-common }
@@ -69,11 +69,17 @@ LdInt	emit: vpu	[ | _int | _int := value _integerValue.
 
 LdPtr	emit: vpu	{ MOVLim	((long)self->v_value	 , LOC(0),_ESP,0,0); }
 
+AddrArg	emit: vpu	{ LEALmr	(	ARG( ),_ESP,0,0, _EAX);
+			  MOVLrm	(_EAX,	LOC(0),_ESP,0,0	     ); }
+
 LdArg	emit: vpu	{ MOVLmr	(	ARG( ),_ESP,0,0, _EAX);
 			  MOVLrm	(_EAX,	LOC(0),_ESP,0,0	     ); }
 
 StArg	emit: vpu	{ MOVLmr	(	LOC(0),_ESP,0,0, _EAX);
 			  MOVLrm	(_EAX,	ARG( ),_ESP,0,0	     ); }
+
+AddrTmp	emit: vpu	{ LEALmr	(	TMP( ),_ESP,0,0, _EAX);
+			  MOVLrm	(_EAX,	LOC(0),_ESP,0,0	     ); }
 
 LdTmp	emit: vpu	{ MOVLmr	(	TMP( ),_ESP,0,0, _EAX);
 			  MOVLrm	(_EAX,	LOC(0),_ESP,0,0	     ); }

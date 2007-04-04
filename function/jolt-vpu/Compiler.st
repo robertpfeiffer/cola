@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:45:56 by piumarta on emilia
+  Last edited: 2007-04-03 18:27:32 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -72,13 +72,15 @@ Variable addOffset: anInteger	[]
 
 GlobalVariable : Variable ()
 
-GlobalVariable compileRead:  aCompiler	[ aCompiler globalRead:  value ]
-GlobalVariable compileWrite: aCompiler	[ aCompiler globalWrite: value ]
+GlobalVariable compileRead:  aCompiler		[ aCompiler globalRead:  value ]
+GlobalVariable compileWrite: aCompiler		[ aCompiler globalWrite: value ]
+GlobalVariable translateLvalue: aCompiler	[ ^aCompiler globalAddress: value ]
 
 ArgumentVariable : Variable ()
 
 ArgumentVariable compileRead:  aCompiler	[ aCompiler argumentRead:  value ]
 ArgumentVariable compileWrite: aCompiler	[ aCompiler argumentWrite: value ]
+ArgumentVariable translateLvalue: aCompiler	[ ^aCompiler argumentAddress: value ]
 
 TemporaryVariable : Variable ()
 
@@ -86,6 +88,7 @@ TemporaryVariable addOffset: anInteger		[ value := value + anInteger ]
 
 TemporaryVariable compileRead:  aCompiler	[ aCompiler temporaryRead:  value ]
 TemporaryVariable compileWrite: aCompiler	[ aCompiler temporaryWrite: value ]
+TemporaryVariable translateLvalue: aCompiler	[ ^aCompiler temporaryAddress: value ]
 
 "----------------------------------------------------------------"
 
@@ -353,14 +356,22 @@ Compiler identifier: aSymbol
     ^nil
 ]
 
+Compiler lookupVariable: aSymbol
+[
+    ^environment lookup: aSymbol
+]
+
 Compiler globalRead:  anAssociation	[ vpu ldPtr: anAssociation _valuePointer; rdw ]
 Compiler globalWrite: anAssociation	[ vpu ldPtr: anAssociation _valuePointer; wrw ]
+Compiler globalAddress: anAssociation	[ vpu ldPtr: anAssociation _valuePointer.  ^nil ]
 
 Compiler argumentRead:  anInteger	[ vpu ldArg: anInteger ]
 Compiler argumentWrite: anInteger	[ vpu stArg: anInteger ]
+Compiler argumentAddress: anInteger	[ vpu addrArg: anInteger.  ^nil ]
 
 Compiler temporaryRead:  anInteger	[ vpu ldTmp: anInteger ]
 Compiler temporaryWrite: anInteger	[ vpu stTmp: anInteger ]
+Compiler temporaryAddress: anInteger	[ vpu addrTmp: anInteger.  ^nil ]
 
 Compiler form: aForm
 [
@@ -602,8 +613,11 @@ Compiler setVariable: symbol from: expr
 
 Compiler setAccessor: accessor from: expr	"(set (foo bar...) baz) -> (set-foo bar... baz)"
 [
-    | setter syntax |
-    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]]) ifFalse: [self syntaxError: accessor].
+    | head op setter syntax |
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]])	ifFalse: [self errorSyntax: accessor].
+    head := accessor first.
+    (op := environment lookupSyntax: head) ifTrue:  [accessor := self applySyntax: op with: accessor].
+    (accessor isArray and: [accessor size > 0 and: [accessor first isSymbol]])	ifFalse: [self errorSyntax: expr].
     setter := WriteStream on: (Expression new: 8).
     setter nextPut: ('set-' , accessor first asString) asSymbol.
     accessor from: 1 do: [:elt | setter nextPut: elt].
