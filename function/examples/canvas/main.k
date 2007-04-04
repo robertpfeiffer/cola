@@ -100,7 +100,7 @@
 	    (set pos-x (+ pos-x dx))
 	    (set pos-y (+ pos-y dy)))))))
 
-(let ((c (Canvas-new)))
+(let ((c (Canvas-newWithSwapAction XdbeBackground)))
   (set document.onmousedown mouse-down)
   (set document.onmouseup   mouse-up)
   (set document.onmousemove mouse-move)

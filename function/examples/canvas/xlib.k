@@ -64,6 +64,11 @@
 (define XdbeAllocateBackBufferName	(_dlsym libXext "XdbeAllocateBackBufferName"))
 (define XdbeSwapBuffers			(_dlsym libXext "XdbeSwapBuffers"))
 
+(define XdbeUndefined   0)
+(define XdbeBackground  1)
+(define XdbeUntouched   2)
+(define XdbeCopied      3)
+
 (define %gcv (malloc 92))
 
 (define XGC-setForeground	(lambda (dpy gc pixel) (set (int@ %gcv 2) pixel) (XChangeGC dpy gc  4 %gcv)))

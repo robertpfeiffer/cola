@@ -1,12 +1,15 @@
-(syntax Canvas-dpy	(lambda (node compiler) `(long@ ,[node second]  )))
-(syntax Canvas-win	(lambda (node compiler) `(long@ ,[node second] 1)))
-(syntax Canvas-buf	(lambda (node compiler) `(long@ ,[node second] 2)))
-(syntax Canvas-gc	(lambda (node compiler) `(long@ ,[node second] 3)))
-(syntax Canvas-path	(lambda (node compiler) `(long@ ,[node second] 4)))
+(syntax Canvas-dpy		(lambda (node compiler) `(long@ ,[node second]  )))
+(syntax Canvas-win		(lambda (node compiler) `(long@ ,[node second] 1)))
+(syntax Canvas-buf		(lambda (node compiler) `(long@ ,[node second] 2)))
+(syntax Canvas-gc		(lambda (node compiler) `(long@ ,[node second] 3)))
+(syntax Canvas-path		(lambda (node compiler) `(long@ ,[node second] 4)))
+(syntax Canvas-swapAction	(lambda (node compiler) `(long@ ,[node second] 5)))
 
-(define Canvas-new
-  (lambda ()
-    (let ((canv (malloc 20))
+(define dbe-mode XdbeBackground)
+
+(define Canvas-newWithSwapAction
+  (lambda (swapAction)
+    (let ((canv (malloc 24))
 	  (dpy  (XOpenDisplay 0))
 	  (root (XDefaultRootWindow dpy))
 	  (win  (XCreateSimpleWindow dpy root 0 0 600 400 5 0 0))
@@ -15,7 +18,7 @@
 			       (q (XdbeQueryExtension dpy (addrof x) (addrof y))))
 			   (or q (printf "dbe disabled (server version %d.%d)\n" x y))
 			   q))
-		    (XdbeAllocateBackBufferName dpy win 1)
+		    (XdbeAllocateBackBufferName dpy win swapAction)
 		    win))
 	  (gc   (XDefaultGC dpy))
 	  (xwa  (malloc 60)))
@@ -49,13 +52,18 @@
       (XChangeWindowAttributes dpy win 2048 xwa)
       (XSetWindowBackground dpy win -1)
       (XMapWindow dpy win)
-      (set (Canvas-dpy  canv) dpy)
-      (set (Canvas-win  canv) win)
-      (set (Canvas-buf  canv) buf)
-      (set (Canvas-gc   canv) gc)
-      (set (Canvas-path canv) (XPolygon-new 32))
+      (set (Canvas-dpy        canv) dpy)
+      (set (Canvas-win        canv) win)
+      (set (Canvas-buf        canv) buf)
+      (set (Canvas-gc         canv) gc)
+      (set (Canvas-path       canv) (XPolygon-new 32))
+      (set (Canvas-swapAction canv) swapAction)
       (XFlush dpy)
       canv)))
+
+(define Canvas-new
+  (lambda ()
+    (Canvas-newWithSwapAction XdbeCopied)))
 
 (define GC_malloc	(dlsym "GC_malloc"))
 
@@ -198,7 +206,7 @@
     (if (!= (Canvas-buf c) (Canvas-win c))
 	(let ((info (malloc 8)))
 	  (set (int@ info 0) (Canvas-win c))
-	  (set (int@ info 1) 1)	; XdbeUntouched
+	  (set (int@ info 1) (Canvas-swapAction c))
 	  (XdbeSwapBuffers (Canvas-dpy c) info 1)))
     (XSync (Canvas-dpy c) 0)))
 
