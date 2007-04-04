@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 12:51:48 by piumarta on ubuntu
+  Last edited: 2007-04-04 09:07:50 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -192,6 +192,7 @@ SyntaxTable := [
 	at: #|		 	put: #xOr:;
 	at: #^		 	put: #xXor:;
 	at: #!		 	put: #xNot:;
+	at: #~		 	put: #xComplement:;
 	at: #<<		 	put: #xShl:;
 	at: #>>		 	put: #xShr:;
 	at: #<		 	put: #xLess:;
@@ -382,6 +383,12 @@ Compiler xNot: expr
 [
     expr size == 2 ifFalse: [self errorArgumentCount: expr].
     ^NOTI4 new lhs: (expr second translate: self)
+]
+
+Compiler xComplement: expr
+[
+    expr size == 2 ifFalse: [self errorArgumentCount: expr].
+    ^COMI4 new lhs: (expr second translate: self)
 ]
 
 Compiler xShl: expr

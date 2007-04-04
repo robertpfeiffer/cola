@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 15:58:42 by piumarta on emilia.local
+  Last edited: 2007-04-04 09:04:28 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -502,6 +502,7 @@ NEGI4   : Unary ()		NEGI4   name [ ^#negi4	 ]
 NEI4    : Binary ()		NEI4    name [ ^#nei4	 ]
 NOP	: Statement ()		NOP	name [ ^#nop	 ]
 NOTI4   : Unary ()		NOTI4   name [ ^#noti4	 ]
+COMI4   : Unary ()		COMI4   name [ ^#comi4	 ]
 ORI4    : Binary ()		ORI4    name [ ^#ori4	 ]
 PARAMI4	: Leaf ()		PARAMI4	name [ ^#parami4 ]
 RETV    : Statement ()		RETV    name [ ^#retv	 ]
