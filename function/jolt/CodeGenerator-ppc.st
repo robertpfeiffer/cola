@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 16:39:02 by piumarta on emilia.local
+  Last edited: 2007-04-04 12:01:04 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -116,7 +116,7 @@ PowerPCCodeGenerator brz      :s :l	[ self cmpwiI: 7 R: s I: 0;  beqI: 7 L: l ]
 PowerPCCodeGenerator cnsti4   :d :v	[ self lisR: d I_: v;  oriR: d R: d I_: v ]
 PowerPCCodeGenerator cnstp4   :d :v	[ self lisR: d I_: v;  oriR: d R: d I_: v ]
 PowerPCCodeGenerator divi4    :d :s	[ self divwR: d R: d R: s ]
-PowerPCCodeGenerator eqi4     :d :s	[ self xorR: d R: d R: s;  subficR: r0 R: r3 I: 0;  addeR: d R: r0 R: d ]
+PowerPCCodeGenerator eqi4     :d :s	[ self xorR: d R: d R: s;  subficR: r0 R: d I: 0;  addeR: d R: r0 R: d ]
 PowerPCCodeGenerator gei4     :d :s	[ self cmpwI: 7 R: d R: s;  crnorI: 30 I: 28 I: 28;  mfcrR: d;  rlwinmR: d R: d I: 31 I: 31 I: 31 ]
 PowerPCCodeGenerator gti4     :d :s	[ self cmpwI: 7 R: d R: s;  mfcrR: d;  rlwinmR: d R: d I: 30 I: 31 I: 31 ]
 PowerPCCodeGenerator indiri1  :d	[ self lbzR: d I: 0 R: d ]
