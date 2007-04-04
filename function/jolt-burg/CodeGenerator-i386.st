@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:09:59 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-04 07:28:45 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -66,6 +66,8 @@ NEI4	clobberIntel32: gen [ gen clobberECX:  	self ]
 NOTI4	clobberIntel32: gen [ gen clobberECX:  	self ]
 SHLI4	clobberIntel32: gen [ gen clobberECX:  	self ]
 SHRI4	clobberIntel32: gen [ gen clobberECX:  	self ]
+SHLU4	clobberIntel32: gen [ gen clobberECX:  	self ]
+SHRU4	clobberIntel32: gen [ gen clobberECX:  	self ]
 
 Intel32CodeGenerator clobberEACDX: insn	[ self clobberRegister: eax; clobberRegister: ecx; clobberRegister: edx ]
 Intel32CodeGenerator clobberEADX: insn	[ self clobberRegister: eax; clobberRegister: edx ]
@@ -191,6 +193,7 @@ StaticIntel32CodeGenerator orlR: s R: d		[ StdOut nextPutAll: '	orl	'; print: s;
 StaticIntel32CodeGenerator poplR: d		[ StdOut nextPutAll: '	popl	'; print: d; cr ]
 StaticIntel32CodeGenerator pushlR: s		[ StdOut nextPutAll: '	pushl	'; print: s; cr ]
 StaticIntel32CodeGenerator ret			[ StdOut nextPutAll: '	ret\n' ]
+StaticIntel32CodeGenerator sallR: s R: d	[ StdOut nextPutAll: '	sall	'; print: s; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator sarlR: s R: d	[ StdOut nextPutAll: '	sarl	'; print: s; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator seteR: d		[ StdOut nextPutAll: '	sete	'; print: d; cr ]
 StaticIntel32CodeGenerator setgR: d		[ StdOut nextPutAll: '	setg	'; print: d; cr ]
@@ -199,6 +202,7 @@ StaticIntel32CodeGenerator setlR: d		[ StdOut nextPutAll: '	setl	'; print: d; cr
 StaticIntel32CodeGenerator setleR: d		[ StdOut nextPutAll: '	setle	'; print: d; cr ]
 StaticIntel32CodeGenerator setneR: d		[ StdOut nextPutAll: '	setne	'; print: d; cr ]
 StaticIntel32CodeGenerator shllR: s R: d	[ StdOut nextPutAll: '	shll	'; print: s; nextPut: $,; print: d; cr ]
+StaticIntel32CodeGenerator shrlR: s R: d	[ StdOut nextPutAll: '	shrl	'; print: s; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator sublI: i R: d	[ StdOut nextPutAll: '	subl	'; nextPut: $$; print: i; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator sublI_: i R: d	[ StdOut nextPutAll: '	subl	'; nextPut: $$; print: (SmallInteger value_: i); nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator sublR: s R: d	[ StdOut nextPutAll: '	subl	'; print: s; nextPut: $,; print: d; cr ]
@@ -271,6 +275,7 @@ DynamicIntel32CodeGenerator orlR: s R: d	  { ORLrr	(      _R(s)	,	_R(d)	 ); }
 DynamicIntel32CodeGenerator poplR: d		  { POPLr	(      			_R(d)	 ); }
 DynamicIntel32CodeGenerator pushlR: s		  { PUSHLr	(      _R(s)			 ); }
 DynamicIntel32CodeGenerator ret			  { RET		(				 ); }
+DynamicIntel32CodeGenerator sallR: s R: d	  { SALLrr	(      _R(s)	,	_R(d)	 ); }
 DynamicIntel32CodeGenerator sarlR: s R: d	  { SARLrr	(      _R(s)	,	_R(d)	 ); }
 DynamicIntel32CodeGenerator seteR: d		  { SETEr	(			_R(d)	 ); }
 DynamicIntel32CodeGenerator setgR: d		  { SETGr	(			_R(d)	 ); }
@@ -279,6 +284,7 @@ DynamicIntel32CodeGenerator setlR: d		  { SETLr	(			_R(d)	 ); }
 DynamicIntel32CodeGenerator setleR: d		  { SETLEr	(			_R(d)	 ); }
 DynamicIntel32CodeGenerator setneR: d		  { SETNEr	(			_R(d)	 ); }
 DynamicIntel32CodeGenerator shllR: s R: d	  { SHLLrr	(      _R(s)	,	_R(d)	 ); }
+DynamicIntel32CodeGenerator shrlR: s R: d	  { SHRLrr	(      _R(s)	,	_R(d)	 ); }
 DynamicIntel32CodeGenerator sublI: i R: d	  { SUBLir	(_I(i)		,	_R(d)	 ); }
 DynamicIntel32CodeGenerator sublI_: _i R: d	  { SUBLir	(_P(i)		,	_R(d)	 ); }
 DynamicIntel32CodeGenerator sublR: s R: d	  { SUBLrr	(      _R(s)	,	_R(d)	 ); }
@@ -379,9 +385,13 @@ Intel32Grammar := [
 								    idivlR: op rhs output;
 								    movlR:  gen edx	  R: op output ];
 	at: #REG  add: #(shli4 	 REG REG)	do: [:op :gen | gen movlR:  op rhs output R: gen ecx;
+								    sallR:  gen cl	  R: op output ];
+	at: #REG  add: #(shlu4 	 REG REG)	do: [:op :gen | gen movlR:  op rhs output R: gen ecx;
 								    shllR:  gen cl	  R: op output ];
 	at: #REG  add: #(shri4 	 REG REG)	do: [:op :gen | gen movlR:  op rhs output R: gen ecx;
 								    sarlR:  gen cl	  R: op output ];
+	at: #REG  add: #(shru4 	 REG REG)	do: [:op :gen | gen movlR:  op rhs output R: gen ecx;
+								    shrlR:  gen cl	  R: op output ];
 	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen xorlR:  gen ecx	  R: gen ecx;
 								    cmplR:  op rhs output R: op lhs output;
 								    setlR:  gen cl;

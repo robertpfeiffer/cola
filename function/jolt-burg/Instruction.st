@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:07:08 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-04 07:32:34 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -503,7 +503,9 @@ PARAMI4	: Leaf ()		PARAMI4	name [ ^#parami4 ]
 RETV    : Statement ()		RETV    name [ ^#retv	 ]
 RETI4   : Sink ()		RETI4   name [ ^#reti4	 ]
 SHLI4   : Binary ()		SHLI4   name [ ^#shli4	 ]
+SHLU4   : Binary ()		SHLU4   name [ ^#shlu4	 ]
 SHRI4   : Binary ()		SHRI4   name [ ^#shri4	 ]
+SHRU4   : Binary ()		SHRU4   name [ ^#shru4	 ]
 SPILLI4	: Spill ()		SPILLI4	name [^ #spilli4 ]
 SUBI4   : Binary ()		SUBI4   name [ ^#subi4	 ]
 XORI4   : Binary ()		XORI4   name [ ^#xori4	 ]

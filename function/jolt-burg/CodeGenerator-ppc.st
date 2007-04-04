@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:11:25 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-04 07:30:26 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -229,6 +229,7 @@ StaticPowerPCCodeGenerator oriR: d R: s I_: _i	[ StdOut nextPutAll: '	ori	'; pri
 StaticPowerPCCodeGenerator rlwinmR: d R: s I: i I: j I: k	[ StdOut nextPutAll: '	rlwinm	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; nextPut: $,; print: j; nextPut: $,; print: k; cr ]
 StaticPowerPCCodeGenerator slwR: d R: a R: b	[ StdOut nextPutAll: '	slw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator srawR: d R: a R: b	[ StdOut nextPutAll: '	sraw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
+StaticPowerPCCodeGenerator srwR: d R: a R: b	[ StdOut nextPutAll: '	srw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator stbR: d I: i R: s	[ StdOut nextPutAll: '	stb	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator sthR: d I: i R: s	[ StdOut nextPutAll: '	sth	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
 StaticPowerPCCodeGenerator stwR: d I: i R: s	[ StdOut nextPutAll: '	stw	'; print: d; nextPut: $,; print: i; nextPut: $(; print: s; nextPut: $); cr ]
@@ -299,6 +300,7 @@ DynamicPowerPCCodeGenerator oriR: d R: s I_: _i	{ ORIrri	(_R(d), _R(s), _P(i & 0
 DynamicPowerPCCodeGenerator rlwinmR: d R: s I: i I: j I:k	{ RLWINMrriii	(_R(d), _R(s), _I(i), _I(j), _I(k)); }
 DynamicPowerPCCodeGenerator slwR: d R: a R: b	{ SLWrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator srawR: d R: a R: b	{ SRAWrrr	(_R(d), _R(a), _R(b)         	); }
+DynamicPowerPCCodeGenerator srwR: d R: a R: b	{ SRWrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator stbR: d I: i R: s	{ STBrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator sthR: d I: i R: s	{ STHrm		(_R(d), _I(i), _R(s)		); }
 DynamicPowerPCCodeGenerator stwR: d I: i R: s	{ STWrm		(_R(d), _I(i), _R(s)		); }
@@ -402,7 +404,9 @@ PowerPCGrammar := [
 								    mullwR:  gen r0    R: gen r0	R: op rhs output;
 								    subfR:   op output R: gen r0	R: op lhs output ];
 	at: #REG  add: #(shli4 	 REG REG)	do: [:op :gen | gen slwR:    op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(shlu4 	 REG REG)	do: [:op :gen | gen slwR:    op output R: op lhs output R: op rhs output ];
 	at: #REG  add: #(shri4 	 REG REG)	do: [:op :gen | gen srawR:   op output R: op lhs output R: op rhs output ];
+	at: #REG  add: #(shru4 	 REG REG)	do: [:op :gen | gen srwR:    op output R: op lhs output R: op rhs output ];
 	at: #REG  add: #(lti4 	 REG REG)	do: [:op :gen | gen cmpwI:   7		R: op lhs output R: op rhs output;
 								    mfcrR:   op output;
 								    rlwinmR: op output	R: op output	 I: 29 I: 31 I: 31 ];
