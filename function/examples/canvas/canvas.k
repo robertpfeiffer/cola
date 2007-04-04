@@ -89,17 +89,30 @@
 
 (define %Canvas-evt (malloc 96))
 
+(define Canvas-dispatchOneEvent
+  (lambda (c evt)
+    (let ((type (XEvent-type evt)))
+      (if (== 2 type) (document.onkeydown   (Event-fromXKeyEvent    evt)))
+      (if (== 3 type) (document.onkeyup     (Event-fromXKeyEvent    evt)))
+      (if (== 4 type) (document.onmousedown (Event-fromXButtonEvent evt)))
+      (if (== 5 type) (document.onmouseup   (Event-fromXButtonEvent evt)))
+      (if (== 6 type) (document.onmousemove (Event-fromXButtonEvent evt))))))
+
+(define Canvas-waitForEvent
+  (lambda (c)
+    (XNextEvent (Canvas-dpy c) %Canvas-evt)
+    (Canvas-dispatchOneEvent c %Canvas-evt)))
+
 (define Canvas-handleEvents
   (lambda (c)
     (while (XPending (Canvas-dpy c))
-      (begin
-	(XNextEvent (Canvas-dpy c) %Canvas-evt)
-	(let ((type (XEvent-type %Canvas-evt)))
-	  (if (== 2 type) (document.onkeydown   (Event-fromXKeyEvent    %Canvas-evt)))
-	  (if (== 3 type) (document.onkeyup     (Event-fromXKeyEvent    %Canvas-evt)))
-	  (if (== 4 type) (document.onmousedown (Event-fromXButtonEvent %Canvas-evt)))
-	  (if (== 5 type) (document.onmouseup   (Event-fromXButtonEvent %Canvas-evt)))
-	  (if (== 6 type) (document.onmousemove (Event-fromXButtonEvent %Canvas-evt))))))))
+      (Canvas-waitForEvent c))))
+
+(define Canvas-handleEventsFor
+  (lambda (c timeout)
+    (let ((file [File withFd_: (XDisplay-fd (Canvas-dpy c)) name: '"X display connection"]))
+      [file waitForInput: [SmallInteger value_: timeout]]
+      (Canvas-handleEvents c))))
 
 (define Canvas-clear
   (lambda (c)
