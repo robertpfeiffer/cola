@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 13:53:42 by piumarta on emilia.local
+  Last edited: 2007-04-04 09:27:49 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -453,6 +453,30 @@ Float cos
 	rcvr= cos(rcvr);
 	memcpy(v_self, &rcvr, sizeof(double));
     }
+]
+
+Float tan
+[
+   self := self copy.
+   {
+       double rcvr;
+       memcpy(&rcvr, v_self, sizeof(double));
+       rcvr= tan(rcvr);
+       memcpy(v_self, &rcvr, sizeof(double));
+   }
+]
+
+Float atan2: y
+[
+   self := self copy.
+   y := y asFloat.
+   {
+       double x, y;
+       memcpy(&x, v_self, sizeof(double));
+       memcpy(&y, v_y, sizeof(double));
+       x= atan2(x, y);
+       memcpy(v_self, &x, sizeof(double));
+   }
 ]
 
 Float sqrt
