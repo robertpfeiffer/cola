@@ -72,3 +72,5 @@
 
 (syntax XColor-new	(lambda (node compiler) `(malloc 12)))
 (syntax XColor-pixel	(lambda (node compiler) `(long@ ,[node second])))
+
+(syntax XDisplay-fd	(lambda (node compiler) `(long@ ,[node second] 2)))
