@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 13:04:01 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-04 07:11:25 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -223,6 +223,7 @@ StaticPowerPCCodeGenerator mrR: d R: s		[ d == s ifFalse: [StdOut nextPutAll: '	
 StaticPowerPCCodeGenerator mtlrR: d		[ StdOut nextPutAll: '	mtlr	'; print: d; cr ]
 StaticPowerPCCodeGenerator mullwR: d R: a R: b	[ StdOut nextPutAll: '	mullw	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator negR: d R: s		[ StdOut nextPutAll: '	neg	'; print: d; nextPut: $,; print: s; cr ]
+StaticPowerPCCodeGenerator notR: d R: s		[ StdOut nextPutAll: '	not	'; print: d; nextPut: $,; print: s; cr ]
 StaticPowerPCCodeGenerator orR: d R: a R: b	[ StdOut nextPutAll: '	or	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticPowerPCCodeGenerator oriR: d R: s I_: _i	[ StdOut nextPutAll: '	ori	'; print: d; nextPut: $,; print: s; nextPut: $,; print: (SmallInteger value_: _i) & 0xffff; cr ]
 StaticPowerPCCodeGenerator rlwinmR: d R: s I: i I: j I: k	[ StdOut nextPutAll: '	rlwinm	'; print: d; nextPut: $,; print: s; nextPut: $,; print: i; nextPut: $,; print: j; nextPut: $,; print: k; cr ]
@@ -292,6 +293,7 @@ DynamicPowerPCCodeGenerator mflrR: d		{ MFLRr		(_R(d)			     	); }
 DynamicPowerPCCodeGenerator mtlrR: d		{ MTLRr		(_R(d)			     	); }
 DynamicPowerPCCodeGenerator mullwR: d R: a R: b	{ MULLWrrr	(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator negR: d R: s	{ NEGrr		(_R(d), _R(s)		     	); }
+DynamicPowerPCCodeGenerator notR: d R: s	{ NOTrr		(_R(d), _R(s)		     	); }
 DynamicPowerPCCodeGenerator orR: d R: a R: b	{ ORrrr		(_R(d), _R(a), _R(b)         	); }
 DynamicPowerPCCodeGenerator oriR: d R: s I_: _i	{ ORIrri	(_R(d), _R(s), _P(i & 0xffff)	); }
 DynamicPowerPCCodeGenerator rlwinmR: d R: s I: i I: j I:k	{ RLWINMrriii	(_R(d), _R(s), _I(i), _I(j), _I(k)); }
@@ -383,6 +385,7 @@ PowerPCGrammar := [
 	at: #REG  add: #(indiri4 REG	)	do: [:op :gen | gen lwzR:    op output I: 0		R: op output ];
 	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen subficR: gen r0    R: op lhs output I: 0;
 								    addeR:   op output R: gen r0	R: op lhs output ];
+	at: #REG  add: #(comi4 	 REG	)	do: [:op :gen | gen notR:    op output R: op lhs output ];
 	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen negR:    op output R: op lhs output ];
 	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4:  op ];
 	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen stbR:    op lhs output I: 0 R: op rhs output ];

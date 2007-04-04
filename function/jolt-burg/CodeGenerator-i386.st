@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 17:13:58 by piumarta on emilia.local
+  Last edited: 2007-04-04 07:09:59 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -186,6 +186,7 @@ StaticIntel32CodeGenerator movsblMb: s R: d	[ StdOut nextPutAll: '	movsbl	('; pr
 StaticIntel32CodeGenerator movswlMb: s R: d	[ StdOut nextPutAll: '	movswl	('; print: s; nextPutAll: '),'; print: d; cr ]
 StaticIntel32CodeGenerator movwR: r Mb: b	[ StdOut nextPutAll: '	movw	'; print: r; nextPutAll: ',('; print: b; nextPut: $); cr ]
 StaticIntel32CodeGenerator neglR: d		[ StdOut nextPutAll: '	negl	'; print: d; cr ]
+StaticIntel32CodeGenerator notlR: d		[ StdOut nextPutAll: '	notl	'; print: d; cr ]
 StaticIntel32CodeGenerator orlR: s R: d		[ StdOut nextPutAll: '	orl	'; print: s; nextPut: $,; print: d; cr ]
 StaticIntel32CodeGenerator poplR: d		[ StdOut nextPutAll: '	popl	'; print: d; cr ]
 StaticIntel32CodeGenerator pushlR: s		[ StdOut nextPutAll: '	pushl	'; print: s; cr ]
@@ -265,6 +266,7 @@ DynamicIntel32CodeGenerator movsblMb: s R: d	  { MOVSBLmr	(    0,_R(s),0,0, 	_R(
 DynamicIntel32CodeGenerator movswlMb: s R: d	  { MOVSWLmr	(    0,_R(s),0,0, 	_R(d)	 ); }
 DynamicIntel32CodeGenerator movwR: r Mb: b	  { MOVWrm	(      _R(r)	,     0,_R(b),0,0); }
 DynamicIntel32CodeGenerator neglR: d		  { NEGLr	(      			_R(d)	 ); }
+DynamicIntel32CodeGenerator notlR: d		  { NOTLr	(      			_R(d)	 ); }
 DynamicIntel32CodeGenerator orlR: s R: d	  { ORLrr	(      _R(s)	,	_R(d)	 ); }
 DynamicIntel32CodeGenerator poplR: d		  { POPLr	(      			_R(d)	 ); }
 DynamicIntel32CodeGenerator pushlR: s		  { PUSHLr	(      _R(s)			 ); }
@@ -354,6 +356,7 @@ Intel32Grammar := [
 								    cmplI:    0		      R: op output;
 								    seteR:    gen cl;
 								    movlR:    gen ecx	      R: op output ];
+	at: #REG  add: #(comi4 	 REG	)	do: [:op :gen | gen notlR:    op output ];
 	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen neglR:    op output ];
 	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4: op ];
 	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen movlR:    op lhs output   R: gen ecx;
