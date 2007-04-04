@@ -106,5 +106,5 @@
   (set document.onmousemove mouse-move)
   (set textBox (Canvas-createTextBox c text))
   (while 1
-    (Canvas-handleEvents c)
+    (Canvas-handleEventsFor c 100)
     (draw c)))
