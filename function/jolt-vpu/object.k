@@ -9,13 +9,13 @@
 
 (define make-getter
   (lambda (offset)
-    `(lambda (_closure self)
-       (long@ (+ self ,[SmallInteger value_: offset])))))
+    `(lambda (_closure _self self)
+       (long@ (+ _self ,[SmallInteger value_: offset])))))
 
 (define make-setter
   (lambda (offset)
-    `(lambda (_closure self value)
-       (set (long@ (+ self ,[SmallInteger value_: offset])) value))))
+    `(lambda (_closure _self self value)
+       (set (long@ (+ _self ,[SmallInteger value_: offset])) value))))
 
 (define make-accessors
   (lambda (offset slotNames)
@@ -46,8 +46,8 @@
 	  (protoSize (+ baseSize slotSize)))
       `(define ,protoName
 	 (let ((proto [(import ,[baseName asString]) _delegated]))	; this is the new type
-	   [[proto _vtable] methodAt: '_sizeof    put: (lambda (_closure self) ,[SmallInteger value_: protoSize]) with: 0]
-	   [[proto _vtable] methodAt: '_debugName put: (lambda (_closure self) ,[protoName asString])		  with: 0]
+	   [[proto _vtable] methodAt: '_sizeof    put: (lambda (_closure _self self) ,[SmallInteger value_: protoSize]) with: 0]
+	   [[proto _vtable] methodAt: '_debugName put: (lambda (_closure _self self) ,[protoName asString])		  with: 0]
 	   (export ,[protoName asString] proto)	; export new type to Pepsi global namespace
 	   ,@(make-accessors baseSize slotNames)
 	   proto)))))
@@ -66,4 +66,4 @@
 	  (type     [form third])
 	  (args     [form copyFrom: '3 to: [[form size] - '2]])
 	  (expr     [form last]))
-      `(add-method ,type ,selector (lambda (_closure self ,@args) ,expr)))))
+      `(add-method ,type ,selector (lambda (_closure _self self ,@args) ,expr)))))
