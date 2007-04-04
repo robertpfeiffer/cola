@@ -6,5 +6,14 @@ Integer nfibs
 ]
 
 [
-    StdOut print: 38 nfibs; cr
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
+    StdOut print: 35 nfibs; cr.
 ]
