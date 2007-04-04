@@ -5,6 +5,17 @@
 (define SmallInteger		(import "SmallInteger"))
 (define OrderedCollection	(import "OrderedCollection"))
 
+;; message send syntax (replaces the bogus version defined in boot.k which cannot cope with ':)
+
+(syntax send ; (send selector receiver args...)
+  (lambda (node compiler)
+    (or [[node size] >= '3] [compiler errorSyntax: node])
+    (let ((selector [node second])
+	  (receiver [node third]))
+      `(let ((__r ,receiver))
+	 (let ((__c (_bind ,selector __r)))
+	   ((long@ __c) __c __r __r ,@[node copyFrom: '3]))))))
+
 ;; define a new object type
 
 (define make-getter
