@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:34:11 by piumarta on emilia
+  Last edited: 2007-04-02 20:22:38 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -38,6 +38,13 @@ File withFd: fd name: nameString
 [
     self := self new.
     _fd := fd _integerValue.
+    name := nameString.
+]
+
+File withFd_: _theFd name: nameString
+[
+    self := self new.
+    _fd := _theFd.
     name := nameString.
 ]
 
@@ -78,6 +85,19 @@ File  read: aCollection size: size	[ ^SmallInteger value_: (self _read_: aCollec
 File _read_: _bytes size_: _size	{ return (oop)read((int)self->v__fd, (void *)v__bytes, (size_t)v__size); }
 
 File isInteractive			{ return (oop)isatty((int)self->v__fd); }
+
+File waitForInput: msTimeout
+{
+    fd_set r, w, x;
+    int n= 0;
+    struct timeval tv= { ((long)v_msTimeout >> 1) / 1000000, ((long)v_msTimeout >> 1) % 1000000 };
+    FD_ZERO(&r);
+    FD_ZERO(&w);
+    FD_ZERO(&x);
+    FD_SET((long)self->v__fd, &r);
+    n= select((long)self->v__fd + 1, &r, &w, &x, &tv);
+    return (oop)(n << 1 | 1);
+}
 
 File open: pathString
 [
