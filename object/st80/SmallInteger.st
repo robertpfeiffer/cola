@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-27 18:52:00 by piumarta on ubuntu
+  Last edited: 2007-04-02 12:07:45 by piumarta on alan-kays-computer.local
 "
 
 { import: Integer }
@@ -30,8 +30,8 @@ Object isSmallInteger		[ ^false ]
 SmallInteger hash		[ ^self bitAnd: 0x00FFFFFF ]
 SmallInteger identityHash	[ ^self bitAnd: 0x00FFFFFF ]
 
-SmallInteger maxVal	{ return (oop)(-1UL >> 1); }
-SmallInteger minVal	{ return (oop)(-1L); }
+SmallInteger maxVal	{ return (oop)((-1UL >> 1)    ); }
+SmallInteger minVal	{ return (oop)((-1UL >> 1) + 2); }
 
 SmallInteger digitLength
 [
