@@ -1,4 +1,4 @@
-IDC		= idc -k # -O
+IDC		= idc -k -O
 IDFLAGS		= -g -I../objects
 
 OBJEXT          = 
@@ -12,7 +12,7 @@ LIBS		= ../objects/objects.a jolt.a
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o
 
-LDLIBS		= jolt.a -lreadline -ltermcap
+LDLIBS		= jolt.a -lreadline -ltermcap # -lopcodes -lintl
 
 all : main$(OBJEXT)
 

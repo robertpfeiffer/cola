@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-31 11:21:53 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-05 20:13:02 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -26,13 +26,12 @@ SlotDictionary new	[ ^self new: nil ]
 
 SlotDictionary new: defaultElement
 {
-    struct t_SlotDictionary *this= (struct t_SlotDictionary *)_alloc(v_self, sizeof(struct t_SlotDictionary));
-    this->v__size=    (oop)4;
-    this->v__tally=   (oop)0;
-    this->v__keys=    (oop)_palloc(sizeof(oop) * 4);
-    this->v__values=  (oop)_palloc(sizeof(oop) * 4);
-    this->v_default=  v_defaultElement;
-    return (oop)this;
+    v_self= (oop)_alloc(v_self, sizeof(struct t_SlotDictionary));
+    self->v__size=    (oop)4;
+    self->v__tally=   (oop)0;
+    self->v__keys=    (oop)_palloc(sizeof(oop) * 4);
+    self->v__values=  (oop)_palloc(sizeof(oop) * 4);
+    self->v_default=  v_defaultElement;
 }
 
 SlotDictionary at: aKey
@@ -46,8 +45,8 @@ SlotDictionary at: aKey
 			 ((oop *)self->v__values)[1]= ((oop *)self->v__values)[0];
 			 ((oop *)self->v__keys  )[0]= v_aKey;
 	return  	 ((oop *)self->v__values)[0]= v1;
-      }
-    else
+       }
+     else
       {
 	register long index, lasti= (long)self->v__tally;
         for (index= 2;  index < lasti;  ++index)
@@ -141,4 +140,9 @@ SlotDictionary valueAt: index
 SlotDictionary valuesDo: aBlock
 [
     0 to: self size - 1 do: [:index | aBlock value: (self valueAt: index)]
+]
+
+SlotDictionary valuesReverseDo: aBlock
+[
+    self size - 1 downTo: 0 do: [:index | aBlock value: (self valueAt: index)]
 ]

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:32:34 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-05 20:14:22 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -120,6 +120,14 @@ Leaf clobberRegisters: codeGenerator
 Leaf allocateRegisters: allocator
 [
     ^source == self ifTrue: [output := allocator perform: type with: self]
+]
+
+Param : Leaf ()
+
+Param allocateRegisters: allocator
+[
+    arg location: (allocator codeGenerator allocateParam: arg).
+    ^super allocateRegisters: allocator
 ]
 
 "generates a value, consumes a value"
@@ -499,7 +507,7 @@ NOP	: Statement ()		NOP	name [ ^#nop	 ]
 NOTI4   : Unary ()		NOTI4   name [ ^#noti4	 ]
 COMI4   : Unary ()		COMI4   name [ ^#comi4	 ]
 ORI4    : Binary ()		ORI4    name [ ^#ori4	 ]
-PARAMI4	: Leaf ()		PARAMI4	name [ ^#parami4 ]
+PARAMI4	: Param ()		PARAMI4	name [ ^#parami4 ]
 RETV    : Statement ()		RETV    name [ ^#retv	 ]
 RETI4   : Sink ()		RETI4   name [ ^#reti4	 ]
 SHLI4   : Binary ()		SHLI4   name [ ^#shli4	 ]

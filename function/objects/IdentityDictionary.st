@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 13:02:00 by piumarta on emilia.local
+  Last edited: 2007-04-05 14:47:34 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -74,6 +74,14 @@ IdentityDictionary printContentsOn: aStream
     aStream nextPut: $).
 ]
 "
+
+IdentityDictionary keys
+[
+    | keys |
+    keys := OrderedCollection new.
+    self do: [:assoc | keys add: assoc key].
+    ^keys
+]
 
 IdentityDictionary valuesDo: aBlock
 [

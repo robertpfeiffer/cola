@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:28:45 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-05 20:08:47 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -453,6 +453,8 @@ StaticIntel32CodeGenerator generate: tree
     tree generate: self.
 ]
 
+"{ include ""dis-i386.c"" }"
+
 DynamicIntel32CodeGenerator generate: tree
 [
     | _entry |
@@ -467,4 +469,6 @@ DynamicIntel32CodeGenerator generate: tree
     self relocateLabels_: self _asmPC.
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
+    { iflush((void *)v__entry, (void *)asm_pc); }.
+"    CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }]."
 ]

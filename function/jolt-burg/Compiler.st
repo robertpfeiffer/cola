@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:06:51 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-05 20:03:21 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -57,7 +57,7 @@ GlobalVariable _value				{ return *(oop *)self->v__storage; }
 GlobalVariable _address				[ ^_storage ]
 GlobalVariable translateLvalue: compiler	[ ^ADDRGP4 new arg: self ]
 
-GlobalVariable printOn: aStream			[ aStream nextPutAll: name; nextPut: $=; print_x: _storage ]
+GlobalVariable printOn: aStream			[ aStream print: name; nextPut: $=; print_x: _storage ]
 
 
 LocalVariable : Variable ( location )
@@ -70,12 +70,12 @@ LocalVariable translateLvalue: compiler		[ ^ADDRLP4 new arg: self ]
 
 LocalVariable allocate: codeGenerator		[ location := codeGenerator allocateTemp: self ]
 
-LocalVariable printOn: aStream			[ aStream nextPutAll: name; nextPut: $=; print: location ]
+LocalVariable printOn: aStream			[ aStream print: name; nextPut: $=; print: location ]
 
 
 ParameterVariable : LocalVariable ()
 
-ParameterVariable allocate: codeGenerator	[ location := codeGenerator allocateParam: self ]
+ParameterVariable allocate: codeGenerator	[ "location := codeGenerator allocateParam: self" ]
 
 
 CompilerVariable : Variable ( _value )
@@ -83,9 +83,13 @@ CompilerVariable : Variable ( _value )
 CompilerVariable value_: _v	[ ^_value := _v ]
 CompilerVariable _value		[ ^_value ]
 
+CompilerVariable printOn: aStream		[ aStream print: name ]
+
 "----------------------------------------------------------------"
 
-Environment : IdentityDictionary ( syntax )
+{ import: SlotDictionary }
+
+Environment : SlotDictionary ( syntax )
 
 Environment lookupVariable: name	[ ^self at: name ifAbsent: [] ]
 
@@ -93,7 +97,7 @@ Environment lookupSyntax: name		[ ^syntax ifTrue: [syntax at: name ifAbsent: []]
 
 Environment defineSyntax: name
 [
-    syntax ifFalse: [syntax := IdentityDictionary new].
+    syntax ifFalse: [syntax := SlotDictionary new].
     ^syntax at: name put: (CompilerVariable withName:  name)
 ]
 
@@ -182,7 +186,7 @@ Compiler breaks		[ ^breaks ]
 Compiler newLabel	[ ^labels add: Label new ]
 
 SyntaxTable := [
-    IdentityDictionary new
+    SlotDictionary new
 	at: #+		 	put: #xAdd:;
 	at: #-		 	put: #xSub:;
 	at: #*		 	put: #xMul:;

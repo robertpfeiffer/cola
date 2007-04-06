@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:24:23 by piumarta on emilia
+  Last edited: 2007-04-05 10:13:48 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -30,6 +30,13 @@ Symbol intern_: _string size_: _stringSize
     buf[(int)v__stringSize]= '\0';
     return _selector(buf);
 }
+
+Symbol intern_: _string
+[
+    | _stringSize |
+    { v__stringSize= (oop)strlen((char *)v__string); }.
+    ^self intern_: _string size_: _stringSize
+]
 
 Symbol intern: aString
 [
