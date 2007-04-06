@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 20:03:21 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-06 09:41:47 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -90,6 +90,8 @@ CompilerVariable printOn: aStream		[ aStream print: name ]
 { import: SlotDictionary }
 
 Environment : SlotDictionary ( syntax )
+
+Environment new		[ ^super basicNew ]
 
 Environment lookupVariable: name	[ ^self at: name ifAbsent: [] ]
 

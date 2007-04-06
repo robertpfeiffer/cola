@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 20:13:02 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-06 09:36:53 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -33,6 +33,18 @@ SlotDictionary new: defaultElement
     self->v__values=  (oop)_palloc(sizeof(oop) * 4);
     self->v_default=  v_defaultElement;
 }
+
+SlotDictionary basicNew
+[
+    self := self _vtable _alloc: self _sizeof.
+    {
+	self->v__size=    (oop)2;
+	self->v__tally=   (oop)0;
+	self->v__keys=    (oop)_palloc(sizeof(oop) * 2);
+	self->v__values=  (oop)_palloc(sizeof(oop) * 2);
+	self->v_default=  0;
+    }
+]
 
 SlotDictionary at: aKey
 {

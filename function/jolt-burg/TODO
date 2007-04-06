@@ -1,1 +1,5 @@
 generate slot accessor syntax in define-type
+
+move SlotDictionary.basicNew into .new and rename the fast version as
+something reflecting the inability to add state
+
