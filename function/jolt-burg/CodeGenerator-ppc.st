@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 07:30:26 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-06 09:23:27 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -474,6 +474,8 @@ StaticPowerPCCodeGenerator generate: tree
     tree generate: self.
 ]
 
+"{ include ""dis-ppc.c"" }"
+
 DynamicPowerPCCodeGenerator generate: tree
 [
     | _entry |
@@ -489,4 +491,5 @@ DynamicPowerPCCodeGenerator generate: tree
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
     { iflush((void *)v__entry, (void *)asm_pc); }.
+"    CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }]."
 ]
