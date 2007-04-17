@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-06 09:36:53 by piumarta on margaux.piumarta.com
+  Last edited: 2007-04-17 11:32:16 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -45,6 +45,9 @@ SlotDictionary basicNew
 	self->v_default=  0;
     }
 ]
+
+SlotDictionary default			[ ^default ]
+SlotDictionary default: defaultElement	[  default := defaultElement ]
 
 SlotDictionary at: aKey
 {
