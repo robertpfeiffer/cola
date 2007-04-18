@@ -16,18 +16,7 @@
 	  (XRectangle-new (* w offset) 0 w h))
 	0)))
 
-; textBox.getIndex(point) -> index of char in [ startIndex , startIndex + charCount ] nearest to point
-
-(define Text-getIndex
-  (lambda (t p)
-    (let ((x (XPoint-x p))
-	  (c (Text-count t))
-	  (w (Text-charWidth t)))
-      (if (and (< 0 x) (< x (* w c)))
-	  (/ x w)
-	  -1))))
-
-; textBox.stopIndex(textBox, pixelWidth) -> indexOfLastChar in [ startIndex, startIndex + charCount ]  < pixelWidth
+; textBox.stopIndex(textBox, pixelWidth) -> indexOfFirstChar in [ startIndex, startIndex + charCount ]  >= pixelWidth
 
 (define Text-stopIndex
   (lambda (t x)
