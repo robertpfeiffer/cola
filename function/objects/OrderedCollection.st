@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:29:16 by piumarta on emilia
+  Last edited: 2007-04-18 16:21:59 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -81,6 +81,7 @@ OrderedCollection removeFirst
     | first |
     self emptyCheck.
     first := array at: firstIndex.
+    array at: firstIndex put: nil.
     firstIndex := firstIndex + 1.
     ^first
 ]
@@ -91,6 +92,7 @@ OrderedCollection removeLast
     self emptyCheck.
     lastIndex := lastIndex - 1.
     last := array at: lastIndex.
+    array at: lastIndex put: nil.
     ^last
 ]
 
