@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-18 16:21:59 by piumarta on emilia.local
+  Last edited: 2007-04-18 16:45:27 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -71,6 +71,24 @@ OrderedCollection makeRoomAtLast
     array := (array new: self size + array size)
 	replaceFrom: firstIndex to: lastIndex - 1 with: array startingAt: firstIndex;
 	yourself.
+]
+
+OrderedCollection shiftToBeginning
+[
+    | delta |
+    (delta := firstIndex) == 0 ifTrue: [^self].
+    0 to: self size - 1 do: [:index | array at: index put: (array at: delta + index)].
+    firstIndex := firstIndex - delta.
+    lastIndex := lastIndex - delta.
+]
+
+OrderedCollection shiftToEnd
+[
+    | delta |
+    (delta := array size - lastIndex) == 0 ifTrue: [^self].
+    lastIndex - 1 downTo: firstIndex do: [:index | array at: index + delta put: (array at: index)].
+    firstIndex := firstIndex + delta.
+    lastIndex := lastIndex + delta.
 ]
 
 OrderedCollection resetToBeginning	[ firstIndex := lastIndex := 0]
