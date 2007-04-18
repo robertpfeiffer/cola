@@ -475,6 +475,28 @@
 			(+ (let ((x 25)) (+ x (let ((x 26)) (+ x (let ((x 27)) (+ x (let ((x 28)) (+ x (let ((x 29)) (+ x (let ((x 30)) x)))))))))))
 			   (let ((x 31)) (+ x (let ((x 32)) (+ x (let ((x 33)) (+ x (let ((x 34)) (+ x (let ((x 35)) (+ x (let ((x 36)) x))))))))))))))))))
 
+(printf "control flow...\n")
+
+(assert (== 55 (let ((x 0) (y 0))
+		 (while (< x 10)
+		   (set x (+ x 1))
+		   (set y (+ x y)))
+		 y)))
+
+(assert (== 28 (let ((x 0) (y 0))
+		 (while (< x 10)
+		   (set x (+ x 1))
+		   (if (== x 8) (break))
+		   (set y (+ x y)))
+		 y)))
+
+(assert (== 50 (let ((x 0) (y 0))
+		 (while (< x 10)
+		   (set x (+ x 1))
+		   (if (== x 5) (continue))
+		   (set y (+ x y)))
+		 y)))
+
 (printf "objects...\n")
 
 (printf "%p\n" `((1)))
@@ -509,6 +531,8 @@
   (set (long1 mem) 666)
   (assert (== 666 (long@ mem 1)))
   (assert (== 666 (long1 mem))))
+
+
 
 (printf "done\n")
 (printf "congratulations -- your code generator (%s) passes a bunch of simple tests\n\n" [[(import "CodeGenerator") versionString] _elements])
