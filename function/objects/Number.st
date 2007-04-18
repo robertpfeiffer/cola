@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-04 09:27:49 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-05 22:28:34 by piumarta on alan-kays-computer.local
 "
 
 { import: Objects }
@@ -279,7 +279,7 @@ Float fromString: s
     ^f
 ]
 
-Float copy	[ ^self new value_: self ]
+Float copy	[ ^self value_: self ]
 
 Float        asFloat	[ ^self ]
 SmallInteger asFloat	[ ^Float new setIntegerValue_: self _integerValue ]
@@ -782,7 +782,15 @@ Integer ^ aNumber	[ ^self bitXor: aNumber ]
 
 SmallInteger asLargeInteger	[ ^LargeInteger withValue: self ]
 
-Number sqrt		[ ^self asFloat sqrt ]
+Number sin		[ ^self asFloat sin ]
+Number cos		[ ^self asFloat cos ]
+Number tan		[ ^self asFloat tan ]
+Number atan2: aNumber	[ ^self asFloat atan2: aNumber ]
+
+Integer rounded		[ ^self ]
+Integer truncated	[ ^self ]
+
+Float rounded		[ ^(self + 0.5) truncated ]
 
 Integer fromString: s
 [
