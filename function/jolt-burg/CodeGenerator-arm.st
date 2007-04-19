@@ -82,6 +82,19 @@ ARMCodeGenerator allocateTemp: insn
     ^(temps add: (Temporary withBase: sp offset: 0)) allocate
 ]
 
+" |           	  |
+  | in arg N-1 	  |
+  | in arg 4  	  | <-- SP
+  | in arg 3  	  | <= r3 [spilled iff varargs]
+  | in arg 2  	  | <= r2 [spilled iff varargs]
+  | in arg 1  	  | <= r1 [spilled iff varargs]
+  | in arg 0  	  | <= r0 [spilled iff varargs]
+  |-------------  |
+  | saved LR   	  |
+  | ...temps...	  |
+  | out params... | <-- SP'
+"
+
 ARMCodeGenerator finaliseFrame
 [
     | align |
@@ -93,7 +106,6 @@ ARMCodeGenerator finaliseFrame
 	temp offset: frameSize.
 	frameSize := frameSize + 4].					"temporary variable"
     tempsSize := frameSize.						"offset to first first four words of incoming arguments"
-    frameSize := frameSize + 16.					"saved incoming args"
     registerList := 0.
     csrs do: [:reg | reg used
 	ifTrue:
@@ -105,31 +117,28 @@ ARMCodeGenerator finaliseFrame
 	    align := (frameSize + 15 bitAnd: -16) - frameSize.
 	    tempsSize := tempsSize + align.
 	    frameSize := frameSize + align].
-    params do: [:param |
-	param offset: (param offset < 16
-			    ifTrue:  [tempsSize]
-			    ifFalse: [frameSize - 16])
-			+ param offset].
+    params do: [:param | param offset: param offset + frameSize].
 ]
 
 ARMCodeGenerator emitPrologue
 [
     | mask |
-    mask := registerList bitOr: 15.					"incoming args"
-    needsFrame ifTrue: [mask := mask bitOr: 0x4000].			"lr[+sp]"
-    mask == 0 ifFalse: [self stmfdW: sp L: mask].
-    tempsSize > 0 ifTrue: [self subR: sp R: sp r: 0 I: tempsSize].
+    params isEmpty ifFalse:	[self stmfdW: sp L: 0x000f].			"push up to four incoming args"
+    mask := registerList.
+    needsFrame ifTrue: [mask := mask bitOr: 0x4000].				"lr[+sp]"
+    mask == 0 ifFalse:		[self stmfdW: sp L: mask].			"push lr"
+    tempsSize == 0 ifFalse:	[self subR: sp R: sp r: 30 I: tempsSize >> 2].	"push temp space"
 ]
 
 ARMCodeGenerator emitEpilogue
 [
     | mask |
+    tempsSize == 0 ifFalse:	[self addR: sp R: sp r: 30 I: tempsSize >> 2].	"pop temp space"
     mask := registerList.
-    needsFrame ifTrue: [mask := mask bitOr: 0x8000].			"pc[+sp]"
-    self addR: sp R: sp r: 30 I: tempsSize + 16 >> 2.			"temps + incoming args"
-    mask == 0
-	ifTrue:  [self movR: pc R: lr]
-	ifFalse: [self ldmfdW: sp L: mask].
+    needsFrame ifTrue: [mask := mask bitOr: 0x4000].				"lr[+sp]"
+    mask == 0 ifFalse:		[self ldmfdW: sp L: mask].			"pop lr"
+    params isEmpty ifFalse:	[self addR: sp R: sp r: 0 I: 16].		"pop up to four incoming args"
+    self movR: pc R: lr.
 ]
 
 ARMCodeGenerator noteCall: call
@@ -208,6 +217,7 @@ StaticARMCodeGenerator movgtR: d	 I: i		[ StdOut nextPutAll: '	movgt	'; print: d
 StaticARMCodeGenerator movleR: d	 I: i		[ StdOut nextPutAll: '	movle	'; print: d; nextPutAll: ',#'; print: i; cr ]
 StaticARMCodeGenerator movltR: d	 I: i		[ StdOut nextPutAll: '	movlt	'; print: d; nextPutAll: ',#'; print: i; cr ]
 StaticARMCodeGenerator movneR: d	 I: i		[ StdOut nextPutAll: '	movne	'; print: d; nextPutAll: ',#'; print: i; cr ]
+StaticARMCodeGenerator mvnR: d		 R: s		[ StdOut nextPutAll: '	mvn	'; print: d; nextPut: $,; print: s; cr ]
 StaticARMCodeGenerator mulR: d R: a	 R: b		[ StdOut nextPutAll: '	mul	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
 StaticARMCodeGenerator orrR: d R: s r: r I: i		[ StdOut nextPutAll: '	orr	'; print: d; nextPut: $,; print: s; nextPutAll: ',#'; print: i; nextPutAll: ' ROR #'; print: r; cr ]
 StaticARMCodeGenerator orrR: d R: a	 R: b		[ StdOut nextPutAll: '	orr	'; print: d; nextPut: $,; print: a; nextPut: $,; print: b; cr ]
@@ -277,7 +287,7 @@ DynamicARMCodeGenerator ldmfdW: d	   L: l		{ LDMwl	(14, 1, _R(d), _I(l), 0); }
 DynamicARMCodeGenerator ldrR: r	    Mb: b		{ LDRrm	(14, 0, 0, _R(r), _R(b), 0); }
 DynamicARMCodeGenerator ldrR: r	    Mb: b  d: d		{ LDRrmpf(14, 0, 0, _R(r), _R(b), 1, _I(d), 0); }
 DynamicARMCodeGenerator ldrbR: r    Mb: b		{ LDRrm	(14, 1, 0, _R(r), _R(b), 0); }
-DynamicARMCodeGenerator ldrhR: r    Mb: b		{ LDRHrm(14, 0, 0, 0, 1, _R(r), _R(b), 0); }
+DynamicARMCodeGenerator ldrhR: r    Mb: b		{ LDRHrm(14, 0, 0, 1, 1, _R(r), _R(b), 0); }
 DynamicARMCodeGenerator movR: d		   R: s		{ if (_R(d) != _R(s)) MOVrr(14, 0, _R(d), _R(s)); }
 DynamicARMCodeGenerator movR: d		   R: m asrR: s	{ MOVrrs(14, 0, _R(d), _R(m), 2, _R(s), 1); }
 DynamicARMCodeGenerator movR: d		   R: m lslR: s	{ MOVrrs(14, 0, _R(d), _R(m), 0, _R(s), 1); }
@@ -289,6 +299,7 @@ DynamicARMCodeGenerator movleR: d	   I: i		{ MOVri	(13, 0, _R(d),		    0, _I(i))
 DynamicARMCodeGenerator movltR: d	   I: i		{ MOVri	(11, 0, _R(d),		    0, _I(i)); }
 DynamicARMCodeGenerator movneR: d	   I: i		{ MOVri	(01, 0, _R(d),		    0, _I(i)); }
 DynamicARMCodeGenerator mulR: d R: a	   R: b		{ MULrrr(14, 0, _R(d), _R(a),	       _R(b)); }
+DynamicARMCodeGenerator mvnR: d		   R: s		{ MVNrr	(14, 0, _R(d), _R(s)); }
 DynamicARMCodeGenerator orrR: d R: s r: r  I: i		{ ORRrri(14, 0, _R(d), _R(s), _I(r)/2, _I(i)); }
 DynamicARMCodeGenerator orrR: d R: a	   R: b		{ ORRrrr(14, 0, _R(d), _R(a),	       _R(b)); }
 DynamicARMCodeGenerator rsbR: d R: s	   I: i		{ RSBrri(14, 0, _R(d), _R(s),       0, _I(i)); }
@@ -382,6 +393,7 @@ ARMGrammar := [
 	at: #REG  add: #(noti4 	 REG	)	do: [:op :gen | gen cmpR:   op lhs output  I: 0;
 								    movneR: op output	   I: 0;
 								    moveqR: op output	   I: 1];
+	at: #REG  add: #(comi4 	 REG	)	do: [:op :gen | gen mvnR:   op output	   R: op lhs output];
 	at: #REG  add: #(negi4 	 REG	)	do: [:op :gen | gen rsbR:   op output	   R: op lhs output    I: 0];
 	at: #REG  add: #(calli4	 REG	)	do: [:op :gen | gen calli4: op];
 	at: #REG  add: #(asgni1  REG REG)	do: [:op :gen | gen strbR:  op lhs output Mb: op rhs output];
