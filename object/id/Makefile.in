@@ -1,8 +1,9 @@
 CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
 PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
+GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
 PREFIX = @PREFIX@
 
-all : $(BIN)libid.o $(BIN)libid_p.o
+all : $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o
 
 $(BIN)libid.o : libid.c
 	$(CC) $(CFLAGS) -DPREFIX='"@PREFIX@"' $< -c -o $@
@@ -10,7 +11,10 @@ $(BIN)libid.o : libid.c
 $(BIN)libid_p.o : libid.c
 	$(CC) $(PFLAGS) -pg -DPREFIX='"@PREFIX@"' $< -c -o $@
 
-install : $(PREFIX)libid.o $(PREFIX)libid_p.o
+$(BIN)libid_g.o : libid.c
+	$(CC) $(GFLAGS) -g -DPREFIX='"@PREFIX@"' $< -c -o $@
+
+install : $(PREFIX)libid.o $(PREFIX)libid_p.o $(PREFIX)libid_g.o
 
 $(PREFIX)libid.o : $(BIN)libid.o
 	-mkdir -p $(PREFIX)
@@ -20,11 +24,15 @@ $(PREFIX)libid_p.o : $(BIN)libid_p.o
 	-mkdir -p $(PREFIX)
 	-cp -p $< $@
 
+$(PREFIX)libid_g.o : $(BIN)libid_g.o
+	-mkdir -p $(PREFIX)
+	-cp -p $< $@
+
 tidy : .FORCE
 	rm -f *~
 
 clean : tidy
-	rm -f $(BIN)libid.o $(BIN)libid_p.o
+	rm -f $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o
 
 distclean spotless : clean
 	rm -f Makefile
