@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-18 16:45:27 by piumarta on emilia.local
+  Last edited: 2007-04-19 14:52:21 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -91,7 +91,7 @@ OrderedCollection shiftToEnd
     lastIndex := lastIndex + delta.
 ]
 
-OrderedCollection resetToBeginning	[ firstIndex := lastIndex := 0]
+OrderedCollection resetToBeginning	[ firstIndex := lastIndex := 0 ]
 OrderedCollection resetToEnd		[ firstIndex := lastIndex := array size ]
 
 OrderedCollection removeFirst
