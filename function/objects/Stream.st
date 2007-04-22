@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 17:50:01 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-21 17:33:05 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -44,6 +44,8 @@ ReadStream on: aCollection
     position := 0.
     readLimit := collection size.
 ]
+
+ReadStream readStream	[ ^self ]
 
 ReadStream peek		[ ^self atEnd ifFalse: [collection at: position] ]
 ReadStream peek: offset	[ ^position + offset < readLimit ifTrue: [collection at: position + offset] ]
