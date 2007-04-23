@@ -15,7 +15,7 @@
  *
  * See the file COPYING for more details.
  *
- * Last edited: 2007-03-23 18:27:44 by piumarta on ubuntu
+ * Last edited: 2007-04-23 13:14:23 by piumarta on emilia
  */
 
 #ifndef __ccg_asm_cache_h
@@ -104,6 +104,10 @@
 #elif defined(__arm__)									/**** ARM ****/
 
 # if defined(__GNUC__)
+#  if 1
+    extern void __clear_cache(char *, char *);	/* libgcc internal */
+#   define iflush(a, b) __clear_cache((char *)(a), (char *)(b))
+#  else
 #   include <asm/unistd.h>
     static void iflush(insn *start, insn *end)
     {
@@ -117,6 +121,7 @@
 	: "r0","r1","r2"
       );
     }
+#  endif /* !1 */
 # else
 #   define _ASM_NOCOMP
 # endif
