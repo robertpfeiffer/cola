@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-06 09:41:47 by piumarta on margaux.piumarta.com
+  Last edited: 2007-04-23 13:24:30 by piumarta on emilia
 "
 
 { import: Objects }
@@ -875,8 +875,12 @@ Object eval
 
 Object _eval
 [
+    | entry value |
     CompilerOptions verboseList ifTrue: [self compile].
-    ^(Compiler compile: self for: CodeGenerator default dynamic) call
+    entry := Compiler compile: self for: CodeGenerator default dynamic.
+    value := entry call.
+    entry free.
+    ^value
 ]
 
 "----------------------------------------------------------------"
@@ -888,4 +892,10 @@ Label call
     { v__result= ((oop (*)(void))self->v__address)(); }.
     CompilerOptions verboseExec ifTrue: [{ printf("=> %d\n", (int)v__result); }].
     ^_result
+]
+
+Label free
+[
+    CompilerOptions verboseExec ifTrue: [{ printf("free %p\n", self->v__address); }].
+    { free((void *)self->v__address); }.
 ]
