@@ -1,6 +1,6 @@
 IDC		= idc -O
 IINC		= -I../st80
-IDFLAGS		= -g -k
+IDFLAGS		= -k
 
 FILES		= $(BIN)ArgumentVariableNode.o \
 		  $(BIN)ArrayLiteralNode.o \

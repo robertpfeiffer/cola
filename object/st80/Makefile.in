@@ -1,6 +1,6 @@
 IDC		= idc -O
 IINC		= 
-IDFLAGS		= -g -k
+IDFLAGS		= -k
 
 FILES		= $(BIN)_object.o \
 		  $(BIN)Array.o \

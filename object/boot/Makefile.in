@@ -112,6 +112,9 @@ all : $(FILES)
 libid.o : src/libid.c
 	$(CC) -Iinclude -DPREFIX='"$(PREFIX)"' $(CFLAGS) $(O3FLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
+libid_g.o : src/libid.c
+	$(CC) -Iinclude -DPREFIX='"$(PREFIX)"' $(CFLAGS) $(GFLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
+
 idc : src/idc
 	cp -p $< .
 
@@ -126,7 +129,7 @@ idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES)
 %$(OBJEXT_O) : src/%$(OBJEXT_O).c
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
-%$(OBJEXT) : src/%.c gc.a libid.o
+%$(OBJEXT) : src/%.c gc.a libid.o libid_g.o
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS) $(LDFLAGS) $< $(LDLIBS) -o $@ libid.o gc.a -lm
 
 ./include :
@@ -139,7 +142,7 @@ gc.a :
 install : all .FORCE
 	-rm -rf $(PREFIX)
 	-mkdir -p $(PREFIX)
-	-cp -pr include gc.a libid.o idc idc1 *$(OBJEXT_SO) $(PREFIX)/.
+	-cp -pr include gc.a libid.o libid_g.o idc idc1 *$(OBJEXT_SO) $(PREFIX)/.
 	-cp -pr ../st80/*.st $(PREFIX)/.
 	-cp -pr ../idc/*.st $(PREFIX)/.
 	-cp -pr idc /usr/local/bin/.

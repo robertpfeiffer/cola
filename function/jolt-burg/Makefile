@@ -1,5 +1,5 @@
-IDC		= idc -k -O
-IDFLAGS		= -g -I../objects
+IDC		= idc -O
+IDFLAGS		= -k -I../objects
 
 OBJEXT          = 
 OBJEXT_O        = .o
