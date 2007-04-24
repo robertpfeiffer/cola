@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-23 11:00:50 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-04-22 19:58:09 by piumarta on emilia
 "
 
 { external }
@@ -89,7 +89,19 @@ _vector new_: _newSize
 
 "Introspection"
 
+_object _methodAt: aSelector
+[
+    ^(self _bind: aSelector) _method
+]
+
 _object _bind: aSelector
 {
   return (oop)_local_bind(v_aSelector, self);
+}
+
+_closure _method	[ ^_method ]
+
+_object performMethod_: _aMethod with: anArgument
+{
+    return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_anArgument);
 }

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-21 17:33:05 by piumarta on emilia.local
+  Last edited: 2007-04-22 20:29:47 by piumarta on emilia
 "
 
 { import: Objects }
@@ -199,6 +199,9 @@ ConsoleFileStream refill
     | length _buffer _bytes |
     {
 	static char *buffer= 0;
+        static int   live= 1;
+        if (!live)
+	    return 0;
 	if (buffer)
 	{
 	    free(buffer);
@@ -212,7 +215,7 @@ ConsoleFileStream refill
 	    atexit((void (*)(void))ConsoleFileStream___5fatexit);
 	}
 	buffer= readline((char *)self->v__prompt);
-	if (!buffer) return 0;
+	if (!buffer) return (oop)(live= 0);
 	if (*buffer) add_history(buffer);
 	v_length= (oop)((strlen(buffer) + 1) << 1 | 1);
 	v__buffer= (oop)buffer;

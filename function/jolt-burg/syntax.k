@@ -27,6 +27,14 @@
 	   ,@body
 	    (set ,var (+ ,var ,step)))))))
 
+(syntax method	; (method (formals...) body...)  =>  (lamdba (_closure _self self formals...) body...)
+  (lambda (node compiler)
+    (or (and [[node size] >= '2]
+	     [[node second] isArray])
+	[compiler errorSyntax: node])
+    `(lambda (_closure _self self ,@[node second])
+       ,@[node copyFrom: '2])))
+
 (syntax addrof	; (addrof varName)  =>  address of varName
   (lambda (node compiler)
     (or (and [[node size] = '2]

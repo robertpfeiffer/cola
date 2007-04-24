@@ -1,5 +1,30 @@
 ;; quasiquotation as userland syntax
 
+(define qq-level 0)
+
+(define backquote-reader
+  (lambda (_closure _self self stream)
+    [stream next]
+    (set qq-level (+ qq-level 1))
+    (let ((expr [self read: stream]))
+      (set qq-level (- qq-level 1))
+      [Expression with: 'quasiquote with: expr])))
+
+(define comma-reader
+  (lambda (_closure _self self stream)
+    (if qq-level
+	(let ((unquote 'unquote))
+	  [stream next]
+	  (if (== '64 [stream peek])	; @
+	      (let ()
+		[stream next]
+		(set unquote 'unquote-splicing)))
+	  [Expression with: unquote with: [self read: stream]])
+	[self xLetter: stream])))	; , is a letter outside quasiquoted forms
+
+[CokeScanner scan: '96 using: backquote-reader withAttributes: 'id]	; allow ` to appear embedded in symbols
+[CokeScanner scan: '44 using: comma-reader     withAttributes: 'id]	; allow , to appear embedded in symbols
+
 (define qq-object 0)    ;; forward
 
 (define qq-atom

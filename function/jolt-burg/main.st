@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-26 10:41:23 by piumarta on emilia
+  Last edited: 2007-04-22 19:59:47 by piumarta on emilia
 "
 
 { import: Object }
@@ -57,7 +57,7 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
 
 
 [
-    | echo args file scanner expr interactive |
+    | echo args file stream scanner expr interactive |
     interactive := false.
     (args := OS arguments) isEmpty ifTrue: [args := Array with: '-'].
     Options libdir: (OS argumentAt: 0) dirname.
@@ -78,10 +78,10 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
     [OSArgumentFiles isEmpty]
 	whileFalse:
 	   [file := OSArgumentFiles removeFirst.
-	    scanner := CokeScanner on: file readStream.
+	    stream := file readStream.
 	    echo := Options verbose or: [file isInteractive].
 	    " read - eval - print "
-	    [(expr := scanner next) isNil]
+	    [(expr := CokeScanner read: stream) isNil]
 		whileFalse:
 		   [Options verbose ifTrue: [StdErr print: expr; cr].
 		    Options compile ifTrue: [expr compile].

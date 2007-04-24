@@ -1,3 +1,5 @@
+generate compiled code in _balloc() memory, not malloc() memory
+
 generate slot accessor syntax in define-type
 
 move SlotDictionary.basicNew into .new and rename the fast version as

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 10:13:48 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-23 19:40:20 by piumarta on emilia
 "
 
 { import: Objects }
@@ -62,6 +62,9 @@ Symbol at: offset	[ (offset between: 0 and: self size - 1) ifTrue: [^SmallIntege
 Symbol _at_: _offset	{ return (oop)(long)(((char *)self->v__elements)[(long)v__offset]); }
 
 Symbol = other		[ ^self == other ]
+
+Object isKeyword	[ ^nil ]
+Symbol isKeyword	[ ^(self at: self size - 1) == $: ]
 
 Symbol printOn: aStream	[ ^aStream nextPut: $#; nextPutAll: self asString ]
 

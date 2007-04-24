@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 22:28:34 by piumarta on alan-kays-computer.local
+  Last edited: 2007-04-23 21:23:14 by piumarta on emilia
 "
 
 { import: Objects }
@@ -50,6 +50,11 @@ Number timesRepeat: aBlock
     | count |
     count := 0.
     [(count := count + 1) <= self] whileTrue: [aBlock value]
+]
+
+Number negated
+[
+    ^0 - self
 ]
 
 "----------------------------------------------------------------"
@@ -279,7 +284,7 @@ Float fromString: s
     ^f
 ]
 
-Float copy	[ ^self value_: self ]
+Float copy	[ ^self new value_: self ]
 
 Float        asFloat	[ ^self ]
 SmallInteger asFloat	[ ^Float new setIntegerValue_: self _integerValue ]
@@ -290,6 +295,8 @@ SmallInteger asInteger	[ ]
 Float pi		[ ^3.14159265358978324 ]
 
 Float asString		[ ^self printString ]
+
+Float negated		[ ^0.0 - self ]
 
 Float + aNumber
 [
@@ -781,6 +788,8 @@ Integer | aNumber	[ ^self bitOr:  aNumber ]
 Integer ^ aNumber	[ ^self bitXor: aNumber ]
 
 SmallInteger asLargeInteger	[ ^LargeInteger withValue: self ]
+
+Number sqrt		[ ^self asFloat sqrt ]
 
 Number sin		[ ^self asFloat sin ]
 Number cos		[ ^self asFloat cos ]

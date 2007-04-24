@@ -15,68 +15,107 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-29 21:25:28 by piumarta on emilia
+  Last edited: 2007-04-23 20:10:18 by piumarta on emilia
 "
 
 { import: Objects }
 { import: Expression }
 
-Scanner : Object ( characterTable stream nextChar )
+Scanner : Object ( readers attributes )
 
-Scanner on: aStream
+Scanner new
 [
-    self := self new initialize.
-    stream := aStream.
-    self nextChar.
+    self := super new.
+    readers := Array new: 256.
+    attributes := Array new: 256.
 ]
 
-Scanner initialize	[ characterTable := Array new: 256 withAll: #xIllegal ]
-
-Scanner atEnd		[ ^nextChar isNil ]
-Scanner nextChar	[ ^nextChar := stream next ]
-Scanner peekChar	[ ^stream peek ]
-
-Scanner nextToken
+Scanner scan: aCharacter using: aMethod
 [
-    | token |
-    [nextChar notNil and: [(token := self perform: (characterTable at: nextChar)) isNil]] whileTrue.
-    ^token
+    self scan: aCharacter using: aMethod withAttributes: nil
 ]
 
-Scanner xIllegal
+Scanner scan: aCharacter using: aMethod withAttributes: attributesOrNil
 [
-    StdErr cr; nextPutAll: 'illegal character: '; print: nextChar; cr; halt.
+    readers at: aCharacter put: aMethod.
+    attributes at: aCharacter put: attributesOrNil.
+]
+
+Scanner scan: firstCharacter through: lastCharacter using: aMethod
+[
+    self scan: firstCharacter through: lastCharacter using: aMethod withAttributes: nil
+]
+
+Scanner scan: firstCharacter through: lastCharacter using: aMethod withAttributes: attributesOrNil
+[
+    firstCharacter to: lastCharacter do: [:aCharacter |
+	readers at: aCharacter put: aMethod.
+	attributes at: aCharacter put: attributesOrNil].
+]
+
+"--------"
+
+Scanner xIllegal: stream
+[
+    self error: 'illegal object: ', stream peek printString.
+]
+
+"--------"
+
+Scanner read: aStringOrStream
+[
+    | input char reader object |
+    input := aStringOrStream readStream.
+    [object or: [input atEnd]]
+	whileFalse:
+	   [(char := input peek) ifFalse: [^nil].
+	    object := self performMethod_: (readers at: char) with: input].
+    ^object
+]
+
+Scanner read: stream list: type delimited: delimiter
+[
+    | list |
+    list := WriteStream on: (type new: 8).
+    [self ignoreSpaces: stream]
+	whileTrue:
+	   [stream peek == delimiter ifTrue: [stream next.  ^list contents].
+	    list nextPut: (self read: stream)].
+    ^self error: 'unterminated list'
+]
+
+Scanner ignoreSpaces: stream
+[
+    [stream atEnd not]
+	whileTrue:
+	   [(attributes at: stream peek) == #space ifFalse: [^self].
+	    stream next].
+    ^nil
+]
+
+Scanner read: stream string: type delimited: delimiter withEscapes: escapeTable
+[
+    | tokenValue nextChar |
+    tokenValue := WriteStream on: (type new: 8).
+    [stream atEnd or: [stream peek == delimiter]]
+	whileFalse: [tokenValue nextPut: (self nextChar: stream withEscape: escapeTable)].
+    stream atEnd ifTrue: [self error: 'EOF in string literal'].
+    stream next.
+    ^tokenValue contents
+]
+
+Scanner nextChar: stream withEscape: escapeTable
+[
+    | c |
+    (c := stream next) == $\\	ifFalse: [^c].
+    (c := stream next) isNil	ifTrue:  [^nil].
+    ^(escapeTable at: c) ifNil: [c]
 ]
 
 "----------------------------------------------------------------"
 
-CokeScanner : Scanner ( characterEscapes tokenType tokenValue quasiquoting )
-
-CokeScanner on: aStream
-[
-    self := super on: aStream.
-]
-
-CokeScanner initialize
-[
-    super initialize.
-    characterTable
-	atAll: '('			put: #xOpen;
-	atAll: ')'			put: #xClose;
-	atAll: '['			put: #xOpenBracket;
-	atAll: ']'			put: #xCloseBracket;
-	atAll: '!#$%&*./:<=>?@\\^_|~'	put: #xLetter;
-	atAll: ','			put: #xComma;
-	atAll: '+-'			put: #xSign;
-	from:  $a to: $z		put: #xLetter;
-	from:  $A to: $Z		put: #xLetter;
-	from:  $0 to: $9		put: #xDigit;
-	from:   0 to: 32		put: #xSpace;
-	at:    $"			put: #xString;
-	at:    $'			put: #xQuote;
-	at:    $`			put: #xBackQuote;
-	at:    $;			put: #xComment.
-    (characterEscapes := IdentityDictionary new)
+CokeEscapeTable := [
+    (Array new: 256)
 	at: $a  put: $\a; "bel"
 	at: $b  put: $\b; "bs"
 	at: $e  put: $\e; "esc"
@@ -84,261 +123,85 @@ CokeScanner initialize
 	at: $n  put: $\n; "nl"
 	at: $r  put: $\r; "cr"
 	at: $t  put: $\t; "ht"
-	at: $v  put: $\v. "vt"
-    quasiquoting := false.
+	at: $v  put: $\v;  "vt"
+	yourself
 ]
 
-CokeScanner nextCharWithEscape
-[
-    nextChar == $\\ ifFalse: [^nextChar].
-    self nextChar isNil ifTrue: [^self error: 'incomplete character escape'].
-    ^characterEscapes at: nextChar ifAbsent: [nextChar]
-]
+CokeScanner : Scanner ()
 
-
-CokeScanner xSpace
+CokeScanner xSpace: stream
 [
-    [self nextChar notNil and: [(characterTable at: nextChar) == #xSpace]] whileTrue.
+    [stream atEnd not and: [(attributes at: stream peek) == #space]] whileTrue: [stream next].
     ^nil
 ]
 
-CokeScanner xComment
+CokeScanner xComment: stream
 [
-    [self nextChar notNil and: [nextChar ~~ $\n and: [nextChar ~~ $\r]]] whileTrue.
+    | c |
+    [stream atEnd not]
+	whileTrue:
+	    [((c := stream next) == $\n or: [c == $\r]) ifTrue: [^nil]].
     ^nil
 ]
 
-CokeScanner xQuote
+CokeScanner xString: stream
 [
-    tokenValue := String with: nextChar.
-    self nextChar.
-    ^#quote
+    ^self read: stream string: String delimited: stream next withEscapes: CokeEscapeTable
 ]
 
-CokeScanner xBackQuote
+CokeScanner xQuote: stream
 [
-    tokenValue := String with: nextChar.
-    self nextChar.
-    ^#backQuote
+    | node |
+    stream next.
+    (node := self read: stream) ifFalse: [self error: 'EOF in quoted literal'].
+    ^Expression with: #quote with: node
 ]
 
-CokeScanner xComma
+CokeScanner xDigit: stream
 [
-    quasiquoting ifFalse: [^self xLetter].
-    tokenValue := String with: nextChar.
-    ^self nextChar == $@
-	ifTrue:
-	   [tokenValue := tokenValue , '@'.
-	    self nextChar.
-	    #commaAt]
-	ifFalse:
-	   [#comma]
+    | tokenValue dv |
+    tokenValue := 0.
+    [(dv := stream peek digitValue) and: [dv < 10]]
+	whileTrue:
+	   [tokenValue := tokenValue * 10 + dv.
+	    stream next].
+    ^tokenValue
 ]
 
-CokeScanner xString
+CokeScanner xLetter: stream
 [
+    | tokenValue nextChar |
     tokenValue := WriteStream on: (String new: 8).
-    [self nextChar notNil and: [nextChar ~~ $"]]
-	whileTrue: [tokenValue nextPut: self nextCharWithEscape].
-    nextChar isNil ifTrue: [self error: 'EOF in string literal'].
-    self nextChar.
-    tokenValue := tokenValue contents.
-    ^#string
-]
-
-CokeScanner xDigit
-[
-    | radix dv multiplier |
-    radix := 10.
-    tokenValue := nextChar digitValue.
-    self nextChar.
-    tokenValue == 0
-	ifTrue:
-	   [nextChar == $x
-		ifTrue:  [radix := 16.  self nextChar]
-		ifFalse: [nextChar == $b
-			      ifTrue: [radix := 2.
-				       self nextChar]
-			      ifFalse: [nextChar == $. ifFalse: [radix := 8]]]].
-    [(dv := nextChar digitValue) notNil and: [dv < radix]]
+    tokenValue nextPut: stream next.
+    [(nextChar := stream peek) and: [(attributes at: nextChar) == #id]]
 	whileTrue:
-	   [tokenValue := tokenValue * radix + dv.
-	    self nextChar].
-    nextChar == $.
-	ifTrue:
-	   [self nextChar.
-	    multiplier := 1.0.
-	    [(dv := nextChar digitValue) notNil and: [dv < radix]]
-		whileTrue:
-		   [multiplier := multiplier / radix.
-		    tokenValue := tokenValue + (multiplier * dv).
-		    self nextChar]].
-    ^#number
+	   [tokenValue nextPut: stream next].
+    ^tokenValue contents asSymbol
 ]
 
-CokeScanner xLetter
+CokeScanner xOpen: stream
 [
-    tokenValue := WriteStream on: (String new: 8).
-    tokenValue nextPut: nextChar.
-    [(characterTable at: self nextChar) == #xLetter
-		or: [(characterTable at: nextChar) == #xDigit
-		or: [(characterTable at: nextChar) == #xSign
-		or: [(characterTable at: nextChar) == #xComma]]]]
-	whileTrue:
-	   [tokenValue nextPut: nextChar].
-    tokenValue := tokenValue contents.
-    ^#name
+    stream next.
+    ^self read: stream list: Expression delimited: $)
 ]
 
-CokeScanner xSign
+CokeScanner xClose: stream
 [
-    | sign |
-    sign := nextChar.
-    (characterTable at: self peekChar) == #xDigit ifFalse: [^self xLetter].
-    self nextChar; xDigit.
-    sign == $- ifTrue: [tokenValue := tokenValue negated].
-    ^#number
+    ^self error: 'unexpected )'
 ]
 
-CokeScanner xOpen
+
+CokeScanner initialise
 [
-    self nextChar.
-    ^#open
+    self
+	scan:   0 through:  32	using: (CokeScanner _methodAt: #xSpace:  ) withAttributes: #space;
+	scan:  33 through: 126	using: (CokeScanner _methodAt: #xLetter: ) withAttributes: #id;
+	scan:  $0 through:  $9	using: (CokeScanner _methodAt: #xDigit:  ) withAttributes: #id;
+	scan:  $(		using: (CokeScanner _methodAt: #xOpen:   );
+	scan:  $)		using: (CokeScanner _methodAt: #xClose:  );
+	scan:  $"		using: (CokeScanner _methodAt: #xString: );
+	scan:  $'		using: (CokeScanner _methodAt: #xQuote:  );
+	scan:  $;		using: (CokeScanner _methodAt: #xComment:)
 ]
 
-CokeScanner xClose
-[
-    self nextChar.
-    ^#close
-]
-
-CokeScanner xOpenBracket
-[
-    self nextChar.
-    ^#openBracket
-]
-
-CokeScanner xCloseBracket
-[
-    self nextChar.
-    ^#closeBracket
-]
-
-CokeScanner next
-[
-    ^(tokenType := super nextToken) notNil ifTrue: [self parse]
-]
-
-CokeScanner parse
-[
-    ^self perform: tokenType
-]
-
-CokeScanner number
-[
-    ^tokenValue.
-]
-
-CokeScanner string
-[
-    ^tokenValue.
-]
-
-CokeScanner name
-[
-    ^tokenValue asSymbol.
-]
-
-CokeScanner quote
-[
-    ^Expression with: #quote with: self next
-]
-
-CokeScanner backQuote
-[
-    | outerQuote node |
-    outerQuote := quasiquoting.
-    quasiquoting := true.
-    node := self next.
-    quasiquoting := outerQuote.
-    ^Expression with: #quasiquote with: node.
-]
-
-CokeScanner comma
-[
-    ^Expression with: #unquote with: self next
-]
-
-CokeScanner commaAt
-[
-    ^Expression with: #'unquote-splicing' with: self next
-]
-
-CokeScanner open
-[
-    | list |
-    list := WriteStream on: (Expression new: 8).
-    [(tokenType := self nextToken) notNil and: [tokenType ~~ #close]]
-	whileTrue: [list nextPut: self parse].
-    ^list contents
-]
-
-CokeScanner close
-[
-    self error: 'unbalanced '')'''
-]
-
-"Syntactic sugar:
-	[receiver unary]			=> (send 'unary receiver)
-	[receiver binary arg]			=> (send 'binary receiver arg)
-	[receiver key1: arg1 key2: arg2 ...]	=> (send 'key1:key2:... receiver arg1 arg2...)
-"
-
-Object isKeyword
-[
-    ^false
-]
-
-Symbol isKeyword
-[
-    ^self asString isKeyword
-]
-
-String isKeyword
-[
-    ^self last == $:
-]
-
-CokeScanner openBracket
-[
-    | list receiver selector arguments |
-    list := OrderedCollection new.
-    [(tokenType := self nextToken) notNil and: [tokenType ~~ #closeBracket]]
-	whileTrue: [list addLast: self parse].
-    list size >= 2 ifFalse: [self error: 'missing elements in message send syntax: ', list printString].
-    receiver  := list removeFirst.
-    selector  := list removeFirst.
-    arguments := OrderedCollection new.
-    selector isSymbol
-	ifFalse:
-	   [self error: 'selector is not a symbol in send syntax: [',
-		receiver printString, ' ', selector printString, ' ...]'].
-    list notEmpty ifTrue: [arguments addLast: list removeFirst].
-    [list size >= 2 and: [selector isKeyword and: [list first isKeyword]]]
-	whileTrue:
-	   [selector := selector asString, list removeFirst asString.
-	    arguments addLast:  list removeFirst].
-    arguments addAllLast: list.
-    ^(WriteStream on: (Expression new: 8))
-	nextPut: #send;
-	nextPut: (Expression with: #quote with: selector asSymbol);
-	nextPut: receiver;
-	nextPutAll: arguments;
-	contents
-]
-
-CokeScanner closeBracket
-[
-    self error: 'unbalanced '']'''
-]
-
+[ CokeScanner := CokeScanner new initialise ]

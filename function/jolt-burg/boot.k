@@ -68,6 +68,7 @@
 (define OS			(import "OS"))
 (define Options			(import "Options"))
 (define CokeScanner		(import "CokeScanner"))
+(define OrderedCollection	(import "OrderedCollection"))
 (define Expression		(import "Expression"))
 (define Compiler		(import "Compiler"))
 (define File			(import "File"))
@@ -105,6 +106,44 @@
 		       : 2))))
 	(Array__withParameters_ 0 send send params)))))
 
+(define CokeScanner		(import "CokeScanner"))
+
+(define open-bracket-reader
+  (lambda (_closure _self self stream)
+    (send 'next stream)
+    (let ((node (send 'read:list:delimited: self stream Expression '93))
+	  (list (send 'withAll: OrderedCollection node)))
+      (if (< (send 'size list) '2)
+	  (send 'synatxError: self node)
+	  (let ((receiver  (send 'removeFirst list))
+		(selector  (send 'removeFirst list))
+		(arguments (send 'new OrderedCollection)))
+	    (or (send 'isSymbol selector)
+		(send 'syntaxError: self node))
+	    (and (send 'notEmpty list)
+		 (send 'addLast: arguments (send 'removeFirst list)))
+	    (while (and (>= (send 'size list) 2)
+			(send 'isKeyword selector)
+			(send 'isKeyword (send 'first list)))
+	      (set selector (send ', selector (send 'removeFirst list)))
+	      (send 'addLast: arguments (send 'removeFirst list)))
+	    (send 'addAllLast: arguments list)
+	    (let ((message (send 'on: WriteStream (send 'new: Expression '4))))
+	      (send 'nextPut: message 'send)
+	      (send 'nextPut: message (send 'with:with: Expression 'quote selector))
+	      (send 'nextPut: message receiver)
+	      (send 'nextPutAll: message arguments)
+	      ;(send 'print: StdOut (send 'contents message))
+	      ;(send 'cr StdOut)
+	      (send 'contents message)))))))
+
+(define close-bracket-reader
+  (lambda (_closure _self self stream)
+    (send self 'error: '"unexpected ]")))
+
+(send 'scan:using: CokeScanner '91 open-bracket-reader)
+(send 'scan:using: CokeScanner '93 close-bracket-reader)
+
 (define herald
   (lambda (path)
     [StdErr nextPutAll: '"; loading: "]
@@ -117,9 +156,9 @@
 
 (define read
   (lambda (fileOrString)
-    (let ((scanner [CokeScanner on: [fileOrString readStream]])
+    (let ((stream [fileOrString readStream])
 	  (expr    0))
-      (while (set expr [scanner next])
+      (while (set expr [CokeScanner read: stream])
 	(if [Options verbose] (let () [StdOut print: expr][StdOut cr]))
 	(set expr [expr eval])
 	(if [Options verbose] (let () [StdOut nextPutAll: '"  => "][StdOut print: expr][StdOut cr]))))))
@@ -157,5 +196,6 @@
 
 (load "quasiquote.k")	; enable backquote (`) syntax for quasiquotation
 (load "syntax.k")	; syntactic sugar for common constructs
+(load "number.k")	; numeric syntax
 (load "debug.k")	; debugging
 (load "object.k")	; object manipulation
