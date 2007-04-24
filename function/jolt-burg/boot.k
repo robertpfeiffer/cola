@@ -114,7 +114,7 @@
     (let ((node (send 'read:list:delimited: self stream Expression '93))
 	  (list (send 'withAll: OrderedCollection node)))
       (if (< (send 'size list) '2)
-	  (send 'synatxError: self node)
+	  (send 'syntaxError: self node)
 	  (let ((receiver  (send 'removeFirst list))
 		(selector  (send 'removeFirst list))
 		(arguments (send 'new OrderedCollection)))
@@ -139,7 +139,7 @@
 
 (define close-bracket-reader
   (lambda (_closure _self self stream)
-    (send self 'error: '"unexpected ]")))
+    (send 'error:unexpected: self stream '93)))
 
 (send 'scan:using: CokeScanner '91 open-bracket-reader)
 (send 'scan:using: CokeScanner '93 close-bracket-reader)

@@ -1,3 +1,5 @@
+line numbers in error messages
+
 generate compiled code in _balloc() memory, not malloc() memory
 
 generate slot accessor syntax in define-type

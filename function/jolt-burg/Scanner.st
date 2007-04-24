@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-23 20:10:18 by piumarta on emilia
+  Last edited: 2007-04-24 11:44:00 by piumarta on emilia
 "
 
 { import: Objects }
@@ -187,7 +187,28 @@ CokeScanner xOpen: stream
 
 CokeScanner xClose: stream
 [
-    ^self error: 'unexpected )'
+    StdErr cr; nextPutAll: 'near tokens: '.
+    20 timesRepeat: [stream peek ifTrue: [StdErr nextPut: stream next]].
+    StdErr cr.
+    ^self error: stream unexpected: $)
+]
+
+CokeScanner pendingInput: stream
+[
+    | tokens |
+    tokens := WriteStream on: (String new: 20).
+    20 timesRepeat: [stream peek ifTrue: [tokens nextPut: stream next]].
+    ^tokens contents
+]
+
+CokeScanner errorSyntax: stream
+[
+    ^self error: 'syntax error near: ', (self pendingInput: stream)
+]
+
+CokeScanner error: stream unexpected: character
+[
+    ^self error: 'unexpected ', (String with: character), ' near: ', (self pendingInput: stream)
 ]
 
 
