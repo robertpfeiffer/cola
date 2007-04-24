@@ -6,7 +6,7 @@
 ;;; [2] Schorre, D. V.  "META II: A Syntax-Oriented Compiler Writing Language".
 ;;;	Proc. 19'th Nat'l. Conf. of the ACM, August 1964, pp. D1.3-1--D1.3-11.
 
-;;; Copyright (c) 2006, 2007 Ian Piumarta
+;;; Copyright (c) 2007 Ian Piumarta
 ;;; All rights reserved.
 ;;; 
 ;;; Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,7 +21,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 16:36:25 by piumarta on emilia
+;;; Last edited: 2007-04-24 16:42:27 by piumarta on emilia
 
 
 (define meta-sequence-reader
