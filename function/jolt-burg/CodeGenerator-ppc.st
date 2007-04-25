@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-06 09:23:27 by piumarta on margaux.piumarta.com
+  Last edited: 2007-04-25 16:46:43 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -430,7 +430,7 @@ PowerPCGrammar := [
 
 	"-------------------------------- optimisations --------------------------------"
 
-	at: #I16 add: #(cnsti4)			if: [:op | (SmallInteger value_: op arg) between: -32768 and: 32767];
+	at: #I16 add: #(cnsti4)			if: [:op | false "(SmallInteger value_: op arg) between: -32768 and: 32767"];
 
 	at: #VOID add: #(brz (lti4 (indiri4 (addrlp4))
 			           I16))	do: [:op :gen | gen lwzR:   gen r0 I: op lhs lhs lhs arg offset R: op lhs lhs lhs arg base;
@@ -446,7 +446,6 @@ PowerPCGrammar := [
 	at: #REG  add: #(addi4 REG I16)		do: [:op :gen | gen addiR: op output R: op lhs output I: (SmallInteger value_: op rhs arg) ];
 	at: #REG  add: #(subi4 I16 REG)		do: [:op :gen | gen addiR: op output R: op rhs output I: (SmallInteger value_: op lhs arg) negated ];
 	at: #REG  add: #(subi4 REG I16)		do: [:op :gen | gen subiR: op output R: op lhs output I: (SmallInteger value_: op rhs arg) ];
-
 	yourself
 ]
 
