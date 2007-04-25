@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 20:22:38 by piumarta on ubuntu
+  Last edited: 2007-04-24 21:02:13 by piumarta on emilia
 "
 
 { import: Objects }
@@ -51,6 +51,7 @@ File withFd_: _theFd name: nameString
 File name			[ ^name ]
 
 File print: anObject		[ anObject printOn: self ]
+File println: anObject		[ self print: anObject; cr ]
 File print: aNumber base: base	[ aNumber printOn: self base: base ]
 File cr				[ self nextPut: $\n ]
 File cr: n			[ n timesRepeat: [self cr] ]

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-24 20:52:09 by piumarta on emilia
+  Last edited: 2007-04-24 21:08:51 by piumarta on emilia
 "
 
 { import: Objects }
@@ -29,6 +29,11 @@ Scanner new
     readers := Array new: 256.
     attributes := Array new: 256.
     saves := OrderedCollection new.
+]
+
+Scanner scanAt: aCharacter
+[
+    ^readers at: aCharacter
 ]
 
 Scanner scan: aCharacter using: aMethod

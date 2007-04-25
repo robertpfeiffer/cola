@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-22 20:29:47 by piumarta on emilia
+  Last edited: 2007-04-24 21:02:35 by piumarta on emilia
 "
 
 { import: Objects }
@@ -26,6 +26,7 @@ SinkStream cr			[]
 SinkStream tab			[]
 SinkStream space		[]
 SinkStream print: o		[]
+SinkStream println: o		[]
 SinkStream print: o base: b	[]
 SinkStream print_x: o		[]
 SinkStream nextPut: o		[]
@@ -103,6 +104,7 @@ WriteStream cr			[ self nextPut: $\n ]
 WriteStream tab			[ self nextPut: $\t ]
 WriteStream space		[ self nextPut: $   ]
 WriteStream print: o		[ o printOn: self ]
+WriteStream println: o		[ self print: o; cr ]
 WriteStream print: o base: b	[ o printOn: self base: b ]
 WriteStream print_x: o		[ self print: (Integer value_: o) base: 16 ]
 
