@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-23 13:24:30 by piumarta on emilia
+  Last edited: 2007-04-25 09:02:25 by piumarta on emilia
 "
 
 { import: Objects }
@@ -518,10 +518,15 @@ Compiler xLong: expr
 
 Compiler xSetChar: expr
 [
-    expr size == 3 ifFalse: [self errorArgumentCount: expr].
-    ^ASGNI1 new
-	lhs: (expr third  translate: self);
-	rhs: (expr second translate: self)
+    expr size == 3 ifTrue: [^ASGNI1 new
+				lhs: (expr third  translate: self);
+				rhs: (expr second translate: self)].
+    expr size == 4 ifTrue: [^ASGNI1 new
+				lhs: (expr fourth translate: self);
+				rhs: (ADDI4 new
+					  lhs: (expr second translate: self);
+					  rhs: (expr third translate: self))].
+    self errorArgumentCount: expr.
 ]
 
 Compiler xSetShort: expr
