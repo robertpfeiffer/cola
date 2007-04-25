@@ -1,4 +1,4 @@
-;;; boot.k -- construct default compilation and evaluaion environment
+;;; boot.k -- construct default compilation and evaluation environment
 
 ;;; Copyright (c) 2006, 2007 Ian Piumarta
 ;;; All rights reserved.
@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 16:28:35 by piumarta on emilia
+;;; Last edited: 2007-04-25 08:52:37 by piumarta on emilia
 
 (define __dlsym _dlsym)
 
