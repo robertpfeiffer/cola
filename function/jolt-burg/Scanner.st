@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-24 21:08:51 by piumarta on emilia
+  Last edited: 2007-04-25 14:55:20 by piumarta on emilia
 "
 
 { import: Objects }
@@ -86,21 +86,25 @@ Scanner read: aStringOrStream
 [
     | input char reader object |
     input := aStringOrStream readStream.
-    [object or: [input atEnd]]
-	whileFalse:
-	   [(char := input peek) ifFalse: [^nil].
-	    object := self performMethod_: (readers at: char) with: input].
+    [object or: [input atEnd]] whileFalse: [object := self internalRead: input].
     ^object
+]
+
+Scanner internalRead: stream
+[
+    | char |
+    (char := stream peek) ifFalse: [^nil].
+    ^self performMethod_: (readers at: char) with: stream
 ]
 
 Scanner read: stream list: type delimited: delimiter
 [
-    | list |
+    | list element |
     list := WriteStream on: (type new: 8).
     [self ignoreSpaces: stream]
 	whileTrue:
 	   [stream peek == delimiter ifTrue: [stream next.  ^list contents].
-	    list nextPut: (self read: stream)].
+	    (element := self internalRead: stream) ifTrue: [list nextPut: element]].
     ^self error: 'unterminated list'
 ]
 
