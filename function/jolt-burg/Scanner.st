@@ -15,19 +15,20 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-24 11:44:00 by piumarta on emilia
+  Last edited: 2007-04-24 20:52:09 by piumarta on emilia
 "
 
 { import: Objects }
 { import: Expression }
 
-Scanner : Object ( readers attributes )
+Scanner : Object ( readers attributes saves )
 
 Scanner new
 [
     self := super new.
     readers := Array new: 256.
     attributes := Array new: 256.
+    saves := OrderedCollection new.
 ]
 
 Scanner scan: aCharacter using: aMethod
@@ -51,6 +52,20 @@ Scanner scan: firstCharacter through: lastCharacter using: aMethod withAttribute
     firstCharacter to: lastCharacter do: [:aCharacter |
 	readers at: aCharacter put: aMethod.
 	attributes at: aCharacter put: attributesOrNil].
+]
+
+Scanner save
+[
+    saves addLast: readers.
+    saves addLast: attributes.
+    readers := readers copy.
+    attributes := attributes copy.
+]
+
+Scanner restore
+[
+    attributes := saves removeLast.
+    readers := saves removeLast.
 ]
 
 "--------"
@@ -187,9 +202,6 @@ CokeScanner xOpen: stream
 
 CokeScanner xClose: stream
 [
-    StdErr cr; nextPutAll: 'near tokens: '.
-    20 timesRepeat: [stream peek ifTrue: [StdErr nextPut: stream next]].
-    StdErr cr.
     ^self error: stream unexpected: $)
 ]
 
