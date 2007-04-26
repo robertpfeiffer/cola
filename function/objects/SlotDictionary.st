@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-17 11:32:16 by piumarta on emilia.local
+  Last edited: 2007-04-26 13:33:59 by piumarta on emilia
 "
 
 { import: Objects }
@@ -123,6 +123,28 @@ SlotDictionary at: aKey put: aValue
         self->v__tally= (oop)(tally + 1);
     }
     return v_aValue;
+}
+
+SlotDictionary removeKey: aKey
+{
+    register long index, lasti= (long)self->v__tally;
+    for (index= 0;  index < lasti;  ++index)
+    {
+	if (((oop *)self->v__keys)[index] == v_aKey)
+	{
+	    --lasti;
+	    for (;  index < lasti;  ++index)
+	    {
+		((oop *)self->v__keys  )[index]= ((oop *)self->v__keys  )[index + 1];
+		((oop *)self->v__values)[index]= ((oop *)self->v__values)[index + 1];
+	    }
+	    self->v__tally= (oop)lasti;
+	    ((oop *)self->v__keys  )[lasti]= 0;
+	    ((oop *)self->v__values)[lasti]= 0;
+	    return v_self;
+	}
+    }
+    return v_self;
 }
 
 SlotDictionary size	[ ^SmallInteger value_: _tally ]
