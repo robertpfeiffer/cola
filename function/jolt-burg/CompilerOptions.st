@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:49:21 by piumarta on emilia
+  Last edited: 2007-04-26 14:10:38 by piumarta on emilia
 "
 
 { import: Objects }
@@ -23,10 +23,15 @@
 CompilerOptions : Object ( verboseList verboseTree verboseRegs verboseExec verboseSyntax )
 
 CompilerOptions verboseList		[ ^verboseList ]
+CompilerOptions verboseList: flag	[ ^verboseList := flag ]
 CompilerOptions verboseTree		[ ^verboseTree ]
+CompilerOptions verboseTree: flag	[ ^verboseTree := flag ]
 CompilerOptions verboseRegs		[ ^verboseRegs ]
+CompilerOptions verboseRegs: flag	[ ^verboseRegs := flag ]
 CompilerOptions verboseExec		[ ^verboseExec ]
+CompilerOptions verboseExec: flag	[ ^verboseExec := flag ]
 CompilerOptions verboseSyntax		[ ^verboseSyntax ]
+CompilerOptions verboseSyntax: flag	[ ^verboseSyntax := flag ]
 
 CompilerOptions parseOption: aString
 [
