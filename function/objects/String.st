@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-26 10:45:06 by piumarta on emilia
+  Last edited: 2007-04-25 11:59:17 by piumarta on emilia
 "
 
 { import: Objects }
@@ -51,7 +51,11 @@ String _stringValue
 
 String _strdup
 {
-    return (oop)strdup((char *)self->v__bytes);
+    size_t size= ((long)self->v_size) >> 1;
+    char *string= malloc(size + 1);
+    memcpy(string, self->v__bytes, size);
+    string[size]= '\0';
+    return (oop)string;
 }
 
 String beginsWith: aString
