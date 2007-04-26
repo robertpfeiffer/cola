@@ -15,10 +15,10 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 16:27:43 by piumarta on emilia
+;;; Last edited: 2007-04-26 15:04:02 by piumarta on emilia
 
-(define error		(lambda (message)	(printf "%s\n" message) (exit 1)))
-(define syntax-error	(lambda (form message)	(printf "syntax error: expected %s\n" message) (exit 1)))
+(define error		(lambda (fmt a b c d e f g h)	(printf fmt a b c d e f g h) (printf "\n") (exit 1)))
+(define syntax-error	(lambda (form message)		(printf "syntax error: expected %s\n" message) (exit 1)))
 
 (define _param		(dlsym "_libid_param"))
 
@@ -139,9 +139,11 @@
 (init-signals signal-handler)
 
 (define error
-  (lambda (message)
+  (lambda (fmt a b c d e f g h)
     (init-signals 0)
-    (printf "\n; error: %s\n" message)
+    (printf "\n; error: ")
+    (printf fmt a b c d e f g h)
+    (printf "\n")
     (backtrace)
     (exit 1)))
 
