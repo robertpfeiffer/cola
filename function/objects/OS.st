@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:28:53 by piumarta on emilia
+  Last edited: 2007-04-25 16:57:12 by piumarta on emilia
 "
 
 { import: Objects }
@@ -24,6 +24,7 @@ OS : Object ()
 
 OSArgumentCount  := []
 OSArgumentVector := []
+OSArguments      := []
 
 OS _argumentCount		{ return (oop)_param(0); }
 OS _argumentAt_: _index		{ return (oop)(((char **)_param(1))[(int)v__index]); }
@@ -41,7 +42,16 @@ OS makeArgumentVector
 ]
 
 OS argumentAt: index	[ ^(index >= 0 and: [index < self argumentVector size]) ifTrue: [OSArgumentVector at: index] ]
-OS arguments		[ ^self argumentVector copyFrom: 1 to: self argumentCount - 1]
+
+OS arguments		[ ^OSArguments ifNil: [OSArguments := self makeArguments] ]
+
+OS makeArguments
+[
+    | arguments |
+    arguments := OrderedCollection new.
+    self argumentVector from: 1 do: [:arg | arguments addLast: arg].
+    ^arguments
+]
 
 OS errno		[ ^self integerParam: -1 ]
 OS architecture		[ ^self stringParam: 5 ]
