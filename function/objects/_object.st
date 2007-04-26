@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-22 19:58:09 by piumarta on emilia
+  Last edited: 2007-04-26 11:26:47 by piumarta on emilia
 "
 
 { external }
@@ -101,7 +101,12 @@ _object _bind: aSelector
 
 _closure _method	[ ^_method ]
 
-_object performMethod_: _aMethod with: anArgument
+_object performMethod_: _aMethod with: a
 {
-    return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_anArgument);
+    return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a);
+}
+
+_object performMethod_: _aMethod with: a with: b
+{
+    return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a, v_b);
 }
