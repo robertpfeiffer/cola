@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 14:55:20 by piumarta on emilia
+  Last edited: 2007-04-26 13:21:51 by piumarta on emilia
 "
 
 { import: Objects }
@@ -31,28 +31,25 @@ Scanner new
     saves := OrderedCollection new.
 ]
 
-Scanner scanAt: aCharacter
+Scanner readerAt: aCharacter	[ ^readers at: aCharacter ]
+
+Scanner readerAt: aCharacter put: aMethod
 [
-    ^readers at: aCharacter
+    self readerAt: aCharacter put: aMethod withAttributes: nil
 ]
 
-Scanner scan: aCharacter using: aMethod
-[
-    self scan: aCharacter using: aMethod withAttributes: nil
-]
-
-Scanner scan: aCharacter using: aMethod withAttributes: attributesOrNil
+Scanner readerAt: aCharacter put: aMethod withAttributes: attributesOrNil
 [
     readers at: aCharacter put: aMethod.
     attributes at: aCharacter put: attributesOrNil.
 ]
 
-Scanner scan: firstCharacter through: lastCharacter using: aMethod
+Scanner readerAt: firstCharacter through: lastCharacter put: aMethod
 [
-    self scan: firstCharacter through: lastCharacter using: aMethod withAttributes: nil
+    self readerAt: firstCharacter through: lastCharacter put: aMethod withAttributes: nil
 ]
 
-Scanner scan: firstCharacter through: lastCharacter using: aMethod withAttributes: attributesOrNil
+Scanner readerAt: firstCharacter through: lastCharacter put: aMethod withAttributes: attributesOrNil
 [
     firstCharacter to: lastCharacter do: [:aCharacter |
 	readers at: aCharacter put: aMethod.
@@ -194,7 +191,7 @@ CokeScanner xDigit: stream
 
 CokeScanner xLetter: stream
 [
-    | tokenValue nextChar |
+    | tokenValue nextChar active |
     tokenValue := WriteStream on: (String new: 8).
     tokenValue nextPut: stream next.
     [(nextChar := stream peek) and: [(attributes at: nextChar) == #id]]
@@ -236,14 +233,14 @@ CokeScanner error: stream unexpected: character
 CokeScanner initialise
 [
     self
-	scan:   0 through:  32	using: (CokeScanner _methodAt: #xSpace:  ) withAttributes: #space;
-	scan:  33 through: 126	using: (CokeScanner _methodAt: #xLetter: ) withAttributes: #id;
-	scan:  $0 through:  $9	using: (CokeScanner _methodAt: #xDigit:  ) withAttributes: #id;
-	scan:  $(		using: (CokeScanner _methodAt: #xOpen:   );
-	scan:  $)		using: (CokeScanner _methodAt: #xClose:  );
-	scan:  $"		using: (CokeScanner _methodAt: #xString: );
-	scan:  $'		using: (CokeScanner _methodAt: #xQuote:  );
-	scan:  $;		using: (CokeScanner _methodAt: #xComment:)
+	readerAt:   0 through:  32	put: (CokeScanner _methodAt: #xSpace:  ) withAttributes: #space;
+	readerAt:  33 through: 126	put: (CokeScanner _methodAt: #xLetter: ) withAttributes: #id;
+	readerAt:  $0 through:  $9	put: (CokeScanner _methodAt: #xDigit:  ) withAttributes: #id;
+	readerAt:  $(			put: (CokeScanner _methodAt: #xOpen:   );
+	readerAt:  $)			put: (CokeScanner _methodAt: #xClose:  );
+	readerAt:  $"			put: (CokeScanner _methodAt: #xString: );
+	readerAt:  $'			put: (CokeScanner _methodAt: #xQuote:  );
+	readerAt:  $;			put: (CokeScanner _methodAt: #xComment:)
 ]
 
 [ CokeScanner := CokeScanner new initialise ]

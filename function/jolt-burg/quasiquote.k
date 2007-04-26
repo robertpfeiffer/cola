@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 16:26:07 by piumarta on emilia
+;;; Last edited: 2007-04-26 13:15:32 by piumarta on emilia
 
 (define qq-level 0)
 
@@ -39,8 +39,8 @@
 	  [Expression with: unquote with: [self read: stream]])
 	[self xLetter: stream])))	; , is a letter outside quasiquoted forms
 
-[CokeScanner scan: '96 using: backquote-reader withAttributes: 'id]	; allow ` to appear embedded in symbols
-[CokeScanner scan: '44 using: comma-reader     withAttributes: 'id]	; allow , to appear embedded in symbols
+[CokeScanner readerAt: '96 put: backquote-reader withAttributes: 'id]	; allow ` to appear embedded in symbols
+[CokeScanner readerAt: '44 put: comma-reader     withAttributes: 'id]	; allow , to appear embedded in symbols
 
 (define qq-object 0)    ;; forward
 

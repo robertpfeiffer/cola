@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-25 08:52:37 by piumarta on emilia
+;;; Last edited: 2007-04-26 13:14:47 by piumarta on emilia
 
 (define __dlsym _dlsym)
 
@@ -156,8 +156,8 @@
   (lambda (_closure _self self stream)
     (send 'error:unexpected: self stream '93)))
 
-(send 'scan:using: CokeScanner '91 open-bracket-reader)
-(send 'scan:using: CokeScanner '93 close-bracket-reader)
+(send 'readerAt:put: CokeScanner '91 open-bracket-reader)
+(send 'readerAt:put: CokeScanner '93 close-bracket-reader)
 
 (define herald
   (lambda (path)
