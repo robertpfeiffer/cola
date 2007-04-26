@@ -15,15 +15,14 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-25 18:59:33 by piumarta on emilia
+;;; Last edited: 2007-04-25 19:18:52 by piumarta on emilia
 
 (define calloc	(dlsym "calloc"))
 (define memset	(dlsym "memset"))
 
 (define re-syntax-error
   (lambda ()
-    (printf "syntax error\n")
-    (exit 0)))
+    (error "syntax error\n")))
 
 (syntax incr
   (lambda (node comp)
@@ -168,27 +167,27 @@
 				      (!= $\] c))
 			    (cond
 			     ((== $\- c)  (let ()
-					    (or prev (error "syntax error"))
-					    (or (set c (char@ (incr string))) (error "syntax error"))
+					    (or prev (re-syntax-error))
+					    (or (set c (char@ (incr string))) (re-syntax-error))
 					    (for (i prev 1 c) (set (char@ cset i) flag))
 					    (set prev 0)
 					    (incr string)))
 			     ((== $\\ c)  (let ()
-					    (or (set prev (char@ (incr string))) (error "syntax error"))
+					    (or (set prev (char@ (incr string))) (re-syntax-error))
 					    (set (char@ cset prev) flag)
 					    (incr string)))
 			     (1		  (let ()
 					    (set (char@ cset c) flag)
 					    (set prev c)
 					    (incr string)))))
-			  (or c (error "syntax error"))
+			  (or c (re-syntax-error))
 			  (set (re-head re) (make-state %re-do-charset cset 0 0))
 			  (set (re-tail re) (re-head re))))
        ((== $\. c)	(let ()
 			  (set (re-head re) (make-state %re-do-any 0 0 0))
 			  (set (re-tail re) (re-head re))))
        ((== $\\ c)	(let ()
-			  (or (set c (char@ (incr string))) (error "syntax error"))
+			  (or (set c (char@ (incr string))) (re-syntax-error))
 			  (set (re-head re) (make-state 0 c 0 0))
 			  (set (re-tail re) (re-head re))))
        (1		(let ()
