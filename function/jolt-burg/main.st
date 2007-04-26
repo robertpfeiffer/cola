@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 17:17:22 by piumarta on emilia
+  Last edited: 2007-04-25 17:25:17 by piumarta on emilia
 "
 
 { import: Object }
@@ -69,7 +69,7 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
 
 
 [
-    | echo args file stream scanner expr interactive |
+    | echo args file path stream scanner expr interactive |
     Options libdir: (OS argumentAt: 0) dirname.
     interactive := false.
     (args := OS arguments) isEmpty
@@ -82,22 +82,24 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
 		nextPutAll: 'Welcome to Jolt 2.0 [';
 		nextPutAll: CodeGenerator versionString;
 		nextPutAll: ']\n'].
-    args do: [:path |
-	((Options parseOption: path) or: [CompilerOptions parseOption: path])
-	    ifFalse:
-	       [(path = '-')
-		    ifTrue:  [file := StdIn]
-		    ifFalse: [(file := File openIfPresent: path) ifFalse: [file := (File open: Options libdir, '/', path)]].
-		file isNil ifTrue: [path error: path, ': No such file or directory'].
-		stream := file readStream.
-		echo := Options verbose or: [file isInteractive].
-		" read - eval - print "
-		[(expr := CokeScanner read: stream) isNil]
-		    whileFalse:
-		       [Options verbose ifTrue: [StdErr print: expr; cr].
-			Options compile ifTrue: [expr compile].
-			expr := expr eval.
-			echo ifTrue: [StdErr nextPutAll: ' => '; print: expr; cr]]]].
+    [args notEmpty]
+	whileTrue:
+	   [path := args removeFirst.
+	    ((Options parseOption: path) or: [CompilerOptions parseOption: path])
+		ifFalse:
+		   [(path = '-')
+			ifTrue:  [file := StdIn]
+			ifFalse: [(file := File openIfPresent: path) ifFalse: [file := (File open: Options libdir, '/', path)]].
+		    file isNil ifTrue: [path error: path, ': No such file or directory'].
+		    stream := file readStream.
+		    echo := Options verbose or: [file isInteractive].
+		    " read - eval - print "
+		    [(expr := CokeScanner read: stream) isNil]
+			whileFalse:
+			   [Options verbose ifTrue: [StdErr print: expr; cr].
+			    Options compile ifTrue: [expr compile].
+			    expr := expr eval.
+			    echo ifTrue: [StdErr nextPutAll: ' => '; print: expr; cr]]]].
     interactive
 	ifTrue:
 	   [StdErr nextPutAll: '\nmorituri te salutant\n'].
