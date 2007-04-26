@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-25 18:50:41 by piumarta on emilia
+;;; Last edited: 2007-04-25 18:59:33 by piumarta on emilia
 
 (define calloc	(dlsym "calloc"))
 (define memset	(dlsym "memset"))
@@ -315,7 +315,3 @@
 	    (set %re-in %re-out)
 	    (set %re-out t)))))
     -1))
-
-;(define re (re-compile "abc"))
-;(re-print re)
-;(printf "%d\n" (re-match re "abcdef"))
