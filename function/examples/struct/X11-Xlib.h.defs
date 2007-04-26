@@ -1,0 +1,867 @@
+(load "struct-gen.k")
+
+(#define XLIB_ILLEGAL_ACCESS 1)
+
+(#include "X11/Xlib.h")
+
+(const
+    XBufferOverflow
+    XLookupNone
+    XLookupChars
+    XLookupKeySym
+    XLookupBoth
+)
+
+(struct XGCValues
+    function
+    plane_mask
+    foreground
+    background
+    line_width
+    line_style
+    cap_style
+    join_style
+    fill_style
+    fill_rule
+    arc_mode
+    tile
+    stipple
+    ts_x_origin
+    ts_y_origin
+    font
+    subwindow_mode
+    graphics_exposures
+    clip_x_origin
+    clip_y_origin
+    clip_mask
+    dash_offset
+    dashes
+)
+
+(struct Visual
+    visualid
+    class
+    red_mask green_mask blue_mask
+    bits_per_rgb
+)
+
+(struct XSetWindowAttributes
+    background_pixmap
+    background_pixel
+    border_pixmap
+    border_pixel
+    bit_gravity
+    win_gravity
+    backing_store
+    backing_planes
+    backing_pixel
+    save_under
+    event_mask
+    do_not_propagate_mask
+    override_redirect
+    colormap
+    cursor
+)
+
+(struct XWindowAttributes
+    x y
+    width height
+    border_width
+    depth
+    visual
+    root
+    class
+    bit_gravity
+    win_gravity
+    backing_store
+    backing_planes
+    backing_pixel
+    save_under
+    colormap
+    map_installed
+    map_state
+    all_event_masks
+    your_event_mask
+    do_not_propagate_mask
+    override_redirect
+    screen
+)
+
+(struct XWindowChanges
+    x y
+    width height
+    border_width
+    sibling
+    stack_mode
+)
+
+(struct XColor
+    pixel
+    red
+    green
+    blue
+    flags
+)
+
+(struct XSegment
+    x1 y1 x2 y2
+)
+
+(struct XPoint
+    x y
+)
+    
+(struct XRectangle
+    x y
+    width height
+)
+    
+(struct XArc
+    x y
+    width height
+    angle1 angle2
+)
+
+(struct Display
+    fd
+    proto_major_version
+    proto_minor_version
+    vendor
+    resource_alloc
+    byte_order
+    bitmap_unit
+    bitmap_pad
+    bitmap_bit_order
+    nformats
+    pixmap_format
+    release
+    qlen
+    last_request_read
+    request
+    max_request_size
+    display_name
+    default_screen
+    nscreens
+    screens
+    motion_buffer
+    min_keycode
+    max_keycode
+    xdefaults
+)
+
+(struct XKeyEvent
+    type
+    serial
+    send_event
+    display
+    window
+    root
+    subwindow
+    time
+    x y
+    x_root y_root
+    state
+    keycode
+    same_screen
+)
+
+(struct XButtonEvent
+    type
+    serial
+    send_event
+    display
+    window
+    root
+    subwindow
+    time
+    x y
+    x_root y_root
+    state
+    button
+    same_screen
+)
+
+(struct XMotionEvent
+    type
+    serial
+    send_event
+    display
+    window
+    root
+    subwindow
+    time
+    x y
+    x_root y_root
+    state
+    is_hint
+    same_screen
+)
+
+(struct XCrossingEvent
+    type
+    serial
+    send_event
+    display
+    window
+    root
+    subwindow
+    time
+    x y
+    x_root y_root
+    mode
+    detail
+    same_screen
+    focus
+    state
+)
+
+(struct XFocusChangeEvent
+    type
+    serial
+    send_event
+    display
+    window
+    mode
+    detail
+)
+
+(struct XExposeEvent
+    type
+    serial
+    send_event
+    display
+    window
+    x y
+    width height
+    count
+)
+
+(struct XGraphicsExposeEvent
+    type
+    serial
+    send_event
+    display
+    drawable
+    x y
+    width height
+    count
+    major_code
+    minor_code
+)
+
+(struct XNoExposeEvent
+    type
+    serial
+    send_event
+    display
+    drawable
+    major_code
+    minor_code
+)
+
+(struct XVisibilityEvent
+    type
+    serial
+    send_event
+    display
+    window
+    state
+)
+
+(struct XCreateWindowEvent
+    type
+    serial
+    send_event
+    display
+    parent
+    window
+    x y
+    width height
+    border_width
+    override_redirect
+)
+
+(struct XDestroyWindowEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+)
+
+(struct XUnmapEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+    from_configure
+)
+
+(struct XMapEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+    override_redirect
+)
+
+(struct XMapRequestEvent
+    type
+    serial
+    send_event
+    display
+    parent
+    window
+)
+
+(struct XReparentEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+    parent
+    x y
+    override_redirect
+)
+
+(struct XConfigureEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+    x y
+    width height
+    border_width
+    above
+    override_redirect
+)
+
+(struct XGravityEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+    x y
+)
+
+(struct XResizeRequestEvent
+    type
+    serial
+    send_event
+    display
+    window
+    width height
+)
+
+(struct XConfigureRequestEvent
+    type
+    serial
+    send_event
+    display
+    parent
+    window
+    x y
+    width height
+    border_width
+    above
+    detail
+    value_mask
+)
+
+(struct XCirculateEvent
+    type
+    serial
+    send_event
+    display
+    event
+    window
+    place
+)
+
+(struct XCirculateRequestEvent
+    type
+    serial
+    send_event
+    display
+    parent
+    window
+    place
+)
+
+(struct XPropertyEvent
+    type
+    serial
+    send_event
+    display
+    window
+    atom
+    time
+    state
+)
+
+(struct XSelectionClearEvent
+    type
+    serial
+    send_event
+    display
+    window
+    selection
+    time
+)
+
+(struct XSelectionRequestEvent
+    type
+    serial
+    send_event
+    display
+    owner
+    requestor
+    selection
+    target
+    property
+    time
+)
+
+(struct XSelectionEvent
+    type
+    serial
+    send_event
+    display
+    requestor
+    selection
+    target
+    property
+    time
+)
+
+(struct XColormapEvent
+    type
+    serial
+    send_event
+    display
+    window
+    colormap
+    new
+    state
+)
+
+(struct XErrorEvent
+    type
+    display
+    resourceid
+    serial
+    error_code
+    request_code
+    minor_code
+)
+
+(struct XAnyEvent
+    type
+    serial
+    send_event
+    display
+    window
+)
+
+(struct XEvent
+    type
+)
+
+(struct XCharStruct
+    lbearing
+    rbearing
+    width
+    ascent
+    descent
+    attributes
+)
+
+(struct XFontProp
+    name
+    card32
+)
+
+(struct XFontStruct
+    fid
+    direction
+    min_char_or_byte2
+    max_char_or_byte2
+    min_byte1
+    max_byte1
+    all_chars_exist
+    default_char
+    n_properties
+    properties
+    min_bounds
+    max_bounds
+    per_char
+    ascent
+    descent
+)
+
+(struct XTextItem
+    chars
+    nchars
+    delta
+    font
+)
+
+(struct XChar2b
+    byte1
+    byte2
+)
+
+(struct XTextItem16
+    chars
+    nchars
+    delta
+    font
+)
+
+(struct XFontSetExtents
+    max_ink_extent
+    max_logical_extent
+)
+
+(#include "X11/X.h")
+
+(const
+    None
+    ParentRelative
+    CopyFromParent
+    PointerWindow
+    InputFocus
+    PointerRoot
+    AnyPropertyType
+    AnyKey
+    AnyButton
+    AllTemporary
+    CurrentTime
+    NoSymbol
+    NoEventMask
+    KeyPressMask
+    KeyReleaseMask
+    ButtonPressMask
+    ButtonReleaseMask
+    EnterWindowMask
+    LeaveWindowMask
+    PointerMotionMask
+    PointerMotionHintMask
+    Button1MotionMask
+    Button2MotionMask
+    Button3MotionMask
+    Button4MotionMask
+    Button5MotionMask
+    ButtonMotionMask
+    KeymapStateMask
+    ExposureMask
+    VisibilityChangeMask
+    StructureNotifyMask
+    ResizeRedirectMask
+    SubstructureNotifyMask
+    SubstructureRedirectMask
+    FocusChangeMask
+    PropertyChangeMask
+    ColormapChangeMask
+    OwnerGrabButtonMask
+    KeyPress
+    KeyRelease
+    ButtonPress
+    ButtonRelease
+    MotionNotify
+    EnterNotify
+    LeaveNotify
+    FocusIn
+    FocusOut
+    KeymapNotify
+    Expose
+    GraphicsExpose
+    NoExpose
+    VisibilityNotify
+    CreateNotify
+    DestroyNotify
+    UnmapNotify
+    MapNotify
+    MapRequest
+    ReparentNotify
+    ConfigureNotify
+    ConfigureRequest
+    GravityNotify
+    ResizeRequest
+    CirculateNotify
+    CirculateRequest
+    PropertyNotify
+    SelectionClear
+    SelectionRequest
+    SelectionNotify
+    ColormapNotify
+    ClientMessage
+    MappingNotify
+    LASTEvent
+    ShiftMask
+    LockMask
+    ControlMask
+    Mod1Mask
+    Mod2Mask
+    Mod3Mask
+    Mod4Mask
+    Mod5Mask
+    ShiftMapIndex
+    LockMapIndex
+    ControlMapIndex
+    Mod1MapIndex
+    Mod2MapIndex
+    Mod3MapIndex
+    Mod4MapIndex
+    Mod5MapIndex
+    Button1Mask
+    Button2Mask
+    Button3Mask
+    Button4Mask
+    Button5Mask
+    AnyModifier
+    Button1
+    Button2
+    Button3
+    Button4
+    Button5
+    NotifyNormal
+    NotifyGrab
+    NotifyUngrab
+    NotifyWhileGrabbed
+    NotifyHint
+    NotifyAncestor
+    NotifyVirtual
+    NotifyInferior
+    NotifyNonlinear
+    NotifyNonlinearVirtual
+    NotifyPointer
+    NotifyPointerRoot
+    NotifyDetailNone
+    VisibilityUnobscured
+    VisibilityPartiallyObscured
+    VisibilityFullyObscured
+    PlaceOnTop
+    PlaceOnBottom
+    FamilyInternet
+    FamilyDECnet
+    FamilyChaos
+    FamilyInternet6
+    PropertyNewValue
+    PropertyDelete
+    ColormapUninstalled
+    ColormapInstalled
+    GrabModeSync
+    GrabModeAsync
+    GrabSuccess
+    AlreadyGrabbed
+    GrabInvalidTime
+    GrabNotViewable
+    GrabFrozen
+    AsyncPointer
+    SyncPointer
+    ReplayPointer
+    AsyncKeyboard
+    SyncKeyboard
+    ReplayKeyboard
+    AsyncBoth
+    SyncBoth
+    RevertToNone
+    RevertToPointerRoot
+    RevertToParent
+    Success
+    InputOutput
+    InputOnly
+    CWBackPixmap
+    CWBackPixel
+    CWBorderPixmap
+    CWBorderPixel
+    CWBitGravity
+    CWWinGravity
+    CWBackingStore
+    CWBackingPlanes
+    CWBackingPixel
+    CWOverrideRedirect
+    CWSaveUnder
+    CWEventMask
+    CWDontPropagate
+    CWColormap
+    CWCursor
+    CWX
+    CWY
+    CWWidth
+    CWHeight
+    CWBorderWidth
+    CWSibling
+    CWStackMode
+    ForgetGravity
+    NorthWestGravity
+    NorthGravity
+    NorthEastGravity
+    WestGravity
+    CenterGravity
+    EastGravity
+    SouthWestGravity
+    SouthGravity
+    SouthEastGravity
+    StaticGravity
+    UnmapGravity
+    NotUseful
+    WhenMapped
+    Always
+    IsUnmapped
+    IsUnviewable
+    IsViewable
+    SetModeInsert
+    SetModeDelete
+    DestroyAll
+    RetainPermanent
+    RetainTemporary
+    Above
+    Below
+    TopIf
+    BottomIf
+    Opposite
+    RaiseLowest
+    LowerHighest
+    PropModeReplace
+    PropModePrepend
+    PropModeAppend
+    GXclear
+    GXand
+    GXandReverse
+    GXcopy
+    GXandInverted
+    GXnoop
+    GXxor
+    GXor
+    GXnor
+    GXequiv
+    GXinvert
+    GXorReverse
+    GXcopyInverted
+    GXorInverted
+    GXnand
+    GXset
+    LineSolid
+    LineOnOffDash
+    LineDoubleDash
+    CapNotLast
+    CapButt
+    CapRound
+    CapProjecting
+    JoinMiter
+    JoinRound
+    JoinBevel
+    FillSolid
+    FillTiled
+    FillStippled
+    FillOpaqueStippled
+    EvenOddRule
+    WindingRule
+    ClipByChildren
+    IncludeInferiors
+    Unsorted
+    YSorted
+    YXSorted
+    YXBanded
+    CoordModeOrigin
+    CoordModePrevious
+    Complex
+    Nonconvex
+    Convex
+    ArcChord
+    ArcPieSlice
+    GCFunction
+    GCPlaneMask
+    GCForeground
+    GCBackground
+    GCLineWidth
+    GCLineStyle
+    GCCapStyle
+    GCJoinStyle
+    GCFillStyle
+    GCFillRule
+    GCTile
+    GCStipple
+    GCTileStipXOrigin
+    GCTileStipYOrigin
+    GCFont
+    GCSubwindowMode
+    GCGraphicsExposures
+    GCClipXOrigin
+    GCClipYOrigin
+    GCClipMask
+    GCDashOffset
+    GCDashList
+    GCArcMode
+    GCLastBit
+    FontLeftToRight
+    FontRightToLeft
+    FontChange
+    XYBitmap
+    XYPixmap
+    ZPixmap
+    AllocNone
+    AllocAll
+    DoRed
+    DoGreen
+    DoBlue
+    CursorShape
+    TileShape
+    StippleShape
+    AutoRepeatModeOff
+    AutoRepeatModeOn
+    AutoRepeatModeDefault
+    LedModeOff
+    LedModeOn
+    KBKeyClickPercent
+    KBBellPercent
+    KBBellPitch
+    KBBellDuration
+    KBLed
+    KBLedMode
+    KBKey
+    KBAutoRepeatMode
+    MappingSuccess
+    MappingBusy
+    MappingFailed
+    MappingModifier
+    MappingKeyboard
+    MappingPointer
+    DontPreferBlanking
+    PreferBlanking
+    DefaultBlanking
+    DisableScreenSaver
+    DisableScreenInterval
+    DontAllowExposures
+    AllowExposures
+    DefaultExposures
+    ScreenSaverReset
+    ScreenSaverActive
+    HostInsert
+    HostDelete
+    EnableAccess
+    DisableAccess
+    StaticGray
+    GrayScale
+    StaticColor
+    PseudoColor
+    TrueColor
+    DirectColor
+    LSBFirst
+    MSBFirst
+)
+
+(generate "xlib-types.k")
