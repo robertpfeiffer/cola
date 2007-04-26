@@ -21,7 +21,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 21:19:45 by piumarta on emilia
+;;; Last edited: 2007-04-26 14:01:07 by piumarta on emilia
 
 (define meta-compile 0)	; forward
 
@@ -84,17 +84,17 @@
   (method (stream)
     [stream next]
     [self save]
-    [self scan: '$\\ using: [self scanAt: '$$]]
-    [self scan: '${  using: meta-sequence-reader]  [self scan: '$} using: meta-sequence-illegal]
-    [self scan: '$[  using: meta-sequence-reader]  [self scan: '$] using: meta-sequence-illegal]
-    [self scan: '$$  using: meta-sequence-reader]
-    [self scan: '$@  using: meta-sequence-reader]
-    [self scan: '$!  using: meta-sequence-reader]
+    [self readerAt: '$\\ put: [self readerAt: '$$]]
+    [self readerAt: '${  put: meta-sequence-reader]  [self readerAt: '$} put: meta-sequence-illegal]
+    [self readerAt: '$[  put: meta-sequence-reader]  [self readerAt: '$] put: meta-sequence-illegal]
+    [self readerAt: '$$  put: meta-sequence-reader]
+    [self readerAt: '$@  put: meta-sequence-reader]
+    [self readerAt: '$!  put: meta-sequence-reader]
     (let ((result [self read: stream]))
       [self restore]
       (meta-compile result))))
 
-[CokeScanner scan: '$? using: meta-sequence-escape withAttributes: 'id]		; allow ? to appear embedded in symbols
+[CokeScanner readerAt: '$? put: meta-sequence-escape withAttributes: 'id]		; allow ? to appear embedded in symbols
 
 ;;; Example: integer parsing (see [2, Section 1])
 

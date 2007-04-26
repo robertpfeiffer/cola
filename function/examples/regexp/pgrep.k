@@ -30,7 +30,7 @@
   (and [args notEmpty] [[args first] = '"-v"]
        (set verbose [args removeFirst]))
   (and [args isEmpty]
-       (error "no regexp given on command line\n"))
+       (error "no regexp given on command line"))
   (let ((re (re-compile [[args removeFirst] _elements])))
     (and verbose (re-print re))
     (grep re (fdopen 0 "r"))

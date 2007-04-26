@@ -15,14 +15,14 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-25 19:18:52 by piumarta on emilia
+;;; Last edited: 2007-04-26 14:44:08 by piumarta on emilia
 
 (define calloc	(dlsym "calloc"))
 (define memset	(dlsym "memset"))
 
 (define re-syntax-error
   (lambda ()
-    (error "syntax error\n")))
+    (error "syntax error")))
 
 (syntax incr
   (lambda (node comp)
