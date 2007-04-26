@@ -688,11 +688,11 @@ clone family.  If you modify the behaviour of the prototype (or any
 other member of its clone family) then the behaviour of <i>all</i>
 members of the clone family (including that of the prototype) is
 modified, identically.  This is something of a compromise between
-Lieberman-style prototypes (much simpler and more general
-oganisational conventions, but very difficult to implement
+Lieberman-style prototypes (simple conventions, since there is no
+`meta' class organisation to manage, but harder to implement
 efficiently) and class-instance systems (easier to implement
-efficiently, but imposing much more complex organisational conventions
-on their surrounding systems).
+efficiently, but imposing more complex organisational conventions on
+their surrounding systems).
 
 <p> In other words, a <i>prototype</i> (in the sense of the present
 discussion) is nothing more than an object that has been:
@@ -702,7 +702,7 @@ discussion) is nothing more than an object that has been:
 <li> had named slots added to it (according to its prototype
 specification);
 <li> been associated with a fresh (empty) method dictionary, in which
-undound messages are delegated to the 'parent' prototype object; and
+unbound messages are delegated to the 'parent' prototype object; and
 <li> bound to a name by which it is known to further prototype
 specifications and method definitions.
 </ul>
@@ -1012,7 +1012,7 @@ _object ()
 
 All objects delegate to <tt>_object</tt>.  All <tt>_object</tt>s have
 a virtual table (either implicit or explicitly stored one word before
-the address of the object).  Virtal tables contain <tt>_vector</tt>s
+the address of the object).  Virtual tables contain <tt>_vector</tt>s
 (one-dimensional fixed-size arrays) containing <tt>_assoc</tt>iations
 between <tt>_selector</tt>s and <tt>_closure</tt>s.
 A <tt>_closure</tt> stores a pointer to a method implementation
