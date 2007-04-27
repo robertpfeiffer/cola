@@ -569,7 +569,13 @@ use it to write a parser for integers (after the example in Baker
 Running the above program produces the following output:
 
 <blockquote><pre>
-(#one 42 #two (#This #is (#a #sequence) #of #tokens) #three 42 #four)
+0
+42
+1
+-1
+42
+-666
+#error
 </pre></blockquote>
 
 To save your typing finger, the above example is available in the idst
