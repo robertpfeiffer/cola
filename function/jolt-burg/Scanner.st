@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-27 15:51:59 by piumarta on emilia
+  Last edited: 2007-04-27 15:53:48 by piumarta on emilia
 "
 
 { import: Objects }
@@ -53,8 +53,7 @@ Scanner save
     0 to: 255 do: [:c |
 	readers at: c put: (self readerAt: c).
 	attributes at: c put: (self attributeAt: c)].
-    saves addLast: readers.
-    saves addLast: attributes.
+    saves addLast: readers; addLast: attributes.
 ]
 
 Scanner restore
