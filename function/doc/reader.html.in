@@ -398,7 +398,10 @@ distribution as <tt>function/examples/macros</tt>.
 
 We can add Val D. Schorre's META-II syntax [1] directly to the scanner
 using an active 'escape' character.  The approach described here is
-similar to that described by Henry Baker [2] for Common Lisp. <p>
+similar to that described by Henry Baker [2] for Common Lisp but
+differs in that the scanner changes needed to read META expresions
+will only be activated within the expression immediately following the
+'escape' character. <p>
 
 We are going to teach the scanner how to transform META markup into
 AST nodes (the head will identify the META operation being encoded)
