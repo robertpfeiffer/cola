@@ -15,11 +15,49 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-26 13:21:51 by piumarta on emilia
+  Last edited: 2007-04-27 09:03:29 by piumarta on emilia
 "
 
 { import: Objects }
 { import: Expression }
+
+NewScanner : Object ( saves )
+
+NewScanner xIllegal: stream
+[
+    self error: 'illegal character: ', stream peek printString
+]
+
+NewScanner new
+[
+    saves := OrderedCollection new.
+    0 to: 255 do: [:c | self _vtable methodAt: c put: (self _methodAt: #xIllegal:) with: 0]
+]
+
+NewScanner readerAt: aCharacter						[ ^(self _vtable lookup: aCharacter) _method ]
+NewScanner readerAt: aCharacter put: aMethod				[ ^(self _vtable at: aCharacter put: aMethod with: 0) ]
+
+NewScanner attributeAt: aCharacter					[ ^(self _vtable lookup: aCharacter) data ]
+NewScanner attribtueAt: aCharacter put: anObject			[ ^(self _vtable lookup: aCharacter) data: anObject ]
+
+NewScanner readerAt: aCharacter put: aMethod withAtribute: anObject	[ ^(self _vtable at: aCharacter put: aMethod with: anObject) ]
+
+NewScanner read: aStringOrStream
+[
+    | input char reader object |
+    input := aStringOrStream readStream.
+    [object or: [input atEnd]] whileFalse: [object := self internalRead: input].
+    ^object
+]
+
+NewScanner internalRead: stream
+[
+    | char |
+    (char := stream peek) ifFalse: [^nil].
+    ^self perform: char with: stream
+]
+
+
 
 Scanner : Object ( readers attributes saves )
 
@@ -35,25 +73,32 @@ Scanner readerAt: aCharacter	[ ^readers at: aCharacter ]
 
 Scanner readerAt: aCharacter put: aMethod
 [
-    self readerAt: aCharacter put: aMethod withAttributes: nil
+    self readerAt: aCharacter put: aMethod withAttribute: nil
 ]
 
-Scanner readerAt: aCharacter put: aMethod withAttributes: attributesOrNil
+Scanner readerAt: aCharacter put: aMethod withAttribute: attributeOrNil
 [
     readers at: aCharacter put: aMethod.
-    attributes at: aCharacter put: attributesOrNil.
+    attributes at: aCharacter put: attributeOrNil.
 ]
 
 Scanner readerAt: firstCharacter through: lastCharacter put: aMethod
 [
-    self readerAt: firstCharacter through: lastCharacter put: aMethod withAttributes: nil
+    self readerAt: firstCharacter through: lastCharacter put: aMethod withAttribute: nil
 ]
 
-Scanner readerAt: firstCharacter through: lastCharacter put: aMethod withAttributes: attributesOrNil
+Scanner readerAt: firstCharacter through: lastCharacter put: aMethod withAttribute: attributeOrNil
 [
     firstCharacter to: lastCharacter do: [:aCharacter |
 	readers at: aCharacter put: aMethod.
-	attributes at: aCharacter put: attributesOrNil].
+	attributes at: aCharacter put: attributeOrNil].
+]
+
+Scanner attributeAt: aCharacter	[ ^attributes at: aCharacter ]
+
+Scanner attributeAt: aCharacter put: attributeOrNil
+[
+    attributes at: aCharacter put: attributeOrNil.
 ]
 
 Scanner save
@@ -233,9 +278,9 @@ CokeScanner error: stream unexpected: character
 CokeScanner initialise
 [
     self
-	readerAt:   0 through:  32	put: (CokeScanner _methodAt: #xSpace:  ) withAttributes: #space;
-	readerAt:  33 through: 126	put: (CokeScanner _methodAt: #xLetter: ) withAttributes: #id;
-	readerAt:  $0 through:  $9	put: (CokeScanner _methodAt: #xDigit:  ) withAttributes: #id;
+	readerAt:   0 through:  32	put: (CokeScanner _methodAt: #xSpace:  ) withAttribute: #space;
+	readerAt:  33 through: 126	put: (CokeScanner _methodAt: #xLetter: ) withAttribute: #id;
+	readerAt:  $0 through:  $9	put: (CokeScanner _methodAt: #xDigit:  ) withAttribute: #id;
 	readerAt:  $(			put: (CokeScanner _methodAt: #xOpen:   );
 	readerAt:  $)			put: (CokeScanner _methodAt: #xClose:  );
 	readerAt:  $"			put: (CokeScanner _methodAt: #xString: );

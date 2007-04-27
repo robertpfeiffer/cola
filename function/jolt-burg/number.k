@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-26 13:15:16 by piumarta on emilia
+;;; Last edited: 2007-04-26 19:02:02 by piumarta on emilia
 
 ;; character constants
 
@@ -33,7 +33,7 @@
 		0))
 	  char))))
 
-[CokeScanner readerAt: '36 put: dollar-reader withAttributes: 'id]	; allow $ to appear embedded in symbols
+[CokeScanner readerAt: '36 put: dollar-reader withAttribute: 'id]	; allow $ to appear embedded in symbols
 
 ;; explicit signs, non-decimal bases, and floating-point numbers
 
@@ -48,8 +48,8 @@
 		number))
 	  [self xLetter: stream]))))	; - or + followed by non-digit starts a symbol
 
-[CokeScanner readerAt: '$+ put: sign-reader withAttributes: 'id]	; allow + to appear embedded in symbols
-[CokeScanner readerAt: '$- put: sign-reader withAttributes: 'id]	; allow - to appear embedded in symbols
+[CokeScanner readerAt: '$+ put: sign-reader withAttribute: 'id]	; allow + to appear embedded in symbols
+[CokeScanner readerAt: '$- put: sign-reader withAttribute: 'id]	; allow - to appear embedded in symbols
 
 ;; non-decimal bases and floating-point literals
 
@@ -88,4 +88,4 @@
 	       [stream next])))
       value)))
 
-[CokeScanner readerAt: '$0 through: '$9 put: digit-reader withAttributes: 'id]	; allow digits to appear embedded in symbols
+[CokeScanner readerAt: '$0 through: '$9 put: digit-reader withAttribute: 'id]	; allow digits to appear embedded in symbols
