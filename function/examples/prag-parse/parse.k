@@ -21,7 +21,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-26 14:00:08 by piumarta on emilia
+;;; Last edited: 2007-04-27 08:45:42 by piumarta on emilia
 
 
 (define meta-sequence-reader
@@ -38,7 +38,7 @@
 
 ;;; use # as 'meta escape' character (becuase [ and $ are already overloaded and useful within meta expressions)
 
-[CokeScanner readerAt: '$# put: meta-sequence-reader withAttributes: 'id]		; allow # to appear embedded in symbols
+[CokeScanner readerAt: '$# put: meta-sequence-reader withAttribute: 'id]		; allow # to appear embedded in symbols
 
 (define meta-map	; poor man's mapcar
   (lambda (function expr)

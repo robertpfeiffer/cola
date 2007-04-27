@@ -21,7 +21,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-26 14:01:07 by piumarta on emilia
+;;; Last edited: 2007-04-27 08:45:51 by piumarta on emilia
 
 (define meta-compile 0)	; forward
 
@@ -94,7 +94,7 @@
       [self restore]
       (meta-compile result))))
 
-[CokeScanner readerAt: '$? put: meta-sequence-escape withAttributes: 'id]		; allow ? to appear embedded in symbols
+[CokeScanner readerAt: '$? put: meta-sequence-escape withAttribute: 'id]		; allow ? to appear embedded in symbols
 
 ;;; Example: integer parsing (see [2, Section 1])
 
