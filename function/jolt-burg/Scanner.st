@@ -15,114 +15,55 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-27 09:03:29 by piumarta on emilia
+  Last edited: 2007-04-27 15:51:59 by piumarta on emilia
 "
 
 { import: Objects }
 { import: Expression }
 
-NewScanner : Object ( saves )
+Scanner : Object ( saves )
 
-NewScanner xIllegal: stream
-[
-    self error: 'illegal character: ', stream peek printString
-]
-
-NewScanner new
-[
-    saves := OrderedCollection new.
-    0 to: 255 do: [:c | self _vtable methodAt: c put: (self _methodAt: #xIllegal:) with: 0]
-]
-
-NewScanner readerAt: aCharacter						[ ^(self _vtable lookup: aCharacter) _method ]
-NewScanner readerAt: aCharacter put: aMethod				[ ^(self _vtable at: aCharacter put: aMethod with: 0) ]
-
-NewScanner attributeAt: aCharacter					[ ^(self _vtable lookup: aCharacter) data ]
-NewScanner attribtueAt: aCharacter put: anObject			[ ^(self _vtable lookup: aCharacter) data: anObject ]
-
-NewScanner readerAt: aCharacter put: aMethod withAtribute: anObject	[ ^(self _vtable at: aCharacter put: aMethod with: anObject) ]
-
-NewScanner read: aStringOrStream
-[
-    | input char reader object |
-    input := aStringOrStream readStream.
-    [object or: [input atEnd]] whileFalse: [object := self internalRead: input].
-    ^object
-]
-
-NewScanner internalRead: stream
-[
-    | char |
-    (char := stream peek) ifFalse: [^nil].
-    ^self perform: char with: stream
-]
-
-
-
-Scanner : Object ( readers attributes saves )
+Scanner xIllegal: stream	[ self error: 'illegal character: ', stream peek printString ]
 
 Scanner new
 [
     self := super new.
-    readers := Array new: 256.
-    attributes := Array new: 256.
     saves := OrderedCollection new.
+    0 to: 255 do: [:c | self _vtable methodAt: c put: (self _methodAt: #xIllegal:) with: 0].
 ]
 
-Scanner readerAt: aCharacter	[ ^readers at: aCharacter ]
+Scanner readerAt: aCharacter						[ ^(self _vtable lookup: aCharacter) value _method ]
+Scanner readerAt: aCharacter put: aMethod				[ ^(self _vtable methodAt: aCharacter put: aMethod with: 0) ]
 
-Scanner readerAt: aCharacter put: aMethod
+Scanner attributeAt: aCharacter						[ ^(self _vtable lookup: aCharacter) value data ]
+Scanner attribtueAt: aCharacter put: anObject				[ ^(self _vtable lookup: aCharacter) value data: anObject ]
+
+Scanner readerAt: aCharacter put: aMethod withAttribute: anObject	[ ^(self _vtable methodAt: aCharacter put: aMethod with: anObject) ]
+
+Scanner readerAt: firstCharacter through: lastCharacter put: aMethod withAttribute: anObject
 [
-    self readerAt: aCharacter put: aMethod withAttribute: nil
-]
-
-Scanner readerAt: aCharacter put: aMethod withAttribute: attributeOrNil
-[
-    readers at: aCharacter put: aMethod.
-    attributes at: aCharacter put: attributeOrNil.
-]
-
-Scanner readerAt: firstCharacter through: lastCharacter put: aMethod
-[
-    self readerAt: firstCharacter through: lastCharacter put: aMethod withAttribute: nil
-]
-
-Scanner readerAt: firstCharacter through: lastCharacter put: aMethod withAttribute: attributeOrNil
-[
-    firstCharacter to: lastCharacter do: [:aCharacter |
-	readers at: aCharacter put: aMethod.
-	attributes at: aCharacter put: attributeOrNil].
-]
-
-Scanner attributeAt: aCharacter	[ ^attributes at: aCharacter ]
-
-Scanner attributeAt: aCharacter put: attributeOrNil
-[
-    attributes at: aCharacter put: attributeOrNil.
+    firstCharacter to: lastCharacter do: [:c | self _vtable methodAt: c put: aMethod with: anObject]
 ]
 
 Scanner save
 [
+    | readers attributes |
+    readers := Array new: 256.
+    attributes := Array new: 256.
+    0 to: 255 do: [:c |
+	readers at: c put: (self readerAt: c).
+	attributes at: c put: (self attributeAt: c)].
     saves addLast: readers.
     saves addLast: attributes.
-    readers := readers copy.
-    attributes := attributes copy.
 ]
 
 Scanner restore
 [
+    | readers attributes |
     attributes := saves removeLast.
     readers := saves removeLast.
+    0 to: 255 do: [:c | self readerAt: c put: (readers at: c) withAttribute: (attributes at: c)].
 ]
-
-"--------"
-
-Scanner xIllegal: stream
-[
-    self error: 'illegal object: ', stream peek printString.
-]
-
-"--------"
 
 Scanner read: aStringOrStream
 [
@@ -136,7 +77,7 @@ Scanner internalRead: stream
 [
     | char |
     (char := stream peek) ifFalse: [^nil].
-    ^self performMethod_: (readers at: char) with: stream
+    ^self perform: char with: stream
 ]
 
 Scanner read: stream list: type delimited: delimiter
@@ -154,7 +95,7 @@ Scanner ignoreSpaces: stream
 [
     [stream atEnd not]
 	whileTrue:
-	   [(attributes at: stream peek) == #space ifFalse: [^self].
+	   [(self attributeAt: stream peek) == #space ifFalse: [^self].
 	    stream next].
     ^nil
 ]
@@ -197,7 +138,7 @@ CokeScanner : Scanner ()
 
 CokeScanner xSpace: stream
 [
-    [stream atEnd not and: [(attributes at: stream peek) == #space]] whileTrue: [stream next].
+    [stream atEnd not and: [(self attributeAt: stream peek) == #space]] whileTrue: [stream next].
     ^nil
 ]
 
@@ -239,7 +180,7 @@ CokeScanner xLetter: stream
     | tokenValue nextChar active |
     tokenValue := WriteStream on: (String new: 8).
     tokenValue nextPut: stream next.
-    [(nextChar := stream peek) and: [(attributes at: nextChar) == #id]]
+    [(nextChar := stream peek) and: [(self attributeAt: nextChar) == #id]]
 	whileTrue:
 	   [tokenValue nextPut: stream next].
     ^tokenValue contents asSymbol
