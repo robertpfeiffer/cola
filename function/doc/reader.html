@@ -406,17 +406,20 @@ distribution as <tt>function/examples/macros</tt>.
 <h3>4.2&nbsp;&nbsp;&nbsp;META-II</h3>
 
 We can add Val D. Schorre's META-II [1] syntax directly to the scanner
-and parser using a combination of active characters and parser syntax.
-The approach described below is similar to that described by Henry
-Baker [2] for Common Lisp. <p>
+using an active 'escape' character.  The approach described here is
+similar to that described by Henry Baker [2] for Common Lisp. <p>
 
 We are going to teach the scanner how to transform META markup into
 AST nodes (the head will identify the META operation being encoded)
 and add a 'META compiler' to the parser that will convert these
-marked-up nodes into an executable recogniser.  <p>
+marked-up nodes into an executable recogniser.  When the scanner sees
+the active 'escape' character it will read the next expression form
+the stream, with META 'markup', and return the result of 'compiling'
+the META program it contains to the scanner's caller (usually the Coke
+compiler).  <p>
 
-First we need a version of 'map' to apply a transformation to each
-element in a list.
+First we need a helper function, a version of 'map' that applies a
+transformation to each element in a list.
 
 <blockquote><pre>
 (define meta-compile 0)	; forward
