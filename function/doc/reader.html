@@ -1,0 +1,610 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">	<!-- -*- html -*- -->
+<html>
+<head>
+<title>Customising the Coke scanner</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="keywords" content="pepsi">
+<meta name="description" content="Coke programming guide">
+</head>
+<body>
+
+<center>
+<h1>Customising the Coke scanner</h1>
+$Id: coke.html.in 545 2006-11-06 18:04:41Z piumarta $
+<br>
+corresponds to the idst-5.9 release
+</center>
+
+<br>
+<br>
+
+<b>Contents:</b><br>
+<blockquote>
+1&nbsp;&nbsp;&nbsp;Introduction<br>
+2&nbsp;&nbsp;&nbsp;The scanner loop<br>
+2.1&nbsp;&nbsp;&nbsp;Attributes<br>
+2.2&nbsp;&nbsp;&nbsp;Temporary modifications<br>
+2.3&nbsp;&nbsp;&nbsp;Initial state<br>
+3&nbsp;&nbsp;&nbsp;Modifying the scanner from within Coke<br>
+4&nbsp;&nbsp;&nbsp;Examples<br>
+4.1&nbsp;&nbsp;&nbsp;Scanner macros<br>
+4.2&nbsp;&nbsp;&nbsp;META-II<br>
+5&nbsp;&nbsp;&nbsp;References<br>
+</blockquote>
+
+
+<h2>1&nbsp;&nbsp;&nbsp;Introduction</h2>
+
+
+Coke includes a built-in scanner that converts a plain text,
+parenthesized representation of s-expressions into object structures
+that represent equivalent ASTs.  Although ambitious language
+processors will certainly replace this scanner with a more exotic and
+powerful parsing mechanism, the scanner is designed to be fully
+programmable and extensible from userland dynamic code.
+
+
+<h2>2&nbsp;&nbsp;&nbsp;The scanner loop</h2>
+
+
+The scanner reads characters from a stream and answers the object they
+represent.  Every character is <i>active</i>; in other words, for
+every character read from the stream the scanner finds a <i>reader
+method</i> and invokes it on the stream.  If the reader method answers
+non-nil, the answer is returned to the scanner's caller.  If the
+reader answers nil, the scanner continues with the next character on
+the stream.  (The scanner therefore answers nil only when the stream
+is empty.)
+
+<blockquote><pre>Scanner read: stream
+[
+  | char reader object |
+  [stream atEnd]
+    whileFalse:
+     [char := stream peek.
+      reader := readers at: char.
+      object := self performMethod: reader with: stream.
+      object notNil ifTrue: [^object]].
+  ^nil
+]
+</pre></blockquote>
+
+For example, the comment character (;) is associated with the
+following method:
+
+<blockquote><pre>Scanner readComment: stream
+[
+  [stream atEnd or: [stream next == $\n]] whileFalse.
+  ^nil
+]
+</pre></blockquote>
+
+The method gobbles the entire line after the comment character,
+including the end of line character.  Since <tt>readComment:</tt>
+answers nil, the scanner does not return a result to its caller but
+continues scanning immediately with the first character on the next
+line. <p>
+
+The scanner is re-entrant.  For example, the quote character (&apos;)
+is associated with a method that invokes the scanner recursively:
+
+<blockquote><pre>Scanner readQuote: stream
+[
+  stream next.	<i>"gobble the &apos;"</i>
+  ^Expression with: #quote with: (self read: stream)
+]
+</pre></blockquote>
+
+This converts the
+text <blockquote><pre>&apos; <i>anything</i></pre></blockquote>
+into the list
+<blockquote><pre>(quote <i>anything</i>)</pre></blockquote>. <p>
+
+The scanner can also read a list of objects from the stream, stopping
+at an arbitrary delimiting character.  This method is invoked whenever
+an opening parenthesis is encountered:
+
+<blockquote><pre>Scanner readOpenParen: stream
+[
+  | list |
+  stream next.	<i>"gobble the ("</i>
+  list := self read: stream list: Expression delimited: $).
+  stream next.	<i>"gobble the )"</i>
+  ^list
+]
+</pre></blockquote>
+
+Reader functions are installed and queried in a scanner using the
+following protocol:
+
+<blockquote><pre>
+Scanner readerAt: aCharacter
+Scanner readerAt: aCharacter put: readerMethod
+Scanner readerAt: firstCharacter through: lastCharacter put: readerMethod
+</pre></blockquote>
+
+For example, during initialisation the Coke scanner sends itself these
+messages:
+
+<blockquote><pre>
+self
+  readerAt: $(             put: (self _methodAt: #readOpenParen:);
+  readerAt: $0 through: $9 put: (self _methodAt: #readDigit:);
+  "... and so forth ..."
+</pre></blockquote>
+
+
+<h3>2.1&nbsp;&nbsp;&nbsp;Attributes</h3>
+
+Each character also has an associated attributes object.  One such
+attribute is the symbol <tt>#id</tt> associated with any character
+that can appear in the second (and subsequent) positions of an
+identifier (symbol).  (Another is <tt>#space</tt>, associated with any
+character that should be considered whitespace.)  <p>
+
+Setting a reader method with either of the messages
+
+<blockquote><pre>
+Scanner readerAt: aCharacter put: readerMethod
+Scanner readerAt: firstCharacter through: lastCharacter put: readerMethod
+</pre></blockquote>
+
+clears the attribute associated with the implicated characters. <p>
+
+To associate a reader method and attribute with one or more
+characters, two similar methods are provided:
+
+<blockquote><pre>
+Scanner readerAt: aCharacter put: readerMethod withAttribute: anObject
+Scanner readerAt: firstCharacter through: lastCharacter put: readerMethod withAttribute: anObject
+</pre></blockquote>
+
+Finally, attributes can be accessed independently of reader methods:
+
+<blockquote><pre>
+Scanner attributeAt: aCharacter
+Scanner attributeAt: aCharacter put: anObject
+</pre></blockquote>
+
+To illustrate these methods, the three messages
+
+<blockquote><pre>
+aScanner readerAt:    $$ put: (aScanner readerAt: $a).
+aScanner readerAt:    $$ put: (aScanner readerAt: $a) withAttribute: #id.
+aScanner attributeAt: $$ put: #id.
+</pre></blockquote>
+
+will ensure <tt>aScanner</tt> allows dollars as the initial character
+of identifiers, anywhere in identifiers, or only in the second (and
+subsequent) characters (but not the first) of identifiers,
+respectively. <p>
+
+
+
+
+<h3>2.2&nbsp;&nbsp;&nbsp;Temporary modifications</h3>
+
+The state of a scanner (associations between characters, reader
+methods and attributes) can be saved and later restored in a LIFO
+manner.  For example, the following parses one object from a stream
+with the comment character disabled (it will act like a letter):
+
+<blockquote><pre>
+| object |
+<i>"save the scanner's state"</i>
+aScanner save.
+<i>"convert ; into a comment"</i>
+aScanner readerAt: $; put: (aScanner readerAt: $a) withAttribute: #id.
+<i>"read the next object from aStream"</i>
+object := aScanner read: aStream.
+<i>"restore the scanner's state"</i>
+aScanner restore.
+</pre></blockquote>
+
+Sends of <tt>save</tt> and <tt>restore</tt> to a given scanner nest
+correctly and to an arbitrary depth.
+
+
+<h3>2.3&nbsp;&nbsp;&nbsp;Initial state</h3>
+
+A new 'empty' <tt>Scanner</tt> associates every character with a
+reader that immediately signals an 'illegal character' error. <p>
+
+During initialisation of the Coke scanner, the following additional
+associations are installed:
+
+<blockquote>
+<table>
+<tr>
+  <td><i>character(s)</i></td>
+  <td><i>reader method</i></td>
+  <td><i>attribtue</i></td></tr>
+<tr>
+  <td>space and control chars&nbsp;&nbsp;</td>
+  <td>whitespace</td>
+  <td><tt>#space</tt></td></tr>
+<tr>
+  <td>0 through 9</td>
+  <td>integer</td>
+  <td><tt>#id</tt></td></tr>
+<tr>
+  <td>(</td>
+  <td>list</td>
+  <td><tt></tt></td></tr>
+<tr>
+  <td>)</td>
+  <td>unexpected char</td>
+  <td><tt></tt></td></tr>
+<tr>
+  <td>&quot;</td>
+  <td>string</td>
+  <td><tt></tt></td></tr>
+<tr>
+  <td>&apos;</td>
+  <td>quoted object</td>
+  <td><tt></tt></td></tr>
+<tr>
+  <td>;</td>
+  <td>comment</td>
+  <td><tt></tt></td></tr>
+<tr>
+  <td><i>everthing else</i></td>
+  <td>letter</td>
+  <td><tt>#id</tt></td></tr>
+</table>
+</blockquote>
+
+
+<h2>3&nbsp;&nbsp;&nbsp;Modifying the scanner from within Coke</h2>
+
+
+Methods expect three 'hidden' initial arguments: a vtable closure and
+two 'self's (one for accessing state, one for sends to self).
+Provided these arguments are specified before any arguments, the
+reader table can be extended using <tt>lambda</tt> expressions from
+within Coke. <p>
+
+For example, if quotation were not provided by default it could be
+added dynamically from Coke as follows:
+
+<blockquote><pre>
+(define CokeScanner (import "CokeScanner"))
+
+(define read-quote
+  (lambda (_closure _self self stream)
+    [stream next]	<i>; gobble the &apos;</i>
+    [Expression with: 'quote with: [self read: stream]]))
+
+[CokeScanner readerAt: '$' put: read-quote]
+</pre></blockquote>
+
+
+<h2>4&nbsp;&nbsp;&nbsp;Examples</h2>
+
+
+<h3>4.1&nbsp;&nbsp;&nbsp;Scanner macros</h3>
+
+The Coke compiler is designed to be extended with new AST node types
+(using the <tt>syntax</tt> form).  These are similar to macros but
+work only on object structures.  More 'traditional' macros, performing
+purely textual substitution, are not built into the scanner but can be
+added by user code. <p>
+
+First we need a small structure to hold macro definitions, which will
+resemble closures, and a dictionary that maps macro names to their
+definitions.
+
+<blockquote><pre>
+(syntax macro-method	(lambda (node comp) `(long@ ,[node second]  )))
+(syntax macro-data	(lambda (node comp) `(long@ ,[node second] 1)))
+
+(define make-macro
+  (lambda (method data)
+    (let ((macro (malloc 8)))
+      (set (macro-method macro) method)
+      (set (macro-data   macro) data)
+      macro)))
+
+(define %macros	[SlotDictionary new])
+</pre></blockquote>
+
+To define a macro we add a <tt>macro</tt> structure to this dictionary
+associating the name with the closure.
+
+<blockquote><pre>
+(define define-macro
+  (lambda (name method data)
+    [%macros at: name put: (make-macro method data)]))
+</pre></blockquote>
+
+Macro (control sequence) names will be prefixed by the backslash (\)
+character.  When the scanner sees this character it will invoke the
+control-sequence reader:
+
+<blockquote><pre>
+(define cs-reader
+  (method (stream)
+    [stream next]
+    (let ((csname [self read: stream]))
+      (or [csname isSymbol] (error "missing control sequence name"))
+      (let ((definition [%macros at: csname]))
+	(or definition (error "undefined control sequence: \\%s" [[csname asString] _stringValue]))
+	((macro-method definition) _closure _self self stream (macro-data definition))))))
+</pre></blockquote>
+
+A macro definition will be either a single object or a list of
+objects.  To delimit lists of object we'll surround them with braces
+({...}) to create a <i>group</i>.  (Closing braces should always be
+consumed by the list reader and never seen by the scanner; they will
+therefore be bound to an error method.)
+
+<blockquote><pre>
+(define group-reader
+  (method (stream)
+    [stream next]
+    [self read: stream list: Expression delimited: '$\}]))
+
+(define group-error
+  (method (stream)
+    [self error: stream unexpected: [stream peek]]))
+</pre></blockquote>
+
+The default behaviour for a macro will be to insert its data into the
+parse.
+
+<blockquote><pre>
+(define %insert
+  (method (stream data)
+    data))
+</pre></blockquote>
+
+The only predefined macro will be the macro-defining macro.  Its
+behaviour will be to scan forwards in the stream looking for a macro
+name followed by either a single token or a group of tokens.
+
+<blockquote><pre>
+(define-macro 'def
+  (method (stream data)
+    (or (and [self ignoreSpaces: stream] (== '$\\ [stream next]))
+	(error "missing control sequence name in \\def"))
+    (let ((csname [self read: stream]))
+      (or [csname isSymbol] (error "missing control sequence name in \\def"))
+      (define-macro csname %insert [self read: stream]))
+    0))
+</pre></blockquote>
+
+Finally, we associate the new active characters with their associated
+methods.  We can then use our textual macros immediately, in-line in
+the source file.
+
+<blockquote><pre>
+[CokeScanner readerAt: '$\\ put: cs-reader]
+[CokeScanner readerAt: '$\{ put: group-reader]
+[CokeScanner readerAt: '$\} put: group-error]
+
+\def\foo 42
+\def\bar{a sequence}
+\def\baz{This is \bar of tokens}
+
+[StdOut println: '(one \foo two \baz three \foo four)]
+</pre></blockquote>
+
+Running the above program produces:
+
+<blockquote><pre>
+(#one 42 #two (#This #is (#a #sequence) #of #tokens) #three 42 #four)
+</pre></blockquote>
+
+The above bear a striking resemblance to TeX macros.  Extending them
+to implement the full TeX macro semantics would not be difficult
+(probably no more than tripling the size of the above code). <p>
+
+To save your typing finger, the above example is available in the idst
+distribution as <tt>function/examples/macros</tt>.
+
+
+<h3>4.2&nbsp;&nbsp;&nbsp;META-II</h3>
+
+We can add Val D. Schorre's META-II [1] syntax directly to the scanner
+and parser using a combination of active characters and parser syntax.
+The approach described below is similar to that described by Henry
+Baker [2] for Common Lisp. <p>
+
+We are going to teach the scanner how to transform META markup into
+AST nodes (the head will identify the META operation being encoded)
+and add a 'META compiler' to the parser that will convert these
+marked-up nodes into an executable recogniser.  <p>
+
+First we need a version of 'map' to apply a transformation to each
+element in a list.
+
+<blockquote><pre>
+(define meta-compile 0)	; forward
+
+(define meta-map	; poor man's mapcar
+  (lambda (function expr)
+    (let ((limit  [expr size])
+	  (result [Expression new: limit])
+	  (index  '0))
+      (while (< index limit)
+	[result at: index put: (function [expr at: index])]
+	(set index [index + '1]))
+      result)))
+</pre></blockquote>
+
+Our 'META compiler' will deal with two kinds of object in AST nodes:
+<tt>meta-form</tt> compiles a node that encode a META operation,
+and <tt>meta-other</tt> compiles everything else.  Both answer true or
+false depending on whether their 'match' succeeds.  By
+default, <tt>meta-other</tt> succeeds if its object in the META
+pattern is identical to the next element read from the input stream.
+(It could be made arbitrarily more sophisticated, for example checking
+structural equivalance or performing unification.)
+
+<blockquote><pre>
+(define meta-other	; default matcher for non-meta constructs within pattern
+  (lambda (expr)
+    `(and (== ',expr [stream peek])
+	  (let () [stream next] 1))))
+
+(define meta-form	; matchers for meta constructs
+  (lambda (node)
+    (let ((type [node first])
+	  (expr [node second]))
+      (cond
+       ((== type 'meta-repeat)		`(let () (while ,(meta-compile expr)) 1))
+       ((== type 'meta-predicate)	expr)
+       ((== type 'meta-alternate)	`(or  ,@(meta-map meta-compile expr)))
+       ((== type 'meta-sequence)	`(and ,@(meta-map meta-compile expr)))
+       ((== type 'meta-unify)		(if (and [expr isArray] (== '2 [expr size]))
+					    `(and (,[expr first] [stream peek])
+						  (let ()
+						    (set ,[expr second] [stream next])
+						    1))
+					    [expr error: '"syntax error near #@"]))
+       (1				(meta-other node))))))
+</pre></blockquote>
+
+The META compiler recursively checks for a possible META expression
+and calls <tt>meta-form</tt> or <tt>meta-form</tt> as appropriate.
+
+<blockquote><pre>
+(define meta-compile	; compile meta pattern
+  (lambda (expr)
+    (if (and [expr isArray] (== '2 [expr size]))
+	(meta-form expr)
+	(meta-other expr))))
+</pre></blockquote>
+
+A META expression will be introduced by an active 'escape' character
+buried in a Coke program.  This character will invoke a meta sequence
+reader.
+
+<blockquote>
+<table>
+<tr><td><i>expression</i>&nbsp;&nbsp;</td>	<td><i>meaning</i></td></tr>
+<tr><td>{ e... }				<td>any one of the elements e...</td></tr>
+<tr><td>[ e... ]				<td>all of the elements e... in order</td></tr>
+<tr><td>$ e					<td>any number (zero or more) of e</td></tr>
+<tr><td>@ ( p v )				<td>anything satisfying predicate p</td></tr>
+<tr><td>					<td>that will be bound to variable v</td></tr>
+<tr><td>! p					<td>the predicate p (any Coke expression)</td></tr>
+</table>
+</blockquote>
+
+The meta sequence reader looks for one of the five META characters
+that prefix META expressions and converts it into a marked-up AST node
+accordingly.  The META compiler recursively checks for a possible META
+expression and calls <tt>meta-form</tt> or <tt>meta-form</tt> as
+appropriate.
+
+<blockquote><pre>
+(define meta-sequence-reader
+  (method (stream)
+    (let ((delim [stream next]))
+      (cond
+       ((== delim '${)	[Expression with: 'meta-alternate with: [self read: stream list: Expression delimited: '$}]])
+       ((== delim '$[)	[Expression with: 'meta-sequence  with: [self read: stream list: Expression delimited: '$]]])
+       ((== delim '$$)	[Expression with: 'meta-repeat    with: [self read: stream]])
+       ((== delim '$@)	[Expression with: 'meta-unify     with: [self read: stream]])
+       ((== delim '$!)	[Expression with: 'meta-predicate with: [self read: stream]])
+       (1		[self error: stream unexpected: delim])))))
+</pre></blockquote>
+
+META expressions will be prefixed by the escape character '?'.  The
+scanner is temporarily modifed (for the duration of scanning the next
+expression from the input stream) to add markup in response to the
+above META operators.  (As in the previous example, closing delimiters
+are made illegal for the duration of META expressions.)
+
+<blockquote><pre>
+(define meta-sequence-illegal
+  (method (stream)
+    [self error: stream unexpected: [stream next]]))
+
+;; make ? an active character that enables meta syntax for the following expression only and then compiles the result
+
+(define meta-sequence-escape
+  (method (stream)
+    [stream next]
+    [self save]
+    [self readerAt: '$\\ put: [self readerAt: '$$]]
+    [self readerAt: '${  put: meta-sequence-reader]  [self readerAt: '$} put: meta-sequence-illegal]
+    [self readerAt: '$[  put: meta-sequence-reader]  [self readerAt: '$] put: meta-sequence-illegal]
+    [self readerAt: '$$  put: meta-sequence-reader]
+    [self readerAt: '$@  put: meta-sequence-reader]
+    [self readerAt: '$!  put: meta-sequence-reader]
+    (let ((result [self read: stream]))
+      [self restore]
+      (meta-compile result))))
+
+[CokeScanner readerAt: '$? put: meta-sequence-escape withAttribute: 'id]		; allow ? to appear embedded in symbols
+</pre></blockquote>
+
+The META syntax is now available immediately to the program.  We can
+use it to write a parser for integers (after the example in Baker
+[2]).
+
+<blockquote><pre>
+;;; Example: integer parsing (see [2, Section 1])
+
+(define digit	(lambda (x) (and (<= '$0 x) (<= x '$9))))	; predicate
+
+(define parse-int
+  (lambda (string)
+    (let ((stream [string readStream])
+	  (s '1) (d  0) (n '0))
+      (if ? [ { \+ [ \- !(set s '-1) ] !1 }
+	      @(digit d) !(set n (send 'digitValue d))
+	      $ [ @(digit d) !(set n (send '+ (send '* n '10) (send 'digitValue d))) ] ]
+	  [s * n]
+	  'error))))
+
+[StdOut print: (parse-int '"0")]	[StdOut cr]
+[StdOut print: (parse-int '"42")]	[StdOut cr]
+[StdOut print: (parse-int '"+1")]	[StdOut cr]
+[StdOut print: (parse-int '"-1")]	[StdOut cr]
+[StdOut print: (parse-int '"+42")]	[StdOut cr]
+[StdOut print: (parse-int '"-666")]	[StdOut cr]
+[StdOut print: (parse-int '"-haha")]	[StdOut cr]
+</pre></blockquote>
+
+Running the above program produces the following output:
+
+<blockquote><pre>
+(#one 42 #two (#This #is (#a #sequence) #of #tokens) #three 42 #four)
+</pre></blockquote>
+
+To save your typing finger, the above example is available in the idst
+distribution as <tt>function/examples/prag-parse</tt>.
+
+
+<h2>5&nbsp;&nbsp;&nbsp;References</h2>
+
+
+<table>
+  <tr><td>[1]</td><td>Schorre, D. V.  "META II: A Syntax-Oriented
+      Compiler Writing Language".  Proc. 19'th Nat'l. Conf. of the ACM,
+      August 1964, pp. D1.3-1--D1.3-11.</td></tr>
+  <tr><td>[2]</td><td>Baker, Henry G.  "Pragmatic Parsing in Common Lisp".
+      ACM Lisp Pointers 4(2), April--June 1991, pp. 3--15.</td></tr>
+</table>
+
+<!-- <dl> -->
+<!--   <dt>[1]</dt><dd> -->
+<!--     Schorre, D. V.  "META II: A Syntax-Oriented Compiler Writing Language". -->
+<!--     Proc. 19'th Nat'l. Conf. of the ACM, August 1964, pp. D1.3-1--D1.3-11. -->
+<!--   </dd> -->
+<!--   <dt>[2]</dt><dd> -->
+<!--     Baker, Henry G.  "Pragmatic Parsing in Common Lisp". -->
+<!--     ACM Lisp Pointers 4(2), April--June 1991, pp. 3--15. -->
+<!--   </dd> -->
+<!-- </dl> -->
+
+</body>
+</html>
+<!--
+Local Variables:
+buffer-file-coding-system: iso-latin-1
+End:
+-->
