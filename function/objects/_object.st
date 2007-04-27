@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-26 11:26:47 by piumarta on emilia
+  Last edited: 2007-04-27 08:58:38 by piumarta on emilia
 "
 
 { external }
@@ -99,7 +99,11 @@ _object _bind: aSelector
   return (oop)_local_bind(v_aSelector, self);
 }
 
-_closure _method	[ ^_method ]
+_closure _method		[ ^_method ]
+_closure _method: _aMethod	[ ^_method := _aMethod ]
+
+_closure data			[ ^data ]
+_closure data: anObject		[ ^data := anObject ]
 
 _object performMethod_: _aMethod with: a
 {
