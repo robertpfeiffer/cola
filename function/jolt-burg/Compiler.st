@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 09:02:25 by piumarta on emilia
+  Last edited: 2007-04-27 17:58:36 by piumarta on emilia
 "
 
 { import: Objects }
@@ -183,7 +183,8 @@ Compiler beginScope	[ ^environment := LocalEnvironment withParent: environment ]
 Compiler endScope	[  environment := environment parent ]
 
 Compiler labels		[ ^labels ]
-Compiler breaks		[ ^breaks ]
+Compiler breakLabels	[ ^breaks ]
+Compiler continueLabels	[ ^continues ]
 
 Compiler newLabel	[ ^labels add: Label new ]
 
