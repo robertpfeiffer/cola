@@ -81,13 +81,13 @@ is associated with a method that invokes the scanner recursively:
 
 <blockquote><pre>Scanner readQuote: stream
 [
-  stream next.	<i>"gobble the &apos;"</i>
+  stream next.	<i>"gobble the '"</i>
   ^Expression with: #quote with: (self read: stream)
 ]
 </pre></blockquote>
 
 This converts the
-text <blockquote><pre>&apos; <i>anything</i></pre></blockquote>
+text <blockquote><pre>'<i>anything</i></pre></blockquote>
 into the list
 <blockquote><pre>(quote <i>anything</i>)</pre></blockquote>. <p>
 
@@ -268,6 +268,89 @@ added dynamically from Coke as follows:
 
 [CokeScanner readerAt: '$' put: read-quote]
 </pre></blockquote>
+
+
+<h2>Scanner protocol</h2>
+
+This section lists all public message to which <tt>Scanner</tt> responds.
+
+<blockquote>
+<dl>
+  <dt><tt>new</tt></dt>
+  <dd>
+    Answers a new <tt>Scanner</tt>.
+  </dd>
+<br>
+  <dt><tt>Scanner readerAt: aCharacter</tt></dt>
+  <dd>
+    Answers the reader method for <tt>aCharacter</tt>.
+  </dd>
+<br>
+  <dt><tt>Scanner readerAt: aCharacter put: aMethod</tt></dt>
+  <dd>
+    Sets the reader method for <tt>aCharacter</tt>.
+  </dd>
+<br>
+  <dt><tt>Scanner attributeAt: aCharacter</tt></dt>
+  <dd>
+    Answers the attribute for <tt>aCharacter</tt>.
+  </dd>
+<br>
+  <dt><tt>Scanner attribtueAt: aCharacter put: anObject</tt></dt>
+  <dd>
+    Sets the attribute for <tt>aCharacter</tt>.
+  </dd>
+<br>
+  <dt><tt>Scanner readerAt: aCharacter put: aMethod withAttribute: anObject</tt></dt>
+  <dd>
+    Sets the reader method and attribute for <tt>aCharacter</tt>.
+  </dd>
+<br>
+  <dt><tt>Scanner readerAt: firstCharacter through: lastCharacter put: aMethod withAttribute: anObject</tt></dt>
+  <dd>
+    Sets the reader method and attribute for characters in the range <tt>firstCharacter</tt> to <tt>firstCharacter</tt> inclusive.
+  </dd>
+<br>
+  <dt><tt>Scanner read: inputStringOrStream</tt></dt>
+  <dd>
+    Answers the next scanned object from
+    the <tt>inputStringOrStream</tt>, or <tt>nil</tt> if the end of
+    the stream is encountered.
+  </dd>
+<br>
+  <dt><tt>Scanner read: inputStream list: listType delimited: terminator</tt></dt>
+  <dd>
+    Scans objects from the <tt>inputStream</tt> until
+    the <tt>terminator</tt> character is encountered (where the first
+    character of an object would be expected).  Answers a collection
+    of the given <tt>listType</tt> containing those objects, or
+    <nil>if the end of stream is encountered.  The <tt>terminator</tt>
+    character is removed from the <tt>inputStream</tt> and discarded.
+  </dd>
+<br>
+  <dt><tt>Scanner ignoreSpaces: inputStream</tt></dt>
+  <dd>
+    Reads and discards characters from the <tt>inputStream</tt> as
+    long as those characters attribute is <tt>#space</tt>.  Answers
+    the first non-<tt>#space</tt> character, or <tt>nil</tt> if the
+    end of the <tt>inputStream</tt> is reached.
+  </dd>
+<br>
+  <dt><tt>Scanner read: inputStream string: stringType delimited: terminator withEscapes: escapeTable</tt></dt>
+  <dd>
+    Creates a collection of the given <tt>stringType</tt> and
+    populates it with all objects (usually characters) read
+    from <tt>inputStream</tt> until the <tt>terminator</tt> is
+    encountered.  The <tt>terminator</tt> is removed from
+    the <tt>inputStream</tt> and discarded.  If a backslash (\)
+    character is encountered in the stream, the character following it
+    is added to the string (even if it is the <tt>terminator</tt>)
+    unless that character has a corresponding entry in
+    the <tt>escapeTable</tt> in which case that entry's value is
+    substituted.
+  </dd>
+</dl>
+</blockquote>
 
 
 <h2>Examples</h2>
