@@ -1,4 +1,5 @@
-IDC		= idc -O
+IDC		= idc $(OFLAGS)
+OFLAGS		= -O
 IDFLAGS		= -k -I../objects
 
 OBJEXT          = 
@@ -31,7 +32,7 @@ test : main$(OBJEXT) .FORCE
 	$(IDC) $(IDFLAGS) $< -o $@
 
 main$(OBJEXT) : main.st $(LIBS)
-	$(IDC) $(IDFLAGS) main.st $(LDLIBS) -o $@
+	$(IDC) $(OFLAGS) $(IDFLAGS) main.st $(LDLIBS) -o $@
 
 jolt.a : $(FILES) ../objects/objects.a
 	ar rc $@.new $(FILES) ../objects/*.o ../objects/mpint/*.o
@@ -67,6 +68,6 @@ bench-c : bench-c.c
 	cc -O -o $@ $<
 
 bench-id : bench-id.st
-	idc -O -k -g -I../objects bench-id.st -o bench-id ../objects/objects.a  -lreadline
+	idc -O -k -I../objects bench-id.st -o bench-id ../objects/objects.a  -lreadline
 
 .FORCE :

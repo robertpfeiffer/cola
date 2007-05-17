@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 16:26:53 by piumarta on emilia
+;;; Last edited: 2007-05-15 18:51:11 by piumarta on emilia
 
 (define SmallInteger		(import "SmallInteger"))
 (define OrderedCollection	(import "OrderedCollection"))
@@ -62,7 +62,7 @@
 	     [[form at: '1] isSymbol]
 	     [[form at: '2] isSymbol]
 	     [[form at: '3] isArray])
-	[compiler syntaxError: form])
+	[compiler errorSyntax: form])
     (let ((protoName [form at: '1])
 	  (baseName  [form at: '2])
 	  (slotNames [form at: '3])

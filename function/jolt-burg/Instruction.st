@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 20:14:22 by piumarta on alan-kays-computer.local
+  Last edited: 2007-05-16 20:33:50 by piumarta on emilia
 "
 
 { import: Objects }
@@ -483,6 +483,7 @@ ASGNI1  : Binary ()		ASGNI1  name [ ^#asgni1	 ]
 ASGNI2  : Binary ()		ASGNI2  name [ ^#asgni2	 ]
 ASGNI4  : Binary ()		ASGNI4  name [ ^#asgni4	 ]
 BRA	: Branch ()		BRA	name [ ^#bra	 ]
+BRI	: Sink ()		BRI	name [ ^#bri	 ]
 BRNZ	: ConditionalBranch ()	BRNZ	name [ ^#brnz	 ]
 BRZ	: ConditionalBranch ()	BRZ	name [ ^#brz 	 ]
 CALLI4	: Call ()		CALLI4	name [ ^#calli4	 ]
@@ -532,13 +533,12 @@ SPILLI4 reload: gen	[ gen reloadi4: output from: location ]
 
 Instruction reduceTo: aSymbol in: aGrammar for: gen
 [
-    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    "StdErr print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     (aGrammar startSetAt: aSymbol at: self name) do: [:rule |
 	((self matchPattern: rule pattern in: aGrammar for: gen) and: [rule predicate value: self])
 	    ifTrue:
-	       ["StdOut print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
+	       ["StdErr print: self; nextPutAll: ' --> '; print: rule pattern; nextPutAll: ' -> '; print: rule symbol; cr."
 		generator := rule action.
-		"self coverPattern: rule pattern."
 		^type := aSymbol]].
     ^nil
 ]
@@ -546,7 +546,7 @@ Instruction reduceTo: aSymbol in: aGrammar for: gen
 Block reduceTo: aSymbol in: aGrammar for: gen
 [
     type := #nil.
-    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    "StdErr print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     instructions do: [:insn | (insn reduceTo: (insn isVoid ifTrue: [#VOID] ifFalse: [aSymbol]) in: aGrammar for: gen) ifFalse: [^nil]].
     type := aSymbol.
 ]
@@ -555,7 +555,7 @@ Call reduceTo: aSymbol in: aGrammar for: gen
 [
     type := #nil.
     (super reduceTo: aSymbol in: aGrammar for: gen) ifFalse: [^nil].
-    "StdOut print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
+    "StdErr print: self; nextPutAll: ' reduceTo: '; nextPutAll: aSymbol; cr."
     arguments from: 1 do: [:arg | arg reduceTo: #REG in: aGrammar for: gen].
     gen noteCall: self.
     type := aSymbol.
@@ -563,7 +563,7 @@ Call reduceTo: aSymbol in: aGrammar for: gen
 
 Instruction matchPattern: aPattern in: aGrammar for: gen
 [
-    "StdOut print: self; nextPutAll: ' matchPattern: '; print: aPattern; cr."
+    "StdErr print: self; nextPutAll: ' matchPattern: '; print: aPattern; cr."
     ^aPattern isSymbol
 	ifTrue:  [type == aPattern or: [self reduceTo: aPattern in: aGrammar for: gen]]
 	ifFalse: [aPattern first == self name and: [self matchArguments: aPattern in: aGrammar for: gen]]
@@ -577,14 +577,6 @@ Unary  	  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g 
 Binary 	  matchArguments: p in: g for: gen	[ ^(lhs matchPattern: p second in: g for: gen) and: [rhs matchPattern: p third in: g for: gen] ]
 Block  	  matchArguments: p in: g for: gen	[ ^true ]
 Call   	  matchArguments: p in: g for: gen	[ ^self function matchPattern: p second in: g for: gen ]
-
-"
-Instruction	coverPattern: aPattern	[ aPattern isSymbol ifFalse: [type := #nil.  self coverArguments: aPattern] ]
-Instruction	coverArguments: p	[ ]
-Unary  		coverArguments: p	[ lhs coverPattern: p second ]
-Binary 		coverArguments: p	[ lhs coverPattern: p second.  rhs coverPattern: p third ]
-Call   		coverArguments: p	[ self function coverPattern: p second ]
-"
 
 Instruction generate: gen	[                                         		    generator ifTrue: [generator value: self value: gen] ]
 Unary	    generate: gen	[ lhs generate: gen.                      		    generator ifTrue: [generator value: self value: gen] ]

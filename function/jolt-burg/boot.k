@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-26 13:14:47 by piumarta on emilia
+;;; Last edited: 2007-05-15 18:50:45 by piumarta on emilia
 
 (define __dlsym _dlsym)
 
@@ -129,12 +129,12 @@
     (let ((node (send 'read:list:delimited: self stream Expression '93))
 	  (list (send 'withAll: OrderedCollection node)))
       (if (< (send 'size list) '2)
-	  (send 'syntaxError: self node)
+	  (send 'errorSyntax: self node)
 	  (let ((receiver  (send 'removeFirst list))
 		(selector  (send 'removeFirst list))
 		(arguments (send 'new OrderedCollection)))
 	    (or (send 'isSymbol selector)
-		(send 'syntaxError: self node))
+		(send 'errorSyntax: self node))
 	    (and (send 'notEmpty list)
 		 (send 'addLast: arguments (send 'removeFirst list)))
 	    (while (and (>= (send 'size list) 2)

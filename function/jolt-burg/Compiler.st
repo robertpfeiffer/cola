@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-27 17:58:36 by piumarta on emilia
+  Last edited: 2007-05-17 10:19:42 by piumarta on emilia
 "
 
 { import: Objects }
@@ -143,7 +143,7 @@ Symbol _dlsym_: _string	{ return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
 
 "----------------------------------------------------------------"
 
-Compiler : Object ( environment labels generatorType breaks continues )
+Compiler : Object ( environment labels generatorType breaks continues postProcessors )
 
 Compiler withGeneratorType: genType
 [
@@ -153,6 +153,7 @@ Compiler withGeneratorType: genType
     generatorType := genType.
     breaks := OrderedCollection new.
     continues := OrderedCollection new.
+    postProcessors := OrderedCollection new.
 ]
 
 Compiler lookupSyntax: name ifAbsent: defaultBlock
@@ -797,6 +798,7 @@ Compiler compileLambda: form
     block allocateRegisters: gen registerAllocator.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen generate: block.    "gen emit: block."
+    self postProcess.
     CompilerOptions verboseRegs ifTrue: [gen dumpResources].
     ^entry
 ]
@@ -841,6 +843,34 @@ Compiler errorLoop: form		[ self error: 'no loop: ', form printString ]
 
 "----------------------------------------------------------------"
 
+CompilerPostProcessor : Object ( _function _a _b _c )
+
+CompilerPostProcessor withFunction: aFunction arg: a arg: b arg: c
+[
+    self := self new.
+    _function := aFunction.
+    _a := a.
+    _b := b.
+    _c := c.
+]
+
+CompilerPostProcessor execute
+{
+    ((void (*)(oop, oop, oop))self->v__function)(self->v__a, self->v__b, self->v__c);
+}
+
+Compiler postProcess
+[
+    [postProcessors notEmpty] whileTrue: [postProcessors removeLast execute]
+]
+
+Compiler postProcess: aFunction with: a with: b with: c	[ postProcessors addLast: (CompilerPostProcessor withFunction: aFunction arg: a   arg: b   arg: c  ) ]
+Compiler postProcess: aFunction with: a with: b		[ postProcessors addLast: (CompilerPostProcessor withFunction: aFunction arg: a   arg: b   arg: nil) ]
+Compiler postProcess: aFunction with: a			[ postProcessors addLast: (CompilerPostProcessor withFunction: aFunction arg: a   arg: nil arg: nil) ]
+Compiler postProcess: aFunction				[ postProcessors addLast: (CompilerPostProcessor withFunction: aFunction arg: nil arg: nil arg: nil) ]
+
+"----------------------------------------------------------------"
+
 Compiler compile: anObject for: codeGeneratorType
 [
     | block entry tree gen |
@@ -863,6 +893,7 @@ Compiler compile: anObject for: codeGeneratorType
     block allocateRegisters: gen registerAllocator.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
     gen generate: block.    "gen emit: block."
+    self postProcess.
     CompilerOptions verboseRegs ifTrue: [gen dumpResources].
     ^entry
 ]

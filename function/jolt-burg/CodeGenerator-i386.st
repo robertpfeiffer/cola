@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 20:08:47 by piumarta on alan-kays-computer.local
+  Last edited: 2007-05-16 20:53:29 by piumarta on emilia
 "
 
 { import: Objects }
@@ -173,6 +173,7 @@ StaticIntel32CodeGenerator imullR: s R: d	[ StdOut nextPutAll: '	imull	'; print:
 StaticIntel32CodeGenerator jeL: l		[ StdOut nextPutAll: '	je	L'; print: l ordinal; cr ]
 StaticIntel32CodeGenerator jgeL: l		[ StdOut nextPutAll: '	jge	L'; print: l ordinal; cr ]
 StaticIntel32CodeGenerator jmpL: l		[ StdOut nextPutAll: '	jmp	L'; print: l ordinal; cr ]
+StaticIntel32CodeGenerator jmpMb: b		[ StdOut nextPutAll: '	jmp	*'; print: b; cr ]
 StaticIntel32CodeGenerator jneL: l		[ StdOut nextPutAll: '	jne	L'; print: l ordinal; cr ]
 StaticIntel32CodeGenerator lealMd: d b: b R: r	[ StdOut nextPutAll: '	leal	'; print: d; nextPut: $(; print: b; nextPutAll: '),'; print: r; cr]
 StaticIntel32CodeGenerator lealMd_: d b: b R: r	[ StdOut nextPutAll: '	leal	'; print: (SmallInteger value_: d); nextPut: $(; print: b; nextPutAll: '),'; print: r; cr]
@@ -254,6 +255,7 @@ DynamicIntel32CodeGenerator idivlR: s		  { IDIVLrr	(      _R(s)	,	_EAX	 ); }
 DynamicIntel32CodeGenerator imullR: s R: d	  { IMULLrr	(      _R(s)	,	_R(d)	 ); }
 DynamicIntel32CodeGenerator jeL: l		  { JEm		(_A(l),    0,0,0		 ); }
 DynamicIntel32CodeGenerator jgeL: l		  { JGEm	(_A(l),	   0,0,0		 ); }
+DynamicIntel32CodeGenerator jmpMb: b		  { JMPm	(    0,_R(b),0,0		 ); }
 DynamicIntel32CodeGenerator jmpL: l		  { JMPm	(_A(l),	   0,0,0		 ); }
 DynamicIntel32CodeGenerator jneL: l		  { JNEm	(_A(l),	   0,0,0		 ); }
 DynamicIntel32CodeGenerator lealMd: d b: b R: r	  { LEALmr	(_I(d),_R(b),0,0,	_R(r)	 ); }
@@ -340,14 +342,15 @@ Intel32Grammar := [
 	"-------------------------------- baseline --------------------------------"
 
 	at: #VOID add: #REG			"discard";
-	at: #VOID add: #(label		)	do: [:op :gen | gen define: op ];
 	at: #VOID add: #(enter		)	do: [:op :gen | gen emitPrologue ];
 	at: #VOID add: #(retv		)	do: [:op :gen | gen emitEpilogue ];
 	at: #VOID add: #(reti4 	 REG	)	do: [:op :gen | gen movlR:    op lhs output   R: gen eax; emitEpilogue ];
 	at: #VOID add: #(drop  	 REG	)	do: [:op :gen | ];
 	at: #VOID add: #(brz   	 REG	)	do: [:op :gen | gen testlR:   op lhs output   R: op lhs output;  jeL: op destination ];
 	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen testlR:   op lhs output   R: op lhs output;  jneL: op destination ];
+	at: #VOID add: #(bri 	 REG	)	do: [:op :gen | gen jmpMb:    op lhs output ];
 	at: #VOID add: #(bra		)	do: [:op :gen | gen jmpL:     op destination ];
+	at: #VOID add: #(label		)	do: [:op :gen | gen define: op ];
 	at: #REG  add: #(cnsti4	 	)	do: [:op :gen | gen movlI_:   op arg	      R: op output ];
 	at: #REG  add: #(cnstp4	 	)	do: [:op :gen | gen movlI_:   op arg	      R: op output ];
 	at: #REG  add: #(parami4 	)	do: [:op :gen | ];
