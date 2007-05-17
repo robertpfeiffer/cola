@@ -21,7 +21,7 @@
 	  ;;[StdOut println: label]
 	  (set (long@ labels lindex) label)
 	  [block add: label]
-	  [block add: [[DROP new] lhs: [[node at: nindex] translate: comp]]]
+	  [block add: [[node at: nindex] translate: comp]]
 	  [block add: [[BRA new] destination: finish]]
 	(set lindex (+ lindex 1))
 	(set nindex (+ nindex 2))))
@@ -44,10 +44,10 @@
       (printf "three\n"))))
 
 (let ()
-  (doit 0)
-  (doit 1)
-  (doit 2)
-  (doit 3)
-  (doit 2)
-  (doit 1)
-  (doit 0))
+  (printf "%d\n" (doit 0))
+  (printf "%d\n" (doit 1))
+  (printf "%d\n" (doit 2))
+  (printf "%d\n" (doit 3))
+  (printf "%d\n" (doit 2))
+  (printf "%d\n" (doit 1))
+  (printf "%d\n" (doit 0)))
