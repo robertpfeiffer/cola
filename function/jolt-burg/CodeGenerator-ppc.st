@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 16:46:43 by piumarta on margaux.piumarta.com
+  Last edited: 2007-05-17 10:40:08 by piumarta on margaux.piumarta.com
 "
 
 { import: Objects }
@@ -203,6 +203,9 @@ StaticPowerPCCodeGenerator baL: l		[ StdOut
 						      nextPutAll: '	ori	r0,r0,lo16(L'; print: l ordinal; nextPutAll: ')\n';
 						      nextPutAll: '	mtctr	r0\n';
 						      nextPutAll: '	bctr\n']
+StaticPowerPCCodeGenerator baR: r		[ StdOut
+						      nextPutAll: '	mtctr	'; print: r; cr;
+						      nextPutAll: '	bctr\n']
 StaticPowerPCCodeGenerator beqI: c L: l		[ StdOut nextPutAll: '	bne	cr'; print: c; nextPutAll: ',.+20\n'.  self baL: l ]
 StaticPowerPCCodeGenerator bgeI: c L: l		[ StdOut nextPutAll: '	blt	cr'; print: c; nextPutAll: ',.+20\n'.  self baL: l ]
 StaticPowerPCCodeGenerator blr			[ StdOut nextPutAll: '	blr\n' ]
@@ -274,6 +277,8 @@ DynamicPowerPCCodeGenerator andR: d R: a R: b	{ ANDrrr	(_R(d), _R(a), _R(b)     
 DynamicPowerPCCodeGenerator baL: l		{ LISri		(   0        ,(_A(l) >> 16)     );
 						  ORIrri	(   0 ,    0 ,(_A(l) & 0xffff)  );
 						  MTCTRr	(0				);
+						  BCTR		(); }
+DynamicPowerPCCodeGenerator baR: r		{ MTCTRr	(_R(r)				);
 						  BCTR		(); }
 DynamicPowerPCCodeGenerator beqI: c L: l	[{BNEii		(_I(c),        (long)asm_pc + 20);}.  self baL: l ]
 DynamicPowerPCCodeGenerator bgeI: c L: l	[{BLTii		(_I(c),        (long)asm_pc + 20);}.  self baL: l ]
@@ -370,6 +375,7 @@ PowerPCGrammar := [
 								    beqI:    7 L: op destination ];
 	at: #VOID add: #(brnz  	 REG	)	do: [:op :gen | gen cmpwiI:  7 R: op lhs output I: 0;
 								    bneI:    7 L: op destination ];
+	at: #VOID add: #(bri 	 REG	)	do: [:op :gen | gen baR:     op lhs output ];
 	at: #VOID add: #(bra		)	do: [:op :gen | gen baL:     op destination ];
 	at: #REG  add: #(cnsti4	 	)	do: [:op :gen | gen lisR:    op output		   I_: op arg;
 								    oriR:    op output R: op output I_: op arg ];
