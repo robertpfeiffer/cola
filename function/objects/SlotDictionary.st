@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-26 13:33:59 by piumarta on emilia
+  Last edited: 2007-05-22 11:49:39 by piumarta on emilia
 "
 
 { import: Objects }
@@ -52,14 +52,14 @@ SlotDictionary default: defaultElement	[  default := defaultElement ]
 SlotDictionary at: aKey
 {
     if (((oop *)self->v__keys)[0] == v_aKey)
-      	return ((oop *)self->v__values)[0];
+      	{ _return ((oop *)self->v__values)[0]; }
     else if (((oop *)self->v__keys)[1] == v_aKey)
       {
         register oop v1= ((oop *)self->v__values)[1];
 			 ((oop *)self->v__keys  )[1]= ((oop *)self->v__keys  )[0];
 			 ((oop *)self->v__values)[1]= ((oop *)self->v__values)[0];
 			 ((oop *)self->v__keys  )[0]= v_aKey;
-	return  	 ((oop *)self->v__values)[0]= v1;
+	_return  	 ((oop *)self->v__values)[0]= v1;
        }
      else
       {
@@ -72,23 +72,23 @@ SlotDictionary at: aKey
 				 ((oop *)self->v__keys  )[index]= ((oop *)self->v__keys  )[lasti= index - 1];
 				 ((oop *)self->v__values)[index]= ((oop *)self->v__values)[lasti];
 				 ((oop *)self->v__keys  )[lasti]= v_aKey;
-		return  	 ((oop *)self->v__values)[lasti]= v1;
+		_return  	 ((oop *)self->v__values)[lasti]= v1;
 	      }
 	  }
       }
-    return self->v_default;
+    _return self->v_default;
 }
 
 SlotDictionary at: aKey put: aValue
 {
     if (((oop *)self->v__keys)[0] == v_aKey)
-      	return ((oop *)self->v__values)[0]= v_aValue;
+      	{ _return ((oop *)self->v__values)[0]= v_aValue; }
     else if (((oop *)self->v__keys)[1] == v_aKey)
     {
 		((oop *)self->v__keys  )[1]= ((oop *)self->v__keys  )[0];
 		((oop *)self->v__values)[1]= ((oop *)self->v__values)[0];
 		((oop *)self->v__keys  )[0]= v_aKey;
-	return	((oop *)self->v__values)[0]= v_aValue;
+	_return	((oop *)self->v__values)[0]= v_aValue;
     }
     else
     {
@@ -100,7 +100,7 @@ SlotDictionary at: aKey put: aValue
 			((oop *)self->v__keys  )[index]= ((oop *)self->v__keys  )[lasti= index - 1];
 			((oop *)self->v__values)[index]= ((oop *)self->v__values)[lasti];
 			((oop *)self->v__keys  )[lasti]= v_aKey;
-		return	((oop *)self->v__values)[lasti]= v_aValue;
+		_return	((oop *)self->v__values)[lasti]= v_aValue;
 	    }
 	}
     }
@@ -122,7 +122,7 @@ SlotDictionary at: aKey put: aValue
 	((oop *)self->v__values)[tally]= v_aValue;
         self->v__tally= (oop)(tally + 1);
     }
-    return v_aValue;
+    _return v_aValue;
 }
 
 SlotDictionary removeKey: aKey
@@ -141,10 +141,10 @@ SlotDictionary removeKey: aKey
 	    self->v__tally= (oop)lasti;
 	    ((oop *)self->v__keys  )[lasti]= 0;
 	    ((oop *)self->v__values)[lasti]= 0;
-	    return v_self;
+	    _return v_self;
 	}
     }
-    return v_self;
+    _return v_self;
 }
 
 SlotDictionary size	[ ^SmallInteger value_: _tally ]
@@ -169,7 +169,7 @@ SlotDictionary valueAt: index
     _index := index _integerValue.
     {
 	if ((long)v__index < (long)self->v__tally)
-	    return ((oop *)self->v__values)[(long)v__index];
+	    { _return ((oop *)self->v__values)[(long)v__index]; }
     }.
     ^self error: 'index is out of bounds'
 ]

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-24 21:02:13 by piumarta on emilia
+  Last edited: 2007-05-22 11:45:40 by piumarta on emilia
 "
 
 { import: Objects }
@@ -62,7 +62,7 @@ File tab: n			[ n timesRepeat: [self tab] ]
 
 File nextPut: aByte
 [
-    { if ((long)v_aByte & 1) { char c= _I(v_aByte);  return _O(write((int)self->v__fd, (void *)&c, 1)); } }.
+    { if ((long)v_aByte & 1) { char c= _I(v_aByte);  _return _O(write((int)self->v__fd, (void *)&c, 1)); } }.
     ^self primitiveFailed
 ]
 
@@ -71,21 +71,21 @@ File nextPutAll: aString
     | _bytes _size |
     _bytes := aString _bytes.
     _size  := aString size _integerValue.
-    { return _O(write((int)self->v__fd, (void *)v__bytes, (size_t)v__size)); }.
+    { _return _O(write((int)self->v__fd, (void *)v__bytes, (size_t)v__size)); }.
 ]
 
 File print_x: _pointer
 {
     char buf[1024];
     int size= sprintf(buf, "%x", (int)v__pointer);
-    return _O(write((int)self->v__fd, (void *)buf, (size_t)size));
+    _return _O(write((int)self->v__fd, (void *)buf, (size_t)size));
 }
 
 File  read: aCollection			[ ^self read: aCollection size: aCollection size ]
 File  read: aCollection size: size	[ ^SmallInteger value_: (self _read_: aCollection _elements size_: size _integerValue) ]
-File _read_: _bytes size_: _size	{ return (oop)read((int)self->v__fd, (void *)v__bytes, (size_t)v__size); }
+File _read_: _bytes size_: _size	{ _return (oop)read((int)self->v__fd, (void *)v__bytes, (size_t)v__size); }
 
-File isInteractive			{ return (oop)isatty((int)self->v__fd); }
+File isInteractive			{ _return (oop)isatty((int)self->v__fd); }
 
 File waitForInput: msTimeout
 {
@@ -97,7 +97,7 @@ File waitForInput: msTimeout
     FD_ZERO(&x);
     FD_SET((long)self->v__fd, &r);
     n= select((long)self->v__fd + 1, &r, &w, &x, &tv);
-    return (oop)(n << 1 | 1);
+    _return (oop)(n << 1 | 1);
 }
 
 File open: pathString
@@ -121,7 +121,7 @@ File open: pathString ifAbsent: errorBlock
 
 File open_: _path
 {
-    return (oop)(((long)open((char *)v__path, O_RDONLY, 0)) << 1 | 1);
+    _return (oop)(((long)open((char *)v__path, O_RDONLY, 0)) << 1 | 1);
 }
 
 File create: pathString
@@ -140,7 +140,7 @@ File create: pathString ifAbsent: errorBlock
 
 File create_: _path
 {
-    return (oop)(((long)open((char *)v__path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) << 1 | 1);
+    _return (oop)(((long)open((char *)v__path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) << 1 | 1);
 }
 
 File close

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-01 10:45:40 by piumarta on emilia
+  Last edited: 2007-05-22 16:05:09 by piumarta on emilia
 "
 
 { import: Objects }
@@ -29,8 +29,8 @@
 
 " literals "
 
-SmallInteger value_: _value		{ return _O(v__value); }
-SmallInteger _integerValue		{ return (oop)_I(v_self); }
+SmallInteger value_: _value		{ _return _O(v__value); }
+SmallInteger _integerValue		{ _return (oop)_I(v_self); }
 
 ByteArray size_: _size value_: _value
 [
@@ -45,14 +45,15 @@ Object new			[ ^self _vtable _alloc: self _sizeof ]
 
 Object yourself			[ "^self" ]
 
-Object identityHash		{ return (oop)((long)self >> 3 | 1); }
+Object identityHash		{ _return (oop)((long)self >> 3 | 1); }
 
 Object = other			[ ^self == other ]
+Object ~= other			[ ^(self = other) not ]
 
-Object _palloc: size		{ return (oop)_palloc(sizeof(oop) * _I(v_size)); }
-Object _balloc: size		{ return (oop)_balloc(              _I(v_size)); }
+Object _palloc: size		{ _return (oop)_palloc(sizeof(oop) * _I(v_size)); }
+Object _balloc: size		{ _return (oop)_balloc(              _I(v_size)); }
 
-UndefinedObject _nil		{ return 0; }
+UndefinedObject _nil		{ _return 0; }
 
 [ nil   := UndefinedObject _nil ]		{ pragma: type nil   nil   }
 [ true  := Object ]				{ pragma: type true  true  }
@@ -98,35 +99,37 @@ Object halt		[ StdErr cr; nextPutAll: 'halt'; cr.  { exit(1); } ]
 Object perform: s
 {
     struct __closure *c= _local_bind(v_s, v_self);
-    return (c->method)((oop)c, v_self, v_self);
+    _return (c->method)((oop)c, v_self, v_self);
 }
 
 Object perform: s with: a
 {
     struct __closure *c= _local_bind(v_s, v_self);
-    return (c->method)((oop)c, v_self, v_self, v_a);
+    _return (c->method)((oop)c, v_self, v_self, v_a);
 }
 
 Object perform: s with: a with: b
 {
     struct __closure *c= _local_bind(v_s, v_self);
-    return (c->method)((oop)c, v_self, v_self, v_a, v_b);
+    _return (c->method)((oop)c, v_self, v_self, v_a, v_b);
 }
 
 Object perform: s with: a with: b with: c
 {
     struct __closure *c= _local_bind(v_s, v_self);
-    return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c);
+    _return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c);
 }
 
 Object perform: s with: a with: b with: c with: d
 {
     struct __closure *c= _local_bind(v_s, v_self);
-    return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c, v_d);
+    _return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c, v_d);
 }
 
 Object error: reason
 [
+    StdErr cr.
+    { _backtrace(); }.
     StdErr cr; nextPutAll: reason; cr.
     { exit(1); }.
 ]

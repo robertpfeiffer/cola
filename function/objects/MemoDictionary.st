@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:31:47 by piumarta on emilia
+  Last edited: 2007-05-22 11:46:05 by piumarta on emilia
 "
 
 { import: Objects }
@@ -26,8 +26,8 @@ MemoDictionary : SlotDictionary ()
 MemoDictionary at: aKey
 {
     register long index, lasti= (long)self->v__tally - 1;
-    if (lasti < 0)					return self->v_default;
-    if (((oop *)self->v__keys)[lasti] == v_aKey)	return ((oop *)self->v__values)[lasti];
+    if (lasti < 0)					{ _return self->v_default; }
+    if (((oop *)self->v__keys)[lasti] == v_aKey)	{ _return ((oop *)self->v__values)[lasti]; }
     for (index= lasti - 1;  index >= 0;  --index)
       {
 	if (((oop *)self->v__keys)[index] == v_aKey)
@@ -36,10 +36,10 @@ MemoDictionary at: aKey
 			     ((oop *)self->v__keys  )[index]= ((oop *)self->v__keys  )[lasti= index + 1];
 			     ((oop *)self->v__values)[index]= ((oop *)self->v__values)[lasti];
 			     ((oop *)self->v__keys  )[lasti]= v_aKey;
-	    return	     ((oop *)self->v__values)[lasti]= v0;
+	    _return	     ((oop *)self->v__values)[lasti]= v0;
 	  }
       }
-    return self->v_default;
+    _return self->v_default;
 }
 
 MemoDictionary at: aKey put: aValue
@@ -60,5 +60,5 @@ MemoDictionary at: aKey put: aValue
     ((oop *)self->v__keys  )[tally]= v_aKey;
     ((oop *)self->v__values)[tally]= v_aValue;
     self->v__tally= (oop)(tally + 1);
-    return v_aValue;
+    _return v_aValue;
 }

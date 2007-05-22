@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:25:29 by piumarta on emilia
+  Last edited: 2007-05-22 11:50:20 by piumarta on emilia
 "
 
 { import: Objects.st }
@@ -31,13 +31,13 @@ SmallInteger negated		[ ^0 - self ]
 
 SmallInteger // arg
 [
-    { if ((long)v_self & (long)v_arg & 1) return _O(_I(v_self) / _I(v_arg)); }.
+    { if ((long)v_self & (long)v_arg & 1) { _return _O(_I(v_self) / _I(v_arg)); } }.
     ^self primitiveFailed
 ]
 
 SmallInteger \\ arg
 [
-    { if ((long)v_self & (long)v_arg & 1) return _O(_I(v_self) % _I(v_arg)); }.
+    { if ((long)v_self & (long)v_arg & 1) { _return _O(_I(v_self) % _I(v_arg)); } }.
     ^self primitiveFailed
 ]
 

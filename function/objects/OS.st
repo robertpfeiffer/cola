@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 16:57:12 by piumarta on emilia
+  Last edited: 2007-05-22 11:48:46 by piumarta on emilia
 "
 
 { import: Objects }
@@ -26,8 +26,8 @@ OSArgumentCount  := []
 OSArgumentVector := []
 OSArguments      := []
 
-OS _argumentCount		{ return (oop)_param(0); }
-OS _argumentAt_: _index		{ return (oop)(((char **)_param(1))[(int)v__index]); }
+OS _argumentCount		{ _return (oop)_param(0); }
+OS _argumentAt_: _index		{ _return (oop)(((char **)_param(1))[(int)v__index]); }
 
 OS argumentCount		[ ^OSArgumentCount  ifNil: [OSArgumentCount := SmallInteger value_: self _argumentCount] ]
 OS argumentVector		[ ^OSArgumentVector ifNil: [OSArgumentVector := self makeArgumentVector] ]
@@ -60,7 +60,7 @@ OS system		[ ^self stringParam: 6 ]
 OS integerParam: number	[ ^SmallInteger value_: (self _param_: number _integerValue) ]
 OS stringParam: number	[ ^String	value_: (self _param_: number _integerValue) ]
 
-OS _param_: _n		{ return (oop)_param((int)v__n); }
+OS _param_: _n		{ _return (oop)_param((int)v__n); }
 
 OS sleep: seconds
 {

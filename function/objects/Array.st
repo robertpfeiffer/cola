@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:37:24 by piumarta on emilia
+  Last edited: 2007-05-22 11:32:53 by piumarta on emilia
 "
 
 { import: Objects }
@@ -52,7 +52,7 @@ Array at: offset
 
 Array at_: _offset
 {
-    return ((oop *)self->v__oops)[(int)v__offset];
+    _return ((oop *)self->v__oops)[(int)v__offset];
 }
 
 Array at: offset put: anObject
@@ -64,13 +64,13 @@ Array at: offset put: anObject
 
 Array at_: _offset put: anObject
 {
-    return ((oop *)self->v__oops)[(int)v__offset]= v_anObject;
+    _return ((oop *)self->v__oops)[(int)v__offset]= v_anObject;
 }
 
 Array  argumentVectorSize	[ ^SmallInteger value_: self _argumentVectorSize ]
-Array _argumentVectorSize	{ return (oop)_param(0); }
+Array _argumentVectorSize	{ _return (oop)_param(0); }
 Array  argumentVectorAt: offset	[ ^String value_: (self _argumentVectorAt_: offset _integerValue) ]
-Array _argumentVectorAt_: _off	{ return (oop)(((char **)_param(1))[(int)v__off]); }
+Array _argumentVectorAt_: _off	{ _return (oop)(((char **)_param(1))[(int)v__off]); }
 
 Array argumentVector
 [

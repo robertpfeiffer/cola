@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-27 15:30:17 by piumarta on emilia
+  Last edited: 2007-05-22 11:26:40 by piumarta on emilia
 "
 
 { external }
@@ -57,12 +57,13 @@ _vtable   _debugName { return (oop)"_vtable";   }  _vtable   _sizeof { return (o
 
 _object doesNotUnderstand: aSelector
 [
-    self _typeName: self _debugName doesNotUnderstand: aSelector _stringValue
+    self _typeName: self _debugName doesNotUnderstand: aSelector _stringValue.
 ]
 
 _object _typeName: _cName doesNotUnderstand: _cSelector
 {
   fprintf(stderr, "%s does not understand '%s'\n", (char *)v__cName, (char *)v__cSelector);
+  _backtrace();
   exit(1);
 }
 

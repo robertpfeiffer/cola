@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:23:50 by piumarta on emilia
+  Last edited: 2007-05-22 11:51:21 by piumarta on emilia
 "
 
 { import: Objects }
@@ -29,7 +29,7 @@ Time millisecondClockValue
 {
     struct timeval tv;
     gettimeofday(&tv, 0);
-    return (oop)(((tv.tv_sec * 1000 + tv.tv_usec / 1000) &0x3fffffff) << 1 | 1);
+    _return (oop)(((tv.tv_sec * 1000 + tv.tv_usec / 1000) &0x3fffffff) << 1 | 1);
 }
 
 Time now
@@ -54,7 +54,7 @@ Time _formatted_: _format
   struct tm *tm= localtime((time_t *)&time);
   static char buf[64];
   strftime(buf, sizeof(buf), (char *)v__format, tm);
-  return (oop)buf;
+  _return (oop)buf;
 }
 
 Time formatted: format

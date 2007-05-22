@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 11:59:17 by piumarta on emilia
+  Last edited: 2007-05-22 11:50:57 by piumarta on emilia
 "
 
 { import: Objects }
@@ -39,14 +39,21 @@ String value_: _value
     size := SmallInteger value_: self _size.
 ]
 
+String size: sizeInteger value_: _value
+[
+    self := self new.
+    _bytes := _value.
+    size := sizeInteger.
+]
+
 String _size
 {
-    return (oop)strlen((char *)self->v__bytes);
+    _return (oop)strlen((char *)self->v__bytes);
 }
 
 String _stringValue
 {
-    return (oop)self->v__bytes;
+    _return (oop)self->v__bytes;
 }
 
 String _strdup
@@ -55,7 +62,7 @@ String _strdup
     char *string= malloc(size + 1);
     memcpy(string, self->v__bytes, size);
     string[size]= '\0';
-    return (oop)string;
+    _return (oop)string;
 }
 
 String beginsWith: aString

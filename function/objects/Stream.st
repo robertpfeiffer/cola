@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-24 21:02:35 by piumarta on emilia
+  Last edited: 2007-05-22 11:50:39 by piumarta on emilia
 "
 
 { import: Objects }
@@ -160,6 +160,14 @@ FileStream on: aFile
     position := collection size.
 ]
 
+FileStream contents
+[
+    | ws |
+    ws := WriteStream on: (String new: 8192).
+    [self atEnd] whileFalse: [ws nextPut: self next].
+    ^ws contents
+]
+
 FileStream close
 [
     file close
@@ -203,7 +211,7 @@ ConsoleFileStream refill
 	static char *buffer= 0;
         static int   live= 1;
         if (!live)
-	    return 0;
+	    { _return 0; }
 	if (buffer)
 	{
 	    free(buffer);
@@ -217,7 +225,7 @@ ConsoleFileStream refill
 	    atexit((void (*)(void))ConsoleFileStream___5fatexit);
 	}
 	buffer= readline((char *)self->v__prompt);
-	if (!buffer) return (oop)(live= 0);
+	if (!buffer) { _return (oop)(live= 0); }
 	if (*buffer) add_history(buffer);
 	v_length= (oop)((strlen(buffer) + 1) << 1 | 1);
 	v__buffer= (oop)buffer;
