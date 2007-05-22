@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-24 23:21:10 by piumarta on ubuntu
+  Last edited: 2007-05-22 13:05:22 by piumarta on emilia
 "
 
 { import: Objects }
@@ -171,7 +171,7 @@ ARMCodeGenerator reloadi4: reg from: tmp	[ self ldrR: reg Mb: tmp base d: tmp of
 
 SmallInteger value_: _int shr: shift and: mask
 {
-    return (oop)((((long)v__int >> ((long)v_shift >> 1)) & ((long)v_mask >> 1)) << 1 | 1);
+    _return (oop)((((long)v__int >> ((long)v_shift >> 1)) & ((long)v_mask >> 1)) << 1 | 1);
 }
 
 StaticARMCodeGenerator : ARMCodeGenerator ()
@@ -247,10 +247,10 @@ StaticARMCodeGenerator subR: d R: a	 R: b		[ StdOut nextPutAll: '	sub	'; print: 
 
 DynamicARMCodeGenerator : ARMCodeGenerator ()
 
-DynamicARMCodeGenerator asmPass	{ return (oop)(asm_pass << 1 | 1); }
-DynamicARMCodeGenerator _asmPC	{ return (oop)(asm_pc); }
+DynamicARMCodeGenerator asmPass	{ _return (oop)(asm_pass << 1 | 1); }
+DynamicARMCodeGenerator _asmPC	{ _return (oop)(asm_pc); }
 
-SmallInteger _int	{ return (oop)((long)self >> 1); }
+SmallInteger _int	{ _return (oop)((long)self >> 1); }
 
 DynamicARMCodeGenerator define: l
 [
@@ -364,8 +364,8 @@ ARMCodeGenerator movR: r I32_: _i
 	orrR: r R: r r:  8 I: (SmallInteger value_: _i shr: 24 and: 255)
 ]
 
-ARMCodeGenerator __aeabi_idiv		{ extern int __aeabi_idiv   (int, int);  return (oop)__aeabi_idiv;	}
-ARMCodeGenerator __aeabi_idivmod	{ extern int __aeabi_idivmod(int, int);  return (oop)__aeabi_idivmod;	}
+ARMCodeGenerator __aeabi_idiv		{ extern int __aeabi_idiv   (int, int);  _return (oop)__aeabi_idiv;	}
+ARMCodeGenerator __aeabi_idivmod	{ extern int __aeabi_idivmod(int, int);  _return (oop)__aeabi_idivmod;	}
 
 ARMGrammar := [
     ReductionGrammar new
@@ -463,6 +463,7 @@ StaticARMCodeGenerator generate: tree
     self finaliseFrame.
     tree printOn: StdOut indent: 0.  StdOut cr.
     tree generate: self.
+    ^Array with: 0 with: 0
 ]
 
 "
@@ -471,12 +472,13 @@ StaticARMCodeGenerator generate: tree
 
 DynamicARMCodeGenerator generate: tree
 [
-    | _entry |
+    | _entry _size |
     { asm_pass= 0; }.
     { asm_pc= 0; }.
     self finaliseFrame.
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code size %d bytes\n", (int)asm_pc); }].
+    { v__size= (oop)asm_pc; }.
     { asm_pc= (insn *)malloc((long)asm_pc); }.
     { asm_pass= 2; }.
     { v__entry= (oop)asm_pc; }.
@@ -487,4 +489,5 @@ DynamicARMCodeGenerator generate: tree
 "
     CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }].
 "
+    ^Array with: _entry with: _size.
 ]

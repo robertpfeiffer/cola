@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-16 20:33:50 by piumarta on emilia
+  Last edited: 2007-05-20 22:29:09 by piumarta on emilia
 "
 
 { import: Objects }
@@ -87,6 +87,10 @@ Instruction assertType: aSymbol
     type == aSymbol ifFalse: [self error: self debugName, ' type ', type printString, ' is not expected type ', aSymbol]
 ]
 
+Instruction dropped	[ ^DROP new lhs: self ]
+
+"----------------------------------------------------------------"
+
 "neither generates nor consumes"
 
 Statement : Instruction ()
@@ -96,6 +100,8 @@ Statement isVoid			[ ^true ]
 Statement findSources: filter		[ ^nil ]
 Statement clobberRegisters: gen		[ gen clobberRegisters: self ]
 Statement allocateRegisters: alloc	[ self assertType: #VOID.  ^nil ]
+
+Statement dropped	[]
 
 "generates a value"
 
@@ -228,6 +234,8 @@ Sink clobberRegisters: codeGenerator
     lhs source ifTrue: [codeGenerator noteDead: lhs].
 ]
 
+Sink dropped	[]
+
 "consumes zero or more values, generates zero or one value"
 
 Block : Instruction (
@@ -264,10 +272,14 @@ Block addInput: insn
 
 Block isVoid	[ ^inputs isNil ]
 
-Block setType: aSymbol
+Block setType: aSymbol from: insn
 [
+    "StdOut print: self; nextPutAll: ' change type from ', type printString, ' to ', aSymbol printString; cr."
     type == #nil ifTrue: [^type := aSymbol].
-    type == aSymbol ifFalse: [self error: 'cannot add input of type ', aSymbol, ' to block of type ', type].
+    type == aSymbol
+	ifFalse:
+	   [self printOn: StdOut indent: 0.
+	    self error: 'cannot add input of type ', aSymbol, ' to block of type ', type, ', from ', insn printString].
 ]
 
 Block findSources: filter
@@ -284,12 +296,12 @@ Block clobberRegisters: codeGenerator
 	    ifFalse:
 	       [(self addInput: codeGenerator lastLive) clobberAllRegistersIn: self.
 		codeGenerator noteDead: insn.
-		self setType: insn type]].
+		self setType: insn type from: insn]].
     (source isNil and: [inputs]) ifTrue: [self printOn: StdOut indent: 0.  self error: 'Block inputs and !source'].
     (inputs isNil and: [source]) ifTrue: [self error: 'Block source and !inputs'].
     inputs
 	ifTrue:  [codeGenerator noteLive: self]
-	ifFalse: [self setType: #VOID]
+	ifFalse: [type := #VOID"self setType: #VOID from: #implicit"]
 ]
 
 Block allocateRegisters: allocator

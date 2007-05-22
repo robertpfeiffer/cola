@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-27 15:53:48 by piumarta on emilia
+  Last edited: 2007-05-20 12:13:26 by piumarta on emilia
 "
 
 { import: Objects }
@@ -115,7 +115,18 @@ Scanner nextChar: stream withEscape: escapeTable
     | c |
     (c := stream next) == $\\	ifFalse: [^c].
     (c := stream next) isNil	ifTrue:  [^nil].
-    ^(escapeTable at: c) ifNil: [c]
+    ^(c between: $0 and: $7)
+	ifTrue:  [self nextOctal: stream with: c]
+	ifFalse: [(escapeTable at: c) ifNil: [c]]
+]
+
+Scanner nextOctal: stream with: digit
+[
+    | c |
+    digit := digit digitValue.
+    ((c := stream peek) notNil and: [c between: $0 and: $7]) ifTrue: [digit := digit * 8 + stream next digitValue].
+    ((c := stream peek) notNil and: [c between: $0 and: $7]) ifTrue: [digit := digit * 8 + stream next digitValue].
+    ^digit
 ]
 
 "----------------------------------------------------------------"

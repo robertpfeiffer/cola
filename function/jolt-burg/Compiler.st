@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-17 10:19:42 by piumarta on emilia
+  Last edited: 2007-05-22 12:11:37 by piumarta on emilia
 "
 
 { import: Objects }
@@ -52,7 +52,7 @@ GlobalVariable withName: nameSymbol value_: _value
 ]
 
 GlobalVariable value_: _value			{ *((oop *)self->v__storage)= v__value; }
-GlobalVariable _value				{ return *(oop *)self->v__storage; }
+GlobalVariable _value				{ _return *(oop *)self->v__storage; }
 
 GlobalVariable _address				[ ^_storage ]
 GlobalVariable translateLvalue: compiler	[ ^ADDRGP4 new arg: self ]
@@ -78,10 +78,30 @@ ParameterVariable : LocalVariable ()
 ParameterVariable allocate: codeGenerator	[ "location := codeGenerator allocateParam: self" ]
 
 
-CompilerVariable : Variable ( _value )
+CompilerVariable : Variable ( _value _value2 )
 
-CompilerVariable value_: _v	[ ^_value := _v ]
+CompilerVariable value_: _v	[ ^_value  := _v ]
+CompilerVariable value2_: _v	[ ^_value2 := _v ]
 CompilerVariable _value		[ ^_value ]
+CompilerVariable _value2	[ ^_value2 ]
+
+CompilerVariable translateRvalue: compiler
+[
+    | rewrite |							"StdOut nextPutAll: 'CV xRval'; cr."
+    _value ifFalse: [compiler error: 'cannot read: ', name].
+    rewrite := compiler applySyntax_: _value with: name.	"StdOut nextPutAll: 'CV xRval 1 = '; println: rewrite."
+    rewrite := compiler recompile: rewrite.			"StdOut nextPutAll: 'CV xRval 2 = '; println: rewrite."
+    ^rewrite
+]
+
+CompilerVariable translateLvalue: compiler
+[
+    | rewrite |							"StdOut nextPutAll: 'CV xLval'; cr."
+    _value2 ifFalse: [compiler error: 'cannot write: ', name].	
+    rewrite := compiler applySyntax_: _value2 with: name.	"StdOut nextPutAll: 'CV xLval 1 = '; println: rewrite."
+    rewrite := compiler recompile: rewrite.			"StdOut nextPutAll: 'CV xLval 2 = '; println: rewrite."
+    ^rewrite
+]
 
 CompilerVariable printOn: aStream		[ aStream print: name ]
 
@@ -89,13 +109,12 @@ CompilerVariable printOn: aStream		[ aStream print: name ]
 
 { import: SlotDictionary }
 
-Environment : SlotDictionary ( syntax )
+Environment : SlotDictionary ( syntax active )
 
 Environment new		[ ^super basicNew ]
 
-Environment lookupVariable: name	[ ^self at: name ifAbsent: [] ]
-
-Environment lookupSyntax: name		[ ^syntax ifTrue: [syntax at: name ifAbsent: []] ]
+Environment lookupVariable: name	[ ^(active ifTrue: [active at: name ifAbsent: []]) ifNil: [self at: name ifAbsent: []] ]
+Environment lookupSyntax: name		[ ^ syntax ifTrue: [syntax at: name ifAbsent: []] ]
 
 Environment defineSyntax: name
 [
@@ -103,6 +122,11 @@ Environment defineSyntax: name
     ^syntax at: name put: (CompilerVariable withName:  name)
 ]
 
+Environment defineActive: name
+[
+    active ifFalse: [active := SlotDictionary new].
+    ^active at: name put: (CompilerVariable withName: name)
+]
 
 GlobalEnvironment : Environment ()
 
@@ -130,7 +154,7 @@ LocalEnvironment defineParameter: name	[ ^self at: name put: (ParameterVariable 
 TheGlobalEnvironment := [ GlobalEnvironment new ]
 
 Symbol _dlsym		[ ^self _dlsym_: self _stringValue ]
-Symbol _dlsym_: _string	{ return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
+Symbol _dlsym_: _string	{ _return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
 
 [
     | _value |
@@ -143,16 +167,17 @@ Symbol _dlsym_: _string	{ return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
 
 "----------------------------------------------------------------"
 
-Compiler : Object ( environment labels generatorType breaks continues postProcessors )
+Compiler : Object ( environment allLabels generatorType breaks continues postProcessors labels )
 
 Compiler withGeneratorType: genType
 [
     self := super new.
     environment := TheGlobalEnvironment.
-    labels := OrderedCollection new.
+    allLabels := OrderedCollection new.
     generatorType := genType.
     breaks := OrderedCollection new.
     continues := OrderedCollection new.
+    labels := IdentityDictionary new.
     postProcessors := OrderedCollection new.
 ]
 
@@ -175,6 +200,7 @@ Compiler lookupVariable: name
     ^self lookupVariable: name ifAbsent: [self errorUndefined: name]
 ]
 
+Compiler defineActive: name	[ ^environment defineActive: name ]
 Compiler defineVariable: name	[ ^environment defineVariable: name ]
 Compiler defineParameter: name	[ ^environment defineParameter: name ]
 
@@ -183,11 +209,11 @@ Compiler defineSyntax: name	[ ^environment defineSyntax: name ]
 Compiler beginScope	[ ^environment := LocalEnvironment withParent: environment ]
 Compiler endScope	[  environment := environment parent ]
 
-Compiler labels		[ ^labels ]
+Compiler labels		[ ^allLabels ]
 Compiler breakLabels	[ ^breaks ]
 Compiler continueLabels	[ ^continues ]
 
-Compiler newLabel	[ ^labels add: Label new ]
+Compiler newLabel	[ ^allLabels add: Label new ]
 
 SyntaxTable := [
     SlotDictionary new
@@ -219,6 +245,7 @@ SyntaxTable := [
 	at: #'set-long@' 	put: #xSetLong:;
 	at: #quote	 	put: #xQuote:;
 	at: #syntax	 	put: #xSyntax:;
+	at: #active	 	put: #xActive:;
 	at: #define	 	put: #xDefine:;
 	at: #set		put: #xSet:;
 	at: #and		put: #xLogAnd:;
@@ -231,6 +258,8 @@ SyntaxTable := [
 	at: #let		put: #xLet:;
 	at: #lambda		put: #xLambda:;
 	at: #return		put: #xReturn:;
+	at: #label		put: #xLabel:;
+	at: #goto		put: #xGoto:;
 	at: #extern		put: #xExtern:;
 	yourself
 ]
@@ -299,7 +328,7 @@ Compiler applySyntax: var with: form
 
 Compiler applySyntax_: _syntax with: form
 {
-    return ((_imp_t)v__syntax)(v_form, v_self);
+    _return ((_imp_t)v__syntax)(v_form, v_self);
 }
 
 Compiler performSyntax: aSelector with: form
@@ -316,6 +345,22 @@ Compiler apply: expr
     (call := CALLI4 new) function: (expr first translate: self).
     expr from: 1 do: [:arg | call addArgument: (arg translate: self)].
     ^call
+]
+
+"----------------------------------------------------------------"
+
+LambdaStart	:= [ nil ]
+LambdaSize	:= [ nil ]
+LambdaRegistrar	:= [ nil ]
+
+Compiler registerLambdasWith: _function	[ LambdaRegistrar := _function ]
+
+Compiler registerLambdaNamed: name
+[
+    | _name |
+    LambdaRegistrar ifFalse: [^self].
+    _name := name _stringValue.
+    { ((_imp_t)v_LambdaRegistrar)(v_LambdaStart, (oop)((long)v_LambdaStart + (long)v_LambdaSize), v__name); }.
 ]
 
 "----------------------------------------------------------------"
@@ -587,6 +632,19 @@ Compiler xQuote: expr
     ^CNSTP4 new  arg: literal
 ]
 
+Compiler xActive: form
+[
+    | name var _value _value2 |
+    (form size between: 3 and: 4)	ifFalse: [self errorSyntax: form].
+    (name := form second) isSymbol	ifFalse: [self errorSyntax: form].
+    _value := form third _eval.
+    _value2 := form size == 4 ifTrue: [form fourth _eval].
+    var := "self lookupSyntax: name ifAbsent: ["self defineActive: name"]".
+    var value_: _value.
+    var value2_: _value2.
+    ^CNSTP4 new arg: _value
+]
+
 Compiler xSyntax: form
 [
     | name var _value |
@@ -615,6 +673,8 @@ Compiler defineVariable: name from: form
     value := form size == 3
 	ifTrue:  [form third translate: self]
 	ifFalse: [CNSTI4 new arg: nil].
+    (form size == 3 and: [form third isArray and: [form third first == #lambda]])
+	ifTrue: [self registerLambdaNamed: name].
     ^ASGNI4 new lhs: value; rhs: (var translateLvalue: self).
 ]
 
@@ -720,7 +780,7 @@ Compiler xWhile: form
 	add: (BRA new destination: continue);
 	add: body.
     form from: 2 do: [:expr | block
-	add: (DROP new lhs: (expr translate: self))].
+	add: (expr translate: self) dropped].
     block
 	add: continue;
 	add: (BRNZ new destination: body; lhs: (form second translate: self));
@@ -756,10 +816,10 @@ Compiler xLet: form
 	| name var |
 	    (binding isExpression and: [binding size == 2 and: [(name := binding first) isSymbol]]) ifFalse: [self errorSyntax: form].
 	var := self defineVariable: name.
-	block add: (DROP new lhs: (ASGNI4 new
-				       lhs: (binding second translate: self);
-				       rhs: (var translateLvalue: self)))].
-    form from: 2 to: form size - 2 do: [:expr | block add: (DROP new lhs: (expr translate: self))].
+	block add: (ASGNI4 new
+			lhs: (binding second translate: self);
+			rhs: (var translateLvalue: self)) dropped].
+    form from: 2 to: form size - 2 do: [:expr | block add: (expr translate: self) dropped].
     block add: (form last translate: self).
     self endScope.
     ^block
@@ -772,7 +832,7 @@ Compiler xLambda: form
 
 Compiler compileLambda: form
 [
-    | block entry last gen |
+    | block entry last gen stats |
     self := self withGeneratorType: generatorType.
     (block := Block new)
 	scope:	self beginScope;
@@ -780,15 +840,15 @@ Compiler compileLambda: form
 	add:	ENTER new.
     form second do: [:param |
 	param isSymbol ifFalse: [self errorSyntax: form second].
-	block add: (DROP new lhs: (PARAMI4 new arg: (self defineParameter: param)))].
-    form from: 2 to: form size - 2 do: [:expr | block add: (DROP new lhs: (expr translate: self))].
+	block add: (PARAMI4 new arg: (self defineParameter: param)) dropped].
+    form from: 2 to: form size - 2 do: [:expr | block add: (expr translate: self) dropped].
     last := form last translate: self.
     last isVoid
 	ifTrue:  [block add: last; add: RETV new]
 	ifFalse: [block add: (RETI4 new lhs: last)].
     self endScope.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
-    gen := generatorType withLabels: labels.
+    gen := generatorType withLabels: allLabels.
     gen selectInstructions: block.    "block selectInstructions: gen."
     block findSources: gen registerFilter.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
@@ -797,15 +857,33 @@ Compiler compileLambda: form
     gen lastLive ifTrue: [self error: 'compileLambda: clobber ends with live register: ', gen lastLive printString].
     block allocateRegisters: gen registerAllocator.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
-    gen generate: block.    "gen emit: block."
+    stats := gen generate: block.    "gen emit: block."
     self postProcess.
     CompilerOptions verboseRegs ifTrue: [gen dumpResources].
+    LambdaStart := stats first.
+    LambdaSize := stats second.
     ^entry
 ]
 
 Compiler xReturn: form
 [
     ^RETI4 new lhs: (form second translate: self)
+]
+
+Compiler xLabel: form
+[
+    | label |
+    form size == 2 ifFalse: [self errorSyntax: form].
+    label := labels at: form second ifAbsent: [labels at: form second put: self newLabel].
+    ^labels at: form second put: label.
+]
+
+Compiler xGoto: form
+[
+    | label |
+    form size == 2 ifFalse: [self errorSyntax: form].
+    label := labels at: form second ifAbsent: [labels at: form second put: self newLabel].
+    ^BRA new destination: label
 ]
 
 Compiler xExtern: form
@@ -883,7 +961,7 @@ Compiler compile: anObject for: codeGeneratorType
 	ifTrue:  [block add: tree; add: RETV new]
 	ifFalse: [block add: (RETI4 new lhs: tree)].
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
-    gen := generatorType withLabels: labels.
+    gen := generatorType withLabels: allLabels.
     gen selectInstructions: block.    "block selectInstructions: gen."
     block findSources: gen registerFilter.
     CompilerOptions verboseTree ifTrue: [block printOn: StdOut indent: 2.  StdOut cr].
@@ -897,8 +975,6 @@ Compiler compile: anObject for: codeGeneratorType
     CompilerOptions verboseRegs ifTrue: [gen dumpResources].
     ^entry
 ]
-
-Compiler registerLambdasWith: _function	[]
 
 Object compile
 [

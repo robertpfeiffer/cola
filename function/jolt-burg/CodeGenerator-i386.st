@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-16 20:53:29 by piumarta on emilia
+  Last edited: 2007-05-22 13:04:33 by piumarta on emilia
 "
 
 { import: Objects }
@@ -217,10 +217,10 @@ Intel32CodeGenerator reloadi4: reg from: tmp	[ self movlMd: tmp offset  b: esp  
 
 DynamicIntel32CodeGenerator : Intel32CodeGenerator ()
 
-DynamicIntel32CodeGenerator asmPass	{ return (oop)(asm_pass << 1 | 1); }
-DynamicIntel32CodeGenerator _asmPC	{ return (oop)(asm_pc); }
+DynamicIntel32CodeGenerator asmPass	{ _return (oop)(asm_pass << 1 | 1); }
+DynamicIntel32CodeGenerator _asmPC	{ _return (oop)(asm_pc); }
 
-SmallInteger _int	{ return (oop)((long)self >> 1); }
+SmallInteger _int	{ _return (oop)((long)self >> 1); }
 
 DynamicIntel32CodeGenerator define: l
 [
@@ -454,18 +454,20 @@ StaticIntel32CodeGenerator generate: tree
     self finaliseFrame.
     tree printOn: StdOut indent: 0.  StdOut cr.
     tree generate: self.
+    ^Array with: 0 with: 0.
 ]
 
 "{ include ""dis-i386.c"" }"
 
 DynamicIntel32CodeGenerator generate: tree
 [
-    | _entry |
+    | _entry _size |
     { asm_pass= 0; }.
     { asm_pc= 0; }.
     self finaliseFrame.
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code size %d bytes\n", (int)asm_pc); }].
+    { v__size= (oop)asm_pc; }.
     { asm_pc= (insn *)malloc((long)asm_pc); }.
     { asm_pass= 2; }.
     { v__entry= (oop)asm_pc; }.
@@ -474,4 +476,5 @@ DynamicIntel32CodeGenerator generate: tree
     CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
     { iflush((void *)v__entry, (void *)asm_pc); }.
 "    CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }]."
+    ^Array with: _entry with: _size.
 ]

@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-24 16:25:38 by piumarta on emilia
+;;; Last edited: 2007-05-18 14:54:09 by piumarta on emilia
 
 (syntax begin
   (lambda (node compiler)
@@ -60,3 +60,11 @@
 	     [[node second] isSymbol])
 	[compiler errorSyntax: node])
     [[compiler lookupVariable: [node second]] translateLvalue: compiler]))
+
+(syntax incr ; (incr lvalue [count])
+  (lambda (node)
+    `(set ,[node second]
+	  (+ ,[node second]
+	     ,(if (== '3 [node size])
+		  [node third]
+		  '1)))))

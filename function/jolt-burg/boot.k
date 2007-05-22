@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-05-15 18:50:45 by piumarta on emilia
+;;; Last edited: 2007-05-21 13:54:08 by piumarta on emilia
 
 (define __dlsym _dlsym)
 
@@ -84,6 +84,7 @@
 (define Options			(import "Options"))
 (define CokeScanner		(import "CokeScanner"))
 (define OrderedCollection	(import "OrderedCollection"))
+(define IdentitySet		(import "IdentitySet"))
 (define Expression		(import "Expression"))
 (define Compiler		(import "Compiler"))
 (define File			(import "File"))
@@ -172,9 +173,11 @@
 (define read
   (lambda (fileOrString)
     (let ((stream [fileOrString readStream])
-	  (expr    0))
+	  (expr    0)
+	  (ticker  0))
       (while (set expr [CokeScanner read: stream])
-	(if [Options verbose] (let () [StdOut print: expr][StdOut cr]))
+	(if [Options verbose]
+	    (let () [StdOut print: expr][StdOut cr]))
 	(set expr [expr eval])
 	(if [Options verbose] (let () [StdOut nextPutAll: '"  => "][StdOut print: expr][StdOut cr]))))))
 
@@ -190,12 +193,12 @@
 	    1)
 	  0))))
 
-(define load
-  (lambda (path)
-    (or (load-if-present path)
-	(let ()
-	  (printf "%s: No such file or directory\n" path)
-	  (exit 1)))))
+;; (define load
+;;   (lambda (path)
+;;     (or (load-if-present path)
+;; 	(let ()
+;; 	  (printf "%s: No such file or directory\n" path)
+;; 	  (exit 1)))))
 
 (define load
   (lambda (path)
@@ -214,3 +217,19 @@
 (load "number.k")	; numeric syntax
 (load "debug.k")	; debugging
 (load "object.k")	; object manipulation
+
+(define *package-list* [IdentitySet new])
+
+(define %require
+  (lambda (package)
+    (or [*package-list* includes: [package asSymbol]]
+	(let ()
+	  (load [[[package asString] , '".k"] _stringValue])
+	  [*package-list* add: [package asSymbol]]))))
+
+(syntax require
+  (lambda (node comp)
+    (let ((requires [WriteStream on: [Expression new: '8]]))
+      (for (i '1 2 [[node size] - '1])
+	[requires nextPut: `(%require ,[node at: i])])
+      `(let () ,@[requires contents]))))

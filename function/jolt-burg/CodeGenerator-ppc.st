@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-17 10:40:08 by piumarta on margaux.piumarta.com
+  Last edited: 2007-05-22 13:12:49 by piumarta on emilia
 "
 
 { import: Objects }
@@ -25,9 +25,9 @@
 { import: CompilerOptions }
 { import: CodeGenerator }
 
-SmallInteger lo16_: _i	{ short i= (long)v__i;  return (oop)(((long)i) << 1 | 1); }
-SmallInteger hi16_: _i	{ unsigned long  i= (unsigned long)v__i;  return (oop)(((i >> 16)                                   ) << 1 | 1); }
-SmallInteger ha16_: _i	{ unsigned long  i= (unsigned long)v__i;  return (oop)(((i >> 16) + (((i & 0xffff) > 32767) ? 1 : 0)) << 1 | 1); }
+SmallInteger lo16_: _i	{ short i= (long)v__i;  _return (oop)(((long)i) << 1 | 1); }
+SmallInteger hi16_: _i	{ unsigned long  i= (unsigned long)v__i;  _return (oop)(((i >> 16)                                   ) << 1 | 1); }
+SmallInteger ha16_: _i	{ unsigned long  i= (unsigned long)v__i;  _return (oop)(((i >> 16) + (((i & 0xffff) > 32767) ? 1 : 0)) << 1 | 1); }
 
 { include "asm-ppc.h" }
 
@@ -248,8 +248,8 @@ StaticPowerPCCodeGenerator xorR: d R: a R: b	[ StdOut nextPutAll: '	xor	'; print
 
 DynamicPowerPCCodeGenerator : PowerPCCodeGenerator ()
 
-DynamicPowerPCCodeGenerator asmPass	{ return (oop)(asm_pass << 1 | 1); }
-DynamicPowerPCCodeGenerator _asmPC	{ return (oop)(asm_pc); }
+DynamicPowerPCCodeGenerator asmPass	{ _return (oop)(asm_pass << 1 | 1); }
+DynamicPowerPCCodeGenerator _asmPC	{ _return (oop)(asm_pc); }
 
 DynamicPowerPCCodeGenerator define: l
 [
@@ -477,18 +477,20 @@ StaticPowerPCCodeGenerator generate: tree
     self finaliseFrame.
     tree printOn: StdOut indent: 0.  StdOut cr.
     tree generate: self.
+    ^Array with: 0 with: 0.
 ]
 
 "{ include ""dis-ppc.c"" }"
 
 DynamicPowerPCCodeGenerator generate: tree
 [
-    | _entry |
+    | _entry _size |
     { asm_pass= 0; }.
     { asm_pc= 0; }.
     self finaliseFrame.
     tree generate: self.
     CompilerOptions verboseExec ifTrue: [{ printf("code size %d bytes\n", (int)asm_pc); }].
+    { v__size= (oop)asm_pc; }.
     { asm_pc= (insn *)malloc((long)asm_pc); }.
     { asm_pass= 2; }.
     { v__entry= (oop)asm_pc; }.
@@ -497,4 +499,5 @@ DynamicPowerPCCodeGenerator generate: tree
     CompilerOptions verboseExec ifTrue: [{ printf("code start %p\n", (void *)v__entry); }].
     { iflush((void *)v__entry, (void *)asm_pc); }.
 "    CompilerOptions verboseExec ifTrue: [{ disassemble((void *)v__entry, (void *)asm_pc); }]."
+    ^Array with: _entry with: _size.
 ]

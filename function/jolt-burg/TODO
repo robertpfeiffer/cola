@@ -1,9 +1,18 @@
-line numbers in error messages
-
-generate compiled code in _balloc() memory, not malloc() memory
-
-generate slot accessor syntax in define-type
+object: 1st-class selectors, selector inheritance, selector namespaces
 
 move SlotDictionary.basicNew into .new and rename the fast version as
 something reflecting the inability to add state
 
+----------------------------------------------------------------
+
+function: namespaces (use _vtbles => a Coke namespace == a Pepsi clone family), symbol search path, relative/absolute path syntax
+
+search path for (load)ed and (require)d files.
+
+auto-load boot.k unless command-line switch disables
+
+line numbers in error messages
+
+generate compiled code in _balloc() memory, not malloc() memory
+
+generate slot accessor syntax in define-type, or add define-struct

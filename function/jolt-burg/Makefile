@@ -1,5 +1,5 @@
 IDC		= idc $(OFLAGS)
-OFLAGS		= -O
+OFLAGS		= -g
 IDFLAGS		= -k -I../objects
 
 OBJEXT          = 

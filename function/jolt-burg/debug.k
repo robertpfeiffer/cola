@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-26 15:04:02 by piumarta on emilia
+;;; Last edited: 2007-05-22 12:14:49 by piumarta on emilia
 
 (define error		(lambda (fmt a b c d e f g h)	(printf fmt a b c d e f g h) (printf "\n") (exit 1)))
 (define syntax-error	(lambda (form message)		(printf "syntax error: expected %s\n" message) (exit 1)))
@@ -75,29 +75,42 @@
    ((== 0 (strcmp %sysarch "arm"))	(lambda (fp) (long@ (get-caller-fp fp) -2)))
    (1					(error "architecture not supported"))))
 
+(define dladdr (dlsym "dladdr"))
+
+(define %dlinfo (malloc 32))
+(syntax dli-sname (lambda (node) `(long@ ,[node second] 2)))
+
 (define get-function-name
   (lambda (ip)
     (for (i 0 1 (- pc-map-size 1))
       (let ((entry (long@ pc-map i)))
 	(if (and (<= (pc-map-start entry) ip) (< ip (pc-map-end entry)))
 	    (return (pc-map-name entry)))))
-    ""))
+    (if (dladdr ip %dlinfo)
+	(dli-sname %dlinfo)
+	"")))
 
 (define %top-level-fp (get-current-fp))
 
-;;(while (get-caller-fp (get-caller-fp %top-level-fp))
-;;  (set %top-level-fp (get-caller-fp %top-level-fp)))
+(while (get-caller-fp (get-caller-fp %top-level-fp))
+  (set %top-level-fp (get-caller-fp %top-level-fp)))
+
+(define _libid_backtrace (dlsym "_libid_backtrace"))
 
 (define backtrace
   (lambda (result)
+    (printf "; ---- dynamic backtrace:\n")
     (let ((fp   (get-current-fp))
 	  (prev (- fp 1)))
       (while (and fp (< prev fp) (<= fp %top-level-fp))
 	(let ((ip (get-frame-ip fp))
 	      (fn (get-function-name ip)))
-	  (printf "%08x %08x %s\n" fp ip fn))
+	  (printf "; %08x %08x %s\n" fp ip fn))
 	(set prev fp)
 	(set fp (get-caller-fp fp))))
+    (printf "; ---- static backtrace:\n")
+    (_libid_backtrace)
+    (printf "; ---- end of backtrace\n")
     result))
 
 (let ((main   (long@ ((dlsym "_libid_param") 1)))
