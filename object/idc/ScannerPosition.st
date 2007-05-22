@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2005-12-21 21:00:48 by piumarta on emilia.local
+  Last edited: 2007-05-22 11:12:56 by piumarta on emilia
 "
 
 "I represent an input location: file name and line number."
@@ -31,10 +31,9 @@ ScannerPosition withFile: fileName line: lineNumber
     line := lineNumber.
 ]
 
-ScannerPosition position
-[
-    ^self
-]
+ScannerPosition position	[ ^self ]
+ScannerPosition file		[ ^file ]
+ScannerPosition line		[ ^line ]
 
 ScannerPosition printOn: aStream
 [

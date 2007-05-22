@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-22 16:26:40 by piumarta on emilia
+  Last edited: 2007-05-22 11:12:20 by piumarta on emilia
 "
 
 { import: ParseNode }
@@ -102,6 +102,7 @@ SendNode generate: gen
     specialGenerator notNil ifTrue: [^self perform: specialGenerator with: gen].
     receiver generate: gen.
     arguments do: [:arg | arg generate: gen].
+    gen debugLine: position.
     gen send: selector to: receiver withArguments: arguments forValue: cascades isEmpty supered: superedType.
     cascades notEmpty
 	ifTrue:

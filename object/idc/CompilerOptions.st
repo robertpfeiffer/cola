@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-06-02 14:03:54 by piumarta on emilia-2.local
+  Last edited: 2007-05-22 10:36:09 by piumarta on emilia
 "
 
 { import: Object }
@@ -26,6 +26,7 @@
 CompilerOptions : Object (
     searchPaths		"OrderedCollection of dir paths to search for included files"
     outputType		"#program, #shared, #object"
+    debugging		"whether to generate debugging information"
     verboseFlag		"whether to print gobs of useless debugging information"
     macroFlag		"whether to expand macro selectors in-line"
     specialFlag		"whether to expand special selector in-line"
@@ -38,6 +39,7 @@ CompilerOptions initialize
 [
     searchPaths := OrderedCollection new.	"DEFAULTS:"
     outputType := #shared.	"generate a shared library"
+    debugging := false.		"do not generate debugging information"
     verboseFlag := false.	"don't print lots of debugging noise"
     macroFlag := true.		"do generate inline versions of macro selectors"
     specialFlag := true.	"do generate inline special selectors"
@@ -65,6 +67,9 @@ CompilerOptions macroFlag		[ ^macroFlag ]
 
 CompilerOptions outputType: typeSymbol	[  outputType := typeSymbol ]
 CompilerOptions outputType		[ ^outputType ]
+
+CompilerOptions debugging: aBoolean	[  debugging := aBoolean ]
+CompilerOptions debugging		[ ^debugging ]
 
 CompilerOptions specialFlag: aBoolean	[  specialFlag := aBoolean ]
 CompilerOptions specialFlag		[ ^specialFlag ]

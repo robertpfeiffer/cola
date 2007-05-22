@@ -91,7 +91,7 @@ while [ $# -gt 0 ]; do
 	-C)	checkarg $@; config="$2"; shift;;
 	-c)	idtype="object";;
 	-f*)	ccopts="$ccopts $1";;
-	-g*)	ccopts="$ccopts $1";  _p="_g";;
+	-g*)	ccopts="$ccopts -g -DID_DEBUG=1";  idopts="$idopts -g";  _p="_g";;
 	-I?*)	idopts="$idopts -I${1#-I}";;
 	-I)	checkarg $@; idopts="$idopts -I$2"; shift;;
 	-J?*)	ccopts="$ccopts -I${1#-J}";;

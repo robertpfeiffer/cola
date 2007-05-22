@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-21 15:56:15 by piumarta on emilia.local
+  Last edited: 2007-05-22 11:18:01 by piumarta on emilia
 "
 
 { import: CodeGenerator }
@@ -47,6 +47,7 @@ CCodeGenerator generate: program on: aStream for: aCompiler outputType: outputTy
     program do: [:node | node genImplementation: self].
     self genl: (self initTextType: outputType fileName: fileName).
     program do: [:node | node genInitialisation: self].
+    self genl: '  _leave();'.
     self genl: '}'.
     outputType == #program ifTrue: [self genl: self mainText].
     ^output
@@ -129,6 +130,10 @@ static void               (*_local_gc_addRoots)(char *lo, char *hi)= 0;
 static void	          (*_local_gc_unregisterDisappearingLink)(void *ptr)= 0;
 static void		  (*_local_gc_generalRegisterDisappearingLink)(void *link, void *ptr)= 0;
 static void		  (*_local_gc_gcollect)(void)= 0;
+static void		 *(*_local_enter)(char *name, char *type, char *file)= 0;
+static void		  (*_local_line)(int line)= 0;
+static void		  (*_local_leave)(void *)= 0;
+static void		  (*_local_backtrace)(void)= 0;
 
 #define _param(INDEX)		_local_param(INDEX)
 #define _selector(NAME)		_local_intern(NAME)
@@ -141,6 +146,17 @@ static void		  (*_local_gc_gcollect)(void)= 0;
 #define _balloc(LBS)		_local_balloc((LBS))
 #define _nlreturn(NLR, ARG)	_local_nlreturn((NLR), (ARG))
 #define _nlresult()		_local_nlresult()
+#ifdef ID_DEBUG
+# define _enter(NM, TYPE, FILE)	void *__id_debug= _local_enter(NM, TYPE, FILE)
+# define _line(line)		_local_line(line)
+# define _leave()		_local_leave(__id_debug)
+# define _backtrace()		_local_backtrace()
+#else
+# define _enter(NM, TYPE, FILE)
+# define _line(line)
+# define _leave()
+# define _backtrace()
+#endif
 ', self sendText, '
 #define _super(TYP, MSG, RCV, ARG...) ({				\\
   register oop _r= (RCV);						\\
@@ -205,6 +221,10 @@ void __id__init__', (outputType == #object ifTrue: [encoder mangleSelector: (fil
     _local_bind= dlsym(global, "_libid_bind");
     _local_nlreturn= dlsym(global, "_libid_nlreturn");
     _local_nlresult= dlsym(global, "_libid_nlresult");
+    _local_enter= dlsym(global, "_libid_enter");
+    _local_line= dlsym(global, "_libid_line");
+    _local_leave= dlsym(global, "_libid_leave");
+    _local_backtrace= dlsym(global, "_libid_backtrace");
     _local_tag_vtable= dlsym(global, "_libid_tag_vtable");
     _local_nil_vtable= dlsym(global, "_libid_nil_vtable");
     _local_gc_addRoots= dlsym(global, "GC_add_roots");
@@ -221,6 +241,7 @@ void __id__init__', (outputType == #object ifTrue: [encoder mangleSelector: (fil
     for (s= _Selectors;  s->name;  ++s)
       *s->addr= _selector(s->name);
   }
+  _enter("__id__init__", "", "', fileName, '");
 ']
 
 CCodeGenerator mainText
@@ -730,6 +751,10 @@ CCodeGenerator beginMethod: methodNode in: typeNode arguments: arguments variadi
     variadic ifTrue: [self gen: ', ...'].
     self genl: ')'.
 ]
+
+CCodeGenerator debugMethod: method	[ self genl: '  _enter("', method selector, '", "', method type name, '", "?");' ]
+CCodeGenerator debugLine:   position	[ self genl: '  _line(', position line printString, ');' ]
+CCodeGenerator debugReturn: method	[ self genl: '  _leave();' ]
 
 CCodeGenerator beginSequence: sequenceNode	[ self genl: ' {' ]
 CCodeGenerator endSequence: sequenceNode	[ self genl: ' }' ]

@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 20:17:21 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-05-22 11:01:12 by piumarta on emilia
 "
 
 { import: BlockNode }
@@ -91,6 +91,7 @@ MethodNode genImplementation: gen
     scope blocks do: [:block | block genImplementation: gen].
     gen beginMethod: self in: type arguments: arguments variadic: variadic sequence: sequenceNumber.
     gen beginSequence: self.
+    gen debugMethod: self.
     scope hasExports ifTrue: [gen createStateVector: scope stateVectorSize inScope: scope tag constructor: stateConstructor].
     "declarations"
     temporaries do: [:var | var isFree ifFalse: [gen declareTemporary: var]].
@@ -110,6 +111,7 @@ MethodNode genImplementation: gen
     scope hasNLR ifTrue: [gen defineNonLocalReturn].
     "body"
     statements do: [:stmt | stmt generate: gen].
+    gen debugReturn: self.
     gen endSequence: self.
 ]
 

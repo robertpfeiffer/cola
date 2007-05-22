@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-01-25 20:39:36 by piumarta on emilia.local
+  Last edited: 2007-05-22 10:34:55 by piumarta on emilia
 "
 
 { import: st80 }
@@ -29,6 +29,7 @@
     "parse command-line options"
     GetOpt new
 	at: $c put: [ :opt      | options outputType: #object ];
+	at: $g put: [ :opt      | options debugging: true ];
 	at: $I put: [ :opt :arg | options searchPaths addFirst: arg ];
 	at: $m put: [ :opt      | options outputType: #program ];
 	at: $M put: [ :opt      | options macroFlag: false ];
