@@ -487,7 +487,7 @@ static oop _object___backtrace(oop _thunk, oop state, oop self)
 #    if defined(__i386__)
       asm("movl 4(%1), %0" : "=r"(ip) : "r"(fp));
 #    elif defined(__PPC__) || defined(__ppc__) || defined(_POWER) || defined(_IBMR2)
-      asm("lwz %0, 8(%1)\nlwz" : "=r"(ip) : "r"(fp));
+      asm("lwz %0, 8(%1)" : "=r"(ip) : "r"(fp));
 #    endif
 
       if (ip)
@@ -504,7 +504,7 @@ static oop _object___backtrace(oop _thunk, oop state, oop self)
 #    if defined(__i386__)
       asm("movl (%1), %0" : "=r"(fp) : "r"(fp));
 #    elif defined(__PPC__) || defined(__ppc__) || defined(_POWER) || defined(_IBMR2)
-      asm("lwz %0, 0(%1)\nlwz" : "=r"(fp) : "r"(fp));
+      asm("lwz %0, 0(%1)" : "=r"(fp) : "r"(fp));
 #    endif
     }
 
