@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:41:02 by piumarta on emilia
+  Last edited: 2007-05-22 12:08:10 by piumarta on emilia
 "
 
 { import: BlockNode }
@@ -110,6 +110,7 @@ MethodNode genImplementation: gen
 	    var isFree ifTrue: [gen saveTemporary: var]].
     scope hasNLR ifTrue: [gen defineNonLocalReturn].
     "body"
+    gen debugLine: position.
     statements do: [:stmt | stmt generate: gen].
     gen debugReturn: position.
     gen endSequence: self.

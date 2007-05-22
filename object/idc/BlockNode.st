@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:41:05 by piumarta on emilia
+  Last edited: 2007-05-22 12:08:17 by piumarta on emilia
 "
 
 { import: SequenceNode }
@@ -179,6 +179,7 @@ BlockNode genImplementation: gen
     temporaries do: [:temp | temp isFree ifFalse: [gen defineTemporary: temp]].
     gen defineStack: scope stackSize.
     arguments   do: [:var | var isFree ifTrue: [gen saveArgument: var]].
+    gen debugLine: position.
     statements  do: [:stmt | stmt generate: gen].
     gen debugReturn: position.
     gen endSequence: self.
