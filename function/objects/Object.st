@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 16:05:09 by piumarta on emilia
+  Last edited: 2007-05-22 16:07:24 by piumarta on emilia
 "
 
 { import: Objects }
@@ -94,7 +94,14 @@ UndefinedObject ifFalse: aBlock		[ ^aBlock value ]
 
 Object abort		{ abort(); }
 Object exit		{ exit(0); }
-Object halt		[ StdErr cr; nextPutAll: 'halt'; cr.  { exit(1); } ]
+
+Object halt
+[
+    StdErr cr.
+    { _backtrace(); }.
+    StdErr cr; nextPutAll: 'halt'; cr.
+    { exit(1); }.
+]
 
 Object perform: s
 {
@@ -136,18 +143,24 @@ Object error: reason
 
 Object shouldNotImplement: aSelector
 [
+    StdErr cr.
+    { _backtrace(); }.
     StdErr cr; nextPutAll: self debugName; nextPutAll: ' should not implement '; print: aSelector; cr.
     { exit(1); }.
 ]
 
 Object subtypeResponsibility: aSelector
 [
+    StdErr cr.
+    { _backtrace(); }.
     StdErr cr; nextPutAll: self debugName; nextPutAll: ' did not override '; print: aSelector; cr.
     { exit(1); }.
 ]
 
 Object errorOutOfBounds: anIndex
 [
+    StdErr cr.
+    { _backtrace(); }.
     StdErr cr;
 	print: anIndex; nextPutAll: ' is out of bounds in ';
 	nextPutAll: self debugName; nextPut: $(; print: self size; nextPut: $);
