@@ -96,6 +96,7 @@ static oop s__beNilType= 0;
 static oop s__import_= 0;
 static oop s_doesNotUnderstand_= 0;
 static oop s__delegate= 0;
+static oop s__backtrace= 0;
 
 typedef union  t__object   _object_t;
 typedef struct t__selector _selector_t;
@@ -465,6 +466,52 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
   return self;
 }
 
+static void *topLevelFP= 0;
+
+static oop _object___backtrace(oop _thunk, oop state, oop self)
+{
+#if defined(__GNUC__)
+
+  void *fp= 0;
+  
+#if defined(__i386__)
+  asm("movl %%ebp, %0" :"=r"(fp));
+#elif defined(__PPC__) || defined(__ppc__) || defined(_POWER) || defined(_IBMR2)
+  asm("lwz %0, 0(r1)" :"=r"(fp));
+#endif
+
+  while (fp && fp < topLevelFP)
+    {
+      void *ip= 0;
+
+#    if defined(__i386__)
+      asm("movl 4(%1), %0" : "=r"(ip) : "r"(fp));
+#    elif defined(__PPC__) || defined(__ppc__) || defined(_POWER) || defined(_IBMR2)
+      asm("lwz %0, 8(%1)\nlwz" : "=r"(ip) : "r"(fp));
+#    endif
+
+      if (ip)
+	{
+	  Dl_info dli;
+	  if (dladdr(ip, &dli) && dli.dli_sname)
+	    printf("%08lx %08lx %s (%s)\n", (long)fp, (long)ip, dli.dli_sname, dli.dli_fname);
+	  else
+	    printf("%08lx %08lx ?\n",       (long)fp, (long)ip);
+	}
+      else
+	break;
+
+#    if defined(__i386__)
+      asm("movl (%1), %0" : "=r"(fp) : "r"(fp));
+#    elif defined(__PPC__) || defined(__ppc__) || defined(_POWER) || defined(_IBMR2)
+      asm("lwz %0, 0(%1)\nlwz" : "=r"(fp) : "r"(fp));
+#    endif
+    }
+
+#endif
+  return self;
+}
+
 static char *nameOf(oop object)
 {
   static char buf[32];
@@ -496,6 +543,8 @@ void _libid_init(int *argcp, char ***argvp, char ***envpp)
 #if USE_GC
   GC_INIT();
 #endif
+
+  topLevelFP= &argcp;
 
   _argc= *argcp;  _argv= *argvp;  _envp= *envpp;
 
@@ -558,6 +607,7 @@ void _libid_init(int *argcp, char ***argvp, char ***envpp)
   method(_object,   "_beTagType", 	  _beTagType);
   method(_object,   "_beNilType", 	  _beNilType);
   method(_object,   "_import:",   	  _import_);
+  method(_object,   "_backtrace",   	  _backtrace);
 # undef method
 
   s_doesNotUnderstand_= _selector___intern_(0, _selector, _selector, "doesNotUnderstand:");
