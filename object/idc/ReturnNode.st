@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2005-12-21 21:00:05 by piumarta on emilia.local
+  Last edited: 2007-05-22 11:29:01 by piumarta on emilia
 "
 
 { import: ParseNode }
@@ -41,6 +41,7 @@ ReturnNode encode: encoder
 ReturnNode generate: gen
 [
     value generate: gen.
+    gen debugReturn: position.
     nonLocal ifTrue: [gen genNonLocalReturn: value] ifFalse: [gen genReturn: value].
 ]
 

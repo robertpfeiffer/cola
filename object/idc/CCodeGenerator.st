@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:18:01 by piumarta on emilia
+  Last edited: 2007-05-22 12:04:48 by piumarta on emilia
 "
 
 { import: CodeGenerator }
@@ -146,17 +146,17 @@ static void		  (*_local_backtrace)(void)= 0;
 #define _balloc(LBS)		_local_balloc((LBS))
 #define _nlreturn(NLR, ARG)	_local_nlreturn((NLR), (ARG))
 #define _nlresult()		_local_nlresult()
+#define _backtrace()		_local_backtrace()
 #ifdef ID_DEBUG
 # define _enter(NM, TYPE, FILE)	void *__id_debug= _local_enter(NM, TYPE, FILE)
 # define _line(line)		_local_line(line)
 # define _leave()		_local_leave(__id_debug)
-# define _backtrace()		_local_backtrace()
 #else
 # define _enter(NM, TYPE, FILE)
 # define _line(line)
 # define _leave()
-# define _backtrace()
 #endif
+#define _return			_leave(); return
 ', self sendText, '
 #define _super(TYP, MSG, RCV, ARG...) ({				\\
   register oop _r= (RCV);						\\
@@ -241,7 +241,7 @@ void __id__init__', (outputType == #object ifTrue: [encoder mangleSelector: (fil
     for (s= _Selectors;  s->name;  ++s)
       *s->addr= _selector(s->name);
   }
-  _enter("__id__init__", "", "', fileName, '");
+  _enter("__id__init__", "<initialisation>", "', fileName, '");
 ']
 
 CCodeGenerator mainText
@@ -752,7 +752,8 @@ CCodeGenerator beginMethod: methodNode in: typeNode arguments: arguments variadi
     self genl: ')'.
 ]
 
-CCodeGenerator debugMethod: method	[ self genl: '  _enter("', method selector, '", "', method type name, '", "?");' ]
+CCodeGenerator debugMethod: method	[ self genl: '  _enter("', method selector, '", "', method type name, '", "', method position file, '");' ]
+CCodeGenerator debugBlock:  block	[ self genl: '  _enter("[]", "?", "', block position file, '");' ]
 CCodeGenerator debugLine:   position	[ self genl: '  _line(', position line printString, ');' ]
 CCodeGenerator debugReturn: method	[ self genl: '  _leave();' ]
 

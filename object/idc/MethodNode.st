@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:01:12 by piumarta on emilia
+  Last edited: 2007-05-22 11:41:02 by piumarta on emilia
 "
 
 { import: BlockNode }
@@ -111,7 +111,7 @@ MethodNode genImplementation: gen
     scope hasNLR ifTrue: [gen defineNonLocalReturn].
     "body"
     statements do: [:stmt | stmt generate: gen].
-    gen debugReturn: self.
+    gen debugReturn: position.
     gen endSequence: self.
 ]
 

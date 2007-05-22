@@ -69,6 +69,10 @@ struct t__closure *_libid_bind    (oop selector, oop receiver);
 struct  __lookup   _libid_bind2   (oop selector, oop receiver);
 oop                _libid_nlreturn(oop nlr, oop result);
 oop                _libid_nlresult(void);
+void		  *_libid_enter(char *name, char *type, char *file);
+void		   _libid_line(int line);
+void		   _libid_leave(void *cookie);
+void		   _libid_backtrace(void);
 
 #define _send(MSG, RCV, ARG...) ({					\
   oop _r= (RCV);							\
@@ -199,6 +203,7 @@ static void fatal(const char *fmt, ...)
   vfprintf(stderr, fmt, ap);
   fputs("\n", stderr);
   va_end(ap);
+  _libid_backtrace();
   exit(1);
 }
 
@@ -836,7 +841,15 @@ void _libid_leave(void *cookie)
 
 void _libid_backtrace(void)
 {
-  int i;
+  int i, indent= 0;
   for (i= position;  i--;)
-    fprintf(stderr, "%s.%s\t%s:%d\n", positions[i].type, positions[i].name, positions[i].file, positions[i].line);
+    {
+      char *base= strrchr(positions[i].file, '/');
+      int   width= fprintf(stderr, "%s:%-4d ", base ? base + 1 : positions[i].file, positions[i].line);
+      if (indent < width)
+	indent= width;
+      else
+	fprintf(stderr, "%*s", indent - width, "");
+      fprintf(stderr, "%s %s\n", positions[i].type, positions[i].name);
+    }
 }

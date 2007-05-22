@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 16:21:44 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-05-22 11:41:05 by piumarta on emilia
 "
 
 { import: SequenceNode }
@@ -172,6 +172,7 @@ BlockNode genImplementation: gen
     scope blocks do: [:block | block genImplementation: gen].
     gen beginBlock: self arguments: arguments variadic: false.
     gen beginSequence: self.
+    gen debugBlock: self.
     scope hasExports ifTrue: [gen createStateVector: scope stateVectorSize inScope: scope tag constructor: stateConstructor].
     temporaries do: [:var | var isFree ifFalse: [gen declareTemporary: var]].
     gen declareStack: scope stackSize.
@@ -179,6 +180,7 @@ BlockNode genImplementation: gen
     gen defineStack: scope stackSize.
     arguments   do: [:var | var isFree ifTrue: [gen saveArgument: var]].
     statements  do: [:stmt | stmt generate: gen].
+    gen debugReturn: position.
     gen endSequence: self.
 ]
 
