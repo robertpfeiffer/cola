@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 16:07:24 by piumarta on emilia
+  Last edited: 2007-06-29 11:14:45 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -67,6 +67,10 @@ Object isNil			[ ^false ]
 
 UndefinedObject notNil		[ ^false ]
 Object notNil			[ ^true ]
+
+_vtable isKindOf:   family	[ ^self == family or: [delegate ~~ nil and: [delegate isKindOf: family]] ]
+Object  isKindOf:   family	[ ^self _vtable isKindOf: family _vtable ]
+Object  isMemberOf: family	[ ^self _vtable == family _vtable ]
 
 Object debugName			[ ^String value_: self _debugName ]
 Object printOn: aStream			[ ^aStream nextPutAll: self debugName ]
