@@ -26,8 +26,8 @@ checkarg () {
 }
 
 banner () {
-    echo "Id Compiler version 1.0"
-    echo "Copyright (c) 2005, 2006 Ian Piumarta"
+    echo "Id Compiler version 1.1"
+    echo "Copyright (c) 2005, 2006, 2007 Ian Piumarta"
 }
 
 copyright () {
@@ -91,7 +91,7 @@ while [ $# -gt 0 ]; do
 	-C)	checkarg $@; config="$2"; shift;;
 	-c)	idtype="object";;
 	-f*)	ccopts="$ccopts $1";;
-	-g*)	ccopts="$ccopts $1";;
+	-g*)	ccopts="$ccopts -g -DID_DEBUG=1";  idopts="$idopts -g";  _p="_g";;
 	-I?*)	idopts="$idopts -I${1#-I}";;
 	-I)	checkarg $@; idopts="$idopts -I$2"; shift;;
 	-J?*)	ccopts="$ccopts -I${1#-J}";;

@@ -69,6 +69,10 @@ struct t__closure *_libid_bind    (oop selector, oop receiver);
 struct  __lookup   _libid_bind2   (oop selector, oop receiver);
 oop                _libid_nlreturn(oop nlr, oop result);
 oop                _libid_nlresult(void);
+void		  *_libid_enter(char *name, char *type, char *file);
+void		   _libid_line(int line);
+void		   _libid_leave(void *cookie);
+void		   _libid_backtrace(void);
 
 #define _send(MSG, RCV, ARG...) ({					\
   oop _r= (RCV);							\
@@ -199,6 +203,7 @@ static void fatal(const char *fmt, ...)
   vfprintf(stderr, fmt, ap);
   fputs("\n", stderr);
   va_end(ap);
+  _libid_backtrace();
   exit(1);
 }
 
@@ -330,7 +335,13 @@ static oop _vtable__lookup_(oop _thunk, oop state, oop self, oop selector)
   dprintf("_vtable__lookup_(%p, %p, %p, %p<%s>)\n", _thunk, self, state, selector, selector->selector.elements);
   assoc= _vtable__findKeyOrNil_(0, self, self, selector);
   assert(isKindOf(self, _vtable));
-  return assoc ? assoc : (self->vtable.delegate ? _vtable__lookup_(0, self->vtable.delegate, self->vtable.delegate, selector) : 0);
+  if (assoc) return assoc;
+  if (self->vtable.delegate)
+    {
+      if (self == self->vtable.delegate) fatal("delegation loop\n");
+      return _vtable__lookup_(0, self->vtable.delegate, self->vtable.delegate, selector);
+    }
+  return 0;
 }
 
 static oop _vtable__add_(oop _thunk, oop state, oop self, oop object)
@@ -786,4 +797,73 @@ void *_libid_param(int index)
     case  6:	return (void *)SYSOS;
     }
   return 0;
+}
+
+/*----------------------------------------------------------------*/
+
+struct position
+{
+  char *name, *type, *file;
+  int   line;
+};
+
+static struct position *positions= 0;
+static int position= 0;
+static int maxPosition= 0;
+
+void *_libid_enter(char *name, char *type, char *file)
+{
+  struct position *p= 0;
+  if (position >= maxPosition)
+    {
+      if (positions)
+	{
+	  maxPosition *= 2;
+	  positions= realloc(positions, sizeof(struct position) * maxPosition);
+	}
+      else
+	{
+	  maxPosition= 128;
+	  positions= malloc(sizeof(struct position) * maxPosition);
+	}
+    }
+  p= positions + position++;
+  p->name= name;
+  p->type= type;
+  p->file= file;
+  p->line= 0;
+  return (void *)(position - 1);
+}
+
+void _libid_line(int line)
+{
+  positions[position - 1].line= line;
+}
+
+void _libid_leave(void *cookie)
+{
+  position= (int)(long)cookie;
+}
+
+void _libid_backtrace(void)
+{
+  int i, indent= 0, len= 0;
+
+  for (i= position;  i--;)
+    {
+      char *base= strrchr(positions[i].file, '/');
+      if (base) positions[i].file= base + 1;
+      if (indent < (len= strlen(positions[i].file)))
+	indent= len;
+    }
+  indent += 9;
+  for (i= position;  i--;)    /*for (i= 0;  i< position;  ++i)*/
+    {
+      int width= fprintf(stderr, "  %s:%-4d ", positions[i].file, positions[i].line);
+      if (indent < width)
+	indent= width;
+      else
+	fprintf(stderr, "%*s", indent - width, "");
+      fprintf(stderr, "%s %s\n", positions[i].type, positions[i].name);
+    }
 }
