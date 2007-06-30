@@ -1,3 +1,22 @@
+;; c99.peg -- C99 parser
+;; 
+;; Copyright (c) 2007 by Ian Piumarta
+;; All rights reserved.
+;; 
+;; Permission is hereby granted, free of charge, to any person obtaining a
+;; copy of this software and associated documentation files (the 'Software'),
+;; to deal in the Software without restriction, including without limitation
+;; the rights to use, copy, modify, merge, publish, distribute, and/or sell
+;; copies of the Software, and to permit persons to whom the Software is
+;; furnished to do so, provided that the above copyright notice(s) and this
+;; permission notice appear in all copies of the Software.  Acknowledgement
+;; of the use of this Software in supporting documentation would be
+;; appreciated but is not required.
+;; 
+;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+;; 
+;; last edited: 2007-06-29 14:14:26 by piumarta on emilia.lax04.mtt
+
 start=
 	- directive
 |	- external-declaration
