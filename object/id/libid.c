@@ -335,7 +335,13 @@ static oop _vtable__lookup_(oop _thunk, oop state, oop self, oop selector)
   dprintf("_vtable__lookup_(%p, %p, %p, %p<%s>)\n", _thunk, self, state, selector, selector->selector.elements);
   assoc= _vtable__findKeyOrNil_(0, self, self, selector);
   assert(isKindOf(self, _vtable));
-  return assoc ? assoc : (self->vtable.delegate ? _vtable__lookup_(0, self->vtable.delegate, self->vtable.delegate, selector) : 0);
+  if (assoc) return assoc;
+  if (self->vtable.delegate)
+    {
+      if (self == self->vtable.delegate) fatal("delegation loop\n");
+      return _vtable__lookup_(0, self->vtable.delegate, self->vtable.delegate, selector);
+    }
+  return 0;
 }
 
 static oop _vtable__add_(oop _thunk, oop state, oop self, oop object)
@@ -841,11 +847,19 @@ void _libid_leave(void *cookie)
 
 void _libid_backtrace(void)
 {
-  int i, indent= 0;
+  int i, indent= 0, len= 0;
+
   for (i= position;  i--;)
     {
       char *base= strrchr(positions[i].file, '/');
-      int   width= fprintf(stderr, "%s:%-4d ", base ? base + 1 : positions[i].file, positions[i].line);
+      if (base) positions[i].file= base + 1;
+      if (indent < (len= strlen(positions[i].file)))
+	indent= len;
+    }
+  indent += 9;
+  for (i= position;  i--;)    /*for (i= 0;  i< position;  ++i)*/
+    {
+      int width= fprintf(stderr, "  %s:%-4d ", positions[i].file, positions[i].line);
       if (indent < width)
 	indent= width;
       else
