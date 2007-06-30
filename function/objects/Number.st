@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:48:30 by piumarta on emilia
+  Last edited: 2007-05-30 07:30:58 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -284,9 +284,10 @@ Float fromString: s
     ^f
 ]
 
-Float copy	[ ^self new value_: self ]
+Float copy		[ ^self new value_: self ]
+SmallInteger copy	[ ]
 
-Float        asFloat	[ ^self ]
+Float        asFloat	[ ]
 SmallInteger asFloat	[ ^Float new setIntegerValue_: self _integerValue ]
 
 Float        asInteger	[ ^self truncated ]
@@ -798,8 +799,34 @@ Number atan2: aNumber	[ ^self asFloat atan2: aNumber ]
 
 Integer rounded		[ ^self ]
 Integer truncated	[ ^self ]
+Integer floor		[ ^self ]
+Integer ceiling		[ ^self ]
 
 Float rounded		[ ^(self + 0.5) truncated ]
+
+Float floor
+[
+    self := self copy.
+    {
+	double rcvr;
+	memcpy(&rcvr, v_self, sizeof(double));
+	rcvr= floor(rcvr);
+	memcpy(v_self, &rcvr, sizeof(double));
+    }.
+    ^self asInteger
+]
+
+Float ceiling
+[
+    self := self copy.
+    {
+	double rcvr;
+	memcpy(&rcvr, v_self, sizeof(double));
+	rcvr= ceil(rcvr);
+	memcpy(v_self, &rcvr, sizeof(double));
+    }.
+    ^self asInteger
+]
 
 Integer fromString: s
 [

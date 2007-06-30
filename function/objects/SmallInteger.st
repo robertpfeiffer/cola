@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:50:20 by piumarta on emilia
+  Last edited: 2007-06-07 16:43:44 by piumarta on emilia.local
 "
 
 { import: Objects.st }
@@ -70,6 +70,15 @@ SmallInteger to: limit do: unaryBlock
 	whileTrue:
 	   [unaryBlock value: self.
 	    self := self + 1]
+]
+
+SmallInteger to: limit do: unaryBlock separatedBy: separatorBlock
+[
+    [self <= limit]
+	whileTrue:
+	   [unaryBlock value: self.
+	    (self := self + 1) <= limit
+		ifTrue: [separatorBlock value]]
 ]
 
 SmallInteger to: limit by: step do: unaryBlock

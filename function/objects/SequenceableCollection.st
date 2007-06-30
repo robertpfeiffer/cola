@@ -15,10 +15,10 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-08 15:08:41 by piumarta on emilia.local
+  Last edited: 2007-05-28 15:32:03 by piumarta on emilia.local
 "
 
-{ import: Objects }
+{ import: Object }
 
 SequenceableCollection isSequenceableCollection       [ ^true ]
 Object isSequenceableCollection                       [ ^false ]
@@ -62,7 +62,7 @@ SequenceableCollection new: size atAllPut: value
 
 SequenceableCollection atAllPut: value
 [
-    0 to: self size - 1 do: [:key | self at: key put: value]
+    0 to: self size - 1 do: [:key | self at: key put: value].
 ]
 
 SequenceableCollection atAll: keyCollection put: value

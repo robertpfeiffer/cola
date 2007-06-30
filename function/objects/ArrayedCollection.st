@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:37:14 by piumarta on emilia
+  Last edited: 2007-05-28 15:26:41 by piumarta on emilia.local
 "
 
 { import: Objects }

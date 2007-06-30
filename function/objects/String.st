@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:50:57 by piumarta on emilia
+  Last edited: 2007-06-07 16:47:38 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -24,6 +24,11 @@ Object isString	[ ^false ]
 String isString	[ ^true ]
 
 String asString []
+
+String lf	[ ^self with: $\n ]
+String cr	[ ^self with: $\r ]
+String tab	[ ^self with: $\t ]
+String space	[ ^self with: $   ]
 
 String new: capacity
 [

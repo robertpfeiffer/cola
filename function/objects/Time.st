@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:51:21 by piumarta on emilia
+  Last edited: 2007-06-11 18:52:00 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -31,6 +31,14 @@ Time millisecondClockValue
     gettimeofday(&tv, 0);
     _return (oop)(((tv.tv_sec * 1000 + tv.tv_usec / 1000) &0x3fffffff) << 1 | 1);
 }
+
+Time millisecondsToRun: aBlock
+[
+    | start |
+    start := self millisecondClockValue.
+    aBlock value.
+    ^self millisecondClockValue - start
+]
 
 Time now
 [

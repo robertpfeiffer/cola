@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-25 17:18:09 by piumarta on emilia
+  Last edited: 2007-06-05 15:01:39 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -144,6 +144,20 @@ OrderedCollection removeAtIndex: offset
     (offset >= 0 and: [arrayOffset < lastIndex]) ifFalse: [^self errorOutOfBounds: offset].
     arrayOffset to: lastIndex - 2 do: [:i | array at: i put: (array at: 1 + i)].
     lastIndex := lastIndex - 1.
+]
+
+OrderedCollection insert: anObject atIndex: offset
+[
+    | arrayOffset |
+    arrayOffset := firstIndex + offset.
+    offset	<  0		ifTrue: [^self errorOutOfBounds: offset].
+    offset      == 0		ifTrue: [^self addFirst: anObject].
+    arrayOffset >  lastIndex	ifTrue: [^self errorOutOfBounds: offset].
+    arrayOffset == lastIndex	ifTrue: [^self addLast: anObject].
+    lastIndex == array size	ifTrue: [self makeRoomAtLast.  arrayOffset := firstIndex + offset].
+    lastIndex - 1 downTo: arrayOffset do: [:i | array at: i + 1 put: (array at: i)].
+    lastIndex := lastIndex + 1.
+    ^array at: arrayOffset put: anObject
 ]
 
 OrderedCollection at: offset
