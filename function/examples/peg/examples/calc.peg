@@ -1,0 +1,42 @@
+%{
+(define atoi	(dlsym "atoi"))
+
+(define stack  (malloc 1024))
+(define stackp stack)
+
+(define push (lambda (x) (set (long@ stackp) x) (incr stackp 4)))
+(define pop  (lambda (x) (incr stackp -4) (long@ stackp)))
+%}
+
+; Grammar
+
+Expr	= - Sum EOL			{ (printf "%d\n" (pop)) }
+	| (!EOL .)* EOL			{ (printf "error\n") }
+
+Sum	= Product ( PLUS  Product	{ (let ((r (pop)) (l (pop))) (push (+ l r))) }
+		  | MINUS Product	{ (let ((r (pop)) (l (pop))) (push (- l r))) }
+		  )*
+
+Product	= Value ( TIMES  Value		{ (let ((r (pop)) (l (pop))) (push (* l r))) }
+                | DIVIDE Value		{ (let ((r (pop)) (l (pop))) (push (/ l r))) }
+		)*
+
+Value	= NUMBER			{ (push (atoi yytext)) }
+	| OPEN Sum CLOSE
+
+; Lexemes
+
+NUMBER	= < [0-9]+ > -
+PLUS	= '+' -
+MINUS	= '-' -
+TIMES	= '*' -
+DIVIDE	= '/' -
+OPEN	= '(' -
+CLOSE	= ')' -
+-	= [ \t]*
+EOL	= '\n' | '\r\n' | '\r'
+
+%%
+
+(while (yy-parse (yy-new [[StdIn readStream] prompt: '">"])))
+(printf "\n")

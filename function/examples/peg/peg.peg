@@ -1,0 +1,120 @@
+;; peg.peg -- PEG parser
+;; 
+;; Copyright (c) 2007 by Ian Piumarta
+;; All rights reserved.
+;; 
+;; Permission is hereby granted, free of charge, to any person obtaining a
+;; copy of this software and associated documentation files (the 'Software'),
+;; to deal in the Software without restriction, including without limitation
+;; the rights to use, copy, modify, merge, publish, distribute, and/or sell
+;; copies of the Software, and to permit persons to whom the Software is
+;; furnished to do so, provided that the above copyright notice(s) and this
+;; permission notice appear in all copies of the Software.  Acknowledgement
+;; of the use of this Software in supporting documentation would be
+;; appreciated but is not required.
+;; 
+;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+;; 
+;; Last edited: 2007-05-21 16:56:05 by piumarta on emilia
+
+; Hierarchical syntax
+
+grammar=	- definition
+
+definition=	identifier 				{ (set (yy-current yy) (yy-findRule yy yytext)) }
+			EQUAL e:expression		{ [(yy-current yy) setExpression: e] }
+			SEMICOLON?
+|		'%{' < ( !'%}' . )* > '%}'		{ (yy-addHeader yy yytext) }
+|		'%%' < .* >				{ (yy-addFooter yy yytext) }
+
+expression=	s:sequence ( BAR t:sequence		{ (set s [s appendAlternate: t]) }
+			   )*				{ s }
+
+sequence=	p:prefix ( q:prefix			{ (set p [p appendSequence: q]) }
+			 )*				{ p }
+
+prefix=		AND   action				{ [yyPredicate withText: yytext] }
+|		AND s:suffix				{ [yyPeekFor with: s] }
+|		NOT s:suffix				{ [yyPeekNot with: s] }
+|		      suffix
+
+suffix=		p:primary ( QUESTION			{ [yyQuery with: p] }
+			  | STAR			{ [yyStar  with: p] }
+			  | PLUS			{ [yyPlus  with: p] }
+			  )?
+
+primary=	i:identifier				{ (set i [yyVariable withName: yytext rule: (yy-current yy)]) }
+			COLON identifier !EQUAL		{ [yyName withRule: (yy-findRule yy yytext) variable: i] }
+|		identifier !EQUAL			{ [yyName withRule: (yy-findRule yy yytext)] }
+|		OPEN expression CLOSE
+|		literal					{ [yyString withString: yytext] }
+|		class					{ [yyClass withString: yytext] }
+|		DOT					{ [yyDot new] }
+|		action					{ [yyAction withText: yytext rule: (yy-current yy)] }
+|		BEGIN					{ [yyPredicate withText: "(yyStart yy)"] }
+|		END					{ [yyPredicate withText: "(yyStop yy)"] }
+
+; Lexical syntax
+
+identifier=	< [-a-zA-Z_][-a-zA-Z_0-9]* > -
+
+literal=	[\'] < ( ![\'] char )* > [\'] -
+|		[\"] < ( ![\"] char )* > [\"] -
+
+class=		'[' < ( !']' range )* > ']' -
+
+range=		char '-' char | char
+
+char=		'\\' [abefnrtv'\"\[\]\\]
+|		'\\' [0-3][0-7][0-7]
+|		'\\' [0-7][0-7]?
+|		!'\\' .
+
+action=		'{' < ( !"}" .)* > '}' -
+
+EQUAL=		'=' -
+COLON=		':' -
+SEMICOLON=	';' -
+BAR=		'|' -
+AND=		'&' -
+NOT=		'!' -
+QUESTION=	'?' -
+STAR=		'*' -
+PLUS=		'+' -
+OPEN=		'(' -
+CLOSE=		')' -
+DOT=		'.' -
+BEGIN=		'<' -
+END=		'>' -
+
+-=		(space | comment)*
+space=		' ' | '\t' | end-of-line
+comment=	';' (!end-of-line .)* end-of-line
+end-of-line=	'\r\n' | '\n' | '\r'
+
+%%
+
+(require 'yy-compile)
+
+(define compile-peg
+  (lambda (stream output)
+    (let ((yy (yy-new stream)))
+      (while (yy-parse yy)
+	(or (yy-start yy) (set (yy-start yy) (yy-current yy))))
+      (printf "%d rules\n" (length (yy-rules yy)))
+      (yy-compile yy output)
+      (printf "parser written on %s\n" output))))
+
+(let ((files  [OrderedCollection new])
+      (argv   [OS arguments])
+      (output 0))
+  (let ((arg 0))
+    (while (and [argv notEmpty]
+		[(set arg [argv removeFirst]) ~= '"--"])
+      (if (and [arg = '"-o"] [argv notEmpty])
+	  (set output [argv removeFirst])
+	  (let ((file [File open: arg])
+		(stream [file readStream]))
+	    (or output (set output [arg , '".k"]))
+	    (compile-peg stream [output _stringValue])
+	    (set output 0))))))

@@ -1,0 +1,762 @@
+start=
+	- directive
+|	- external-declaration
+
+directive=
+	'#' ( !EOL . )* EOL
+
+EOL=
+	[\n\r]
+
+; A.1 Lexical grammar
+
+; A.1.1 Lexical elements
+
+; (6.4) token=
+; (6.4) preprocessing-token=
+
+; A.1.2 Keywords
+
+; (6.4.1)
+keyword=
+	auto | break | case | char | const | continue | default | do |
+	double | else | enum | extern | float | for | goto | if |
+	inline | int | long | register | restrict | return | short |
+	signed | sizeof | static | struct | switch | typedef | union |
+	unsigned | void | volatile | while | _Bool | _Complex |
+	_Imaginary
+
+; A.1.3 Identifiers
+
+; (6.4.2.1)
+identifier=
+	!keyword < [a-zA-Z_][a-zA-Z_0-9]* > -
+
+; (6.4.2.1)
+digit=
+	[0-9]
+
+; A.1.4 Universal character names
+
+; (6.4.3)
+universal-character-name=
+	'\\u' hex-quad
+|	'\\U' hex-quad hex-quad
+
+; (6.4.3)
+hex-quad=
+	hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+
+; A.1.5 Constants
+
+; (6.4.4)
+constant=
+	integer-constant -
+|	floating-constant -
+|	enumeration-constant -
+|	character-constant -
+
+; (6.4.4.1)
+integer-constant=
+	decimal-constant integer-suffix?
+|	octal-constant integer-suffix?
+|	hexadecimal-constant integer-suffix?
+
+; (6.4.4.1)
+decimal-constant=
+	nonzero-digit digit*
+
+; (6.4.4.1)
+octal-constant=
+	'0' octal-digit*
+
+; (6.4.4.1)
+hexadecimal-constant=
+	hexadecimal-prefix hexadecimal-digit+
+
+; (6.4.4.1)
+hexadecimal-prefix=
+	'0x'
+|	'0X'
+
+; (6.4.4.1)
+nonzero-digit=
+	[1-9]
+
+; (6.4.4.1)
+octal-digit=
+	[0-7]
+
+; (6.4.4.1)
+hexadecimal-digit=
+	[0-9a-fA-F]
+
+; (6.4.4.1)
+integer-suffix=
+	unsigned-suffix long-suffix?
+|	unsigned-suffix long-long-suffix
+|	long-suffix unsigned-suffix?
+|	long-long-suffix unsigned-suffix?
+
+; (6.4.4.1)
+unsigned-suffix=
+	[uU]
+
+; (6.4.4.1)
+long-suffix=
+	[lL]
+
+; (6.4.4.1)
+long-long-suffix=
+	'll'
+|	'LL'
+
+; (6.4.4.2)
+floating-constant=
+	decimal-floating-constant
+|	hexadecimal-floating-constant
+
+; (6.4.4.2)
+decimal-floating-constant=
+	fractional-constant exponent-part? floating-suffix?
+|	digit-sequence exponent-part floating-suffix?
+
+; (6.4.4.2)
+hexadecimal-floating-constant=
+	hexadecimal-prefix hexadecimal-fractional-constant binary-exponent-part floating-suffix?
+|	hexadecimal-prefix hexadecimal-digit-sequence binary-exponent-part floating-suffix?
+
+; (6.4.4.2)
+fractional-constant=
+	digit-sequence? '.' digit-sequence
+|	digit-sequence '.'
+
+; (6.4.4.2)
+exponent-part=
+	[eE] sign? digit-sequence
+
+; (6.4.4.2)
+sign=
+	[-+]
+
+; (6.4.4.2)
+digit-sequence=
+	digit+
+
+; (6.4.4.2)
+hexadecimal-fractional-constant=
+	hexadecimal-digit-sequence? '.' hexadecimal-digit-sequence
+|	hexadecimal-digit-sequence '.'
+
+; (6.4.4.2)
+binary-exponent-part=
+	[pP] sign? digit-sequence
+
+; (6.4.4.2)
+hexadecimal-digit-sequence=
+	hexadecimal-digit
+|	hexadecimal-digit-sequence hexadecimal-digit
+
+; (6.4.4.2)
+floating-suffix=
+	[flFL]
+
+; (6.4.4.3)
+enumeration-constant=
+	identifier
+
+; (6.4.4.4)
+character-constant=
+	'L'? ['] c-char-sequence ['] -
+
+; (6.4.4.4)
+c-char-sequence=
+	c-char
+|	c-char-sequence c-char
+
+; (6.4.4.4)
+c-char=
+	[^'\\\n\r]
+|	escape-sequence
+
+; (6.4.4.4)
+escape-sequence=
+	simple-escape-sequence
+|	octal-escape-sequence
+|	hexadecimal-escape-sequence
+|	universal-character-name
+
+; (6.4.4.4)
+simple-escape-sequence=
+	'\\'['"?\\abfnrtv]
+
+; (6.4.4.4)
+octal-escape-sequence=
+	'\\' octal-digit
+|	'\\' octal-digit octal-digit
+|	'\\' octal-digit octal-digit octal-digit
+
+; (6.4.4.4)
+hexadecimal-escape-sequence=
+	'\\x' hexadecimal-digit+
+
+; A.1.6 String literals
+
+; (6.4.5)
+string-literal=
+	'L'? '"' s-char* '"' -
+
+; (6.4.5)
+s-char=
+	[^"\\\n\r]
+|	escape-sequence
+
+; A.2 Phrase structure grammar
+
+; A.2.1 Expressions
+
+; (6.5.1)
+primary-expression=
+	identifier
+|	constant
+|	string-literal
+|	LPAREN expression RPAREN
+
+; # (6.5.2)
+; postfix-expression=
+; 	primary-expression
+; |	postfix-expression LBRACKET expression RBRACKET
+; |	postfix-expression LPAREN argument-expression-list? RPAREN
+; |	postfix-expression DOT identifier
+; |	postfix-expression ARROW identifier
+; |	postfix-expression PLUSPLUS
+; |	postfix-expression MINUSMINUS
+; |	LPAREN type-name RPAREN LBRACE initializer-list RBRACE
+; |	LPAREN type-name RPAREN LBRACE initializer-list COMMA RBRACE
+
+; (6.5.2)
+postfix-expression=
+	postfix-expression-head postfix-expression-tail*
+
+; (6.5.2)
+postfix-expression-head=
+	primary-expression
+|	LPAREN type-name RPAREN LBRACE initializer-list RBRACE
+|	LPAREN type-name RPAREN LBRACE initializer-list COMMA RBRACE
+
+; (6.5.2)
+postfix-expression-tail=
+	LBRACKET expression RBRACKET
+|	LPAREN argument-expression-list? RPAREN
+|	DOT identifier
+|	ARROW identifier
+|	PLUSPLUS
+|	MINUSMINUS
+
+; (6.5.2)
+argument-expression-list=
+	assignment-expression ( COMMA assignment-expression )*
+
+; (6.5.3)
+unary-expression=
+	postfix-expression
+|	PLUSPLUS unary-expression
+|	MINUSMINUS unary-expression
+|	unary-operator cast-expression
+|	sizeof unary-expression
+|	sizeof LPAREN type-name RPAREN
+
+; (6.5.3)
+unary-operator=
+	AMPERSAND
+|	STAR
+|	PLUS
+|	MINUS
+|	TILDE
+|	PLING
+
+; (6.5.4)
+cast-expression=
+	unary-expression
+|	LPAREN type-name RPAREN cast-expression
+
+; (6.5.5)
+multiplicative-expression=
+	cast-expression ( ( STAR | SLASH | PERCENT ) cast-expression )*
+
+; (6.5.6)
+additive-expression=
+	multiplicative-expression ( ( PLUS | MINUS ) multiplicative-expression )*
+
+; (6.5.7)
+shift-expression=
+	additive-expression ( ( LESSLESS | GREATERGREATER ) additive-expression )*
+
+; (6.5.8)
+relational-expression=
+	shift-expression ( ( LESSEQUAL | GREATEREQUAL | LESS | GREATER ) shift-expression )*
+
+; (6.5.9)
+equality-expression=
+	relational-expression ( ( EQUALEQUAL | PLINGEQUAL ) relational-expression )*
+
+; (6.5.10)
+AND-expression=
+	equality-expression ( AND equality-expression )*
+
+; (6.5.11)
+exclusive-OR-expression=
+	AND-expression ( HAT AND-expression )*
+
+; (6.5.12)
+inclusive-OR-expression=
+	exclusive-OR-expression ( BAR exclusive-OR-expression )*
+
+; (6.5.13)
+logical-AND-expression=
+	inclusive-OR-expression ( ANDAND inclusive-OR-expression )*
+
+; (6.5.14)
+logical-OR-expression=
+	logical-AND-expression ( BARBAR logical-AND-expression )*
+
+; (6.5.15)
+conditional-expression=
+	logical-OR-expression ( QUERY expression COLON conditional-expression )*
+
+; (6.5.16)
+assignment-expression=
+	unary-expression assignment-operator assignment-expression
+|	conditional-expression
+
+; (6.5.16)
+assignment-operator=
+	EQUAL
+|	STAREQUAL
+|	SLASHEQUAL
+|	PERCENTEQUAL
+|	PLUSEQUAL
+|	MINUSEQUAL
+|	LESSLESSEQUAL
+|	GREATERGREATEREQUAL
+|	ANDEQUAL
+|	HATEQUAL
+|	BAREQUAL
+
+; (6.5.17)
+expression=
+	assignment-expression ( COMMA assignment-expression )*
+
+; (6.6)
+constant-expression=
+	conditional-expression
+
+; A.2.2 Declarations
+
+; (6.7)
+declaration=
+	declaration-specifiers init-declarator-list? SEMICOLON
+
+; (6.7)
+declaration-specifiers=
+	storage-class-specifier declaration-specifiers?
+|	type-specifier declaration-specifiers?
+|	type-qualifier declaration-specifiers?
+|	function-specifier declaration-specifiers?
+
+; (6.7)
+init-declarator-list=
+	init-declarator ( COMMA init-declarator )*
+
+; (6.7)
+init-declarator=
+	declarator ( EQUAL initializer )?
+
+; (6.7.1)
+storage-class-specifier=
+	typedef
+|	extern
+|	static
+|	auto
+|	register
+
+; (6.7.2)
+type-specifier=
+	void
+|	char
+|	short
+|	int
+|	long
+|	float
+|	double
+|	signed
+|	unsigned
+|	_Bool
+|	_Complex
+|	_Imaginary
+|	struct-or-union-specifier
+|	enum-specifier
+|	typedef-name
+; extensions
+|	__signed
+|	__builtin_va_list
+
+; (6.7.2.1)
+struct-or-union-specifier=
+	struct-or-union identifier? LBRACE struct-declaration-list RBRACE
+|	struct-or-union identifier
+
+; (6.7.2.1)
+struct-or-union=
+	struct
+|	union
+
+; (6.7.2.1)
+struct-declaration-list=
+	struct-declaration+
+
+; (6.7.2.1)
+struct-declaration=
+	specifier-qualifier-list struct-declarator-list SEMICOLON
+
+; (6.7.2.1)
+specifier-qualifier-list=
+	( type-specifier | type-qualifier )+
+
+; (6.7.2.1)
+struct-declarator-list=
+	struct-declarator ( COMMA struct-declarator )*
+
+; (6.7.2.1)
+struct-declarator=
+	declarator
+|	declarator? COLON constant-expression
+
+; (6.7.2.2)
+enum-specifier=
+	enum identifier? LBRACE enumerator-list RBRACE
+|	enum identifier? LBRACE enumerator-list COMMA RBRACE
+|	enum identifier
+
+; (6.7.2.2)
+enumerator-list=
+	enumerator ( COMMA enumerator )*
+
+; (6.7.2.2)
+enumerator=
+	enumeration-constant ( EQUAL constant-expression )?
+
+; (6.7.3)
+type-qualifier=
+	const
+|	restrict
+|	volatile
+
+; (6.7.4)
+function-specifier=
+	inline
+
+; (6.7.5)
+declarator=
+	pointer? direct-declarator
+
+; (6.7.5)
+; direct-declarator=
+; 	identifier
+; |	LPAREN declarator RPAREN
+; |	direct-declarator LBRACKET type-qualifier-list? assignment-expression? RBRACKET
+; |	direct-declarator LBRACKET static type-qualifier-list? assignment-expression RBRACKET
+; |	direct-declarator LBRACKET type-qualifier-list static assignment-expression RBRACKET
+; |	direct-declarator LBRACKET type-qualifier-list? STAR RBRACKET
+; |	direct-declarator LPAREN parameter-type-list RPAREN
+; |	direct-declarator LPAREN identifier-list? RPAREN
+
+direct-declarator=
+	direct-declarator-head direct-declarator-tail?
+
+direct-declarator-head=
+	identifier
+|	LPAREN declarator RPAREN
+
+direct-declarator-tail=
+	LBRACKET type-qualifier-list? assignment-expression? RBRACKET
+|	LBRACKET static type-qualifier-list? assignment-expression RBRACKET
+|	LBRACKET type-qualifier-list static assignment-expression RBRACKET
+|	LBRACKET type-qualifier-list? STAR RBRACKET
+|	LPAREN parameter-type-list RPAREN
+|	LPAREN identifier-list? RPAREN
+
+; (6.7.5)
+pointer=
+	( STAR type-qualifier-list? )+
+
+; (6.7.5)
+type-qualifier-list=
+	type-qualifier+
+
+; (6.7.5)
+parameter-type-list=
+	parameter-list ( COMMA ELLIPSIS )?
+
+; (6.7.5)
+parameter-list=
+	parameter-declaration ( COMMA parameter-declaration )*
+
+; (6.7.5)
+parameter-declaration=
+	declaration-specifiers declarator
+|	declaration-specifiers abstract-declarator?
+
+; (6.7.5)
+identifier-list=
+	identifier ( COMMA identifier )*
+
+; (6.7.6)
+type-name=
+	specifier-qualifier-list abstract-declarator?
+
+; (6.7.6)
+abstract-declarator=
+	pointer
+|	pointer? direct-abstract-declarator
+
+; # (6.7.6)
+; direct-abstract-declarator=
+; 	LPAREN abstract-declarator RPAREN
+; |	direct-abstract-declarator? LBRACKET assignment-expression? RBRACKET
+; |	direct-abstract-declarator? LBRACKET STAR RBRACKET
+; |	direct-abstract-declarator? LPAREN parameter-type-list? RPAREN
+
+; (6.7.6)
+direct-abstract-declarator=
+	direct-abstract-declarator-head direct-abstract-declarator-tail*
+
+; (6.7.6)
+direct-abstract-declarator-head=
+	LPAREN abstract-declarator RPAREN
+|	direct-abstract-declarator-tail
+
+; (6.7.6)
+direct-abstract-declarator-tail=
+	LBRACKET assignment-expression? RBRACKET
+|	LBRACKET STAR RBRACKET
+|	LPAREN parameter-type-list? RPAREN
+
+; (6.7.7)
+typedef-name=
+	&{0} identifier
+
+; (6.7.8)
+initializer=
+	assignment-expression
+|	LBRACE initializer-list RBRACE
+|	LBRACE initializer-list COMMA RBRACE
+
+; (6.7.8)
+initializer-list=
+	designation? initializer ( COMMA designation? initializer )*
+
+; (6.7.8)
+designation=
+	designator-list EQUAL
+
+; (6.7.8)
+designator-list=
+	designator+
+
+; (6.7.8)
+designator=
+	LBRACKET constant-expression RBRACKET
+|	DOT identifier
+
+; A.2.3 Statements
+
+; (6.8)
+statement=
+	labeled-statement
+|	compound-statement
+|	expression-statement
+|	selection-statement
+|	iteration-statement
+|	jump-statement
+
+; (6.8.1)
+labeled-statement=
+	identifier COLON statement
+|	case constant-expression COLON statement
+|	default COLON statement
+
+; (6.8.2)
+compound-statement=
+	LBRACE block-item-list? RBRACE
+
+; (6.8.2)
+block-item-list=
+	block-item+
+
+; (6.8.2)
+block-item=
+	declaration
+|	statement
+
+; (6.8.3)
+expression-statement=
+	expression? SEMICOLON
+
+; (6.8.4)
+selection-statement=
+	if LPAREN expression RPAREN statement
+|	if LPAREN expression RPAREN statement else statement
+|	switch LPAREN expression RPAREN statement
+
+; (6.8.5)
+iteration-statement=
+	while LPAREN expression RPAREN statement
+|	do statement while LPAREN expression RPAREN SEMICOLON
+|	for LPAREN expression? SEMICOLON expression? SEMICOLON expression? RPAREN statement
+|	for LPAREN declaration           expression? SEMICOLON expression? RPAREN statement
+
+; (6.8.6)
+jump-statement=
+	goto identifier SEMICOLON
+|	continue SEMICOLON
+|	break SEMICOLON
+|	return expression? SEMICOLON
+
+; A.2.4 External definitions
+
+; (6.9)
+translation-unit=
+	external-declaration
+|	translation-unit external-declaration
+
+; (6.9)
+external-declaration=
+	function-definition
+|	declaration
+
+; (6.9.1)
+function-definition=
+	declaration-specifiers declarator declaration-list? compound-statement
+
+; (6.9.1)
+declaration-list=
+	declaration+
+
+;#######
+
+DOT=			'.' -
+ELLIPSIS=		'...' -
+STAR=			'*' -
+LBRACKET=		'[' -
+RBRACKET=		']' -
+LPAREN=			'(' -
+RPAREN=			')' -
+LBRACE=			'{' -
+RBRACE=			'}' -
+COLON=			':' -
+EQUAL=			'=' -
+COMMA=			',' -
+SEMICOLON=		';' -
+BAREQUAL=		'|=' -
+HATEQUAL=		'^=' -
+ANDEQUAL=		'&=' -
+GREATERGREATEREQUAL=	'>>=' -
+LESSLESSEQUAL=		'<<=' -
+MINUSEQUAL=		'-=' -
+PLUSEQUAL=		'+=' -
+PERCENTEQUAL=		'%=' -
+SLASHEQUAL=		'/=' -
+STAREQUAL=		'*=' -
+QUERY=			'?' -
+BARBAR=			'||' -
+ANDAND=			'&&' -
+BAR=			'|' -
+HAT=			'^' -
+AND=			'&' -
+PLINGEQUAL=		'!=' -
+EQUALEQUAL=		'==' -
+GREATEREQUAL=		'>=' -
+LESSEQUAL=		'<=' -
+GREATER=		'>' -
+LESS=			'<' -
+GREATERGREATER=		'>>' -
+LESSLESS=		'<<' -
+PERCENT=		'%' -
+SLASH=			'/' -
+PLING=			'!' -
+TILDE=			'~' -
+MINUS=			'-' -
+PLUS=			'+' -
+AMPERSAND=		'&' -
+MINUSMINUS=		'--' -
+PLUSPLUS=		'++' -
+ARROW=			'->' -
+
+inline=		'inline'	&[^a-zA_Z0-9_] -
+volatile=	'volatile'	&[^a-zA_Z0-9_] -
+restrict=	'restrict'	&[^a-zA_Z0-9_] -
+const=		'const'		&[^a-zA_Z0-9_] -
+enum=		'enum'		&[^a-zA_Z0-9_] -
+union=		'union'		&[^a-zA_Z0-9_] -
+struct=		'struct'	&[^a-zA_Z0-9_] -
+_Imaginary=	'_Imaginary'	&[^a-zA_Z0-9_] -
+_Complex=	'_Complex'	&[^a-zA_Z0-9_] -
+_Bool=		'_Bool'		&[^a-zA_Z0-9_] -
+unsigned=	'unsigned'	&[^a-zA_Z0-9_] -
+signed=		'signed'	&[^a-zA_Z0-9_] -
+double=		'double'	&[^a-zA_Z0-9_] -
+float=		'float'		&[^a-zA_Z0-9_] -
+long=		'long'		&[^a-zA_Z0-9_] -
+int=		'int'		&[^a-zA_Z0-9_] -
+short=		'short'		&[^a-zA_Z0-9_] -
+char=		'char'		&[^a-zA_Z0-9_] -
+void=		'void'		&[^a-zA_Z0-9_] -
+register=	'register'	&[^a-zA_Z0-9_] -
+auto=		'auto'		&[^a-zA_Z0-9_] -
+static=		'static'	&[^a-zA_Z0-9_] -
+extern=		'extern'	&[^a-zA_Z0-9_] -
+typedef=	'typedef'	&[^a-zA_Z0-9_] -
+return=		'return'	&[^a-zA_Z0-9_] -
+break=		'break'		&[^a-zA_Z0-9_] -
+continue=	'continue'	&[^a-zA_Z0-9_] -
+goto=		'goto'		&[^a-zA_Z0-9_] -
+for=		'for'		&[^a-zA_Z0-9_] -
+do=		'do'		&[^a-zA_Z0-9_] -
+while=		'while'		&[^a-zA_Z0-9_] -
+switch=		'switch'	&[^a-zA_Z0-9_] -
+else=		'else'		&[^a-zA_Z0-9_] -
+if=		'if'		&[^a-zA_Z0-9_] -
+default=	'default'	&[^a-zA_Z0-9_] -
+case=		'case'		&[^a-zA_Z0-9_] -
+sizeof=		'sizeof'	&[^a-zA_Z0-9_] -
+
+__signed=		'__signed'		&[^a-zA_Z0-9_] -
+__builtin_va_list=	'__builtin_va_list'	&[^a-zA_Z0-9_] -
+
+-=		[ \t\n\r\f\v]*
+
+%%
+
+(define gettimeofday (dlsym "gettimeofday"))
+
+(syntax tv-sec	(lambda (node) `(long@ ,[node second]  )))
+(syntax tv-usec	(lambda (node) `(long@ ,[node second] 1)))
+
+(define %timeval (malloc 8))
+
+(define ms
+  (lambda ()
+    (gettimeofday %timeval 0)
+    (+ (* (tv-sec  %timeval) 1000)
+       (/ (tv-usec %timeval) 1000))))
+
+(let ((yy    (yy-new [StdIn readStream]))
+      (start 0)
+      (stop  0)
+      (count 0))
+  (set start (ms))
+  (while (yy-parse yy)
+    (incr count))
+  (set stop (ms))
+  (printf "%d declarations in %d ms\n" count (- stop start)))

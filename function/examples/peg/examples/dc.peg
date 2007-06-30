@@ -1,0 +1,42 @@
+%{
+(define atoi	(dlsym "atoi"))
+(define vars	(malloc (* 4 26)))
+%}
+
+Stmt	= - e:Expr EOL			{ (printf "%d\n" e) }
+	| ( !EOL . )* EOL		{ (printf "error\n") }
+
+Expr	= i:ID ASSIGN s:Sum		{ (set (long@ vars i) s) }
+	| s:Sum
+
+Sum	= l:Product
+		( PLUS  r:Product	{ (set l (+ l r)) }
+		| MINUS r:Product	{ (set l (- l r)) }
+		)*
+
+Product	= l:Value
+		( TIMES  r:Value	{ (set l (* l r)) }
+		| DIVIDE r:Value	{ (set l (/ l r)) }
+		)*
+
+Value	= i:NUMBER			{ (atoi yytext) }
+	| i:ID !ASSIGN			{ (long@ vars i) }
+	| OPEN i:Expr CLOSE
+
+NUMBER	= < [0-9]+ >	-		{ (atoi yytext) }
+ID	= < [a-z]  >	-		{ (- (char@ yytext) $a) }
+ASSIGN	= '='		-
+PLUS	= '+'		-
+MINUS	= '-'		-
+TIMES	= '*'		-
+DIVIDE	= '/'		-
+OPEN	= '('		-
+CLOSE	= ')'		-
+
+-	= [ \t]*
+EOL	= '\n' | '\r\n' | '\r' | ';'
+
+%%
+
+(while (yy-parse (yy-new [[StdIn readStream] prompt: '">"])))
+(printf "\n")

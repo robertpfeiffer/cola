@@ -1,0 +1,307 @@
+; A 'syntax-directed interpreter' (all execution is a side-effect of parsing).
+; Inspired by Dennis Allison's original Tiny BASIC grammar, circa 1975.
+; 
+; Copyright (c) 2007 by Ian Piumarta
+; All rights reserved.
+; 
+; Permission is hereby granted, free of charge, to any person obtaining a
+; copy of this software and associated documentation files (the 'Software'),
+; to deal in the Software without restriction, including without limitation
+; the rights to use, copy, modify, merge, publish, distribute, and/or sell
+; copies of the Software, and to permit persons to whom the Software is
+; furnished to do so, provided that the above copyright notice(s) and this
+; permission notice appear in all copies of the Software.  Acknowledgement
+; of the use of this Software in supporting documentation would be
+; appreciated but is not required.
+; 
+; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+; 
+; Last edited: 2007-05-21 13:43:09 by piumarta on emilia
+
+%{
+(syntax line-number	(lambda (node) `(long@ ,[node second]  )))
+(syntax line-length	(lambda (node) `(long@ ,[node second] 1)))
+(syntax line-source	(lambda (node) `(long@ ,[node second] 2)))
+(syntax line_sizeof	(lambda (node) '12))
+
+(syntax lines-at	(lambda (node) `(+ lines (* (line_sizeof) ,[node second]))))
+
+(define lines 0)
+(define numLines 0)
+(define pc -1)
+(define epc -1)
+(define batch 0)
+
+(define stack (malloc 4906))
+(define sp 0)
+
+(define variables (malloc (* 4 26)))
+
+(define accept 0)	; forward
+(define saveFile 0)	; forward
+(define loadFile 0)	; forward
+(define typeFile 0)	; forward
+(define input 0)	; forward
+(define findLine 0)	; forward
+
+(define help 0)		; forward
+(define warning 0)	; forward
+
+(define atoi		(dlsym "atoi"))
+(define system		(dlsym "system"))
+(define fopen		(dlsym "fopen"))
+(define fdopen		(dlsym "fdopen"))
+(define fclose		(dlsym "fclose"))
+(define fgetc		(dlsym "fgetc"))
+(define fgets		(dlsym "fgets"))
+(define fprintf		(dlsym "fprintf"))
+(define fscanf		(dlsym "fscanf"))
+(define perror		(dlsym "perror"))
+(define strcasecmp	(dlsym "strcasecmp"))
+(define gettimeofday	(dlsym "gettimeofday"))
+
+(define ms 0)
+%}
+
+line = - s:statement CR
+|      - n:number < ( !CR . )* CR >			{ (accept n yytext) }
+|      - CR
+|      - < ( !CR . )* CR >				{ (set epc pc)  (warning "syntax error") }
+|      - !.						{ (exit 0) }
+
+statement = 'print'- expr-list
+|           'if'- e1:expression r:relop e2:expression	{ (if (not (r e1 e2)) (set (yy-thunkpos yy) 0)) }
+		'then'- statement
+|           'goto'- e:expression			{ (set epc pc)  (if (< (set pc (findLine e 0)) 0) (warning "no such line")) }
+|           'input'- var-list
+|           'let'- v:var EQUAL e:expression		{ (set (long@ variables v) e) }
+|           'gosub'- e:expression			{ (set epc pc)
+							  (if (< sp 1024)
+							      (let ()
+							        (set (long@ stack sp) pc)
+							        (incr sp)
+							        (set pc (findLine e 0)))
+							      (warning "too many gosubs"))
+							  (if (< pc 0) (warning "no such line")) }
+|           'return'-					{ (set epc pc)  (if (< (set pc (if sp (long@ stack (incr sp -1)) -1)) 0) (warning "no gosub")) }
+|           'clear'-					{ (while numLines (accept (line-number lines) "\n")) }
+|           'list'-					{ (for (i 0 1 (- numLines 1))
+							    (printf "%5d %s" (line-number (lines-at i)) (line-source (lines-at i)))) }
+|           'run'- s:string				{ (loadFile s)  (set pc 0) }
+|           'run'-					{ (set pc 0) }
+|           'end'-					{ (set pc -1)  (if batch (exit 0)) }
+|           'rem'- ( !CR . )*
+|           ('bye'|'quit'|'exit')-			{ (exit 0) }
+|           'save'- s:string				{ (saveFile s) }
+|           'load'- s:string				{ (loadFile s) }
+|           'type'- s:string				{ (typeFile s) }
+|           'dir'-					{ (system "ls *.bas") }
+|           'help'-					{ (printf "%s" help) }
+
+expr-list = ( e:string					{ (printf "%s" e) }
+            | e:expression				{ (printf "%d" e) }
+            )? ( COMMA ( e:string			{ (printf "%s" e) }
+                       | e:expression			{ (printf "%d" e) }
+                       )
+               )* ( COMMA
+	          | !COMMA				{ (printf "\n") }
+		  )
+
+var-list = v:var					{ (set (long@ variables v) (input)) }
+           ( COMMA v:var				{ (set (long@ variables v) (input)) }
+           )*
+
+expression = ( PLUS? l:term
+             | MINUS l:term				{ (set l (- l)) }
+             ) ( PLUS  r:term				{ (set l (+ l r)) }
+               | MINUS r:term				{ (set l (- l r)) }
+               )*					{ l }
+
+term = l:factor ( STAR  r:factor			{ (set l (* l r)) }
+                | SLASH r:factor			{ (set l (/ l r)) }
+                )*					{ l }
+
+factor = number
+|        'time' -					{ (ms) }
+|        v:var						{ (long@ variables v) }
+|        OPEN expression CLOSE
+
+var = < [a-z] > -					{ (- (char@ yytext) $a) }
+
+number = < digit+ > -					{ (atoi yytext) }
+
+digit = [0-9]
+
+string = '\"' < ( !'\"' . )* > '\"' -			{ yytext }
+
+relop = '<=' -						{ (lambda (l r) (<= l r)) }
+|       '<>' -						{ (lambda (l r) (!= l r)) }
+|       '<'  -						{ (lambda (l r) (<  l r)) }
+|       '>=' -						{ (lambda (l r) (>= l r)) }
+|       '>'  -						{ (lambda (l r) (>  l r)) }
+|       '='  -						{ (lambda (l r) (== l r)) }
+
+EQUAL  = '=' -  CLOSE  = ')' -  OPEN   = '(' -
+SLASH  = '/' -  STAR   = '*' -  MINUS  = '-' -
+PLUS   = '+' -  COMMA  = ',' -
+
+- = [ \t]*
+
+CR = '\n' | '\r' | '\r\n'
+
+%%
+
+(define help "print <num>|<string> [, <num>|<string> ...] [,]
+if <expr> <|<=|<>|=|>=|> <expr> then <stmt>
+input <var> [, <var> ...]     let <var> = <expr>
+goto <expr>                   gosub <expr>
+end                           return
+list                          clear
+run [\"filename\"]              rem <comment...>
+dir                           type \"filename\"
+save \"filename\"               load \"filename\"
+bye|quit|exit                 help\n")
+
+(define %tv (malloc 8))
+
+(syntax tv-sec	(lambda (node) `(long@ ,[node second]  )))
+(syntax tv-usec	(lambda (node) `(long@ ,[node second] 1)))
+
+(define ms
+  (lambda ()
+    (gettimeofday %tv 0)
+    (+ (* (tv-sec  %tv) 1000)
+       (/ (tv-usec %tv) 1000))))
+
+(define warning
+  (lambda (fmt a b c)
+    (if (> epc 0)
+	(printf "\nline %d: %s" (line-number (lines-at (- epc 1))) (line-source (lines-at (- epc 1))))
+	(printf "\n"))
+    (printf fmt a b c)
+    (printf "\n")
+    (set epc (set pc -1))))
+
+(define maxLines 0)
+
+(define findLine
+  (lambda (n create)
+    (let ((lo 0) (hi (- numLines 1)))
+      (while (<= lo hi)
+	(let ((mid (/ (+ lo hi) 2))
+	      (lno (line-number (lines-at mid))))
+	  (if (> lno n)
+	      (set hi (- mid 1))
+	      (if (< lno n)
+		  (set lo (+ mid 1))
+		  (return mid)))))
+      (if create
+	  (let ()
+	    (if (== numLines maxLines)
+		(let ()
+		  (incr maxLines maxLines)
+		  (set lines (realloc lines (* (line_sizeof) maxLines)))))
+	    
+	    (if (< lo numLines)
+		(memmove (lines-at (+ lo 1))
+			 (lines-at lo)
+			 (* (line_sizeof) (- numLines lo))))
+	    (incr numLines)
+	    (set (line-number (lines-at lo)) n)
+	    (set (line-source (lines-at lo)) 0)
+	    (return lo))))
+    -1))
+
+(define accept
+  (lambda (n s)
+    (if (< (char@ s) 32)
+	(let ((lno (findLine n 0)))	; delete
+	  (if (>= lno 0)
+	      (let ()
+		(if (< lno (- numLines 1))
+		    (memmove (lines-at lno)
+			     (lines-at (+ lno 1))
+			     (* (line_sizeof) (- numLines lno 1))))
+		(incr numLines -1))))
+	(let ((lno (findLine n 1)))	; insert
+	  (if (line-source (lines-at lno)) (free (line-source (lines-at lno))))
+	  (set (line-length (lines-at lno)) (strlen s))
+	  (set (line-source (lines-at lno)) (strdup s))))))
+
+(define %extend (malloc 1024))
+
+(define extend
+  (lambda (name)
+    (let ((len (strlen name)))
+      (sprintf %extend "%s%s" name (if (or (< len 4) (strcasecmp ".bas" (+ name len -4))) ".bas" ""))
+      %extend)))
+
+(define saveFile
+  (lambda (name)
+    (let ((f (fopen (set name (extend name)) "w")))
+      (if f
+	  (let ()
+	    (for (i 0 1 (- numLines 1))
+	      (fprintf f "%d %s" (line-number (lines-at i)) (line-source (lines-at i))))
+	    (fclose f))
+	  (perror name)))))
+
+(define %lineText (malloc 1024))
+
+(define loadFile
+  (lambda (name)
+    (let ((f (fopen (set name (extend name)) "r")))
+      (if f
+	  (let ((lineNumber 0))
+	    (while (and (== 1 (fscanf f " %d " (addrof lineNumber)))
+			(fgets %lineText 1024 f))
+	      (accept lineNumber %lineText))
+	    (fclose f))
+	  (perror name)))))
+
+(define typeFile
+  (lambda (name)
+    (let ((f (fopen (set name (extend name)) "r")))
+      (if f
+	  (let ((c 0) (d 0))
+	    (while (>= (set c (fgetc f)) 0)
+	      (printf "%c" (set d c)))
+	    (fclose f)
+	    (if (and (!= $\n d) (!= $\r d))
+		(printf "\n")))
+	  (perror name)))))
+
+(define %line  (malloc 32))
+(define %stdin (fdopen 0 "r"))
+
+(define input
+  (lambda ()
+    (fgets %line 32 %stdin)
+    (atoi %line)))
+
+(set lines (malloc (* (line_sizeof) (set maxLines 32))))
+(set numLines 0)
+
+(if [[OS arguments] notEmpty]
+    (let ()
+      (set batch 1)
+      (while [[OS arguments] notEmpty]
+	(loadFile [[[OS arguments] removeFirst] _stringValue]))
+      (set pc 0)))
+
+(define myrefill
+  (lambda (yy)
+    (if (and (>= pc 0) (< pc numLines))
+	(let ((line   (lines-at pc))
+	      (length (line-length line)))
+	  (incr pc)
+	  (buffer-full-check (yy-buf yy) (+ length (yy-limit yy)) (yy-buflen yy))
+	  (memcpy (+ (yy-buf yy) (yy-pos yy))
+		  (line-source line)
+		  (line-length line))
+	  (incr (yy-limit yy) (line-length line)))
+	(yyrefill yy))))
+
+(let ((yy (yy-new [StdIn readStream])))
+  (set (yy-refill yy) myrefill)
+  (while (yy-parse yy)))
