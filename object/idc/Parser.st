@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-06-06 17:14:37 by piumarta on emilia.local
+  Last edited: 2007-06-29 13:06:51 by piumarta on emilia.lax04.mtt
 "
 
 { import: Scanner }
@@ -28,6 +28,7 @@
 { import: FloatNode }
 { import: CharacterNode }
 { import: VariableNode }
+{ import: VarargNode }
 { import: SendNode }
 { import: AssignmentNode }
 { import: ReturnNode }
@@ -176,6 +177,11 @@ Parser parsePrimary
     type == #'['
 	ifTrue:
 	    [^self scan; parseBlock].
+    type == #ellipsis
+	ifTrue:
+	    [node := VarargNode withPosition: self position.
+	     self scan.
+	     ^node].
     self note: 'PRIMARY-2'.
     node := self parseLiteralP.
     self note: 'PRIMARY-3'.
@@ -281,8 +287,8 @@ Parser parseSequence: block
 				      ifFalse: [((type == #binary and: [token contents = '^'])
 						     ifTrue:  [ReturnNode withValue: (self scan; parseExpression) position: self position]
 						     ifFalse: [self parseExpression])]).
-	     (type == #'.' or: [type == #']' or: [type == #ellipsis]]) ifFalse: [self error: '''.'' or '']'' expected in block'].
-	     [type == #'.' or: [type == #ellipsis]] whileTrue: [self scan].
+	     (type == #'.' or: [type == #']' "or: [type == #ellipsis]"]) ifFalse: [self error: '''.'' or '']'' expected in block'].
+	     [type == #'.' "or: [type == #ellipsis]"] whileTrue: [self scan].
 	     (block lastStatement isReturnNode and: [type ~~ #']']) ifTrue: [self error: ''']'' expected at end of block']].
     self note: 'SEQ-4'.
     self scan.

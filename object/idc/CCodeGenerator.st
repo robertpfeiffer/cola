@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 12:04:48 by piumarta on emilia
+  Last edited: 2007-06-29 13:24:24 by piumarta on emilia.lax04.mtt
 "
 
 { import: CodeGenerator }
@@ -537,6 +537,11 @@ CCodeGenerator makeBlock:   tag
 
 "stack: loading and storing variables"
 
+CCodeGenerator loadVararg: va location: loc
+[
+    self gen: '  '; genLocation: loc; genl: '= va_arg(ap, oop);'.
+]
+
 CCodeGenerator loadGlobal: var location: loc
 [
     self gen: '  '; genLocation: loc; gen: '= '; genVariable: var name; genl: ';'.
@@ -775,6 +780,12 @@ CCodeGenerator genState: scopeTag at: offset	[ self genState: scopeTag; gen: '['
 CCodeGenerator declareVariadic: arg
 [
     self gen: '  '; genl: 'va_list ap;'.
+    self gen: '  va_start(ap, '; genVariable: arg name; genl: ');'.
+]
+
+CCodeGenerator endVariadic
+[
+    self genl: '  va_end(ap);'.
 ]
 
 CCodeGenerator declareTemporary: tmp

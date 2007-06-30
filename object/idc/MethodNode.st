@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 12:08:10 by piumarta on emilia
+  Last edited: 2007-06-29 13:11:19 by piumarta on emilia.lax04.mtt
 "
 
 { import: BlockNode }
@@ -57,7 +57,7 @@ MethodNode encode: encoder
     arguments addFirst: 'stateful_self'.
     arguments   := arguments   collect: [:arg | encoder declareArgument:  arg position: position].
     temporaries := temporaries collect: [:tmp | encoder declareTemporary: tmp position: position].
-    variadic ifTrue: [temporaries addLast: (encoder declareVararg: 'nextArgument' position: position)].
+    "variadic ifTrue: [temporaries addLast: (encoder declareVararg: 'nextArgument' position: position)]."
     arguments second tied: arguments first.	"<--------"
     type slots do: [:slot | encoder declareSlot: slot position: position type: type receiver: arguments first].	"<--------"
     "implicit ^self"
@@ -96,18 +96,20 @@ MethodNode genImplementation: gen
     "declarations"
     temporaries do: [:var | var isFree ifFalse: [gen declareTemporary: var]].
     gen declareStack: scope stackSize.
-    variadic ifTrue: [gen declareVariadic: arguments last].
     scope hasNLR ifTrue: [gen declareNonLocalReturn].
+    variadic ifTrue: [gen declareVariadic: arguments last].
     "definitions"
     temporaries do: [:var | var isFree ifFalse: [gen defineTemporary: var]].
     gen defineStack: scope stackSize.
     arguments   do: [:var | var isFree ifTrue: [gen saveArgument:  var]].
+    "
     variadic
 	ifTrue:
 	   [| var |
 	    var := temporaries last.
 	    gen defineVariadic: arguments last.
 	    var isFree ifTrue: [gen saveTemporary: var]].
+    "
     scope hasNLR ifTrue: [gen defineNonLocalReturn].
     "body"
     gen debugLine: position.

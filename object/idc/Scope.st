@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-01-13 14:40:56 by piumarta on emilia.local
+  Last edited: 2007-06-29 13:31:27 by piumarta on emilia.lax04.mtt
 "
 
 "I represent a lexical scope (a block) and any local state defined within it."
@@ -37,6 +37,7 @@ Scope : Dictionary (
     exportFlag		"true if any of my state appears free in an enclosed scope"
     importFlag		"true if any state from an enclosing scope appears free in me"
     nlrFlag		"true if a nonlocal return traverses my lexical level"
+    hasVarargs		"true if the scope has an active va_list"
 )
 
 
@@ -55,6 +56,7 @@ Scope initialize
     exportFlag := false.
     importFlag := false.
     nlrFlag := false.
+    hasVarargs := false.
 ]
 
 Scope withOuter: aScope
@@ -96,6 +98,9 @@ Scope noteNLR
     "propagate up to outermost method"
     outer notNil ifTrue: [outer noteNLR].
 ]
+
+Scope hasVarargs: aBool		[  hasVarargs := aBool ]
+Scope hasVarargs		[ ^hasVarargs ]
 
 Scope stateVectorSize
 [

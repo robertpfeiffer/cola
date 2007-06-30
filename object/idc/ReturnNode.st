@@ -1,5 +1,5 @@
 "							-*- Smalltalk -*-
-  Copyright (c) 2005 Ian Piumarta
+  Copyright (c) 2005-2007 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -14,12 +14,12 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:29:01 by piumarta on emilia
+  Last edited: 2007-06-29 13:32:01 by piumarta on emilia.lax04.mtt
 "
 
 { import: ParseNode }
 
-ReturnNode : ParseNode ( value nonLocal )
+ReturnNode : ParseNode ( value nonLocal variadic )
 
 ParseNode isReturnNode	[ ^false ]
 ReturnNode isReturnNode	[ ^true ]
@@ -29,18 +29,21 @@ ReturnNode withValue: aNode position: aPosition
     self := self withPosition: aPosition.
     value := aNode.
     nonLocal := false.
+    variadic := false.
 ]
 
 ReturnNode encode: encoder
 [
     location := value encode: encoder; location.
     "explicit return from deeper than method level -> NLR"
-    (nonLocal := encoder level > 1) ifTrue: [encoder noteNLR]
+    (nonLocal := encoder level > 1) ifTrue: [encoder noteNLR].
+    variadic := encoder scope hasVarargs.
 ]
 
 ReturnNode generate: gen
 [
     value generate: gen.
+    variadic ifTrue: [gen endVariadic].
     gen debugReturn: position.
     nonLocal ifTrue: [gen genNonLocalReturn: value] ifFalse: [gen genReturn: value].
 ]
@@ -60,6 +63,7 @@ LocalReturnNode : ReturnNode ()
 LocalReturnNode encode: encoder
 [
     value := value encode: encoder.
+    variadic := encoder scope hasVarargs.
 ]
 
 LocalReturnNode println: indent

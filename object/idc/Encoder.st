@@ -1,5 +1,5 @@
 "							-*- Smalltalk -*-
-  Copyright (c) 2005 Ian Piumarta
+  Copyright (c) 2005-2007 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-09-30 12:46:55 by piumarta on emilia.local
+  Last edited: 2007-06-29 13:31:36 by piumarta on emilia.lax04.mtt
 "
 
 { import: Object }
@@ -35,7 +35,7 @@ Encoder : Object (
     selectors		"Dictionary mapping plain selector names onto mangled names"
     literals		"OrderedCollection of all literals used in this scope"
     literalMap		"Dictionary mapping LiteralNodes values onto their unique tags"
-    literalTag		"the next unique tag to assign to a literl"
+    literalTag		"the next unique tag to assign to a literal"
     methodType		"PrototypeNode of the method (inside a method defn) or nil (outside)"
     specialEncoders	"Dictionary mapping macro/arithmetic/special selectors to specific encoding methods"
     implementations	"Dictionary mapping type names onto Dictionary of selectors onto implementation counts"
@@ -178,11 +178,12 @@ Encoder endBlock
     ^scope
 ]
 
-Encoder beginMethod: methodNode in: typeNode
+Encoder beginMethod: aMethodNode in: typeNode
 [
     self beginBlock.
-    self addSelector: methodNode selector.	"make sure we have a selector to install"
+    self addSelector: aMethodNode selector.	"make sure we have a selector to install"
     methodType := typeNode.
+    scope hasVarargs: aMethodNode isVariadic.
     ^scope.
 ]
 
