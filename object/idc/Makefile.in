@@ -43,6 +43,7 @@ FILES		= $(BIN)ArgumentVariableNode.o \
 		  $(BIN)StringNode.o \
 		  $(BIN)SymbolNode.o \
 		  $(BIN)TemporaryVariableNode.o \
+		  $(BIN)VarargNode.o \
 		  $(BIN)VariableNode.o \
 		  $(BIN)WordArrayNode.o
 
