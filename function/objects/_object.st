@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 22:49:02 by piumarta on emilia
+  Last edited: 2007-07-03 11:32:35 by piumarta on emilia.lax04.mtt
 "
 
 { external }
@@ -118,3 +118,5 @@ _object performMethod_: _aMethod with: a with: b
 {
     return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a, v_b);
 }
+
+_vtable delegate		[ ^delegate ]
