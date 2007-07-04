@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-07-03 13:07:17 by piumarta on emilia.lax04.mtt
+;;; Last edited: 2007-07-03 13:11:04 by piumarta on emilia.lax04.mtt
 
 (define __dlsym _dlsym)
 
@@ -124,7 +124,7 @@
 
 (define CokeScanner		(import "CokeScanner"))
 
-(define old-open-bracket-reader
+(define open-bracket-reader
   (lambda (_closure _self self stream)
     (send 'next stream)
     (let ((node (send 'read:list:delimited: self stream Expression '93))
@@ -152,51 +152,6 @@
 	      ;(send 'print: StdOut (send 'contents message))
 	      ;(send 'cr StdOut)
 	      (send 'contents message)))))))
-
-(define open-bracket-generic-reader
-  (lambda (self node)
-    (let ((list (send 'withAll: OrderedCollection node)))
-      (if (< (send 'size list) '2)
-	  (send 'errorSyntax: self node)
-	  (let ((receiver  (send 'removeFirst list))
-		(selector  (send 'removeFirst list))
-		(arguments (send 'new OrderedCollection)))
-	    (or (send 'isSymbol selector)
-		(send 'errorSyntax: self node))
-	    (and (send 'notEmpty list)
-		 (send 'addLast: arguments (send 'removeFirst list)))
-	    (while (and (>= (send 'size list) 2)
-			(send 'isKeyword selector)
-			(send 'isKeyword (send 'first list)))
-	      (set selector (send ', selector (send 'removeFirst list)))
-	      (send 'addLast: arguments (send 'removeFirst list)))
-	    (send 'addAllLast: arguments list)
-	    (let ((message (send 'on: WriteStream (send 'new: Expression '4))))
-	      (send 'nextPut: message 'send)
-	      (send 'nextPut: message (send 'with:with: Expression 'quote selector))
-	      (send 'nextPut: message receiver)
-	      (send 'nextPutAll: message arguments)
-	      ;;(send 'print: StdOut (send 'contents message))
-	      ;;(send 'cr StdOut)
-	      (send 'contents message)))))))
-
-(define open-bracket-unary-reader
-  (lambda (self node)
-    (let ((receiver (send 'first node))
-	  (selector (send 'second node)))
-      (send 'with:with:with: Expression
-	    'send
-	    (send 'with:with: Expression 'quote selector)
-	    receiver))))
-
-(define open-bracket-reader
-  (lambda (_closure _self self stream)
-    (send 'next stream)
-    (let ((node (send 'read:list:delimited: self stream Expression '93)))
-      ((if (== '2 (send 'size node))
-	   open-bracket-unary-reader
-	   open-bracket-generic-reader)
-         self node))))
 
 (define close-bracket-reader
   (lambda (_closure _self self stream)
