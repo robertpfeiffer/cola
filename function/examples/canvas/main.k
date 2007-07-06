@@ -12,7 +12,7 @@
 (load "point.k")
 (load "polygon.k")
 (load "text.k")
-(load "canvas.k")
+(load "canvas-cairo-xlib.k")
 
 (define polygon
   (let ((p     (XPolygon-new 11))
@@ -65,11 +65,12 @@
     (Canvas-fillStyle c "black")
     (let ((box (Canvas-createTextBox c text 0 (strlen text))))
       (Canvas-renderText c box pos-x pos-y)
-      (Canvas-setLineWidth c 1)
+      (Canvas-setLineWidth c 2)
       (Canvas-fillStyle c "red")
       (let ((r (Text-getBounds box 2)))
 	(XRectangle-translate-xy r pos-x pos-y)
-	(Canvas-drawEllipse c (XRectangle-x r) (XRectangle-y r) (XRectangle-width r) (XRectangle-height r))))
+	(Canvas-drawEllipse c (XRectangle-x r) (XRectangle-y r) (XRectangle-width r) (XRectangle-height r))
+	))
     (Canvas-repaint c)))
 
 (define mouse-x  0)

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 10:34:55 by piumarta on emilia
+  Last edited: 2007-07-05 14:02:44 by piumarta on emilia.lax04.mtt
 "
 
 { import: st80 }
@@ -45,6 +45,8 @@
 	parse: Smalltalk arguments startingAt: 0.
     files size < 1 ifTrue: [Compiler error: 'no source file specified'].
     files size > 1 ifTrue: [Compiler error: 'multiple source files specified'].
+    "search '.' for included files first, unless order specified explicitly"
+    (options searchPaths includes: '.') ifFalse: [options searchPaths addFirst: '.'].
     "run the compiler"
 "   ('compiling ', files first printString, ' to ', outputPath printString, ' searching ', options searchPaths printString) putln."
     Compiler

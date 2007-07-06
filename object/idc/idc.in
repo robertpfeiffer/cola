@@ -228,7 +228,7 @@ ccflags="$ccflags -I${prefix}"
 
 if [ ! -z "$infile" ]; then
   $verbose
-  $run ${prefix}idc1 -I$prefix -I. $idopts $idflags $infile -o $ccfile &&
+  $run ${prefix}idc1 -I$prefix $idopts $idflags $infile -o $ccfile &&
   $run $cc -I$prefix/include $ccflags $ccopts $ccfile -o $outfile $ldflags $ldobjs $idlibs $ldlibs &&
   $run $cckill $ccfile
 else

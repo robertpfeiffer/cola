@@ -1,4 +1,4 @@
-IDC		= idc $(OFLAGS)
+IDC		= ./idc $(OFLAGS)
 OFLAGS		= -g
 IDFLAGS		= -k -I../objects
 

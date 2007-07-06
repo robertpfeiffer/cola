@@ -52,6 +52,7 @@
       (XChangeWindowAttributes dpy win 2048 xwa)
       (XSetWindowBackground dpy win -1)
       (XMapWindow dpy win)
+      (free xwa)
       (set (Canvas-dpy        canv) dpy)
       (set (Canvas-win        canv) win)
       (set (Canvas-buf        canv) buf)

@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 10:36:09 by piumarta on emilia
+  Last edited: 2007-07-05 13:58:43 by piumarta on emilia.lax04.mtt
 "
 
 { import: Object }
@@ -46,7 +46,7 @@ CompilerOptions initialize
     taggedFlag := true.		"do generate inline tagged arithmetic operators"
     cacheLevel := 0.		"probe the global method cache at ever send site"
     executionModel := #native.	"generate sends on the C stack"
-    searchPaths add: '.'.	"look in '.' for included files"
+    "searchPaths add: '.'."	"look in '.' for included files"
 ]
 
 "BUG: this should all be in a Dictionary"
