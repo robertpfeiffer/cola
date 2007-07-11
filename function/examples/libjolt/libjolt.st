@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-26 08:54:27 by piumarta on emilia
+  Last edited: 2007-07-11 10:12:19 by piumarta on emilia.lax04.mtt
 "
 
 { import: Object }
@@ -88,6 +88,7 @@ Initialisation := ['
 (define File			(import "File"))
 (define ReadStream		(import "ReadStream"))
 (define WriteStream		(import "WriteStream"))
+(define OrderedCollection	(import "OrderedCollection"))
 (define String			(import "String"))
 (define StdIn			(import "StdIn"))
 (define StdOut			(import "StdOut"))
@@ -120,6 +121,42 @@ Initialisation := ['
 		       : 2))))
 	(Array__withParameters_ 0 send send params)))))
 
+(define open-bracket-reader
+  (lambda (_closure _self self stream)
+    (send \'next stream)
+    (let ((node (send \'read:list:delimited: self stream Expression \'93))
+	  (list (send \'withAll: OrderedCollection node)))
+      (if (< (send \'size list) \'2)
+	  (send \'errorSyntax: self node)
+	  (let ((receiver  (send \'removeFirst list))
+		(selector  (send \'removeFirst list))
+		(arguments (send \'new OrderedCollection)))
+	    (or (send \'isSymbol selector)
+		(send \'errorSyntax: self node))
+	    (and (send \'notEmpty list)
+		 (send \'addLast: arguments (send \'removeFirst list)))
+	    (while (and (>= (send \'size list) 2)
+			(send \'isKeyword selector)
+			(send \'isKeyword (send \'first list)))
+	      (set selector (send \', selector (send \'removeFirst list)))
+	      (send \'addLast: arguments (send \'removeFirst list)))
+	    (send \'addAllLast: arguments list)
+	    (let ((message (send \'on: WriteStream (send \'new: Expression \'4))))
+	      (send \'nextPut: message \'send)
+	      (send \'nextPut: message (send \'with:with: Expression \'quote selector))
+	      (send \'nextPut: message receiver)
+	      (send \'nextPutAll: message arguments)
+	      ;(send \'print: StdOut (send \'contents message))
+	      ;(send \'cr StdOut)
+	      (send \'contents message)))))))
+
+(define close-bracket-reader
+  (lambda (_closure _self self stream)
+    (send \'error:unexpected: self stream \'93)))
+
+(send \'readerAt:put: CokeScanner \'91 open-bracket-reader)
+(send \'readerAt:put: CokeScanner \'93 close-bracket-reader)
+
 (define herald
   (lambda (path)
     [StdErr nextPutAll: \'"; "]
@@ -130,10 +167,10 @@ Initialisation := ['
 
 (lambda (cString)
   (let ((string  [String value_: cString])
-        (scanner [CokeScanner on: [string readStream]])
+	(stream  [string readStream])
         (expr    0)
         (result  0))
-    (while (set expr [scanner next])
+    (while (set expr [CokeScanner read: stream])
       ;;[StdOut print: expr][StdOut cr]
       (set result [expr _eval]))
     result))
@@ -143,9 +180,9 @@ Jolt : Object ()
 
 Jolt initialise
 [
-    | scanner expr result |
-    scanner := CokeScanner on: Initialisation readStream.
-    [(expr := scanner next) isNil]
+    | stream expr result |
+    stream := Initialisation readStream.
+    [(expr := CokeScanner read: stream) isNil]
 	whileFalse:
 	   ["StdErr print: expr; cr."
 	    result := expr _eval.
