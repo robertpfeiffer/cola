@@ -1,4 +1,4 @@
-#include "libjolt.h"
+#include "jolt.h"
 
 typedef unsigned int pixel_t;
 typedef pixel_t (*pixop_t   )(pixel_t, pixel_t);
