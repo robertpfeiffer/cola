@@ -10,6 +10,7 @@ OBJEXT_O        = .o
 OBJEXT_SO       = .so
 
 ARCH		= $(shell $(IDC) -C arch)
+LDFLAGS		= $(shell $(IDC) -C LDFLAGS)
 
 LIBS		= $(JOLT)/jolt.a
 LDLIBS		= jest.a -lreadline
@@ -40,7 +41,7 @@ libjoltall.a : $(LIBS) libjolt.o
 	ar rcs libjoltall.a libjoltall.o
 
 test-libjolt : $(LIBS) libjoltall.a .FORCE
-	gcc test-libjolt.c libjoltall.a -lreadline -lm
+	gcc $(LDFLAGS) test-libjolt.c libjoltall.a -lreadline -lm
 	./a.out
 
 jest : jest.c libjolt.a jolt.h
