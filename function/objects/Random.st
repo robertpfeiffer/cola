@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:28:22 by piumarta on emilia
+  Last edited: 2007-07-10 11:44:38 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -54,4 +54,9 @@ Random nextValue
 Random nextInt: anInteger
 [
     ^(self next * anInteger) truncated
+]
+
+
+[
+    Random := Random new
 ]
