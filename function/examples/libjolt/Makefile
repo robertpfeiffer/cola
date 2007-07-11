@@ -40,7 +40,7 @@ libjoltall.a : $(LIBS) libjolt.o
 	ar rcs libjoltall.a libjoltall.o
 
 test-libjolt : $(LIBS) libjoltall.a .FORCE
-	gcc -u ___id__init__libjolt test-libjolt.c libjoltall.a -lreadline -lm
+	gcc test-libjolt.c libjoltall.a -lreadline -lm
 	./a.out
 
 jest : jest.c libjolt.a jolt.h

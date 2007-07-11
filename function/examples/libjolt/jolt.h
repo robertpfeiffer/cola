@@ -17,7 +17,7 @@
  * If you use this software in a product, an acknowledgment in the product
  * documentation would be appreciated but is not required.
  *
- * Last edited: 2007-03-26 08:53:24 by piumarta on emilia
+ * Last edited: 2007-07-11 10:49:14 by piumarta on emilia
  */
 
 #include <stdio.h>
@@ -79,6 +79,9 @@ static oop s_size_5f_value_5f_= 0;
 
 static oop v_String= 0;
 static oop v_Jolt= 0;
+
+extern oop __id__init__libjolt(void);
+static void *__libjolt_ref= __id__init__libjolt;
 
 oop __id__init__(void)
 {
