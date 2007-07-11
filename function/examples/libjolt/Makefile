@@ -11,9 +11,9 @@ OBJEXT_SO       = .so
 
 ARCH		= $(shell $(IDC) -C arch)
 LDFLAGS		= $(shell $(IDC) -C LDFLAGS)
+LDLIBS		= $(shell $(IDC) -C LDLIBS) jest.a -lreadline
 
 LIBS		= $(JOLT)/jolt.a
-LDLIBS		= jest.a -lreadline
 
 all : jest$(OBJEXT)
 
