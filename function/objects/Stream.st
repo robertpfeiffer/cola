@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:50:39 by piumarta on emilia
+  Last edited: 2007-07-11 10:28:53 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -196,14 +196,6 @@ ConsoleFileStream prompt: aString
     _prompt := aString _stringValue.
 ]
 
-{ include <readline/readline.h }
-{ include <readline/history.h }
-
-ConsoleFileStream _atexit
-{
-    write_history(".jolt-history");
-}
-
 ConsoleFileStream refill
 [
     | length _buffer _bytes |
@@ -212,23 +204,20 @@ ConsoleFileStream refill
         static int   live= 1;
         if (!live)
 	    { _return 0; }
-	if (buffer)
-	{
-	    free(buffer);
-	    buffer= 0;
-	}
+	if (!buffer)
+	    buffer= malloc(1024);
+	printf("%s", (char *)self->v__prompt);
+	fflush(stdout);
+	if (fgets(buffer, 1024, stdin))
+	    {
+		long len= strlen(buffer);
+		if (len && buffer[len - 1] == '\n')
+		    buffer[len - 1]= '\0';
+		v_length= (oop)((len + 1) << 1 | 1);
+		v__buffer= (oop)buffer;
+	    }
 	else
-	{
-	    using_history();
-	    stifle_history(1000);
-	    read_history(".jolt-history");
-	    atexit((void (*)(void))ConsoleFileStream___5fatexit);
-	}
-	buffer= readline((char *)self->v__prompt);
-	if (!buffer) { _return (oop)(live= 0); }
-	if (*buffer) add_history(buffer);
-	v_length= (oop)((strlen(buffer) + 1) << 1 | 1);
-	v__buffer= (oop)buffer;
+	    { _return (oop)(live= 0); }
     }.
     collection size < length ifTrue: [collection := collection new: length].
     _bytes := collection _bytes.
