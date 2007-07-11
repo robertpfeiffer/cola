@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-03 11:32:35 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-07-10 13:21:42 by piumarta on emilia.lax04.mtt
 "
 
 { external }
@@ -120,3 +120,5 @@ _object performMethod_: _aMethod with: a with: b
 }
 
 _vtable delegate		[ ^delegate ]
+
+_object _gcollect		{ _local_gc_gcollect(); }
