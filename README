@@ -1,7 +1,7 @@
 The static object compiler (codename Pepsi)
 -------------------------------------------
 
-To build and install, relative to this directory:
+To build and install relative to this directory:
 
     cd object
     make
@@ -15,13 +15,36 @@ Examples, relative to this directory:
 The dynamic function compiler (codename Jolt)
 ---------------------------------------------
 
-To build and install, relative to this directory:
+To build and install, after building Pepsi as above, relative to this
+directory:
 
     cd function
     make
     make test
 
 Examples forthcoming.
+
+
+The API library for 'embeddable Jolt' (libjolt)
+-----------------------------------------------
+
+To build and install, after building Pepsi and Jolt as above, relative
+to this directory:
+
+    cd function/examples/libjolt
+    make
+    make test
+    sudo make install
+
+Notes:
+
+- The final step will copy libjolt.a to /usr/lib and jolt.h to
+  /usr/include.  Edit the Makefile if you want them elsewhere.
+
+- Use the output of `idc -C LDFLAGS` and `idc -C LDLIBS` when linking
+  your program with this library; e.g:
+
+    gcc `idc -C LDFLAGS` program.c -ljolt `idc -C LDLIBS` -o program
 
 
 Resources
