@@ -36,9 +36,15 @@ libjolt.a : $(LIBS) libjolt.o
 	mv $@.new $@
 	nm $@ | fgrep __id__init__ | awk '{print "-u " $$3}' > libjolt.nm
 
-libjoltall.a : $(LIBS) libjolt.o
-	ld -r libjolt.o $(OBJECTS)/*.o $(MPINT)/*.o $(JOLT)/*.o $(OBJ)/gc.a $(OBJ)/libid.o -o libjoltall.o
+libjoltall.a : $(LIBS) libjolt.o libjolt/Compiler.o
+	ld -r libjolt.o $(OBJECTS)/*.o $(MPINT)/*.o libjolt/*.o $(OBJ)/gc.a $(OBJ)/libid.o -o libjoltall.o
 	ar rcs libjoltall.a libjoltall.o
+
+libjolt/Compiler.o :
+	test -d libjolt || mkdir libjolt
+	cp -p $(JOLT)/*.o libjolt/.
+	rm -f libjolt/main.o
+	rm -f libjolt/readline.o
 
 test-libjolt : $(LIBS) libjoltall.a .FORCE
 	gcc $(LDFLAGS) test-libjolt.c libjoltall.a -lreadline -lm
@@ -52,6 +58,7 @@ tidy : .FORCE
 
 clean : tidy
 	-rm -f $(FILES) jest$(OBJEXT) libjolt.a libjolt.nm libjoltall.a a.out
+	-rm -rf libjolt
 
 distclean spotless : clean
 
