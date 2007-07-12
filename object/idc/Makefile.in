@@ -88,7 +88,7 @@ tidy : .FORCE
 	-rm -f *.o *.d *~ .gdb* *.stackdump *.c
 
 clean : tidy
-	-rm -f $(FILES) $(BIN)idc1$(OBJEXT)
+	-rm -f $(FILES) $(BIN)idc1$(OBJEXT) $(BIN)idc
 
 distclean spotless : clean
 	-rm -f Makefile
