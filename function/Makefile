@@ -1,4 +1,4 @@
-SUBDIRS = objects jolt
+SUBDIRS = objects jolt-burg
 
 all : .FORCE
 	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) ); done'
