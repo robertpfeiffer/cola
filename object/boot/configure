@@ -173,7 +173,7 @@ mingw32 () {
 linux () {
     CC=${CC:-"cc"}
     PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
-    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1 -Wno-unused-value"}
     LDFLAGS=${LDFLAGS:-"-export-dynamic"}
     LDLIBS=${LDLIBS:-"-ldl"}
     CCFLAGS_O=${CCFLAGS_O:-"-c"}
