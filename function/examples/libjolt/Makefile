@@ -12,9 +12,7 @@ OBJEXT_SO       = .so
 LDFLAGS  = $(shell $(IDC) -C LDFLAGS)
 LDLIBS   = $(shell $(IDC) -C LDLIBS)
 
-JOLT_OBJ_FILES_TO_EXCLUDE = $(JOLT)/main.o $(JOLT)/readline.o
-JOLT_OBJ_FILES = \
-	$(filter-out $(JOLT_OBJ_FILES_TO_EXCLUDE), $(wildcard $(JOLT)/*.o))
+JOLT_OBJ_FILES	= $(filter-out $(JOLT)/readline.o, $(wildcard $(JOLT)/*.o))
 
 all : jest$(OBJEXT)
 
