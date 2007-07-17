@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-11 10:30:04 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-07-16 20:19:49 by piumarta on emilia
 "
 
 { import: Object }
@@ -25,31 +25,7 @@
 { import: Compiler }
 { import: CodeGenerator }
 { import: CodeGenerator-local }
-
-Options : Object ( verbose compile list libdir )
-
-Options verbose		[ ^verbose ]
-Options compile		[ ^compile ]
-Options list		[ ^list ]
-Options libdir: aString	[  libdir := aString ]
-Options libdir		[ ^libdir ]
-
-Options new
-[
-    self := super new.
-    verbose := false.
-]
-
-Options parseOption: aString
-[
-    aString = '-v'		ifTrue: [^verbose := true].
-    aString = '-c'		ifTrue: [^compile := true].
-    aString = '-S'		ifTrue: [^list	  := true].
-    (aString beginsWith: '-L')	ifTrue: [^libdir  := aString copyFrom: 2].
-    ^false
-]
-
-[ Options := Options new ]
+{ import: Options }
 
 OSArgumentFiles := []
 

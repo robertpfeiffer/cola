@@ -11,7 +11,7 @@ ARCH		= $(shell $(IDC) -C arch)
 LIBS		= ../objects/objects.a readline.o jolt.a
 
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
-		  Resource.o CodeGenerator.o CodeGenerator-local.o
+		  Resource.o CodeGenerator.o CodeGenerator-local.o Options.o
 
 LDLIBS		= readline.o jolt.a -lreadline -ltermcap # -lopcodes -lintl
 
@@ -56,7 +56,7 @@ distclean spotless : clean
 
 stats : .FORCE
 	$(SHELL) -ec 'for i in *.st; do printf "%8d %s\n" `sort -u $$i | wc -l` $$i; done'
-	sort -u Expression.st Scanner.st CompilerOptions.st Compiler.st Instruction.st Resource.st CodeGenerator.st CodeGenerator-i386.st CodeGenerator-ppc.st | wc -l
+	sort -u Expression.st Scanner.st CompilerOptions.st Compiler.st Instruction.st Resource.st CodeGenerator.st CodeGenerator-i386.st CodeGenerator-ppc.st Options.st | wc -l
 
 bench : main bench-c bench-id .FORCE
 	-time ./bench-id

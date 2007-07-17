@@ -1,4 +1,4 @@
-1;;; quasiquote.k -- quasiquotation as userland syntax
+;;; quasiquote.k -- quasiquotation as userland syntax
 
 ;;; Copyright (c) 2006, 2007 Ian Piumarta
 ;;; All rights reserved.
@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2007-04-26 19:02:20 by piumarta on emilia
+;;; Last edited: 2007-07-14 00:35:51 by piumarta on emilia
 
 (define qq-level 0)
 
