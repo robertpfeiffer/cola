@@ -14,6 +14,8 @@
   documentation.
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+
+  Last edited: 2007-07-16 21:26:58 by piumarta on emilia
 "
 
 { import: Objects }
