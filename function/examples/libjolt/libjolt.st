@@ -15,177 +15,36 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-11 10:12:19 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-07-16 20:22:15 by piumarta on emilia
 "
 
 { import: Object }
 { import: Scanner }
 { import: Compiler }
 { import: CodeGenerator-local }
+{ import: Options }
 
-Initialisation := ['
-(define printf			(_dlsym _RTLD_DEFAULT "printf"))
-(define exit			(_dlsym _RTLD_DEFAULT "exit"))
-
-(define dlsym
-  (lambda (name)
-    (let ((addr (_dlsym _RTLD_DEFAULT name)))
-      (if addr
-	  addr
-	  (let ()
-	    (printf "%s: symbol lookup failed\n" name)
-	    (exit 1))))))
-
-(define sprintf			(dlsym "sprintf"))
-(define malloc			(dlsym "malloc"))
-(define realloc			(dlsym "realloc"))
-(define free			(dlsym "free"))
-(define strcmp			(dlsym "strcmp"))
-(define usleep			(dlsym "usleep"))
-
-(define _dlopen			(dlsym "dlopen"))
-
-(define %%dlopen
-  (lambda (dir lib ext)
-    (let ((buf (malloc 1024)))
-      (sprintf buf "%s%s%s" dir lib ext)
-      (let ((handle (_dlopen buf _RTLD_NOW)))
-	(free buf)
-	handle))))
-
-(define %dlopen
-  (lambda (dir lib)
-    (let ((handle 0))
-      (or handle (set handle (%%dlopen dir lib "")))
-      (or handle (set handle (%%dlopen dir lib ".so")))
-      (or handle (set handle (%%dlopen dir lib ".dylib")))
-      handle)))
-
-(define dlopen
-  (lambda (lib)
-    (printf "; loading: %s\n" lib)
-    (let ((handle 0))
-      (or handle (set handle (%dlopen "./"              lib)))
-      (or handle (set handle (%dlopen ""                lib)))
-      (or handle (set handle (%dlopen "/usr/local/lib/" lib)))
-      (or handle (set handle (%dlopen "/usr/X11R6/lib/" lib)))
-      (if handle
-	  handle
-	  (let ()
-	    (printf "%s: cannot load library\n" lib)
-	    (exit 1))))))
-
-;; import/export to/from the object namespace
-
-(define import			(dlsym	"_libid_import"))
-(define export			(dlsym	"_libid_export"))
-
-(define Object			(import "Object"))
-(define OS			(import "OS"))
-(define CokeScanner		(import "CokeScanner"))
-(define Expression		(import "Expression"))
-(define Compiler		(import "Compiler"))
-(define File			(import "File"))
-(define ReadStream		(import "ReadStream"))
-(define WriteStream		(import "WriteStream"))
-(define OrderedCollection	(import "OrderedCollection"))
-(define String			(import "String"))
-(define StdIn			(import "StdIn"))
-(define StdOut			(import "StdOut"))
-(define StdErr			(import "StdErr"))
-
-;; message send syntax
-
-(define _bind	(dlsym "_libid_bind"))
-
-(define Array			(import "Array"))
-(define Array__new_		(long@ (_bind \'new:		Array)))
-(define Array__copyWithFirst_	(long@ (_bind \'copyWithFirst:	Array)))
-(define Array__withParameters_	(long@ (_bind \'withParameters:	Array)))
-(define Array__at_		(long@ (_bind \'at:		Array)))
-(define Array__at_put_		(long@ (_bind \'at:put:		Array)))
-
-(syntax send ; (send selector receiver args...)
-  (lambda (form compiler)
-    (let ((call   (Array__copyWithFirst_ 0 form form 0))
-	  (params (Array__new_           0 Array Array \'3)))
-      (Array__at_put_ 0 call call   \'0 \'(long@ __c))
-      (Array__at_put_ 0 call call   \'1 \'__c)
-      (Array__at_put_ 0 call call   \'2 \'__r)
-      (Array__at_put_ 0 call call   \'3 \'__r)
-      (Array__at_put_ 0 params params \'0 (Array__at_ 0 form form \'1))
-      (Array__at_put_ 0 params params \'1 (Array__at_ 0 form form \'2))
-      (Array__at_put_ 0 params params \'2 call)
-      (let ((send \'(let ((__s : 0) (__r : 1))
-		     (let ((__c (_bind __s __r)))
-		       : 2))))
-	(Array__withParameters_ 0 send send params)))))
-
-(define open-bracket-reader
-  (lambda (_closure _self self stream)
-    (send \'next stream)
-    (let ((node (send \'read:list:delimited: self stream Expression \'93))
-	  (list (send \'withAll: OrderedCollection node)))
-      (if (< (send \'size list) \'2)
-	  (send \'errorSyntax: self node)
-	  (let ((receiver  (send \'removeFirst list))
-		(selector  (send \'removeFirst list))
-		(arguments (send \'new OrderedCollection)))
-	    (or (send \'isSymbol selector)
-		(send \'errorSyntax: self node))
-	    (and (send \'notEmpty list)
-		 (send \'addLast: arguments (send \'removeFirst list)))
-	    (while (and (>= (send \'size list) 2)
-			(send \'isKeyword selector)
-			(send \'isKeyword (send \'first list)))
-	      (set selector (send \', selector (send \'removeFirst list)))
-	      (send \'addLast: arguments (send \'removeFirst list)))
-	    (send \'addAllLast: arguments list)
-	    (let ((message (send \'on: WriteStream (send \'new: Expression \'4))))
-	      (send \'nextPut: message \'send)
-	      (send \'nextPut: message (send \'with:with: Expression \'quote selector))
-	      (send \'nextPut: message receiver)
-	      (send \'nextPutAll: message arguments)
-	      ;(send \'print: StdOut (send \'contents message))
-	      ;(send \'cr StdOut)
-	      (send \'contents message)))))))
-
-(define close-bracket-reader
-  (lambda (_closure _self self stream)
-    (send \'error:unexpected: self stream \'93)))
-
-(send \'readerAt:put: CokeScanner \'91 open-bracket-reader)
-(send \'readerAt:put: CokeScanner \'93 close-bracket-reader)
-
-(define herald
-  (lambda (path)
-    [StdErr nextPutAll: \'"; "]
-    [StdErr nextPutAll: [String value_: path]]
-    [StdErr cr]))
-
-;; read and evaluate a sequence of ASTs
-
-(lambda (cString)
-  (let ((string  [String value_: cString])
-	(stream  [string readStream])
-        (expr    0)
-        (result  0))
-    (while (set expr [CokeScanner read: stream])
-      ;;[StdOut print: expr][StdOut cr]
-      (set result [expr _eval]))
-    result))
-']
+{ include "boot.h" }
 
 Jolt : Object ()
 
 Jolt initialise
 [
-    | stream expr result |
-    stream := Initialisation readStream.
-    [(expr := CokeScanner read: stream) isNil]
-	whileFalse:
-	   ["StdErr print: expr; cr."
-	    result := expr _eval.
-	    "StdErr nextPutAll: ' => '; print: expr; cr"].
-    ^result
+    | _boot stream expr result |
+
+    { v__boot= (oop)boot; }.
+
+    stream := (String value_: _boot) readStream.
+    [(expr := CokeScanner read: stream)] whileTrue: [expr _eval].
+
+    stream :=
+        '(lambda (_string)
+           (let ((string  [String value_: _string])
+                 (stream  [string readStream])
+                 (expr    0)
+                 (result  0))
+             (while (set expr [CokeScanner read: stream])
+               (set result [expr _eval]))
+             result))' readStream.
+    ^(CokeScanner read: stream) _eval
 ]
