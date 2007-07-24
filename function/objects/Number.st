@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-30 07:30:58 by piumarta on emilia.local
+  Last edited: 2007-07-12 11:54:33 by piumarta on emilia
 "
 
 { import: Objects }
@@ -44,6 +44,12 @@ Number < aNumber
 [
     self error: 'illegal argument: ', self printString, ' < ', aNumber printString
 ]
+
+Number isEven		[ ^self \\ 2 = 0 ]
+
+Integer isEven		[ ^((self digitAt: 1) bitAnd: 1) = 0 ]
+
+SmallInteger isEven	[ ^(self bitAnd: 1) = 0 ]
 
 Number timesRepeat: aBlock
 [
