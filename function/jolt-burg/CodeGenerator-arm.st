@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 13:05:22 by piumarta on emilia
+  Last edited: 2007-07-24 18:08:51 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -355,13 +355,22 @@ ARMCodeGenerator sp		[ ^sp ]
 ARMCodeGenerator lr		[ ^lr ]
 ARMCodeGenerator frameSize	[ ^frameSize ]
 
-ARMCodeGenerator movR: r I32_: _i
+ARMCodeGenerator movR: r P32_: _i
 [
     self
 	movR: r	     r:  0 I: (SmallInteger value_: _i shr:  0 and: 255);
 	orrR: r R: r r: 24 I: (SmallInteger value_: _i shr:  8 and: 255);
 	orrR: r R: r r: 16 I: (SmallInteger value_: _i shr: 16 and: 255);
 	orrR: r R: r r:  8 I: (SmallInteger value_: _i shr: 24 and: 255)
+]
+
+ARMCodeGenerator movR: r I32_: _i
+[
+    | i |
+    self movR: r r:  0 I: (SmallInteger value_: _i shr:  0 and: 255).
+    (i := SmallInteger value_: _i shr:  8 and: 255) == 0 ifFalse: [self orrR: r R: r r: 24 I: i].
+    (i := SmallInteger value_: _i shr: 16 and: 255) == 0 ifFalse: [self	orrR: r R: r r: 16 I: i].
+    (i := SmallInteger value_: _i shr: 24 and: 255) == 0 ifFalse: [self	orrR: r R: r r:  8 I: i].
 ]
 
 ARMCodeGenerator __aeabi_idiv		{ extern int __aeabi_idiv   (int, int);  _return (oop)__aeabi_idiv;	}
@@ -385,7 +394,7 @@ ARMGrammar := [
 	at: #REG  add: #(parami4 	)	do: [:op :gen | ];
 	at: #REG  add: #(addrfp4 	)	do: [:op :gen | gen addR:   op output	   R: gen sp	 r: 30 I: gen frameSize / 4];
 	at: #REG  add: #(addrgp4 	)	do: [:op :gen | gen movR:   op output   I32_: op arg _address];
-	at: #REG  add: #(addrjp4 	)	do: [:op :gen | gen movR:   op output   I32_: op arg _address];
+	at: #REG  add: #(addrjp4 	)	do: [:op :gen | gen movR:   op output   P32_: op arg _address];
 	at: #REG  add: #(addrlp4 	)	do: [:op :gen | gen addR:   op output	   R: gen sp	 r: 30 I: op arg offset >> 2];
 	at: #REG  add: #(indiri1 REG	)	do: [:op :gen | gen ldrbR:  op output     Mb: op lhs output];
 	at: #REG  add: #(indiri2 REG	)	do: [:op :gen | gen ldrhR:  op output     Mb: op lhs output];
