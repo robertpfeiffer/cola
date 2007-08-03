@@ -15,20 +15,13 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-12 11:54:33 by piumarta on emilia
+  Last edited: 2007-08-02 15:21:14 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
 
-Number min: aNumber
-[
-    ^self < aNumber ifTrue: [self] ifFalse: [aNumber]
-]
-
-Number max: aNumber
-[
-    ^self < aNumber ifTrue: [aNumber] ifFalse: [self]
-]
+Number min: aNumber	[ ^self < aNumber ifTrue: [self] ifFalse: [aNumber] ]
+Number max: aNumber	[ ^self < aNumber ifTrue: [aNumber] ifFalse: [self] ]
 
 Number quo: aNumber
 [

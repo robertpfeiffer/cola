@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-05 14:47:34 by piumarta on alan-kays-computer.local
+  Last edited: 2007-08-03 09:35:16 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -41,6 +41,14 @@ IdentityDictionary at: aKey ifAbsent: failBlock
 IdentityDictionary at: aKey put: anObject
 [
     ^(self add: aKey -> anObject) setValue: anObject
+]
+
+IdentityDictionary at: aKey ifAbsentPut: anObject
+[
+    | lookup assoc |
+    ^(assoc := self findElement: (lookup := aKey -> nil)) notNil
+	ifTrue:  [assoc value]
+	ifFalse: [(self add: lookup) setValue: anObject]
 ]
 
 IdentityDictionary associationAt: aKey ifAbsent: errorBlock

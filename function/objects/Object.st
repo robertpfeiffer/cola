@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-29 11:14:45 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-08-03 09:10:42 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -168,6 +168,17 @@ Object errorOutOfBounds: anIndex
     StdErr cr;
 	print: anIndex; nextPutAll: ' is out of bounds in ';
 	nextPutAll: self debugName; nextPut: $(; print: self size; nextPut: $);
+	cr.
+    { exit(1); }.
+]
+
+Object errorKeyNotFound: aKey
+[
+    StdErr cr.
+    { _backtrace(); }.
+    StdErr cr;
+	print: aKey; nextPutAll: ' is not a key in ';
+	nextPutAll: self debugName;
 	cr.
     { exit(1); }.
 ]
