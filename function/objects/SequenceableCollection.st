@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-28 15:32:03 by piumarta on emilia.local
+  Last edited: 2007-08-03 14:23:33 by piumarta on emilia.lax04.mtt
 "
 
 { import: Object }
@@ -90,8 +90,13 @@ SequenceableCollection from: firstKey to: lastKey put: value
 
 SequenceableCollection collect: elementBlock
 [
+    ^self collect: elementBlock as: self
+]
+
+SequenceableCollection collect: elementBlock as: resultType
+[
     | result |
-    result := self new: self size.
+    result := resultType new: self size.
     self doWithIndex: [:e :i | result at: i put: (elementBlock value: e)].
     ^result
 ]
