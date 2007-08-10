@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:32:09 by piumarta on emilia
+  Last edited: 2007-08-08 15:36:36 by piumarta on emilia
 "
 
 { import: Objects }
@@ -59,4 +59,14 @@ LinkedList do: unaryBlock
 	whileTrue:
 	   [unaryBlock value: link.
 	    link := link nextLink]
+]
+
+LinkedList reverseDo: unaryBlock
+[
+    | link |
+    link := lastLink.
+    [link notNil]
+	whileTrue:
+	   [unaryBlock value: link.
+	    link := link prevLink]
 ]
