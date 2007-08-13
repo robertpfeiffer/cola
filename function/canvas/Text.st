@@ -3,12 +3,12 @@
 { import: Font }
 { import: Views }
 
-String asText
+String asCompositeView
 [
-    ^self asTextWithFont: Font default
+    ^self asCompositeViewWithFont: Font default
 ]
 
-String asTextWithFont: aFont
+String asCompositeViewWithFont: aFont
 [
     | text |
     text := CompositeView new.

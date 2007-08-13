@@ -34,7 +34,7 @@ World setup
 [
     | text |
     self fillColour: (Colour withR: 0.4 G: 0.6 B: 0.8).
-    self add: (text := 'Hello, world' asText transformView translate: 100@100).
+    self add: (text := 'Hello, world' asCompositeView transformView translate: 100@100).
     text propertyAt: #pointerDownEvent put: [:view :event | self startDragging: view at: event position].
 ]
 
