@@ -610,13 +610,6 @@ static void binary(void *p)
 }
 #endif
 
-_closure_t *_libid_binder(register oop selector, register oop receiver)
-{
-  oop vtable= receiver ? (((unsigned)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
-  struct __entry *entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
-  return (entry->selector == selector && entry->vtable == vtable) ? entry->closure : 0;
-}
-
 #if GLOBAL_MCACHE && defined(__GNUC__) && defined(__i386__)
 asm (
 "	.text					\n"
@@ -648,6 +641,43 @@ asm (
 "	jmp	__tok				\n"
 "__t1:	movl	__libid_tag_vtable, %edx	\n"
 "	jmp	__tok				\n"
+);
+# define _libid_bind _libid_bind_fill
+#endif
+
+#if GLOBAL_MCACHE && defined(__GNUC__) && defined(__ppc__)
+asm (
+"	.text						\n"
+"	.align	4					\n"
+"	.globl	__libid_bind				\n"
+"__libid_bind:						\n"	// r3= selector, r4= receiver
+"	andi.	r0, r4, 1				\n"
+"	bne	__t1					\n"	// tagged
+"	cmpwi	r4, 0					\n"
+"	beq	__t0					\n"	// nil
+"	lwz	r5, -4(r4)				\n"	// r5 = recevier.vtable
+"__tok:	slwi	r6, r5, 4				\n"	// r6 = vtable << 4 (2+2)
+"	srawi	r7, r3, 1				\n"	// r7 = selector >> 1 (3-2)
+"	xor	r6, r6, r7				\n"	// r6 = (vtable << 2) ^ (selector >> 3)
+"	andi.	r6, r6, 0xffc				\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
+"	add	r7, r6, r6				\n"
+"	add	r6, r6, r7				\n"
+"	addis	r6, r6, ha16(__libid_mcache)		\n"
+"	addi	r6, r6, lo16(__libid_mcache)		\n"
+"	lwz	r7, 0(r6)				\n"	// line.vtable
+"	cmpw	r5, r7					\n"	// line.vtable == receiver.vtable ?
+"	bne	__libid_bind_fill			\n"
+"	lwz	r7, 4(r6)				\n"	// line.selector
+"	cmpw	r3, r7					\n"	// line.selector == selector ?
+"	bne	__libid_bind_fill			\n"
+"	lwz	r3, 8(r6)				\n"	// return line.closure
+"	blr						\n"
+"__t0:	lis	r5, ha16(__libid_nil_vtable)		\n"
+"	lwz	r5, lo16(__libid_nil_vtable)(r5)	\n"
+"	b	__tok					\n"
+"__t1:	lis	r5, ha16(__libid_tag_vtable)		\n"
+"	lwz	r5, lo16(__libid_tag_vtable)(r5)	\n"
+"	b	__tok					\n"
 );
 # define _libid_bind _libid_bind_fill
 #endif
