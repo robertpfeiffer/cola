@@ -72,7 +72,7 @@ oop                _libid_nlresult(void);
 void		  *_libid_enter(char *name, char *type, char *file);
 void		   _libid_line(int line);
 void		   _libid_leave(void *cookie);
-void		   _libid_backtrace(void);
+char		  *_libid_backtrace(void);
 
 #define _send(MSG, RCV, ARG...) ({					\
   oop _r= (RCV);							\
@@ -203,7 +203,7 @@ static void fatal(const char *fmt, ...)
   vfprintf(stderr, fmt, ap);
   fputs("\n", stderr);
   va_end(ap);
-  _libid_backtrace();
+  fputs(_libid_backtrace(), stderr);
   exit(1);
 }
 
@@ -500,6 +500,9 @@ static char *nameOf(oop object)
   return name;
 }
 
+static void sigint(int signum)	{ fatal("\nInterrupt"); }
+static void sighup(int signum)	{ fprintf(stderr, "\nHangup\n");  fputs(_libid_backtrace(), stderr); }
+
 void _libid_init(int *argcp, char ***argvp, char ***envpp)
 {
   dprintf("_libid_init()\n");
@@ -583,6 +586,9 @@ void _libid_init(int *argcp, char ***argvp, char ***envpp)
   export(_vector);
   export(_vtable);
 # undef export
+
+  signal(SIGINT, sigint);
+  signal(SIGHUP, sighup);
 }
 
 oop _libid_intern(const char *string)
@@ -604,7 +610,51 @@ static void binary(void *p)
 }
 #endif
 
+_closure_t *_libid_binder(register oop selector, register oop receiver)
+{
+  oop vtable= receiver ? (((unsigned)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
+  struct __entry *entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
+  return (entry->selector == selector && entry->vtable == vtable) ? entry->closure : 0;
+}
+
+#if GLOBAL_MCACHE && defined(__GNUC__) && defined(__i386__)
+//int _libid_hits= 0;
+asm (
+"	.text					\n"
+"	.align	4				\n"
+"	.globl	__libid_bind			\n"
+"__libid_bind:					\n"
+"	movl	8(%esp), %eax			\n"	// eax = receiver
+"	testb	$0x1, %al			\n"
+"	jne	__t1				\n"	// tagged
+"	testl	%eax, %eax			\n"
+"	je	__t0				\n"	// nil
+"	movl	-4(%eax), %edx			\n"	// edx = recevier.vtable
+"__tok:	movl	4(%esp), %ecx			\n"	// ecx = selector
+"	leal	0(,%edx,4), %eax		\n"	// eax = vtable << 2
+"	shrl	$3, %ecx			\n"	// ecx = selector >> 3
+"	xorl	%ecx, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3)
+"	andl	$0x3ff, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
+"	leal	(%eax,%eax,2), %eax		\n"	// eax = eax * sizeof(entry)
+"	leal	__libid_mcache(,%eax,4), %eax	\n"	// eax = mcache + eax * 3
+"	cmpl	(%eax), %edx			\n"	// eax.vtable == vtable ?
+"	jne	__libid_bind_fill		\n"
+"	movl	4(%esp), %ecx			\n"	// ecx = selector
+"	cmp	4(%eax), %ecx			\n"	// eax.selector == selector ?
+"	jne	__libid_bind_fill		\n"
+"	movl	8(%eax), %eax			\n"	// ecx = closure
+//"	addl	$1, __libid_hits		\n"
+"	ret					\n"	// hit
+"__t0:	movl	__libid_nil_vtable, %edx	\n"
+"	jmp	__tok				\n"
+"__t1:	movl	__libid_tag_vtable, %edx	\n"
+"	jmp	__tok				\n"
+);
+# define _libid_bind _libid_bind_fill
+#endif
+
 _closure_t *_libid_bind(oop selector, oop receiver)
+#undef _libid_bind
 {
   static int recursionGuard= 0;
 #if GLOBAL_MCACHE
@@ -845,25 +895,40 @@ void _libid_leave(void *cookie)
   position= (int)(long)cookie;
 }
 
-void _libid_backtrace(void)
+char *_libid_backtrace(void)
 {
   int i, indent= 0, len= 0;
+  int size= 2048;
+  char *result;
 
-  for (i= position;  i--;)
-    {
-      char *base= strrchr(positions[i].file, '/');
-      if (base) positions[i].file= base + 1;
-      if (indent < (len= strlen(positions[i].file)))
-	indent= len;
-    }
-  indent += 9;
-  for (i= position;  i--;)    /*for (i= 0;  i< position;  ++i)*/
-    {
-      int width= fprintf(stderr, "  %s:%-4d ", positions[i].file, positions[i].line);
-      if (indent < width)
-	indent= width;
-      else
-	fprintf(stderr, "%*s", indent - width, "");
-      fprintf(stderr, "%s %s\n", positions[i].type, positions[i].name);
-    }
+ grow:
+  size *= 2;
+  {
+    int offset= 0;
+    result= _libid_balloc(size);
+    for (i= position;  i--;)
+      {
+	char *base= strrchr(positions[i].file, '/');
+	if (base) positions[i].file= base + 1;
+	if (indent < (len= strlen(positions[i].file)))
+	  indent= len;
+      }
+    indent += 9;
+    for (i= position;  i--;)    /*for (i= 0;  i< position;  ++i)*/
+      {
+	int width= snprintf(result + offset, size - offset, "  %s:%-4d ", positions[i].file, positions[i].line);
+	offset += width;
+	if (indent < width)
+	  indent= width;
+	else
+	  {
+	    width= snprintf(result + offset, size - offset, "%*s", indent - width, "");
+	    offset += width;
+	  }
+	width= snprintf(result + offset, size - offset, "%s %s\n", positions[i].type, positions[i].name);
+	offset += width;
+      }
+    if (offset == size) goto grow;
+  }
+  return result;
 }
