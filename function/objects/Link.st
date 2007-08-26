@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:32:26 by piumarta on emilia
+  Last edited: 2007-08-15 16:30:41 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -31,4 +31,10 @@ Link unlink
 [
     prevLink nextLink: nextLink.
     nextLink prevLink: prevLink.
+    prevLink := nextLink := nil
+]
+
+Link unlinked
+[
+    prevLink := nextLink := nil
 ]

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-10 13:21:42 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-08-21 12:06:31 by piumarta on emilia.lax04.mtt
 "
 
 { external }
@@ -46,12 +46,12 @@ _vtable methodAt: aSelector		"install aMethod as the response to sending aSelect
 
 "Support for debugging and cloning."
 
-_object   _debugName { return (oop)"_object";   }  _object   _sizeof { return (oop)sizeof(struct t__object  ); }
-_selector _debugName { return (oop)"_selector"; }  _selector _sizeof { return (oop)sizeof(struct t__selector); }
-_assoc    _debugName { return (oop)"_assoc";    }  _assoc    _sizeof { return (oop)sizeof(struct t__assoc   ); }
-_closure  _debugName { return (oop)"_closure";  }  _closure  _sizeof { return (oop)sizeof(struct t__closure ); }
-_vector   _debugName { return (oop)"_vector";   }  _vector   _sizeof { return (oop)sizeof(struct t__vector  ); }
-_vtable   _debugName { return (oop)"_vtable";   }  _vtable   _sizeof { return (oop)sizeof(struct t__vtable  ); }
+_object   _debugName { _return ((oop)"_object");   }  _object   _sizeof { _return ((oop)sizeof(struct t__object  )); }
+_selector _debugName { _return ((oop)"_selector"); }  _selector _sizeof { _return ((oop)sizeof(struct t__selector)); }
+_assoc    _debugName { _return ((oop)"_assoc");    }  _assoc    _sizeof { _return ((oop)sizeof(struct t__assoc   )); }
+_closure  _debugName { _return ((oop)"_closure");  }  _closure  _sizeof { _return ((oop)sizeof(struct t__closure )); }
+_vector   _debugName { _return ((oop)"_vector");   }  _vector   _sizeof { _return ((oop)sizeof(struct t__vector  )); }
+_vtable   _debugName { _return ((oop)"_vtable");   }  _vtable   _sizeof { _return ((oop)sizeof(struct t__vtable  )); }
 
 "Primitive error handling -- #doesNotUnderstand:"
 
@@ -62,7 +62,7 @@ _object doesNotUnderstand: aSelector
     _cSelector := aSelector _stringValue.
     {
 	fprintf(stderr, "\n");
-	_backtrace();
+	fputs(_backtrace(), stderr);
 	fprintf(stderr, "\n%s does not understand '%s'\n", (char *)v__cName, (char *)v__cSelector);
 	exit(1);
     }
@@ -73,7 +73,7 @@ _selector size_: _stringSize value_: _stringValue
   char *buf= alloca((size_t)v__stringSize + 1);
   memcpy((void *)buf, (void *)v__stringValue, (size_t)v__stringSize);
   buf[(size_t)v__stringSize]= '\0';
-  return _local_intern(buf);
+  _return (_local_intern(buf));
 }
 
 _selector _stringValue
@@ -98,7 +98,7 @@ _object _methodAt: aSelector
 
 _object _bind: aSelector
 {
-  return (oop)_local_bind(v_aSelector, self);
+  _return ((oop)_local_bind(v_aSelector, self));
 }
 
 _assoc value			[ ^value ]
@@ -111,12 +111,12 @@ _closure data: anObject		[ ^data := anObject ]
 
 _object performMethod_: _aMethod with: a
 {
-    return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a);
+    _return (((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a));
 }
 
 _object performMethod_: _aMethod with: a with: b
 {
-    return ((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a, v_b);
+    _return (((_imp_t)v__aMethod)(0, v_stateful_self, v_self, v_a, v_b));
 }
 
 _vtable delegate		[ ^delegate ]

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-05 15:01:39 by piumarta on emilia.local
+  Last edited: 2007-08-24 08:03:45 by piumarta on emilia
 "
 
 { import: Objects }
@@ -32,9 +32,13 @@ OrderedCollection new: size
     lastIndex := size.
 ]
 
-OrderedCollection with: anObject	[ ^self new add: anObject; yourself ]
+OrderedCollection with: anObject		[ ^self new add: anObject; yourself ]
+OrderedCollection with: a with: b		[ ^self new add: a; add: b; yourself ]
+OrderedCollection with: a with: b with: c	[ ^self new add: a; add: b; add: c; yourself ]
 
 OrderedCollection size			[ ^lastIndex - firstIndex ]
+
+OrderedCollection , anObject		[  self addLast: anObject ]
 
 OrderedCollection add: anObject		[ ^self addLast: anObject ]
 

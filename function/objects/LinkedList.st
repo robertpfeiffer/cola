@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-10 13:41:45 by piumarta on emilia
+  Last edited: 2007-08-15 16:33:45 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -48,12 +48,62 @@ LinkedList add: aLink
     ^self addLast: aLink
 ]
 
+LinkedList add: aLink before: anotherLink
+[
+    anotherLink == firstLink
+	ifTrue:
+	   [aLink nextLink: anotherLink.
+	    anotherLink prevLink: aLink.
+	    ^firstLink := aLink].
+    (firstLink and: [anotherLink prevLink]) ifFalse: [self error: 'cannot add link'].
+    aLink prevLink: anotherLink prevLink.
+    aLink nextLink: anotherLink.
+    anotherLink prevLink nextLink: aLink.
+    anotherLink prevLink: aLink.
+    ^aLink
+]
+
+LinkedList add: aLink after: anotherLink
+[
+    anotherLink == lastLink
+	ifTrue:
+	   [aLink prevLink: anotherLink.
+	    anotherLink nextLink: aLink.
+	    ^lastLink := aLink].
+    (lastLink and: [anotherLink nextLink]) ifFalse: [self error: 'cannot add link'].
+    aLink nextLink: anotherLink nextLink.
+    aLink prevLink: anotherLink.
+    anotherLink nextLink prevLink: aLink.
+    anotherLink nextLink: aLink.
+    ^aLink
+]
+
 LinkedList remove: aLink
 [
     aLink == firstLink ifTrue: [^self removeFirst].
     aLink == lastLink  ifTrue: [^self removeLast].
     aLink unlink.
     ^aLink
+]
+
+LinkedList removeFirst
+[
+    | aLink |
+    aLink := firstLink.
+    (firstLink := firstLink nextLink)
+	ifTrue:  [firstLink prevLink: nil]
+	ifFalse: [lastLink := nil].
+    ^aLink unlinked
+]
+
+LinkedList removeLast
+[
+    | aLink |
+    aLink := lastLink.
+    (lastLink := lastLink prevLink)
+	ifTrue:  [lastLink nextLink: nil]
+	ifFalse: [firstLink := nil].
+    ^aLink unlinked
 ]
 
 LinkedList size
@@ -98,6 +148,49 @@ LinkedList reverseDo: unaryBlock
 	whileTrue:
 	   [unaryBlock value: link.
 	    link := link prevLink]
+]
+
+LinkedList detect: unaryBlock
+[
+    | link |
+    link := firstLink.
+    [link notNil]
+	whileTrue:
+	   [(unaryBlock value: link) ifTrue: [^link].
+	    link := link nextLink].
+    ^nil
+]
+
+LinkedList inject: answer into: binaryBlock
+[
+    | link |
+    link := firstLink.
+    [link]
+	whileTrue:
+	   [answer := binaryBlock value: answer value: link.
+	    link := link nextLink].
+    ^answer
+]
+
+Link to: bLink inject: answer into: binaryBlock
+[
+    | aLink |
+    aLink := self.
+    [aLink and: [answer := binaryBlock value: answer value: aLink.
+		 aLink ~~ bLink]]
+	whileTrue: [aLink := aLink nextLink].
+    ^answer
+]
+
+Link upTo: bLink inject: answer into: binaryBlock
+[
+    | aLink |
+    aLink := self.
+    [aLink and: [aLink ~~ bLink]]
+	whileTrue:
+	   [answer := binaryBlock value: answer value: aLink.
+	    aLink := aLink nextLink].
+    ^answer
 ]
 
 LinkedList isEmpty	[ ^firstLink isNil ]

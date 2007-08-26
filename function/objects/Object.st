@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-03 09:10:42 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-08-21 12:06:03 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -99,10 +99,15 @@ UndefinedObject ifFalse: aBlock		[ ^aBlock value ]
 Object abort		{ abort(); }
 Object exit		{ exit(0); }
 
+Object backtrace
+{
+    fputs(_backtrace(), stderr);
+}
+
 Object halt
 [
     StdErr cr.
-    { _backtrace(); }.
+    StdErr backtrace.
     StdErr cr; nextPutAll: 'halt'; cr.
     { exit(1); }.
 ]
@@ -140,7 +145,7 @@ Object perform: s with: a with: b with: c with: d
 Object error: reason
 [
     StdErr cr.
-    { _backtrace(); }.
+    StdErr backtrace.
     StdErr cr; nextPutAll: reason; cr.
     { exit(1); }.
 ]
@@ -148,7 +153,7 @@ Object error: reason
 Object shouldNotImplement: aSelector
 [
     StdErr cr.
-    { _backtrace(); }.
+    StdErr backtrace.
     StdErr cr; nextPutAll: self debugName; nextPutAll: ' should not implement '; print: aSelector; cr.
     { exit(1); }.
 ]
@@ -156,7 +161,7 @@ Object shouldNotImplement: aSelector
 Object subtypeResponsibility: aSelector
 [
     StdErr cr.
-    { _backtrace(); }.
+    StdErr backtrace.
     StdErr cr; nextPutAll: self debugName; nextPutAll: ' did not override '; print: aSelector; cr.
     { exit(1); }.
 ]
@@ -164,7 +169,7 @@ Object subtypeResponsibility: aSelector
 Object errorOutOfBounds: anIndex
 [
     StdErr cr.
-    { _backtrace(); }.
+    StdErr backtrace.
     StdErr cr;
 	print: anIndex; nextPutAll: ' is out of bounds in ';
 	nextPutAll: self debugName; nextPut: $(; print: self size; nextPut: $);
@@ -175,7 +180,7 @@ Object errorOutOfBounds: anIndex
 Object errorKeyNotFound: aKey
 [
     StdErr cr.
-    { _backtrace(); }.
+    StdErr backtrace.
     StdErr cr;
 	print: aKey; nextPutAll: ' is not a key in ';
 	nextPutAll: self debugName;

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-09 17:14:49 by piumarta on emilia
+  Last edited: 2007-08-17 13:48:01 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -102,7 +102,7 @@ SmallInteger / aNumber
     } }.
     aNumber = 0 ifTrue: [^self errorDivisionByZero].
     ^aNumber isSmallInteger
-	ifTrue:  [self error: '(Fraction numerator: self denominator: aNumber) reduced']
+	ifTrue:  [self asFloat / aNumber]
 	ifFalse: [super / aNumber]
 ]
 
