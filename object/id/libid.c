@@ -618,7 +618,6 @@ _closure_t *_libid_binder(register oop selector, register oop receiver)
 }
 
 #if GLOBAL_MCACHE && defined(__GNUC__) && defined(__i386__)
-//int _libid_hits= 0;
 asm (
 "	.text					\n"
 "	.align	4				\n"
@@ -631,12 +630,12 @@ asm (
 "	je	__t0				\n"	// nil
 "	movl	-4(%eax), %edx			\n"	// edx = recevier.vtable
 "__tok:	movl	4(%esp), %ecx			\n"	// ecx = selector
-"	leal	0(,%edx,4), %eax		\n"	// eax = vtable << 2
-"	shrl	$3, %ecx			\n"	// ecx = selector >> 3
+"	movl	%edx, %eax			\n"	// eax = vtable
+"	shll	$4, %eax			\n"	// eax = vtable << 2+2
+"	shrl	$1, %ecx			\n"	// ecx = selector >> 3-2
 "	xorl	%ecx, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3)
-"	andl	$0x3ff, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
-"	leal	(%eax,%eax,2), %eax		\n"	// eax = eax * sizeof(entry)
-"	leal	__libid_mcache(,%eax,4), %eax	\n"	// eax = mcache + eax * 3
+"	andl	$0xffc, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
+"	leal	__libid_mcache(%eax,%eax,2), %eax \n"	// eax = mcache + eax * sizeof(entry)
 "	cmpl	(%eax), %edx			\n"	// eax.vtable == vtable ?
 "	jne	__libid_bind_fill		\n"
 "	movl	4(%esp), %ecx			\n"	// ecx = selector
