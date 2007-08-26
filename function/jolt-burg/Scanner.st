@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-20 12:13:26 by piumarta on emilia
+  Last edited: 2007-08-21 14:24:34 by piumarta on emilia.lax04.mtt
 "
 
 { import: Objects }
@@ -178,7 +178,7 @@ CokeScanner xDigit: stream
 [
     | tokenValue dv |
     tokenValue := 0.
-    [(dv := stream peek digitValue) and: [dv < 10]]
+    [(dv := stream peek) and: [(dv := dv digitValue) and: [dv < 10]]]
 	whileTrue:
 	   [tokenValue := tokenValue * 10 + dv.
 	    stream next].
