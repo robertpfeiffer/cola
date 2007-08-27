@@ -659,7 +659,7 @@ asm (
 "__tok:	slwi	r6, r5, 4				\n"	// r6 = vtable << 4 (2+2)
 "	srawi	r7, r3, 1				\n"	// r7 = selector >> 1 (3-2)
 "	xor	r6, r6, r7				\n"	// r6 = (vtable << 2) ^ (selector >> 3)
-"	andi.	r6, r6, 0xffc				\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
+"	andi.	r6, r6, 0xffc				\n"	// r6 = (vtable << 2) ^ (selector >> 3) & CacheSize
 "	add	r7, r6, r6				\n"
 "	add	r6, r6, r7				\n"
 "	addis	r6, r6, ha16(__libid_mcache)		\n"
