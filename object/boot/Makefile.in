@@ -137,7 +137,7 @@ idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES)
 	-$(SHELL) -ec '( mkdir include; cd include; ln -s ../../$(GCDIR)/include gc )'
 
 gc.a : 
-	$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) ABI_FLAG="$(MFLAGS)"'
+	$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
 	-$(SHELL) -ec 'ln -s ../$(GCDIR)/gc.a .'
 
 install : all .FORCE
