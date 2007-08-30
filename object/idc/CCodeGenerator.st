@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-29 13:24:24 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-08-24 17:13:17 by piumarta on emilia
 "
 
 { import: CodeGenerator }
@@ -34,7 +34,7 @@ CCodeGenerator generate: program on: aStream for: aCompiler outputType: outputTy
     "Generate an entire program on aStream within aCompiler's global context.
     If outputType is #program then generate global program entry point and initialisation.
     If outputType is #object then append fileName to global initialiser."
-    self := self withCompiler: aCompiler encoder: (Encoder withGlobalContext: aCompiler).
+    self := self withCompiler: aCompiler encoder: (Encoder withGlobalContext: aCompiler knownSelectors: aCompiler knownSelectors).
     output := aStream.
     program do: [:node | node encode: encoder].
     self genl: (self headerTextType: outputType).
@@ -133,7 +133,7 @@ static void		  (*_local_gc_gcollect)(void)= 0;
 static void		 *(*_local_enter)(char *name, char *type, char *file)= 0;
 static void		  (*_local_line)(int line)= 0;
 static void		  (*_local_leave)(void *)= 0;
-static void		  (*_local_backtrace)(void)= 0;
+static char		 *(*_local_backtrace)(void)= 0;
 
 #define _param(INDEX)		_local_param(INDEX)
 #define _selector(NAME)		_local_intern(NAME)

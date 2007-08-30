@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-22 10:35:45 by piumarta on emilia
+  Last edited: 2007-08-24 17:13:43 by piumarta on emilia
 "
 
 { import: Object }
@@ -52,6 +52,7 @@ Compiler : Object (
     imports		"names of libraries already imported (to avoid redundant imports)"
     externalFlags	"stack of flags indicating whether declarations are local or external"
     intrinsicTypes	"built-in type names and method selectors for cloning them"
+    knownSelectors	"IdentitySet of known selectors"
 )
 
 Compiler initialize
@@ -82,7 +83,10 @@ Compiler initialize
 	at: 'staticClosure' 	    put: '_staticClosure' 	  -> 'function_:arity_:';
 	at: 'fullClosure'   	    put: '_fullClosure'	  	  -> 'function_:arity_:outer:state:nlr_:';
 	yourself.
+    knownSelectors := nil"IdentitySet new".
 ]
+
+Compiler knownSelectors	[ ^knownSelectors ]
 
 Compiler compileFile: fileName toFile: outputName withOptions: compilerOptions
 [
@@ -211,6 +215,7 @@ Compiler addMethod: methodNode			""
     base := types at: methodNode type ifAbsent: [self errorUndefined: methodNode type at: methodNode].
     base isPrototypeNode ifFalse: [self errorNoType: methodNode type at: methodNode].
     including ifFalse: [program add: methodNode].
+    knownSelectors ifTrue: [knownSelectors add: methodNode selector asSymbol].
 ]
 
 Compiler addType: typeNode			"Proto [ : Base ] ( [slots...] )"

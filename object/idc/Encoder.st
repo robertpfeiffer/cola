@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-29 13:31:36 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-08-24 17:09:15 by piumarta on emilia
 "
 
 { import: Object }
@@ -39,7 +39,28 @@ Encoder : Object (
     methodType		"PrototypeNode of the method (inside a method defn) or nil (outside)"
     specialEncoders	"Dictionary mapping macro/arithmetic/special selectors to specific encoding methods"
     implementations	"Dictionary mapping type names onto Dictionary of selectors onto implementation counts"
+    knownSelectors	"IdentitySet of known selectors"
 )
+
+Encoder withGlobalContext: aGlobalContext knownSelectors: knownSelectorSet
+[
+    self := self new.
+    globalContext := aGlobalContext.
+    globals := scope := Scope new.
+    tempCount := tempMax := 0.
+    outerCount := OrderedCollection new.
+    selectors := Dictionary new.
+    literals := OrderedCollection new.
+    literalMap := Dictionary new.
+    literalTag := 0.
+    methodType := nil.
+    specialEncoders := Dictionary new.
+    implementations := Dictionary new.
+    globalContext inlineMacroSelectors   ifTrue: [specialEncoders addAll: SendNode macroEncoders].
+    globalContext inlineSpecialSelectors ifTrue: [specialEncoders addAll: SendNode specialEncoders].
+    globalContext inlineTaggedArithmetic ifTrue: [specialEncoders addAll: SendNode taggedEncoders].
+    knownSelectors := knownSelectorSet.
+]
 
 Encoder withGlobalContext: aGlobalContext
 [
@@ -122,6 +143,18 @@ Encoder mangleOther: aCharacter to: aStream
 Encoder addSelector: aSelector
 [
     selectors at: aSelector ifAbsent: [selectors at: aSelector put: (self mangleSelector: aSelector)]
+]
+
+Encoder addSelector: aSelector at: aPosition
+[
+    | symbol |
+    selectors at: aSelector ifAbsent: [selectors at: aSelector put: (self mangleSelector: aSelector)].
+    knownSelectors
+	ifTrue:
+	    [(knownSelectors includes: (symbol := aSelector asSymbol))
+		ifFalse:
+		    [self warn: aSelector, ' may not be implemented' at: aPosition.
+		     knownSelectors add: symbol]]
 ]
 
 Encoder noteImplementation: selectorName in: typeName at: aPosition

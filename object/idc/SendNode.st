@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:12:20 by piumarta on emilia
+  Last edited: 2007-08-24 17:04:48 by piumarta on emilia
 "
 
 { import: ParseNode }
@@ -77,7 +77,7 @@ SendNode beThisSend: methodType
 SendNode encode: encoder
 [
     "ensure the literals contain my selector"
-    encoder addSelector: selector.
+    encoder addSelector: selector at: position.
     "ensure an supertype is available for super sends"
     (receiver notNil and: [receiver isSuper])
 	ifTrue: [self beSuperSend: (encoder superTypeAt: position)].
