@@ -17,6 +17,10 @@ stage2 : .FORCE
 	-$(SHELL) -ec '[ -d stage2 ] || mkdir stage2'
 	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( echo $$dir; cd $$dir; $(MAKE) IDC="../stage1/idc -B../stage1/ -O" BIN="../stage2/" ); done'
 
+stage3 : .FORCE
+	-$(SHELL) -ec '[ -d stage3 ] || mkdir stage3'
+	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( echo $$dir; cd $$dir; $(MAKE) IDC="../stage2/idc -B../stage2/ -O" BIN="../stage3/" ); done'
+
 install : all .FORCE
 	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) IDC="../stage1/idc -B../stage1/ -O" BIN="../stage2/" install ); done'
 
