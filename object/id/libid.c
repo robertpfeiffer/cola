@@ -610,12 +610,18 @@ static void binary(void *p)
 }
 #endif
 
+#if defined(__MACH__)
+# define _ "_"
+#else
+# define _
+#endif
+
 #if GLOBAL_MCACHE && defined(__GNUC__) && defined(__i386__)
 asm (
 "	.text					\n"
 "	.align	4				\n"
-"	.globl	__libid_bind			\n"
-"__libid_bind:					\n"
+"	.globl	"_"_libid_bind			\n"
+_"_libid_bind:					\n"
 "	movl	8(%esp), %eax			\n"	// eax = receiver
 "	testb	$0x1, %al			\n"
 "	jne	__t1				\n"	// tagged
@@ -628,18 +634,18 @@ asm (
 "	shrl	$1, %ecx			\n"	// ecx = selector >> 3-2
 "	xorl	%ecx, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3)
 "	andl	$0xffc, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
-"	leal	__libid_mcache(%eax,%eax,2), %eax \n"	// eax = mcache + eax * sizeof(entry)
+"	leal	"_"_libid_mcache(%eax,%eax,2), %eax \n"	// eax = mcache + eax * sizeof(entry)
 "	cmpl	(%eax), %edx			\n"	// eax.vtable == vtable ?
-"	jne	__libid_bind_fill		\n"
+"	jne	"_"_libid_bind_fill		\n"
 "	movl	4(%esp), %ecx			\n"	// ecx = selector
 "	cmp	4(%eax), %ecx			\n"	// eax.selector == selector ?
-"	jne	__libid_bind_fill		\n"
+"	jne	"_"_libid_bind_fill		\n"
 "	movl	8(%eax), %eax			\n"	// ecx = closure
-//"	addl	$1, __libid_hits		\n"
+//"	addl	$1, "_"_libid_hits		\n"
 "	ret					\n"	// hit
-"__t0:	movl	__libid_nil_vtable, %edx	\n"
+"__t0:	movl	"_"_libid_nil_vtable, %edx	\n"
 "	jmp	__tok				\n"
-"__t1:	movl	__libid_tag_vtable, %edx	\n"
+"__t1:	movl	"_"_libid_tag_vtable, %edx	\n"
 "	jmp	__tok				\n"
 );
 # define _libid_bind _libid_bind_fill
@@ -649,8 +655,8 @@ asm (
 asm (
 "	.text						\n"
 "	.align	4					\n"
-"	.globl	__libid_bind				\n"
-"__libid_bind:						\n"	// r3= selector, r4= receiver
+"	.globl	"_"_libid_bind				\n"
+_"_libid_bind:						\n"	// r3= selector, r4= receiver
 "	andi.	r0, r4, 1				\n"
 "	bne	__t1					\n"	// tagged
 "	cmpwi	r4, 0					\n"
@@ -662,25 +668,27 @@ asm (
 "	andi.	r6, r6, 0xffc				\n"	// r6 = (vtable << 2) ^ (selector >> 3) & CacheSize
 "	add	r7, r6, r6				\n"
 "	add	r6, r6, r7				\n"
-"	addis	r6, r6, ha16(__libid_mcache)		\n"
-"	addi	r6, r6, lo16(__libid_mcache)		\n"
+"	addis	r6, r6, ha16("_"_libid_mcache)		\n"
+"	addi	r6, r6, lo16("_"_libid_mcache)		\n"
 "	lwz	r7, 0(r6)				\n"	// line.vtable
 "	cmpw	r5, r7					\n"	// line.vtable == receiver.vtable ?
-"	bne	__libid_bind_fill			\n"
+"	bne	"_"_libid_bind_fill			\n"
 "	lwz	r7, 4(r6)				\n"	// line.selector
 "	cmpw	r3, r7					\n"	// line.selector == selector ?
-"	bne	__libid_bind_fill			\n"
+"	bne	"_"_libid_bind_fill			\n"
 "	lwz	r3, 8(r6)				\n"	// return line.closure
 "	blr						\n"
-"__t0:	lis	r5, ha16(__libid_nil_vtable)		\n"
-"	lwz	r5, lo16(__libid_nil_vtable)(r5)	\n"
+"__t0:	lis	r5, ha16("_"_libid_nil_vtable)		\n"
+"	lwz	r5, lo16("_"_libid_nil_vtable)(r5)	\n"
 "	b	__tok					\n"
-"__t1:	lis	r5, ha16(__libid_tag_vtable)		\n"
-"	lwz	r5, lo16(__libid_tag_vtable)(r5)	\n"
+"__t1:	lis	r5, ha16("_"_libid_tag_vtable)		\n"
+"	lwz	r5, lo16("_"_libid_tag_vtable)(r5)	\n"
 "	b	__tok					\n"
 );
 # define _libid_bind _libid_bind_fill
 #endif
+
+#undef _
 
 _closure_t *_libid_bind(oop selector, oop receiver)
 #undef _libid_bind
