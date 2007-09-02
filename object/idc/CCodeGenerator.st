@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-24 17:13:17 by piumarta on emilia
+  Last edited: 2007-09-02 07:33:36 by piumarta on ubuntu
 "
 
 { import: CodeGenerator }
@@ -77,22 +77,11 @@ CCodeGenerator headerTextType: outputType
 #if defined(WIN32)
 # include <malloc.h>
 # include <windows.h>
+# include <winbase.h>
   typedef HINSTANCE dlhandle_t;
 # define dlopen(path, mode)	LoadLibrary(path)
 # define dlsym(handle, name)	((void *)GetProcAddress(handle, name))
 # define dlclose(handle)	FreeLibrary(handle)
-# include <winbase.h>
-  inline int gettimeofday(struct timeval *tp, void *tzp)
-  {
-     union {
-       long long ns100;
-       FILETIME ft;
-     } _now;
-     GetSystemTimeAsFileTime(&_now.ft);
-     tp->tv_usec= (long)((_now.ns100 / 10LL) % 1000000LL);
-     tp->tv_sec= (long)((_now.ns100 - (116444736000000000LL)) / 10000000LL);
-     return 0;
-   }
 #else
 # include <dlfcn.h>
   typedef void *dlhandle_t;
