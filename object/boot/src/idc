@@ -2,8 +2,8 @@
 
 program="$0"
 
-prefix="/usr/local/lib/idc/i386-apple-darwin8.8.1/"
-libfix="/usr/local/lib/idc/i386-apple-darwin8.8.1/"
+prefix="/usr/local/lib/idc/i686-pc-linux-gnu/"
+libfix="/usr/local/lib/idc/i686-pc-linux-gnu/"
 config=""
 cc="cc"
 infile=""
@@ -130,21 +130,21 @@ done
 
 case "$config" in
     "arch")		echo "i386";	exit;;
-    "os")		echo "darwin";		exit;;
-    "TARGET")		echo "i386-apple-darwin8.8.1";	exit;;
-    "PREFIX")		echo "/usr/local/lib/idc/i386-apple-darwin8.8.1/";	exit;;
+    "os")		echo "linux";		exit;;
+    "TARGET")		echo "i686-pc-linux-gnu";	exit;;
+    "PREFIX")		echo "/usr/local/lib/idc/i686-pc-linux-gnu/";	exit;;
     "CC")		echo "cc";		exit;;
-    "CFLAGS")		echo "-g -Wall -Wreturn-type -Werror -fno-common";	exit;;
-    "MFLAGS")		echo "-arch i486";	exit;;
+    "CFLAGS")		echo "-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1 -Wno-unused-value";	exit;;
+    "MFLAGS")		echo "";	exit;;
     "OFLAGS")		echo "-O";	exit;;
     "O3FLAGS")		echo "-O3 -march=prescott -fomit-frame-pointer -falign-functions=16 -funroll-loops";	exit;;
     "CCFLAGS")		echo "";	exit;;
     "CCFLAGS_O")	echo "-c";	exit;;
-    "CCFLAGS_SO")	echo "";	exit;;
-    "LDFLAGS")		echo "";	exit;;
+    "CCFLAGS_SO")	echo " -fpic";	exit;;
+    "LDFLAGS")		echo "-export-dynamic";	exit;;
     "LDFLAGS_O")	echo "";	exit;;
-    "LDFLAGS_SO")	echo "-bundle -flat_namespace -undefined suppress";	exit;;
-    "LDLIBS")		echo "";	exit;;
+    "LDFLAGS_SO")	echo "-shared";	exit;;
+    "LDLIBS")		echo "-ldl -lm";	exit;;
     "LDLIBS_O")		echo "";	exit;;
     "LDLIBS_SO")	echo "";	exit;;
     "OBJEXT")		echo "";	exit;;
@@ -152,30 +152,30 @@ case "$config" in
     "OBJEXT_SO")	echo ".so";	exit;;
     "GCDIR")		echo "gc6.7";		exit;;
     "SYSARCH")		echo "i386";	exit;;
-    "SYSOS")		echo "darwin";		exit;;
+    "SYSOS")		echo "linux";		exit;;
     ?*)			echo "unknown config parameter: $config" >&2;  exit 1;;
 esac
 
 case $idtype in
     program)
 	idflags="-m"
-	ccflags="-g -Wall -Wreturn-type -Werror -fno-common -arch i486 "
-	ldflags=""
+	ccflags="-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1 -Wno-unused-value  "
+	ldflags="-export-dynamic"
 	idlibs="libid$_p.o gc.a"
-	ldlibs=" -lm"
+	ldlibs="-ldl -lm -lm"
 	soext=""
 	;;
     object)
 	idflags="-c"
-	ccflags="-g -Wall -Wreturn-type -Werror -fno-common -arch i486 -c"
+	ccflags="-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1 -Wno-unused-value  -c"
 	ldflags=""
 	ldlibs=""
 	soext=".o"
 	;;
     shared)
 	idflags=""
-	ccflags="-g -Wall -Wreturn-type -Werror -fno-common -arch i486 "
-	ldflags="-bundle -flat_namespace -undefined suppress"
+	ccflags="-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1 -Wno-unused-value   -fpic"
+	ldflags="-shared"
 	idlibs=""
 	ldlibs=""
 	soext=".so"
@@ -228,7 +228,7 @@ ccflags="$ccflags -I${prefix}"
 
 if [ ! -z "$infile" ]; then
   $verbose
-  $run ${prefix}idc1 -I$prefix -I. $idopts $idflags $infile -o $ccfile &&
+  $run ${prefix}idc1 -I$prefix $idopts $idflags $infile -o $ccfile &&
   $run $cc -I$prefix/include $ccflags $ccopts $ccfile -o $outfile $ldflags $ldobjs $idlibs $ldlibs &&
   $run $cckill $ccfile
 else
