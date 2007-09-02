@@ -1,6 +1,7 @@
 #include <stdio.h>					/* cum mortuis in lingua mortua */
 #include <stdlib.h>
 #include <stdarg.h>
+#include <signal.h>
 #include <setjmp.h>
 #include <string.h>
 #include <ctype.h>
