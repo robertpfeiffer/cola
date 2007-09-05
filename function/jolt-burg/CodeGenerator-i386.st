@@ -1,4 +1,4 @@
-" CodeGenerator-ppc.st -- translate abstract Instructions to x86 machine instructions
+" CodeGenerator-i386.st -- translate abstract Instructions to x86 machine instructions
 
   Copyright (c) 2006, 2007 Ian Piumarta
   All rights reserved.

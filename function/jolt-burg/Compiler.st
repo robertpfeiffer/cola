@@ -24,6 +24,8 @@
 { import: Instruction }
 { import: CompilerOptions }
 
+{ include "dlsym.h" }
+
 "----------------------------------------------------------------"
 
 Variable : Object ( name )
@@ -154,7 +156,7 @@ LocalEnvironment defineParameter: name	[ ^self at: name put: (ParameterVariable 
 TheGlobalEnvironment := [ GlobalEnvironment new ]
 
 Symbol _dlsym		[ ^self _dlsym_: self _stringValue ]
-Symbol _dlsym_: _string	{ _return (oop)dlsym(RTLD_DEFAULT, (char *)v__string); }
+Symbol _dlsym_: _string	{ _return (oop)_libid->dlsym(RTLD_DEFAULT, (char *)v__string); }
 
 [
     | _value |

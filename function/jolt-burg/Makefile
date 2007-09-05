@@ -9,11 +9,13 @@ OBJEXT_SO       = .so
 ARCH		= $(shell $(IDC) -C arch)
 
 LIBS		= ../objects/objects.a readline.o jolt.a
+#LIBS		= ../objects/objects.a readline.o jolt.a
 
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o Options.o
 
-LDLIBS		= readline.o jolt.a -lreadline -ltermcap # -lopcodes -lintl
+LDLIBS		= readline.o jolt.a -lreadline -lhistory -ltermcap # -lopcodes -lintl
+#LDLIBS		= jolt.a # -lopcodes -lintl
 
 all : main$(OBJEXT)
 
@@ -43,7 +45,7 @@ jolt.a : $(FILES) ../objects/objects.a
 
 CodeGenerator-local.st : .FORCE
 	-rm -f $@
-	ln -s CodeGenerator-$(ARCH).st $@
+	cp -p CodeGenerator-$(ARCH).st $@
 
 tidy : .FORCE
 	-rm -f *.o *.d *~ .gdb* *.stackdump *.o.c main.c
@@ -69,5 +71,6 @@ bench-c : bench-c.c
 
 bench-id : bench-id.st
 	idc -O -k -I../objects bench-id.st -o bench-id ../objects/objects.a  -lreadline
+#	idc -O -k -I../objects bench-id.st -o bench-id ../objects/objects.a
 
 .FORCE :
