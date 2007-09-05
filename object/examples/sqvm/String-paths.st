@@ -3,7 +3,7 @@
 String _cString
 {
   int len= (int)self->v_size >> 1;
-  char *cString= (char *)_balloc(len + 1);
+  char *cString= (char *)_libid->balloc(len + 1);
   memcpy(cString, self->v__bytes, len);
   cString[len]= '\0';
   return (oop)cString;
@@ -17,7 +17,7 @@ String getcwd
       getcwd(buf, sizeof(buf));
       size_t len= strlen(buf);
       self->v_size= (oop)((len << 1) | 1);
-      self->v__bytes= _balloc(len);
+      self->v__bytes= _libid->balloc(len);
       memcpy(self->v__bytes, buf, len);
     }.
 ]

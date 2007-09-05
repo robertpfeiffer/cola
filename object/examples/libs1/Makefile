@@ -15,7 +15,6 @@ libs.a : lib1.o lib2.o
 	ar rc $@.new lib1.o lib2.o
 	mv $@.new $@
 	-@ranlib $@
-	rm lib1.o lib2.o
 
 %.o : %.st
 	$(IDC) -c $<

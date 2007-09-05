@@ -30,7 +30,7 @@ Pring announce
 
 Object perform: aSymbol withSelf: anObject	[ ^self _perform: (SelectorTable at: aSymbol) s: anObject ]
 
-Object _perform: s s: r				{ struct __closure *c= _local_bind(v_s, v_self);  return (c->method)((oop)c, v_self, v_r); }
+Object _perform: s s: r				{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, v_self, v_r); }
 
 
 Pring test

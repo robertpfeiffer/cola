@@ -72,7 +72,7 @@ _vtable  tally: anInteger	[  _tally := anInteger _integerValue ]
 
 _vtable alloc: size
 {
-    oop *object= _palloc(sizeof(oop) + (v_size ? (size_t)v_size : 1));
+    oop *object= _libid->palloc(sizeof(oop) + (v_size ? (size_t)v_size : 1));
     *object= v_self;
     return (oop)(object + 1);
 }

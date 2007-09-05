@@ -119,7 +119,7 @@ X11Event : Object ( _event )
 X11Event initialize
 [
     super initialize.
-    { self->v__event= (oop)_balloc(sizeof(XEvent)); }.
+    { self->v__event= (oop)_libid->balloc(sizeof(XEvent)); }.
 ]
 
 X11Event _event		[ ^_event ]
@@ -277,7 +277,7 @@ X11WindowAttributes : Object ( _xwa )
 X11WindowAttributes initialize
 [
     super initialize.
-    { self->v__xwa= (oop)_balloc(sizeof(XSetWindowAttributes)); }.
+    { self->v__xwa= (oop)_libid->balloc(sizeof(XSetWindowAttributes)); }.
 ]
 
 X11WindowAttributes _xwa		[ ^_xwa ]

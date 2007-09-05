@@ -5,7 +5,7 @@ ObjectTable : Object ( entries size youngStart position lastInstance lastIndex )
 
 Smalltalk garbageCollect
 {
-    _local_gc_gcollect();
+    _libid->gc_gcollect();
 }
 
 ObjectTable new: numObjects

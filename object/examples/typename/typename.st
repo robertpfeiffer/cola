@@ -2,7 +2,7 @@
 
 String asPrototype
 {
-    return _local_import((char *)self->v__bytes);
+    return _libid->import((char *)self->v__bytes);
 }
 
 [

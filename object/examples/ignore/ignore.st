@@ -1,6 +1,6 @@
 { import: st80 }
 
-_object _bind: aSelector	{ return (oop)_local_bind(v_aSelector, self); }
+_object _bind: aSelector	{ return (oop)_libid->bind(v_aSelector, self); }
 
 _selector asString		[ ^String value_: self _string ]
 
