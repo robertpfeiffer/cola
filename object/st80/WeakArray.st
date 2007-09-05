@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-10-02 13:49:13 by piumarta on emilia.local
+  Last edited: 2007-09-03 12:06:43 by piumarta on ubuntu
 "
 
 { import: Array }
@@ -26,7 +26,7 @@ Object _newWeakPointers: anInteger
 {
     void *ptrs;
     size_t size= (size_t)v_anInteger >> 1;
-    ptrs= _balloc(sizeof(oop) * size);
+    ptrs= _libid->balloc(sizeof(oop) * size);
     memset(ptrs, 0, sizeof(oop) * size);
     return ptrs;
 }
@@ -43,7 +43,7 @@ WeakArray at: anInteger put: anObject
 	    {
 		GC_PTR *ptr= (GC_PTR *)(self->v__pointers) + ((int)v_anInteger >> 1) - 1;
 	        if (*(oop *)ptr)
-	            _local_gc_unregisterDisappearingLink(ptr);
+	            _libid->gc_unregisterDisappearingLink(ptr);
 	    }
     }.
     super at: anInteger put: anObject.
@@ -51,7 +51,7 @@ WeakArray at: anInteger put: anObject
 	if (v_anObject && !((long)v_anObject & 1))
 	    {
 		GC_PTR *ptr= (GC_PTR *)(self->v__pointers) + ((int)v_anInteger >> 1) - 1;
-	        _local_gc_generalRegisterDisappearingLink(ptr, &(v_anObject->_vtable[-1]));
+	        _libid->gc_generalRegisterDisappearingLink(ptr, &(v_anObject->_vtable[-1]));
 	    }
     }.
     ^anObject

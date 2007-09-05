@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 21:24:42 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-09-03 11:29:59 by piumarta on ubuntu
 "
 
 { external }
@@ -70,7 +70,7 @@ _selector size_: _stringSize value_: _stringValue
   char *buf= alloca((size_t)v__stringSize + 1);
   memcpy((void *)buf, (void *)v__stringValue, (size_t)v__stringSize);
   buf[(size_t)v__stringSize]= '\0';
-  return _local_intern(buf);
+  return _libid->intern(buf);
 }
 
 _selector _string
@@ -85,6 +85,6 @@ _vector new_: _newSize
 #ifndef STAGE1
   v_stateful_self=
 #endif
-  v_self= _alloc(v_self, sizeof(struct t__vector) + sizeof(oop) * (size_t)v__newSize);
+  v_self= _libid->alloc(v_self, sizeof(struct t__vector) + sizeof(oop) * (size_t)v__newSize);
   ((struct t__vector *)v_self)->v__size= v__newSize;
 }

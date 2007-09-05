@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-02-10 01:08:15 by piumarta on emilia.local
+  Last edited: 2007-09-03 11:34:15 by piumarta on ubuntu
 "
 
 { import: ByteArray }
@@ -35,7 +35,7 @@ String _stringValue
     | _string |
     {
       int len= (int)(self->v_size) >> 1;
-      v__string= _balloc(len + 1);
+      v__string= _libid->balloc(len + 1);
       memcpy(v__string, self->v__bytes, len);
       ((char *)v__string)[len]= '\0';
     }.
@@ -48,7 +48,7 @@ String value_: _cString
     {
       int len= strlen((char *)v__cString);
       self->v_size= (oop)((len << 1) | 1);
-      self->v__bytes= _balloc(len);
+      self->v__bytes= _libid->balloc(len);
       memcpy(self->v__bytes, v__cString, len);
     }.
 ]

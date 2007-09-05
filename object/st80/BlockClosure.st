@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 21:26:42 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-09-03 11:30:39 by piumarta on ubuntu
 "
 
 { import: Object }
@@ -33,7 +33,7 @@ StaticBlockClosure function_: _implementationAddress arity_: _argumentCount
 #     ifndef STAGE1
         v_stateful_self=
 #     endif
-        v_self= _alloc(v_self, sizeof(*self));
+        v_self= _libid->alloc(v_self, sizeof(*self));
     }.
     _arity    := _argumentCount.
     _function := _implementationAddress.
@@ -130,7 +130,7 @@ BlockClosure function_: _implementationAddress arity_: _argumentCount
 #     ifndef STAGE1
 	v_stateful_self=
 #     endif
-	v_self= _alloc(v_self, sizeof(*self));
+	v_self= _libid->alloc(v_self, sizeof(*self));
     }.
     _function := _implementationAddress.
     _arity    := _argumentCount.

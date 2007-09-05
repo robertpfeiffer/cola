@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 14:49:21 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-09-03 11:35:57 by piumarta on ubuntu
 "
 
 { import: Symbol }
@@ -56,22 +56,22 @@ Object _perform: s
 #else
 # define V_SELF v_self, v_self
 #endif
-  struct __closure *c= _local_bind(v_s, v_self);
+  struct __closure *c= _libid->bind(v_s, v_self);
   return (c->method)((oop)c, V_SELF);
 }
 
-Object _perform: s w: a				{ struct __closure *c= _local_bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a); }
-Object _perform: s w: a w: b			{ struct __closure *c= _local_bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b); }
-Object _perform: s w: a w: b w: c		{ struct __closure *c= _local_bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c); }
-Object _perform: s w: a w: b w: c w: d		{ struct __closure *c= _local_bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c, v_d); }
-Object _perform: s w: a w: b w: c w: d w: e	{ struct __closure *c= _local_bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c, v_d, v_e); }
+Object _perform: s w: a				{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a); }
+Object _perform: s w: a w: b			{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b); }
+Object _perform: s w: a w: b w: c		{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c); }
+Object _perform: s w: a w: b w: c w: d		{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c, v_d); }
+Object _perform: s w: a w: b w: c w: d w: e	{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c, v_d, v_e); }
 
 Object in: aType perform: aSymbol	[ ^self in: aType _perform: (SelectorTable at: aSymbol) ]
 Object in: aType  perform: s with: a	[ ^self in: aType _perform: (SelectorTable at: s) with: a ]
 
-Object in: aType _perform: s		{ struct __closure *c= _local_bind(v_s, v_aType);  return (c->method)((oop)c, V_SELF); }
+Object in: aType _perform: s		{ struct __closure *c= _libid->bind(v_s, v_aType);  return (c->method)((oop)c, V_SELF); }
 
-Object in: aType _perform: s with: a	{ struct __closure *c= _local_bind(v_s, v_aType);  return (c->method)((oop)c, V_SELF, v_a); }
+Object in: aType _perform: s with: a	{ struct __closure *c= _libid->bind(v_s, v_aType);  return (c->method)((oop)c, V_SELF, v_a); }
 
 PerformWithArgumentsSelectors : Array ()
 [

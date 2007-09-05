@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 15:30:30 by piumarta on emilia.lax02.mtt
+  Last edited: 2007-09-03 13:35:07 by piumarta on ubuntu
 "
 
 { import: Magnitude }
@@ -25,6 +25,8 @@ Character : Magnitude ( value )
 
 Character isCharacter	[ ^true ]
 Object isCharacter	[ ^false ]
+
+"---- moved to Object.st
 
 Character _value: anInteger
 [
@@ -40,6 +42,8 @@ CharacterTable : Array ()
 
 Character value: anInteger	[ ^CharacterTable at: anInteger + 1 ]
 Character value_: _int		[ ^self value: (SmallInteger value_: _int) ]
+
+----"
 
 Character asciiValue		[ ^value ]
 Character value			[ ^value ]

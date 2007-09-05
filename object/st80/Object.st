@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-21 16:06:43 by piumarta on emilia.local
+  Last edited: 2007-09-03 13:33:30 by piumarta on ubuntu
 "
 
 { import: _object }
@@ -63,9 +63,9 @@ Object _clone: size	[ ^self _vtable _alloc: size _integerValue ]
 Object new		[ ^self _clone initialize ]
 Object initialize	[]
 
-Object _newPointers: anInteger	{ return (oop)_palloc(((size_t)v_anInteger >> 1) * sizeof(oop)); }
-Object _newWords: anInteger	{ return (oop)_balloc(((size_t)v_anInteger >> 1) * sizeof(int)); }
-Object _newBytes: anInteger	{ return (oop)_balloc(((size_t)v_anInteger >> 1) * sizeof(char)); }
+Object _newPointers: anInteger	{ return (oop)_libid->palloc(((size_t)v_anInteger >> 1) * sizeof(oop)); }
+Object _newWords: anInteger	{ return (oop)_libid->balloc(((size_t)v_anInteger >> 1) * sizeof(int)); }
+Object _newBytes: anInteger	{ return (oop)_libid->balloc(((size_t)v_anInteger >> 1) * sizeof(char)); }
 
 SmallInteger value_: _int	{ return (oop)((((int)v__int) << 1) | 1); }
 SmallInteger _integerValue	{ return (oop)(((int)self) >> 1); }
@@ -82,7 +82,7 @@ StaticBlockClosure function_: _implementationAddress arity_: _argumentCount
 #     ifndef STAGE1
 	v_stateful_self=
 #     endif
-	v_self= _alloc(v_self, sizeof(*self));
+	v_self= _libid->alloc(v_self, sizeof(*self));
     }.
     _arity    := _argumentCount.
     _function := _implementationAddress.
@@ -95,7 +95,7 @@ BlockClosure function_: _implementationAddress arity_: _argumentCount
 #     ifndef STAGE1
 	v_stateful_self=
 #     endif
-	v_self= _alloc(v_self, sizeof(*self));
+	v_self= _libid->alloc(v_self, sizeof(*self));
     }.
     _function := _implementationAddress.
     _arity    := _argumentCount.
@@ -155,6 +155,13 @@ Array at: anInteger
     ^self primitiveFailed
 ]
 
+ByteArray size_: _size value_: _value	"ByteArray and String constructor"
+[
+    self := self _clone.
+    size := SmallInteger value_: _size.
+    _bytes := _value.
+]
+
 ImmutableArray size_: _size value_: _value
 [
     self := self _clone.
@@ -209,10 +216,25 @@ SmallInteger + aNumber
     ^super + aNumber
 ]
 
+Character _value: anInteger
+[
+    self := super new.
+    value := anInteger.
+]
+
+CharacterTable : Array ()
+[
+    CharacterTable := Array new: 256.
+    0 to: 255 do: [:i | CharacterTable at: i + 1 put: (Character _value: i)]
+]
+
+Character value: anInteger	[ ^CharacterTable at: anInteger + 1 ]
+Character value_: _int		[ ^self value: (SmallInteger value_: _int) ]
+
 { import: BlockClosure }	"control structures"
+{ import: Character }		"program literals, debug printing and error handling"
 { import: SmallInteger }	"ubiquitous"
 { import: Array }		"program literals and the global Character table"
-{ import: Character }		"program literals, debug printing and error handling"
 { import: String }		"ditto -- loads ByteArray for us"
 { import: WordArray }		"program literals"
 
