@@ -81,7 +81,8 @@ IDST_FILES	= ArgumentVariableNode$(OBJEXT_O) \
 		  VariableNode$(OBJEXT_O) \
 		  WordArrayNode$(OBJEXT_O) \
 
-FILES		= st80$(OBJEXT_SO) \
+FILES		= include/gc \
+		  st80$(OBJEXT_SO) \
 		  idst$(OBJEXT_SO) \
 		  idc1$(OBJEXT) \
 		  idc \
@@ -132,6 +133,10 @@ idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES)
 %$(OBJEXT) : src/%.c gc.a libid.o libid_g.o
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS) $(LDFLAGS) $< $(LDLIBS) -o $@ libid.o gc.a -lm
 
+include/gc :
+	rm -rf include/gc
+	cp -pr ../$(GCDIR)/include include/gc
+
 gc.a : ../$(GCDIR)/gc.a
 	-$(SHELL) -ec 'ln -s ../$(GCDIR)/gc.a .'
 
@@ -152,7 +157,7 @@ tidy : .FORCE
 
 clean : tidy
 	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) clean'
-	-rm -f $(FILES) idc1$(OBJEXT) gc.a *$(OBJEXT_O) *$(OBJEXT_SO)
+	-rm -rf $(FILES) idc1$(OBJEXT) gc.a *$(OBJEXT_O) *$(OBJEXT_SO)
 
 distclean spotless : clean
 	-rm -f Makefile
