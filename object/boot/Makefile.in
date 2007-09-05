@@ -81,8 +81,7 @@ IDST_FILES	= ArgumentVariableNode$(OBJEXT_O) \
 		  VariableNode$(OBJEXT_O) \
 		  WordArrayNode$(OBJEXT_O) \
 
-FILES		= ./include \
-		  st80$(OBJEXT_SO) \
+FILES		= st80$(OBJEXT_SO) \
 		  idst$(OBJEXT_SO) \
 		  idc1$(OBJEXT) \
 		  idc \
@@ -133,12 +132,11 @@ idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES)
 %$(OBJEXT) : src/%.c gc.a libid.o libid_g.o
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS) $(LDFLAGS) $< $(LDLIBS) -o $@ libid.o gc.a -lm
 
-./include :
-	-$(SHELL) -ec '( mkdir include; cd include; ln -s ../../$(GCDIR)/include gc )'
-
-gc.a : 
-	$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
+gc.a : ../$(GCDIR)/gc.a
 	-$(SHELL) -ec 'ln -s ../$(GCDIR)/gc.a .'
+
+../$(GCDIR)/gc.a :
+	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
 
 install : all .FORCE
 	-rm -rf $(PREFIX)
@@ -154,7 +152,6 @@ tidy : .FORCE
 
 clean : tidy
 	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) clean'
-	-rm -rf include
 	-rm -f $(FILES) idc1$(OBJEXT) gc.a *$(OBJEXT_O) *$(OBJEXT_SO)
 
 distclean spotless : clean

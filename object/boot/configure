@@ -161,7 +161,8 @@ cygwin () {
 mingw32 () {
     CC=${CC:-"gcc"}
     PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
-    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -mno-cygwin"}
+    CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror"}
+    MFLAGS="-mno-cygwin"
     LDFLAGS=${LDFLAGS:-"-Wl,--export-all-symbols"}
     CCFLAGS_O=${CCFLAGS_O:-"-c"}
     OBJEXT_O=${OBJEXT_O:-".o"}
