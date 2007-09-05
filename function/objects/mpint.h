@@ -1,6 +1,6 @@
-#define XMALLOC		GC_malloc
-#define XCALLOC		GC_calloc
-#define XREALLOC	GC_realloc
-#define XFREE		GC_free
+#define XMALLOC		GC_MALLOC
+#define XCALLOC		GC_CALLOC
+#define XREALLOC	GC_REALLOC
+#define XFREE		GC_FREE
 
 #include "tommath.h"

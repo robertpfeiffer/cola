@@ -87,6 +87,7 @@ File _read_: _bytes size_: _size	{ _return (oop)read((int)self->v__fd, (void *)v
 
 File isInteractive			{ _return (oop)isatty((int)self->v__fd); }
 
+"
 File waitForInput: msTimeout
 {
     fd_set r, w, x;
@@ -99,6 +100,7 @@ File waitForInput: msTimeout
     n= select((long)self->v__fd + 1, &r, &w, &x, &tv);
     _return (oop)(n << 1 | 1);
 }
+"
 
 File open: pathString
 [
@@ -140,7 +142,14 @@ File create: pathString ifAbsent: errorBlock
 
 File create_: _path
 {
-    _return (oop)(((long)open((char *)v__path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) << 1 | 1);
+    _return (oop)(((long)open((char *)v__path,
+			      O_WRONLY | O_CREAT | O_TRUNC,
+#			     if defined(WIN32)
+			      0644
+#			     else
+			      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
+#			     endif
+			      )) << 1 | 1);
 }
 
 File close

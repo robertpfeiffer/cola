@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-21 12:06:31 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-09-03 12:58:22 by piumarta on ubuntu
 "
 
 { external }
@@ -73,7 +73,7 @@ _selector size_: _stringSize value_: _stringValue
   char *buf= alloca((size_t)v__stringSize + 1);
   memcpy((void *)buf, (void *)v__stringValue, (size_t)v__stringSize);
   buf[(size_t)v__stringSize]= '\0';
-  _return (_local_intern(buf));
+  _return (_libid->intern(buf));
 }
 
 _selector _stringValue
@@ -85,7 +85,7 @@ _selector _stringValue
 
 _vector new_: _newSize
 {
-  v_self= v_stateful_self= _alloc(v_self, sizeof(struct t__vector) + sizeof(oop) * (size_t)v__newSize);
+  v_self= v_stateful_self= _libid->alloc(v_self, sizeof(struct t__vector) + sizeof(oop) * (size_t)v__newSize);
   ((struct t__vector *)v_self)->v__size= v__newSize;
 }
 
@@ -98,7 +98,7 @@ _object _methodAt: aSelector
 
 _object _bind: aSelector
 {
-  _return ((oop)_local_bind(v_aSelector, self));
+  _return ((oop)_libid->bind(v_aSelector, self));
 }
 
 _assoc value			[ ^value ]
@@ -121,4 +121,4 @@ _object performMethod_: _aMethod with: a with: b
 
 _vtable delegate		[ ^delegate ]
 
-_object _gcollect		{ _local_gc_gcollect(); }
+_object _gcollect		{ _libid->gc_gcollect(); }

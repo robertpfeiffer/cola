@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-21 12:06:03 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-09-03 12:59:04 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -50,8 +50,8 @@ Object identityHash		{ _return (oop)((long)self >> 3 | 1); }
 Object = other			[ ^self == other ]
 Object ~= other			[ ^(self = other) not ]
 
-Object _palloc: size		{ _return (oop)_palloc(sizeof(oop) * _I(v_size)); }
-Object _balloc: size		{ _return (oop)_balloc(              _I(v_size)); }
+Object _palloc: size		{ _return (oop)_libid->palloc(sizeof(oop) * _I(v_size)); }
+Object _balloc: size		{ _return (oop)_libid->balloc(              _I(v_size)); }
 
 UndefinedObject _nil		{ _return 0; }
 
@@ -114,31 +114,31 @@ Object halt
 
 Object perform: s
 {
-    struct __closure *c= _local_bind(v_s, v_self);
+    struct __closure *c= _libid->bind(v_s, v_self);
     _return (c->method)((oop)c, v_self, v_self);
 }
 
 Object perform: s with: a
 {
-    struct __closure *c= _local_bind(v_s, v_self);
+    struct __closure *c= _libid->bind(v_s, v_self);
     _return (c->method)((oop)c, v_self, v_self, v_a);
 }
 
 Object perform: s with: a with: b
 {
-    struct __closure *c= _local_bind(v_s, v_self);
+    struct __closure *c= _libid->bind(v_s, v_self);
     _return (c->method)((oop)c, v_self, v_self, v_a, v_b);
 }
 
 Object perform: s with: a with: b with: c
 {
-    struct __closure *c= _local_bind(v_s, v_self);
+    struct __closure *c= _libid->bind(v_s, v_self);
     _return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c);
 }
 
 Object perform: s with: a with: b with: c with: d
 {
-    struct __closure *c= _local_bind(v_s, v_self);
+    struct __closure *c= _libid->bind(v_s, v_self);
     _return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c, v_d);
 }
 

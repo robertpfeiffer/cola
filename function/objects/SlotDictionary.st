@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:49:39 by piumarta on emilia
+  Last edited: 2007-09-03 13:00:29 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -26,11 +26,11 @@ SlotDictionary new	[ ^self new: nil ]
 
 SlotDictionary new: defaultElement
 {
-    v_self= (oop)_alloc(v_self, sizeof(struct t_SlotDictionary));
+    v_self= (oop)_libid->alloc(v_self, sizeof(struct t_SlotDictionary));
     self->v__size=    (oop)4;
     self->v__tally=   (oop)0;
-    self->v__keys=    (oop)_palloc(sizeof(oop) * 4);
-    self->v__values=  (oop)_palloc(sizeof(oop) * 4);
+    self->v__keys=    (oop)_libid->palloc(sizeof(oop) * 4);
+    self->v__values=  (oop)_libid->palloc(sizeof(oop) * 4);
     self->v_default=  v_defaultElement;
 }
 
@@ -40,8 +40,8 @@ SlotDictionary basicNew
     {
 	self->v__size=    (oop)2;
 	self->v__tally=   (oop)0;
-	self->v__keys=    (oop)_palloc(sizeof(oop) * 2);
-	self->v__values=  (oop)_palloc(sizeof(oop) * 2);
+	self->v__keys=    (oop)_libid->palloc(sizeof(oop) * 2);
+	self->v__values=  (oop)_libid->palloc(sizeof(oop) * 2);
 	self->v_default=  0;
     }
 ]
@@ -110,8 +110,8 @@ SlotDictionary at: aKey put: aValue
         {
             long oldSize= (long)self->v__size;
             long newSize= oldSize * 2;
-	    oop *keys=   (oop *)_palloc(sizeof(oop) * newSize);
-	    oop *values= (oop *)_palloc(sizeof(oop) * newSize);
+	    oop *keys=   (oop *)_libid->palloc(sizeof(oop) * newSize);
+	    oop *values= (oop *)_libid->palloc(sizeof(oop) * newSize);
 	    memcpy(keys,   self->v__keys,   sizeof(oop) * oldSize);
 	    memcpy(values, self->v__values, sizeof(oop) * oldSize);
 	    self->v__keys=   (oop)keys;

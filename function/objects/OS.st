@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:48:46 by piumarta on emilia
+  Last edited: 2007-09-03 13:01:03 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -26,8 +26,8 @@ OSArgumentCount  := []
 OSArgumentVector := []
 OSArguments      := []
 
-OS _argumentCount		{ _return (oop)_param(0); }
-OS _argumentAt_: _index		{ _return (oop)(((char **)_param(1))[(int)v__index]); }
+OS _argumentCount		{ _return (oop)_libid->param(0); }
+OS _argumentAt_: _index		{ _return (oop)(((char **)_libid->param(1))[(int)v__index]); }
 
 OS argumentCount		[ ^OSArgumentCount  ifNil: [OSArgumentCount := SmallInteger value_: self _argumentCount] ]
 OS argumentVector		[ ^OSArgumentVector ifNil: [OSArgumentVector := self makeArgumentVector] ]
@@ -60,16 +60,24 @@ OS system		[ ^self stringParam: 6 ]
 OS integerParam: number	[ ^SmallInteger value_: (self _param_: number _integerValue) ]
 OS stringParam: number	[ ^String	value_: (self _param_: number _integerValue) ]
 
-OS _param_: _n		{ _return (oop)_param((int)v__n); }
+OS _param_: _n		{ _return (oop)_libid->param((int)v__n); }
 
 OS sleep: seconds
 {
+#  if defined(WIN32)
+    Sleep(((long)v_seconds >> 1) * 1000);
+#  else
     sleep((long)v_seconds >> 1);
+#  endif
 }
 
 OS usleep: useconds
 {
+#  if defined(WIN32)
+    Sleep(((long)v_useconds >> 1) / 1000);
+#  else
     usleep((long)v_useconds >> 1);
+#  endif
 }
 
 OS exit: status

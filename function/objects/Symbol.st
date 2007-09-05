@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:51:10 by piumarta on emilia
+  Last edited: 2007-09-03 12:59:20 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -28,7 +28,7 @@ Symbol intern_: _string size_: _stringSize
     char *buf= (char *)alloca((int)v__stringSize + 1);
     memcpy((void *)buf, (void *)v__string, (int)v__stringSize);
     buf[(int)v__stringSize]= '\0';
-    _return _selector(buf);
+    _return _libid->intern(buf);
 }
 
 Symbol intern_: _string

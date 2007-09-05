@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-28 15:25:46 by piumarta on emilia.local
+  Last edited: 2007-09-03 13:00:01 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -68,9 +68,9 @@ Array at_: _offset put: anObject
 }
 
 Array  argumentVectorSize	[ ^SmallInteger value_: self _argumentVectorSize ]
-Array _argumentVectorSize	{ _return (oop)_param(0); }
+Array _argumentVectorSize	{ _return (oop)_libid->param(0); }
 Array  argumentVectorAt: offset	[ ^String value_: (self _argumentVectorAt_: offset _integerValue) ]
-Array _argumentVectorAt_: _off	{ _return (oop)(((char **)_param(1))[(int)v__off]); }
+Array _argumentVectorAt_: _off	{ _return (oop)(((char **)_libid->param(1))[(int)v__off]); }
 
 Array argumentVector
 [

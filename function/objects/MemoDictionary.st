@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:46:05 by piumarta on emilia
+  Last edited: 2007-09-03 13:00:41 by piumarta on ubuntu
 "
 
 { import: Objects }
@@ -49,8 +49,8 @@ MemoDictionary at: aKey put: aValue
     {
         long oldSize= (long)self->v__size;
         long newSize= oldSize * 2;
-        oop *keys=   (oop *)_palloc(sizeof(oop) * newSize);
-        oop *values= (oop *)_palloc(sizeof(oop) * newSize);
+        oop *keys=   (oop *)_libid->palloc(sizeof(oop) * newSize);
+        oop *values= (oop *)_libid->palloc(sizeof(oop) * newSize);
         memcpy(keys,   self->v__keys,   sizeof(oop) * oldSize);
         memcpy(values, self->v__values, sizeof(oop) * oldSize);
         self->v__keys=   (oop)keys;

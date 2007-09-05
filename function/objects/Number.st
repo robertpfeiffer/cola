@@ -522,7 +522,7 @@ Float _printString
     memcpy(&l, self, sizeof(l));
     sprintf(buf, "%f", l);
     len= strlen(buf);
-    ptr= (char *)GC_malloc(len + 1);
+    ptr= (char *)_libid->balloc(len + 1);
     memcpy(ptr, buf, len);
     ptr[len]= '\0';
     _return (oop)ptr;

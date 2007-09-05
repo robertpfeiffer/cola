@@ -15,14 +15,14 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:44:57 by piumarta on emilia
+  Last edited: 2007-09-03 12:59:42 by piumarta on ubuntu
 "
 
 { import: Objects }
 
 StaticBlockClosure function_: _implementationAddress arity_: _argumentCount
 [
-    { v_self= v_stateful_self= _alloc(v_self, sizeof(*self)); }.
+    { v_self= v_stateful_self= _libid->alloc(v_self, sizeof(*self)); }.
     _arity    := _argumentCount.
     _function := _implementationAddress.
 ]
@@ -109,7 +109,7 @@ StaticBlockClosure repeat
 BlockClosure function_: _implementationAddress arity_: _argumentCount
 	     outer: outerBlock state: variableArray nlr_: _dynamicEnvironment
 [
-    { v_self= v_stateful_self= _alloc(v_self, sizeof(*self)); }.
+    { v_self= v_stateful_self= _libid->alloc(v_self, sizeof(*self)); }.
     _function := _implementationAddress.
     _arity    := _argumentCount.
     outer     := outerBlock.

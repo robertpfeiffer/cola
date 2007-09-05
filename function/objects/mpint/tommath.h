@@ -112,7 +112,7 @@ extern "C" {
        #define XFREE    free
        #define XREALLOC realloc
        #define XCALLOC  calloc
-   #else
+   #elif 0
       /* prototypes for our heap functions */
       extern void *XMALLOC(size_t n);
       extern void *XREALLOC(void *p, size_t n);
