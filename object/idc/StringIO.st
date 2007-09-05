@@ -22,11 +22,12 @@
 
 { import: String }
 { import: Smalltalk }
+{ import: WriteStream }
 
 String _cString
 {
   int len= (int)self->v_size >> 1;
-  char *cString= (char *)_balloc(len + 1);
+  char *cString= (char *)_libid->balloc(len + 1);
   memcpy(cString, self->v__bytes, len);
   cString[len]= '\0';
   return (oop)cString;
@@ -126,7 +127,7 @@ String readFromFileNamed: path ifError: errorBlock
           struct stat sb;
           fstat(fd, &sb);
           remaining= sb.st_size;
-	  self->v__bytes= _balloc(remaining);
+	  self->v__bytes= _libid->balloc(remaining);
           while (remaining)
             {
 	      int count= read(fd, (char *)self->v__bytes + position, remaining);
@@ -224,3 +225,13 @@ String timeStamp		[ ^'%H:%M:%S' strftimeNow ]
 String dateAndTimeStamp		[ ^'%Y-%m-%d %H:%M:%S' strftimeNow ]
 String dateAndTimeZoneStamp	[ ^'%Y-%m-%d %H:%M:%S %Z' strftimeNow ]
 String dateAndTimeZuluStamp	[ ^'%Y-%m-%d %H:%M:%S Z' strftimeZulu ]
+
+String escaped
+[
+    | answer |
+    answer := WriteStream on: (String new: self size * 2).
+    self do: [:c |
+        c == $\\ ifTrue: [answer nextPut: c].
+        answer nextPut: c].
+    ^answer contents
+]

@@ -54,7 +54,7 @@ OBJEXT		= @OBJEXT@
 OBJEXT_O	= @OBJEXT_O@
 OBJEXT_SO	= @OBJEXT_SO@
 
-all : $(BIN)gc.a $(BIN)idst$(OBJEXT_SO) $(BIN)idc1$(OBJEXT) $(BIN)idc $(BIN)./include
+all : $(BIN)gc.a $(BIN)idst$(OBJEXT_SO) $(BIN)idc1$(OBJEXT) $(BIN)idc
 
 $(BIN)idst$(OBJEXT_SO) : idst.st $(FILES)
 	$(IDC) $(IINC) $(IDFLAGS) -s idst.st $(FILES) -o $@
@@ -72,9 +72,6 @@ $(BIN)%$(OBJEXT) : %.st
 
 $(BIN)idc : ../idc/idc
 	-$(SHELL) -ec 'cp -p $< $@'
-
-$(BIN)./include : 
-	-$(SHELL) -ec 'mkdir $(BIN)./include; cp -pr ../$(GCDIR)/include $(BIN)./include/gc; find $(BIN)./include/gc -name .svn -exec rm -rf {} \;'
 
 $(BIN)gc.a : 
 	-$(SHELL) -ec 'cp -p ../$(GCDIR)/gc.a $(BIN).'

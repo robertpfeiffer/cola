@@ -14,19 +14,29 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2005-12-21 20:53:46 by piumarta on emilia.local
+  Last edited: 2007-09-03 13:14:33 by piumarta on ubuntu
 "
 
 { import: ParseNode }
 
 "I represent an imported runtime library."
 
-ImportNode : ParseNode ( name )
+ImportNode : ParseNode (
+    name	"String -- the name of the imported file"
+    included	"non-nil if I was imported indirectly through another import"
+)
 
 ImportNode withName: nameString position: aPosition
 [
     self := self withPosition: aPosition.
     name := nameString.
+]
+
+ImportNode withName: nameString included: includedFlag position: aPosition
+[
+    self := self withPosition: aPosition.
+    name := nameString.
+    included := includedFlag.
 ]
 
 ImportNode encode: encoder
@@ -40,7 +50,7 @@ ImportNode encode: encoder
 ImportNode genDeclaration: gen		[]
 ImportNode genDefinition: gen		[]
 ImportNode genImplementation: gen	[]
-ImportNode genInitialisation: gen	[ gen import: name ]
+ImportNode genInitialisation: gen	[ included ifFalse: [gen import: name] ]
 
 ImportNode println: indent
 [

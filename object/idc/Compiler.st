@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-24 17:13:43 by piumarta on emilia
+  Last edited: 2007-09-03 13:14:06 by piumarta on ubuntu
 "
 
 { import: Object }
@@ -120,7 +120,7 @@ Compiler import: fileName	"include fileName and try to find a corresponding libr
     libName := fileName withoutSuffix: '.st'.
     (imports includes: libName)
 	ifFalse:
-	   [program add: (ImportNode withName: libName position: parser position).
+	   [program add: (ImportNode withName: libName included: including position: parser position).
 	    imports add: libName].
     self readFrom: fileName including: true.
 ]
