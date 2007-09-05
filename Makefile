@@ -3,8 +3,11 @@ SUBDIRS = object function
 all : .FORCE
 	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) ); done'
 
-dist : install .FORCE
+dist : .FORCE
 	$(SHELL) -ec '( cd dist; $(MAKE) dist )'
+
+install : .FORCE
+	$(SHELL) -ec '( cd object; $(MAKE) install )'
 
 dist-src : .FORCE
 	$(SHELL) -ec '( cd dist; $(MAKE) dist-src )'
