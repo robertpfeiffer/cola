@@ -1,10 +1,12 @@
 The static object compiler (codename Pepsi)
 -------------------------------------------
 
-To build and install relative to this directory:
+To build in this directory:
 
-    cd object
     make
+
+To install from this directory:
+
     sudo make install
 
 Examples, relative to this directory:
@@ -15,14 +17,9 @@ Examples, relative to this directory:
 The dynamic function compiler (codename Jolt)
 ---------------------------------------------
 
-To build and install, after building Pepsi as above, relative to this
-directory:
+Examples, relative to this directory:
 
-    cd function
-    make
-    make test
-
-Examples forthcoming.
+    see indivdual subdirs in function/examples
 
 
 The API library for 'embeddable Jolt' (libjolt)
