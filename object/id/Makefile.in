@@ -1,9 +1,15 @@
-CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
-PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
-GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I../boot/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
+CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
+PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
+GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
 PREFIX = @PREFIX@
+GCDIR  = @GCDIR@
 
-all : $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o
+all : $(BIN)./include $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o
+
+$(BIN)./include : 
+	-$(SHELL) -ec 'mkdir $(BIN)./include; \
+		mkdir $(BIN)./include/id;  cp -pr ../id/*.h $(BIN)./include/id; \
+		cp -pr ../$(GCDIR)/include $(BIN)./include/gc;  find $(BIN)./include/gc -name .svn -exec rm -rf {} \;'
 
 $(BIN)libid.o : libid.c
 	$(CC) $(CFLAGS) -DPREFIX='"@PREFIX@"' $< -c -o $@

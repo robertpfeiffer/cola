@@ -15,9 +15,12 @@
 #if defined(WIN32)
 # include <windows.h>
   typedef HINSTANCE dlhandle_t;
-# define dlopen(path, mode)	LoadLibrary(path)
-# define dlsym(handle, name)	((void *)GetProcAddress(handle, name))
-# define dlclose(handle)	FreeLibrary(handle)
+# define RTLD_DEFAULT	0
+# define RTLD_LAZY	0
+# define RTLD_GLOBAL	0
+  dlhandle_t  dlopen(const char *path, int mode);
+  void	     *dlsym(dlhandle_t handle, const char *symbol);
+  int	      dlclose(dlhandle_t handle);
 #else
 # include <dlfcn.h>
   typedef void *dlhandle_t;
@@ -40,23 +43,13 @@
 # define dprintf(fmt, args...)
 #endif
 
-typedef union t__object *oop;
+typedef struct t__object *oop;
 
 typedef oop (*_imp_t)(oop closure, oop state, oop receiver, ...);
 
-struct __closure
-{
-  _imp_t method;
-  oop	 data;
-};
+#include <id/id.h>
 
-struct __lookup
-{
-  struct t__closure *closure;
-  oop		     state;
-};
-
-void 		   _libid_init    (int *argcp, char ***argvp, char ***envp);
+struct __libid	  *_libid_init    (int *argcp, char ***argvp, char ***envp);
 oop  		   _libid_intern  (const char *string);
 oop  		   _libid_proto   (oop base);
 oop  		   _libid_import  (const char *name);
@@ -66,8 +59,8 @@ oop  		   _libid_alloc   (oop type, size_t size);
 oop  		  *_libid_palloc  (size_t size);
 void  		  *_libid_balloc  (size_t size);
 void		   _libid_flush   (oop selector);
-struct t__closure *_libid_bind    (oop selector, oop receiver);
-struct  __lookup   _libid_bind2   (oop selector, oop receiver);
+struct __closure  *_libid_bind    (oop selector, oop receiver);
+struct __lookup    _libid_bind2   (oop selector, oop receiver);
 oop                _libid_nlreturn(oop nlr, oop result);
 oop                _libid_nlresult(void);
 void		  *_libid_enter(char *name, char *type, char *file);
@@ -75,17 +68,15 @@ void		   _libid_line(int line);
 void		   _libid_leave(void *cookie);
 char		  *_libid_backtrace(void);
 
-#define _send(MSG, RCV, ARG...) ({					\
-  oop _r= (RCV);							\
-  struct __closure *_c= (struct __closure *)_libid_bind((MSG), _r);	\
-  (_c->method)((oop)_c, _r, _r, ##ARG);					\
+#define _send(MSG, RCV, ARG...) ({		\
+  oop _r= (RCV);				\
+  struct __closure *_c= _libid_bind((MSG), _r);	\
+  (_c->method)((oop)_c, _r, _r, ##ARG);		\
 })
 
 static int    _argc= 0;
 static char **_argv= 0;
 static char **_envp= 0;
-
-oop _libid_object= 0;
 
 static oop s_methodAt_put_with_= 0;
 static oop s__intern_= 0;
@@ -102,12 +93,14 @@ static oop s__import_= 0;
 static oop s_doesNotUnderstand_= 0;
 static oop s__delegate= 0;
 
-typedef union  t__object   _object_t;
+typedef struct t__object   _object_t;
 typedef struct t__selector _selector_t;
 typedef struct t__closure  _closure_t;
 typedef struct t__assoc    _assoc_t;
 typedef struct t__vector   _vector_t;
 typedef struct t__vtable   _vtable_t;
+
+static struct __libid _libid;
 
 struct t__selector
 {
@@ -155,14 +148,16 @@ struct t__vtable
 static oop _vtable_vtable= 0;
 static oop _vtable= 0;
 
-union t__object
+struct t__object
 {
-  oop		_vtable[0];
-  _closure_t	 closure;
-  _selector_t	 selector;
-  _assoc_t	 assoc;
-  _vector_t	 vector;
-  _vtable_t	 vtable;
+  union {
+    oop		_vtable[0];
+    _closure_t	 closure;
+    _selector_t	 selector;
+    _assoc_t	 assoc;
+    _vector_t	 vector;
+    _vtable_t	 vtable;
+  };
 };
 
 static oop _object_vtable= 0;
@@ -473,7 +468,7 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
       if (!init) fatal("%s: __id__init__: Undefined symbol\n", path);
     }
   dprintf("INIT %s %p %p\n", fileName, lib, init);
-  ((void (*)(void))init)();
+  ((void (*)(struct __libid *))init)(&_libid);
   return self;
 }
 
@@ -501,97 +496,6 @@ static char *nameOf(oop object)
   return name;
 }
 
-static void sigint(int signum)	{ fatal("\nInterrupt"); }
-static void sighup(int signum)	{ fprintf(stderr, "\nHangup\n");  fputs(_libid_backtrace(), stderr); }
-
-void _libid_init(int *argcp, char ***argvp, char ***envpp)
-{
-  dprintf("_libid_init()\n");
-
-#if USE_GC
-  GC_INIT();
-#endif
-
-  _argc= *argcp;  _argv= *argvp;  _envp= *envpp;
-
-  _vtable_vtable= new(_vtable);
-  _vtable_vtable->_vtable[-1]= _vtable_vtable;
-
-  _vector_vtable= new(_vtable);
-  _vtable_vtable->vtable.bindings->_vtable[-1]= _vector_vtable;
-  _vector_vtable->vtable.bindings->_vtable[-1]= _vector_vtable;
-
-  _object_vtable= new(_vtable);
-  _vtable_vtable->vtable.delegate= _object_vtable;
-  _vector_vtable->vtable.delegate= _object_vtable;
-
-  _selector_Table= new(_vtable);
-  _object_Table= new(_vtable);
-
-  _object= new(_object);
-  _vtable= new(_vtable);
-  _vector= new__(_vector, 0, 0);
-
-  _assoc=    _object___delegated(0, _object, _object);  _assoc_vtable=    _assoc->_vtable[-1];
-  _selector= _object___delegated(0, _object, _object);  _selector_vtable= _selector->_vtable[-1];
-  _closure=  _object___delegated(0, _object, _object);  _closure_vtable=  _closure->_vtable[-1];
-
-# define check(type)						\
-  dprintf("type %s %p\n", #type, type);				\
-  assert(type);							\
-  dprintf("%s->_vtable[-1] %p\n", #type, type->_vtable[-1]);	\
-  dprintf("%s_vtable %p\n", #type, type##_vtable);		\
-  assert(type->_vtable[-1] == type##_vtable);			\
-  assert(type##_vtable);					\
-  assert(type##_vtable->_vtable[-1]= _vtable_vtable);
-  check(_vtable);
-  check(_vector);
-  check(_object);
-  check(_selector);
-  check(_assoc);
-  check(_closure);
-# undef check
-
-  s_methodAt_put_with_= _selector___intern_(0, _selector, _selector, "methodAt:put:with:");
-  _vtable__methodAt_put_with_(0, _vtable_vtable, _vtable_vtable, s_methodAt_put_with_, (oop)_vtable__methodAt_put_with_, 0);
-
-  s_lookup_= _selector___intern_(0, _selector, _selector, "lookup:");
-  _vtable__methodAt_put_with_(0, _vtable_vtable, _vtable_vtable, s_lookup_, (oop)_vtable__lookup_, 0);
-
-# define method(type, sel, var)								\
-  s_##var= _selector___intern_(0, _selector, _selector, sel);				\
-  _send(s_methodAt_put_with_, type##_vtable, s_##var, (_imp_t)type##__##var, 0);
-
-  method(_selector, "_intern:",   	  _intern_);
-  method(_object,   "_delegate", 	  _delegate);
-  method(_object,   "_delegated", 	  _delegated);
-  method(_object,   "_vtable",    	  _vtable);
-  method(_vtable,   "init",		  init);
-  method(_vtable,   "_alloc:",    	  _alloc_);
-  method(_vtable,   "findKeyOrNil:",      findKeyOrNil_);
-  method(_vtable,   "flush",		  flush);
-  method(_object,   "_beTagType", 	  _beTagType);
-  method(_object,   "_beNilType", 	  _beNilType);
-  method(_object,   "_import:",   	  _import_);
-# undef method
-
-  s_doesNotUnderstand_= _selector___intern_(0, _selector, _selector, "doesNotUnderstand:");
-
-  _libid_object= _object;
-
-# define export(type) _libid_export(#type, type)
-  export(_object);
-  export(_selector);
-  export(_assoc);
-  export(_closure);
-  export(_vector);
-  export(_vtable);
-# undef export
-
-  signal(SIGINT, sigint);
-  signal(SIGHUP, sighup);
-}
-
 oop _libid_intern(const char *string)
 {
   dprintf("_libid_intern(\"%s\")\n", string);
@@ -611,7 +515,7 @@ static void binary(void *p)
 }
 #endif
 
-#if defined(__MACH__)
+#if defined(__MACH__) || defined(__CYGWIN__) || defined(__WIN32__)
 # define _ "_"
 #else
 # define _
@@ -691,7 +595,7 @@ _"_libid_bind:						\n"	// r3= selector, r4= receiver
 
 #undef _
 
-_closure_t *_libid_bind(oop selector, oop receiver)
+struct __closure *_libid_bind(oop selector, oop receiver)
 #undef _libid_bind
 {
   static int recursionGuard= 0;
@@ -709,7 +613,7 @@ _closure_t *_libid_bind(oop selector, oop receiver)
 # endif
   entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
   if (entry->selector == selector && entry->vtable == vtable)
-    return entry->closure;
+    return (struct __closure *) entry->closure;
 #endif
 
   assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _send(s_lookup_, vtable, selector);
@@ -721,7 +625,7 @@ _closure_t *_libid_bind(oop selector, oop receiver)
 	{
 	  oop result= _send(s_doesNotUnderstand_, receiver, selector);
 	  if (_object___vtable(0, result, result) == _closure->_vtable[-1])
-	    return (_closure_t *)result;
+	    return (struct __closure *)result;
 	}
       fatal("primitive error handling failed (%p %p)", receiver, selector);
     }
@@ -730,7 +634,7 @@ _closure_t *_libid_bind(oop selector, oop receiver)
   entry->vtable=   vtable;
   entry->closure= &assoc->assoc.value->closure;
 #endif
-  return &assoc->assoc.value->closure;
+  return (struct __closure *)&assoc->assoc.value->closure;
 }
 
 struct __lookup _libid_bind2(oop selector, oop receiver)
@@ -748,7 +652,7 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
 #  if GLOBAL_MCACHE
     entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
     if (entry->selector == selector && entry->vtable == vtable)
-      return (struct __lookup){ entry->closure, fragment };
+      return (struct __lookup){ (struct __closure *)entry->closure, fragment };
 #  endif
     assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _send(s_lookup_, vtable, selector);
   /*assoc= _vtable__lookup_(0, vtable, selector);*/
@@ -760,7 +664,7 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
 	entry->vtable=   vtable;
 	entry->closure= &assoc->assoc.value->closure;
 #      endif
-	return (struct __lookup){ &assoc->assoc.value->closure, fragment };
+	return (struct __lookup){ (struct __closure *)&assoc->assoc.value->closure, fragment };
       }
     fragment= _send(s__delegate, fragment);
   } while (fragment);
@@ -769,7 +673,7 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
     {
       oop result= _send(s_doesNotUnderstand_, receiver, selector);
       if (_object___vtable(0, result, result) == _closure->_vtable[-1])
-	return (struct __lookup){ (_closure_t *)result, receiver };
+	return (struct __lookup){ (struct __closure *)result, receiver };
     }
   fatal("primitive error handling failed (%p %p)", receiver, selector);
   return (struct __lookup){ 0, 0 };
@@ -883,6 +787,12 @@ void *_libid_param(int index)
 #  endif
     case  5:	return (void *)SYSARCH;
     case  6:	return (void *)SYSOS;
+    case  7:
+#    if defined(WIN32)
+      return (void *)'\\';
+#    else
+      return (void *)'/';
+#    endif
     }
   return 0;
 }
@@ -970,3 +880,179 @@ char *_libid_backtrace(void)
   }
   return result;
 }
+
+static void sigint(int signum)	{ fatal("\nInterrupt"); }
+#if defined(SIGHUP)
+static void sighup(int signum)	{ fprintf(stderr, "\nHangup\n");  fputs(_libid_backtrace(), stderr); }
+#endif
+
+struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
+{
+  dprintf("_libid_init()\n");
+
+#if USE_GC
+  GC_INIT();
+#endif
+
+  _argc= *argcp;  _argv= *argvp;  _envp= *envpp;
+
+  _vtable_vtable= new(_vtable);
+  _vtable_vtable->_vtable[-1]= _vtable_vtable;
+
+  _vector_vtable= new(_vtable);
+  _vtable_vtable->vtable.bindings->_vtable[-1]= _vector_vtable;
+  _vector_vtable->vtable.bindings->_vtable[-1]= _vector_vtable;
+
+  _object_vtable= new(_vtable);
+  _vtable_vtable->vtable.delegate= _object_vtable;
+  _vector_vtable->vtable.delegate= _object_vtable;
+
+  _selector_Table= new(_vtable);
+  _object_Table= new(_vtable);
+
+  _object= new(_object);
+  _vtable= new(_vtable);
+  _vector= new__(_vector, 0, 0);
+
+  _assoc=    _object___delegated(0, _object, _object);  _assoc_vtable=    _assoc->_vtable[-1];
+  _selector= _object___delegated(0, _object, _object);  _selector_vtable= _selector->_vtable[-1];
+  _closure=  _object___delegated(0, _object, _object);  _closure_vtable=  _closure->_vtable[-1];
+
+# define check(type)						\
+  dprintf("type %s %p\n", #type, type);				\
+  assert(type);							\
+  dprintf("%s->_vtable[-1] %p\n", #type, type->_vtable[-1]);	\
+  dprintf("%s_vtable %p\n", #type, type##_vtable);		\
+  assert(type->_vtable[-1] == type##_vtable);			\
+  assert(type##_vtable);					\
+  assert(type##_vtable->_vtable[-1]= _vtable_vtable);
+  check(_vtable);
+  check(_vector);
+  check(_object);
+  check(_selector);
+  check(_assoc);
+  check(_closure);
+# undef check
+
+  s_methodAt_put_with_= _selector___intern_(0, _selector, _selector, "methodAt:put:with:");
+  _vtable__methodAt_put_with_(0, _vtable_vtable, _vtable_vtable, s_methodAt_put_with_, (oop)_vtable__methodAt_put_with_, 0);
+
+  s_lookup_= _selector___intern_(0, _selector, _selector, "lookup:");
+  _vtable__methodAt_put_with_(0, _vtable_vtable, _vtable_vtable, s_lookup_, (oop)_vtable__lookup_, 0);
+
+# define method(type, sel, var)								\
+  s_##var= _selector___intern_(0, _selector, _selector, sel);				\
+  _send(s_methodAt_put_with_, type##_vtable, s_##var, (_imp_t)type##__##var, 0);
+
+  method(_selector, "_intern:",   	  _intern_);
+  method(_object,   "_delegate", 	  _delegate);
+  method(_object,   "_delegated", 	  _delegated);
+  method(_object,   "_vtable",    	  _vtable);
+  method(_vtable,   "init",		  init);
+  method(_vtable,   "_alloc:",    	  _alloc_);
+  method(_vtable,   "findKeyOrNil:",      findKeyOrNil_);
+  method(_vtable,   "flush",		  flush);
+  method(_object,   "_beTagType", 	  _beTagType);
+  method(_object,   "_beNilType", 	  _beNilType);
+  method(_object,   "_import:",   	  _import_);
+# undef method
+
+  s_doesNotUnderstand_= _selector___intern_(0, _selector, _selector, "doesNotUnderstand:");
+
+# define export(type) _libid_export(#type, type)
+  export(_object);
+  export(_selector);
+  export(_assoc);
+  export(_closure);
+  export(_vector);
+  export(_vtable);
+# undef export
+
+  signal(SIGINT, sigint);
+# if defined(SIGHUP)
+  signal(SIGHUP, sighup);
+# endif
+
+  _libid.dlopen		= dlopen;
+  _libid.dlsym		= dlsym;
+  _libid.dlclose	= dlclose;
+
+  _libid._object	= _object;
+  _libid.nil_vtable	= _libid_nil_vtable;
+  _libid.tag_vtable	= _libid_tag_vtable;
+
+  _libid.intern		= _libid_intern;
+  _libid.proto		= _libid_proto;
+  _libid.method		= _libid_method;
+  _libid.alloc		= _libid_alloc;
+  _libid.palloc		= _libid_palloc;
+  _libid.balloc		= _libid_balloc;
+
+  _libid.import		= _libid_import;
+  _libid.export		= _libid_export;
+  _libid.param		= _libid_param;
+
+  _libid.bind		= _libid_bind;
+
+  _libid.nlreturn	= _libid_nlreturn;
+  _libid.nlresult	= _libid_nlresult;
+
+  _libid.enter		= _libid_enter;
+  _libid.line		= _libid_line;
+  _libid.leave		= _libid_leave;
+  _libid.backtrace	= _libid_backtrace;
+
+  _libid.gc_addRoots			    = _libid.dlsym(RTLD_DEFAULT, "GC_add_roots");
+  _libid.gc_gcollect			    = _libid.dlsym(RTLD_DEFAULT, "GC_gcollect");
+  _libid.gc_unregisterDisappearingLink	    = _libid.dlsym(RTLD_DEFAULT, "GC_unregister_disappearing_link");
+  _libid.gc_generalRegisterDisappearingLink = _libid.dlsym(RTLD_DEFAULT, "GC_general_register_disappearing_link");
+
+  return &_libid;
+}
+
+
+#if defined(WIN32)
+
+struct dll
+{
+  dlhandle_t	 handle;
+  struct dll	*next;
+};
+
+static struct dll *dlls= 0;
+
+dlhandle_t dlopen(const char *path, int mode)
+{
+  dlhandle_t handle= 0;
+  if (!path) return GetModuleHandle(0);
+  if ((handle= LoadLibrary(path)))
+    {
+      struct dll *dll= (struct dll *)malloc(sizeof(struct dll));
+      dll->handle= handle;
+      dll->next= dlls;
+      dlls= dll;
+    }
+  return handle;
+}
+
+void *dlsym(dlhandle_t handle, const char *symbol)
+{
+  void *addr= 0;
+  struct dll *dll;
+  if (handle)
+    return GetProcAddress(handle, symbol);
+  if ((addr= GetProcAddress(GetModuleHandle(0), symbol)))
+    return addr;
+  for (dll= dlls;  dll;  dll= dll->next)
+    if ((addr= GetProcAddress(dll->handle, symbol)))
+      return addr;
+  return 0;
+}
+
+int dlclose(dlhandle_t handle)
+{
+  FreeLibrary(handle);
+  return 0;
+}
+
+#endif
