@@ -9,12 +9,12 @@ OBJEXT_SO       = .so
 ARCH		= $(shell $(IDC) -C arch)
 
 LIBS		= ../objects/objects.a readline.o jolt.a
-#LIBS		= ../objects/objects.a readline.o jolt.a
+#LIBS		= ../objects/objects.a jolt.a
 
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o Options.o
 
-LDLIBS		= readline.o jolt.a -lreadline -lhistory -ltermcap # -lopcodes -lintl
+LDLIBS		= readline.o jolt.a -lreadline -ltermcap # -lopcodes -lintl
 #LDLIBS		= jolt.a # -lopcodes -lintl
 
 all : main$(OBJEXT)
