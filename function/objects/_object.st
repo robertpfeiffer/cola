@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 12:58:22 by piumarta on ubuntu
+  Last edited: 2007-09-10 04:20:58 by piumarta on cygwin.piumarta.com
 "
 
 { external }

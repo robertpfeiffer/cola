@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-11 10:28:53 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-09-10 04:41:54 by piumarta on cygwin.piumarta.com
 "
 
 { import: Objects }
@@ -206,6 +206,7 @@ ConsoleFileStream refill
 	    { _return 0; }
 	if (!buffer)
 	    buffer= malloc(1024);
+	fprintf(stderr, "PROMPT\n");
 	printf("%s", (char *)self->v__prompt);
 	fflush(stdout);
 	if (fgets(buffer, 1024, stdin))

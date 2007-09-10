@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-03 14:23:33 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-09-10 16:54:32 by piumarta on cygwin.piumarta.com
 "
 
 { import: Object }
@@ -37,6 +37,7 @@ SequenceableCollection last		[ ^self at: self size - 1		]
 SequenceableCollection last: anObject	[ ^self at: self size - 1 put: anObject	]
 
 SequenceableCollection asString		[ ^self as: String ]
+SequenceableCollection asArray		[ ^self as: Array ]
 
 SequenceableCollection as: newType
 [

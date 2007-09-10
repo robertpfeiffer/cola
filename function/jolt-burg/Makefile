@@ -7,15 +7,22 @@ OBJEXT_O        = .o
 OBJEXT_SO       = .so
 
 ARCH		= $(shell $(IDC) -C arch)
+OS		= $(shell $(IDC) -C os)
 
+ifeq ($(OS),win32)
+LIBS		= ../objects/objects.a jolt.a
+else
 LIBS		= ../objects/objects.a readline.o jolt.a
-#LIBS		= ../objects/objects.a jolt.a
+endif
 
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o Options.o
 
+ifeq ($(OS),win32)
+LDLIBS		= jolt.a # -lopcodes -lintl
+else
 LDLIBS		= readline.o jolt.a -lreadline -ltermcap # -lopcodes -lintl
-#LDLIBS		= jolt.a # -lopcodes -lintl
+endif
 
 all : main$(OBJEXT)
 
@@ -70,7 +77,10 @@ bench-c : bench-c.c
 	cc -O -o $@ $<
 
 bench-id : bench-id.st
+ifeq ($(OS),win32)
+	idc -O -k -I../objects bench-id.st -o bench-id ../objects/objects.a
+else
 	idc -O -k -I../objects bench-id.st -o bench-id ../objects/objects.a  -lreadline
-#	idc -O -k -I../objects bench-id.st -o bench-id ../objects/objects.a
+endif
 
 .FORCE :

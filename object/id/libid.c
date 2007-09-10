@@ -18,6 +18,7 @@
 # define RTLD_DEFAULT	0
 # define RTLD_LAZY	0
 # define RTLD_GLOBAL	0
+# define RTLD_NOW	0
   dlhandle_t  dlopen(const char *path, int mode);
   void	     *dlsym(dlhandle_t handle, const char *symbol);
   int	      dlclose(dlhandle_t handle);
@@ -1013,19 +1014,35 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
 
 #if defined(WIN32)
 
+# include <tlhelp32.h>
+
 struct dll
 {
+  char		*name;
   dlhandle_t	 handle;
   struct dll	*next;
 };
 
 static struct dll *dlls= 0;
 
+static int dlinitialised= 0;
+
+static void dlinit(void);
+
 dlhandle_t dlopen(const char *path, int mode)
 {
   dlhandle_t handle= 0;
-  if (!path) return GetModuleHandle(0);
-  if ((handle= LoadLibrary(path)))
+  if (!dlinitialised) dlinit();
+  {
+    unsigned int errormode= SetErrorMode(SEM_FAILCRITICALERRORS);
+    SetErrorMode(errormode | SEM_FAILCRITICALERRORS);
+    handle= GetModuleHandle(path);
+    if (((dlhandle_t)-1 == handle) && path) handle= LoadLibrary(path);
+    SetErrorMode(errormode);
+  }
+  if ((dlhandle_t)-1 == handle)
+    handle= 0;
+  else
     {
       struct dll *dll= (struct dll *)malloc(sizeof(struct dll));
       dll->handle= handle;
@@ -1035,22 +1052,58 @@ dlhandle_t dlopen(const char *path, int mode)
   return handle;
 }
 
+static void dlinit(void)
+{
+  HANDLE snapshot;
+  dlinitialised= 1;
+  if ((HANDLE)-1 != (snapshot= CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, getpid())))
+    {
+      MODULEENTRY32 me32;
+      me32.dwSize= sizeof(MODULEENTRY32);
+      if (Module32First(snapshot, &me32))
+	do
+	  dlopen(me32.szModule, RTLD_NOW | RTLD_GLOBAL);
+	while (Module32Next(snapshot, &me32));
+      CloseHandle(snapshot);
+    }
+}
+
 void *dlsym(dlhandle_t handle, const char *symbol)
 {
   void *addr= 0;
   struct dll *dll;
+  if (!dlinitialised) dlinit();
   if (handle)
-    return GetProcAddress(handle, symbol);
+    {
+      addr= GetProcAddress(handle, symbol);
+      dprintf("dlsym %p \"%s\" -> %p\n", handle, symbol, addr);
+      return addr;
+    }
   if ((addr= GetProcAddress(GetModuleHandle(0), symbol)))
-    return addr;
+    {
+      dprintf("dlsym <main> \"%s\" -> %p\n", symbol, addr);
+      return addr;
+    }
   for (dll= dlls;  dll;  dll= dll->next)
     if ((addr= GetProcAddress(dll->handle, symbol)))
-      return addr;
+      {
+	dprintf("dlsym dll %p \"%s\" -> %p\n", dll->handle, symbol, addr);
+	return addr;
+      }
+  dprintf("dlsym %p \"%s\" -> FAIL\n", dll->handle, symbol);
   return 0;
 }
 
 int dlclose(dlhandle_t handle)
 {
+  struct dll **dllp;
+  for (dllp= &dlls;  *dllp;  dllp= &((*dllp)->next))
+    if ((*dllp)->handle == handle)
+      {
+	struct dll *dll= *dllp;
+	*dllp= dll->next;
+	free(dll);
+      }
   FreeLibrary(handle);
   return 0;
 }

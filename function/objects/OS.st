@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 13:01:03 by piumarta on ubuntu
+  Last edited: 2007-09-10 04:26:01 by piumarta on cygwin.piumarta.com
 "
 
 { import: Objects }
@@ -84,3 +84,8 @@ OS exit: status
 {
     exit((long)v_status >> 1);
 }
+
+OS import: libraryName
+[
+    self _import: libraryName _stringValue :('__id__init__', libraryName) _stringValue
+]

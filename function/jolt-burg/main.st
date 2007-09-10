@@ -15,11 +15,10 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-16 20:19:49 by piumarta on emilia
+  Last edited: 2007-09-10 04:26:31 by piumarta on cygwin.piumarta.com
 "
 
 { import: Object }
-{ import: readline }
 { import: Expression }
 { import: Scanner }
 { import: Compiler }
@@ -47,6 +46,7 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
 
 [
     | echo args file path stream scanner expr interactive |
+    OS system = 'win32' ifFalse: [OS import: 'readline'].
     Options libdir: (OS argumentAt: 0) dirname.
     interactive := false.
     (args := OS arguments) isEmpty
