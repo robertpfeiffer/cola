@@ -1,0 +1,45 @@
+gc.a :
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o alloc.o alloc.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o reclaim.o reclaim.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o allchblk.o allchblk.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o misc.o misc.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS -o if_mach ./if_mach.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS -o if_not_there ./if_not_there.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS -o threadlibs ./threadlibs.c
+	rm -f mach_dep.o
+	cc -mno-cygwin -DLARGE_CONFIG -c -I./include ./mach_dep.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o os_dep.o os_dep.c
+	rm -f mark_rts.o
+	cc -mno-cygwin -DLARGE_CONFIG -c -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS ./mark_rts.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o headers.o headers.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o mark.o mark.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o obj_map.o obj_map.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o blacklst.o blacklst.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o finalize.o finalize.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o new_hblk.o new_hblk.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o dbg_mlc.o dbg_mlc.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o malloc.o malloc.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o stubborn.o stubborn.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o checksums.o checksums.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o solaris_threads.o solaris_threads.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o pthread_support.o pthread_support.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o pthread_stop_world.o pthread_stop_world.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o darwin_stop_world.o darwin_stop_world.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o typd_mlc.o typd_mlc.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o ptr_chck.o ptr_chck.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o mallocx.o mallocx.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o solaris_pthreads.o solaris_pthreads.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o gcj_mlc.o gcj_mlc.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o specific.o specific.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o gc_dlopen.o gc_dlopen.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o backgraph.o backgraph.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o win32_threads.o win32_threads.c
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS   -c -o dyn_load.o dyn_load.c
+	echo > base_lib
+	rm -f dont_ar_1
+	ar ru gc.a alloc.o reclaim.o allchblk.o misc.o mach_dep.o os_dep.o mark_rts.o headers.o mark.o obj_map.o blacklst.o finalize.o new_hblk.o dbg_mlc.o malloc.o stubborn.o checksums.o solaris_threads.o pthread_support.o pthread_stop_world.o darwin_stop_world.o typd_mlc.o ptr_chck.o mallocx.o solaris_pthreads.o gcj_mlc.o specific.o gc_dlopen.o backgraph.o win32_threads.o dyn_load.o
+	ranlib gc.a || cat /dev/null
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS -c ./tests/test.c
+	mv test.o tests/test.o
+	rm -f gctest
+	cc -mno-cygwin -DLARGE_CONFIG -O -I./include -DATOMIC_UNCOLLECTABLE -DNO_SIGNALS -DNO_EXECUTE_PERMISSION -DSILENT -DALL_INTERIOR_POINTERS -o gctest tests/test.o gc.a `./threadlibs`

@@ -107,6 +107,7 @@ OBJEXT		= @OBJEXT@
 OBJEXT_O	= @OBJEXT_O@
 OBJEXT_SO	= @OBJEXT_SO@
 GCDIR		= @GCDIR@
+SYSOS		= @SYSOS@
 
 all : $(FILES)
 
@@ -141,7 +142,11 @@ gc.a : ../$(GCDIR)/gc.a
 	-$(SHELL) -ec 'ln -s ../$(GCDIR)/gc.a .'
 
 ../$(GCDIR)/gc.a :
+ifeq ($(SYSOS),win32)
+	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) -f Makefile.win32 ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
+else
 	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
+endif
 
 install : all .FORCE
 	-rm -rf $(PREFIX)
