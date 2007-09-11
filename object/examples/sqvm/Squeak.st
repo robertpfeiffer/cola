@@ -109,7 +109,7 @@ MethodCacheMask			:= [ MethodCacheSize - 1 ]
 
 MaxPrimitiveIndex		:= [ 700 ]
 
-MillisecondClockMask := [ 0x1fffffff ]
+MillisecondClockMask		:= [ 0x1fffffff ]
 
 Squeak : Object ( bytecodeTable primitiveTable viPath vmPath lastHash specialObjectsArray nilObj trueObj falseObj
 		  currentBytecode activeContext homeContext receiver method instructionPointer stackPointer
