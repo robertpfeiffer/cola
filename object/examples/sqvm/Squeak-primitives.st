@@ -248,8 +248,6 @@ Squeak primitiveTable
     )
 ]
 
-MillisecondClockMask := [ 0x1fffffff ]
-
 Squeak pop2thenPushIfIntegerValue: result
 [
     result isSmallInteger
