@@ -19,7 +19,7 @@ stage2 : .FORCE
 
 stage3 : .FORCE
 	-$(SHELL) -ec '[ -d stage3 ] || mkdir stage3'
-	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( echo $$dir; cd $$dir; $(MAKE) IDC="../stage2/idc -B../stage2/ -O" BIN="../stage3/" ); done'
+	$(SHELL) -ec 'for dir in $(SUBDIRS); do ( echo $$dir; cd $$dir; $(MAKE) IDC="../stage2/idc -B../stage2/ -g" BIN="../stage3/" ); done'
 
 test2 : stage2 .FORCE
 	-$(SHELL) -ec '( cd examples/hw; make clean; ../../stage2/idc -B../../stage2/ -I../../st80 -g -k hw.st; LD_LIBRARY_PATH=../../stage2 ./hw )'
@@ -36,6 +36,9 @@ install : all .FORCE
 
 install-boot : boot .FORCE
 	$(SHELL) -ec '( cd boot; $(MAKE) install )'
+
+win32 : .FORCE
+	$(MAKE) TARGET="i686-pc-mingw32"
 
 newboot : all .FORCE
 	rm -f boot/src/*

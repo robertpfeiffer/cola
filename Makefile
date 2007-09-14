@@ -15,6 +15,9 @@ dist-src : .FORCE
 config : .FORCE
 	$(SHELL) -ec '( cd object; $(MAKE) config )'
 
+win32 : .FORCE
+	$(MAKE) TARGET="i686-pc-mingw32"
+
 tidy : .FORCE
 	rm -f *~
 	-$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) tidy ); done'
