@@ -448,21 +448,23 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	  snprintf(path, MAXPATHLEN, "%s%s.so", prefix, fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
 	  dprintf("5  dlopen %s -> %p\n", path, lib);
-#        if defined(WIN32)
-	  if (!lib)
-	    {
-	      char *p;
-	      for (p= path;  *p;  ++p)
-		if ('/' == *p) *p= '\\';
-	      lib= dlopen(path, ID_RTLD_FLAGS);
-	      dprintf("6  dlopen %s -> %p\n", path, lib);
-	      if (!lib)
-		{
-		  perror(path);
-		}
-	    }
-#        endif
 	}
+#      if defined(WIN32)
+      if (!lib)
+	{
+	  char *p;
+	  for (p= path;  *p;  ++p)
+	    if ('/' == *p) *p= '\\';
+	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  dprintf("7  dlopen %s -> %p\n", path, lib);
+	}
+      if (!lib)
+	{
+	  snprintf(path, MAXPATHLEN, ".\\%s.so", fileName);
+	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  dprintf("6  dlopen %s -> %p\n", path, lib);
+	}
+#      endif
       if (!lib) fatal("import: %s.so: No such file or directory\n", fileName);
       init= dlsym(lib, "__id__init__");
       dprintf("7  dlsym %p __id__init__ -> %p\n", lib, init);
@@ -1037,12 +1039,10 @@ dlhandle_t dlopen(const char *path, int mode)
     unsigned int errormode= SetErrorMode(SEM_FAILCRITICALERRORS);
     SetErrorMode(errormode | SEM_FAILCRITICALERRORS);
     handle= GetModuleHandle(path);
-    if (((dlhandle_t)-1 == handle) && path) handle= LoadLibrary(path);
+    if ((!handle) && path) handle= LoadLibrary(path);
     SetErrorMode(errormode);
   }
-  if ((dlhandle_t)-1 == handle)
-    handle= 0;
-  else
+  if (handle)
     {
       struct dll *dll= (struct dll *)malloc(sizeof(struct dll));
       dll->handle= handle;
@@ -1090,19 +1090,19 @@ void *dlsym(dlhandle_t handle, const char *symbol)
 	dprintf("dlsym dll %p \"%s\" -> %p\n", dll->handle, symbol, addr);
 	return addr;
       }
-  dprintf("dlsym %p \"%s\" -> FAIL\n", dll->handle, symbol);
+  dprintf("dlsym 0 \"%s\" -> FAIL\n", symbol);
   return 0;
 }
 
 int dlclose(dlhandle_t handle)
 {
-  struct dll **dllp;
-  for (dllp= &dlls;  *dllp;  dllp= &((*dllp)->next))
-    if ((*dllp)->handle == handle)
+  struct dll *dll, **dllp;
+  for (dllp= &dlls;  (dll= *dllp);  dllp= &dll->next)
+    if (dll->handle == handle)
       {
-	struct dll *dll= *dllp;
 	*dllp= dll->next;
 	free(dll);
+	break;
       }
   FreeLibrary(handle);
   return 0;
