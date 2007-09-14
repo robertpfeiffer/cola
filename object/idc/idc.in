@@ -122,6 +122,7 @@ while [ $# -gt 0 ]; do
 	*.a)	ldobjs="$ldobjs $1"
 		echo $1 >> .id.ldobjs
 		;;
+	*.dll)	ldobjs="$ldobjs $1";;
 	*)	[ -z "$infile" ] || fatal "multiple input files";
 		infile="$1";;
     esac
