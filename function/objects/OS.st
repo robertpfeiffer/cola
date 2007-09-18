@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-10 04:26:01 by piumarta on cygwin.piumarta.com
+  Last edited: 2007-09-17 17:53:55 by piumarta on emilia
 "
 
 { import: Objects }
@@ -61,6 +61,14 @@ OS integerParam: number	[ ^SmallInteger value_: (self _param_: number _integerVa
 OS stringParam: number	[ ^String	value_: (self _param_: number _integerValue) ]
 
 OS _param_: _n		{ _return (oop)_libid->param((int)v__n); }
+
+OS getenv: aString
+[
+    | _value |
+    ^(_value := self _getenv_: aString _stringValue) ifTrue: [String value_: _value]
+]
+
+OS _getenv_: _string	{ return (oop)getenv((char *)v__string); }
 
 OS sleep: seconds
 {
