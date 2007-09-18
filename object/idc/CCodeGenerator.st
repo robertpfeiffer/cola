@@ -50,6 +50,7 @@ CCodeGenerator generate: program on: aStream for: aCompiler outputType: outputTy
     self genl: '  _leave();'.
     self genl: '}'.
     outputType == #program ifTrue: [self genl: self mainText].
+    outputType == #windows ifTrue: [self genl: self winText].
     ^output
 ]
 
@@ -180,6 +181,19 @@ int main(int argc, char **argv, char **envp)
   struct __libid *libid;
   if (!init) { fprintf(stderr, "id runtime not found\\n");  abort(); }
   libid= ((struct __libid *(*)(int *, char ***, char ***))init)(&argc, &argv, &envp);
+  __id__init__(libid);
+  return 0;
+}']
+
+CCodeGenerator winText
+[
+    ^'
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+  void *init= GetProcAddress(GetModuleHandle(0), "_libid_init");
+  struct __libid *libid;
+  if (!init) { fprintf(stderr, "id runtime not found\\n");  abort(); }
+  libid= ((struct __libid *(*)(int *, char ***, char ***))init)(0, 0, 0);
   __id__init__(libid);
   return 0;
 }']
