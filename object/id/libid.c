@@ -896,7 +896,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   GC_INIT();
 #endif
 
-  if (_argc)
+  if (argcp)
     {
       _argc= *argcp;
       _argv= *argvp;
