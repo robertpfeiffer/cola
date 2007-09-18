@@ -39,6 +39,7 @@
 	at: $S put: [ :opt      | options specialFlag: false ];
 	at: $T put: [ :opt      | options taggedFlag: false ];
 	at: $v put: [ :opt      | options verboseFlag: true ];
+	at: $w put: [ :opt      | options outputType: #windows ];
 	at: $x put: [ :opt :arg | options executionModel: arg ];
 	at: $? put: [ :opt      | Compiler error: 'illegal option: -' , opt asString ];
 	default: [ :arg | files add: arg ];

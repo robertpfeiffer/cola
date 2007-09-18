@@ -72,6 +72,7 @@ usage: $program [-option ...] filename
   -p        - profile
   -s        - generate a shared library
   -v        - print compilation commands (useful with '-n')
+  -w        - generate a Windows executable
   -Wi,opt   - pass opt to the Id compiler
   -Wc,opt   - pass opt to the C compiler
   -Wl,opt   - pass opt to the linker
@@ -110,6 +111,7 @@ while [ $# -gt 0 ]; do
 	-p)	ccopts="$ccopts -pg"; _p="_p";;
 	-s)	idtype="shared";;
 	-v)	verbose="set -x";;
+	-w)	idtype="win32";;
 	-Wi,*)	idopts="$idopts ${1#-Wi,}";;
 	-Wc,*)	ccopts="$ccopts ${1#-Wc,}";;
 	-Wl,*)	ccopts="$ccopts $1";;
@@ -160,6 +162,14 @@ esac
 case $idtype in
     program)
 	idflags="-m"
+	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS@"
+	ldflags="@LDFLAGS@"
+	idlibs="libid$_p.o gc.a"
+	ldlibs="@LDLIBS@ -lm"
+	soext="@OBJEXT@"
+	;;
+    win32)
+	idflags="-w"
 	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS@"
 	ldflags="@LDFLAGS@"
 	idlibs="libid$_p.o gc.a"
