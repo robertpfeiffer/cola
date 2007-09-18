@@ -790,12 +790,11 @@ void *_libid_param(int index)
 #  endif
     case  5:	return (void *)SYSARCH;
     case  6:	return (void *)SYSOS;
-    case  7:
-#    if defined(WIN32)
-      return (void *)'\\';
-#    else
-      return (void *)'/';
-#    endif
+#  if defined(WIN32)
+    case  7:	return (void *)'\\';
+#  else
+    case  7:	return (void *)'/';
+#  endif
     }
   return 0;
 }
@@ -897,7 +896,12 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   GC_INIT();
 #endif
 
-  _argc= *argcp;  _argv= *argvp;  _envp= *envpp;
+  if (_argc)
+    {
+      _argc= *argcp;
+      _argv= *argvp;
+      _envp= *envpp;
+    }
 
   _vtable_vtable= new(_vtable);
   _vtable_vtable->_vtable[-1]= _vtable_vtable;
