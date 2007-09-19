@@ -33,7 +33,6 @@ WinWindow withExtent: extent
     self	 := super new.
     windowWidth  := extent x rounded.
     windowHeight := extent y rounded.
-    StdErr println: 'withExtent'.
     {
 	static int registered= 0;
 	if (!registered)
