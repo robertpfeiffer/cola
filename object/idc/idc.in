@@ -72,7 +72,7 @@ usage: $program [-option ...] filename
   -p        - profile
   -s        - generate a shared library
   -v        - print compilation commands (useful with '-n')
-  -w        - generate a Windows executable
+  -w        - generate a Windows executable (no console)
   -Wi,opt   - pass opt to the Id compiler
   -Wc,opt   - pass opt to the C compiler
   -Wl,opt   - pass opt to the linker
@@ -111,7 +111,7 @@ while [ $# -gt 0 ]; do
 	-p)	ccopts="$ccopts -pg"; _p="_p";;
 	-s)	idtype="shared";;
 	-v)	verbose="set -x";;
-	-w)	idtype="win32";;
+	-w)	idtype="win32"; ccopts="$ccopts -mwindows";;
 	-Wi,*)	idopts="$idopts ${1#-Wi,}";;
 	-Wc,*)	ccopts="$ccopts ${1#-Wc,}";;
 	-Wl,*)	ccopts="$ccopts $1";;
