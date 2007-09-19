@@ -33,12 +33,12 @@ HostWindow bounds	[ ^Pair zero corner: self extent ]
 
 HostWindow swapBuffers: clipRectangle
 [
-    self swapBuffers
+    self subtypeResponsibility: 'swapBuffers:'
 ]
 
 HostWindow swapBuffers
 [
-    self subtypeResponsibility: 'swapBuffers'
+    self swapBuffers: self bounds
 ]
 
 HostWindow pointerDownEvent	:state :button :x :y	[ ^PointerDownEvent   new position: x,y; state: state; button: button; yourself ]

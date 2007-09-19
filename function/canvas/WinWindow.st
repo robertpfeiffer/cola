@@ -186,6 +186,13 @@ WinWindow newPainter
 	scale:		 1 , -1
 ]
 
+WinWindow newCPainter
+[
+    ^(Cairo withWinWindow: self)
+	translate:	 (0".5") , (windowHeight" - 0.5");
+	scale:		 1 , -1
+]
+
 Cairo withWinWindow: winWindow	[ ^self withSurface_: winWindow _cairoSurface ]
 
 WinWindow _cairoSurface	[ ^libcairo _cairo_win32_surface_create :_hbdc ]
