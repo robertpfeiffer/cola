@@ -2,23 +2,19 @@
 
 "TODO: this needs sideways composition"
 
-CompositeView applyTransform: aPointOrShape	[ ^aPointOrShape ]
-
+CompositeView  applyTransform: aPointOrShape	[ ^aPointOrShape ]
 ComposableView applyTransform: aPointOrShape	[ ^aPointOrShape ]
+TransformView  applyTransform: aPointOrShape	[ ^aPointOrShape transformedBy: inverse ]
 
-TransformView applyTransform: aPointOrShape
-[
-    translation	ifTrue: [aPointOrShape := aPointOrShape translatedBy: translation negated].
-    rotation	ifTrue: [aPointOrShape := aPointOrShape rotatedBy: rotation negated about: Point zero].
-    ^aPointOrShape
-]
-
+CompositeView  globalToLocal: aPointOrShape	[ ^containers first globalToLocal: aPointOrShape ]
+ComposableView globalToLocal: aPointOrShape	[ ^container globalToLocal: aPointOrShape ]
+TransformView  globalToLocal: aPointOrShape	[ ^(super globalToLocal: aPointOrShape) transformedBy: inverse ]
 
 ComposableView handleEvent: anEvent	[ ^self handleEvent: anEvent at: anEvent localPosition ]
 CompositeView  handleEvent: anEvent	[ ^self handleEvent: anEvent at: anEvent localPosition ]
 
 
-ComposableView handleEvent: anEvent at: aPoint
+ComposableView oldHandleEvent: anEvent at: aPoint
 [
     | handler |
     ((self bounds containsPoint: aPoint) and: [handler := self propertyAt: anEvent name])
@@ -27,17 +23,44 @@ ComposableView handleEvent: anEvent at: aPoint
 	ifNil: 
 	   [(anEvent dispatchTo: self)
 		ifTrue:  [anEvent handled: self]
-		ifFalse: [contents handleEvent: anEvent at: (self applyTransform: aPoint)]].
+		ifFalse: [contents oldHandleEvent: anEvent at: (self applyTransform: aPoint)]].
 ]
 
-CompositeView handleEvent: anEvent at: aPoint
+CompositeView oldHandleEvent: anEvent at: aPoint
 [
     (anEvent dispatchTo: self) ifTrue: [^anEvent handled: self].
     self do: [:v |
 	anEvent localPosition: aPoint.
-	(v handleEvent: anEvent at: aPoint) ifTrue: [^v]].
+	(v oldHandleEvent: anEvent at: aPoint) ifTrue: [^v]].
     ^nil
 ]
+
+
+ComposableView handleEvent: anEvent at: aPoint
+[
+    | handler |
+    (self bounds containsPoint: aPoint) ifFalse: [^nil].
+    contents handleEvent: anEvent at: (self applyTransform: aPoint).
+    (handler := anEvent handled) ifTrue: [^handler].
+    (handler := self propertyAt: anEvent name) ifTrue: [handler value: self value: anEvent].
+    (handler := anEvent handled) ifTrue: [^handler].
+    ^(anEvent dispatchTo: self) ifTrue: [anEvent handled: self]
+]
+
+CompositeView handleEvent: anEvent at: aPoint
+[
+    self do: [:v |
+	| handler |
+	anEvent localPosition: aPoint.
+	v handleEvent: anEvent at: aPoint.
+	(handler := anEvent handled) ifTrue: [^handler]].
+    anEvent dispatchTo: self.
+]
+
+
+ComposableView transformedBounds	[ ^self bounds ]
+CompositeView transformedBounds		[ ^self bounds ]
+TransformView transformedBounds		[ ^self applyTransform: self bounds ]
 
 
 CompositeView pointerMotionEvent :anEvent	[ ^nil ]

@@ -1,27 +1,27 @@
-OBJS =	Cairo.o \
-	CharacterMap.o \
-	Colour.o \
-	Event.o \
-	Font.o \
-	Geometry.o \
-	HostWindow.o \
-	Shape.o \
-	Text.o \
-	View.o \
-	Views.o \
-	Views-drawing.o \
-	Views-events.o \
-	Views-properties.o \
-	XCairo.o \
-	XWindow.o \
-	_cairo.o
+OFLAGS	= -g
+IDC	= ./idc -k $(OFLAGS) $(XFLAGS) -I../objects -I../jolt-burg
+SYSOS	= $(shell $(IDC) -C os)
 
-LIBS =  ../objects/objects.a canvas.a -L/usr/X11R6/lib -lX11 -lXext -lreadline -lcairo
+ifeq ($(SYSOS),win32)
+XFLAGS	= -Jcairo/cairo
+MFLAGS	= -w
+XOBJS	= WinWindow.o
+XLIBS	= cairo/*.dll -lgdi32
+else
+XFLAGS	= -J/usr/local/include/cairo
+XOBJS	= X11Window.o
+XLIBS	= -L/usr/local/lib -L/usr/X11R6/lib -lX11 -lXext -lreadline -lcairo
+endif
 
-IDC = ./idc -k $(OFLAGS) -I../objects -J/usr/local/include/cairo -L/usr/local/lib
-OFLAGS = -g
+OBJS	= $(XOBJS) _cairo.o Cairo.o CharacterMap.o Colour.o \
+	  Event.o EventHandler.o Font.o Geometry.o HostWindow.o \
+	  Model.o Shape.o Text.o Transform.o View.o Views.o \
+	  Views-button.o Views-drawing.o Views-events.o Views-layout.o \
+	  Views-properties.o Views-scrolling.o Views-world.o
 
-all : canvas.a world fontsel geystar
+LIBS	= ../jolt-burg/jolt.a canvas.a $(XLIBS)
+
+all : canvas.a hello # geystar fontsel world
 
 .SUFFIXES :
 
@@ -30,10 +30,15 @@ canvas.a : $(OBJS)
 	mv $@.new $@
 
 run : all
-	./world
+	./hello
+
+X11Window.o : X11Window.st X11WindowUCS4.st
+WinWindow.o : WinWindow.st winWindow.h
+
+world : systemWorkspace.st
 
 % : %.st $(OBJS) ../objects/objects.a canvas.a
-	$(IDC) $< $(OBJS) $(LIBS)
+	$(IDC) $< $(LIBS)
 
 %.o : %.st
 	$(IDC) -c $<
@@ -46,6 +51,7 @@ tidy: .FORCE
 
 clean : tidy .FORCE
 	rm -f $(OBJS) canvas.a *.exe *.o.c
+	rm -f hello hello.c hello.o
 	rm -f geystar geystar.c geystar.o
 	rm -f fontsel fontsel.c fontsel.o
 	rm -f world world.c world.o

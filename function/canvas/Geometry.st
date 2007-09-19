@@ -5,111 +5,186 @@ Number radiansToDegrees	[ ^self *  0.01745329251994329576 ]
 Number degreesToRadians	[ ^self * 57.29577951308232087684 ]
 
 
-Point : Object ( x y )
+Pair : Collection ( first second )
 
-Number @ aNumber
-[
-    ^Point x: self y: aNumber
-]
+Object isPair	[ ^nil ]
+Pair isPair	[ ^self ]
 
-Point x: xValue y: yValue
-[
-    self := self new.
-    x := xValue.
-    y := yValue.
-]
+Number , anObject	[ ^Pair x: self y: anObject ]
 
-Point r: r theta: theta
+Pair first: xValue second: yValue
 [
     self := self new.
-    x := r * theta cos.
-    y := r * theta sin.
+    first := xValue.
+    second := yValue.
 ]
 
-Point zero	[ ^0@0 ]
-Point unit	[ ^1@1 ]
-
-Point x		[ ^x ]
-Point y		[ ^y ]
-Point x: xVal	[  x := xVal ]
-Point y: yVal	[  y := yVal ]
-Point r		[ ^((x * x) + (y * y)) sqrt ]
-Point theta	[ ^57.2957795201 * (x atan2: y) ]
-
-Point asPoint	[ ]
-Number asPoint	[ ^self @ self ]
-
-Point + aPoint	[ ^Point x: x + aPoint x y: y + aPoint y ]
-Point - aPoint	[ ^Point x: x - aPoint x y: y - aPoint y ]
-Point * aPoint	[ ^Point x: x * aPoint x y: y * aPoint y ]
-Point / aPoint	[ ^Point x: x / aPoint x y: y / aPoint y ]
-
-Point <  aPoint	[ ^x <  aPoint x and: [y <  aPoint y] ]
-Point <= aPoint	[ ^x <= aPoint x and: [y <= aPoint y] ]
-
-Point min: aPoint
+Pair with: xValue with: yValue
 [
-    "Answer the lower left corner of the rectangle uniquely defined by the receiver and aPoint."
-    ^(x min: aPoint x) @ (y min: aPoint y)
+    self := self new.
+    first := xValue.
+    second := yValue.
 ]
 
-Point max: aPoint
+Pair x: xValue y: yValue
 [
-    "Answer the upper right corner of the rectangle uniquely defined by the receiver and aPoint."
-    ^(x max: aPoint x) @ (y max: aPoint y)
+    self := self new.
+    first := xValue.
+    second := yValue.
 ]
 
-Point negated
+Pair r: r theta: theta
 [
-    ^x negated @ y negated
+    self := self new.
+    first  := r * theta cos.
+    second := r * theta sin.
 ]
 
-Point truncated
+Pair zero	[ ^0,0 ]
+Pair unit	[ ^1,1 ]
+
+Pair first		[ ^first ]
+Pair first: anObject	[  first := anObject ]
+Pair x			[ ^first ]
+Pair x: anObject	[  first := anObject ]
+Pair width		[ ^first ]
+Pair width: anObject	[  first := anObject ]
+
+Pair second		[ ^second ]
+Pair second: anObject	[  second := anObject ]
+Pair y			[ ^second ]
+Pair y: anObject	[  second := anObject ]
+Pair height		[ ^second ]
+Pair height: anObject	[  second := anObject ]
+
+Pair last		[ ^second ]
+Pair last: anObject	[  second := anObject ]
+
+Pair size		[ ^2 ]
+
+Pair r		[ ^((first * first) + (second * second)) sqrt ]
+Pair theta	[ ^57.2957795201 * (first atan2: second) ]
+
+Pair asPair	[ ]
+Object asPair	[ ^self , self ]
+
+Pair + aPair	[ ^Pair first: first + aPair first second: second + aPair second ]
+Pair - aPair	[ ^Pair first: first - aPair first second: second - aPair second ]
+Pair * aPair	[ ^Pair first: first * aPair first second: second * aPair second ]
+Pair / aPair	[ ^Pair first: first / aPair first second: second / aPair second ]
+
+Pair <  aPair	[ ^first <  aPair first and: [second <  aPair second] ]
+Pair  = aPair	[ ^first  = aPair first and: [second  = aPair second] ]
+Pair <= aPair	[ ^first <= aPair first and: [second <= aPair second] ]
+
+Pair precedes: aPair	[ ^second > aPair second or: [second = aPair second and: [first > aPair first]] ]
+Pair follows: aPair	[ ^second < aPair second or: [second = aPair second and: [first < aPair first]] ]
+
+Pair min: aPair
 [
-    ^(x isSmallInteger and: [y isSmallInteger])
+    "Answer the lower left corner of the rectangle uniquely defined by the receiver and aPair."
+    ^(first min: aPair first) , (second min: aPair second)
+]
+
+Pair max: aPair
+[
+    "Answer the upper right corner of the rectangle uniquely defined by the receiver and aPair."
+    ^(first max: aPair first) , (second max: aPair second)
+]
+
+Pair reciprocal
+[
+    ^(1.0 / first) , (1.0 / second)
+]
+
+Pair negated
+[
+    ^first negated , second negated
+]
+
+Pair truncated
+[
+    ^(first isSmallInteger and: [second isSmallInteger])
 	ifTrue:  [self]
-	ifFalse: [self x: x truncated y: y truncated]
+	ifFalse: [self first: first truncated second: second truncated]
 ]
 
-Point floor
+Pair floor
 [
-    ^(x isSmallInteger and: [y isSmallInteger])
+    ^(first isSmallInteger and: [second isSmallInteger])
 	ifTrue:  [self]
-	ifFalse: [self x: x floor y: y floor]
+	ifFalse: [self first: first floor second: second floor]
 ]
 
-Point ceiling
+Pair ceiling
 [
-    ^(x isSmallInteger and: [y isSmallInteger])
+    ^(first isSmallInteger and: [second isSmallInteger])
 	ifTrue:  [self]
-	ifFalse: [self x: x ceiling y: y ceiling]
+	ifFalse: [self first: first ceiling second: second ceiling]
 ]
 
-Point translateBy: aPoint
+Pair translateBy: aPair
 [
-    x := x + aPoint x.
-    y := y + aPoint y.
+    first := first + aPair first.
+    second := second + aPair second.
 ]
 
-Point translatedBy: aPoint
+Pair scaledBy: aPair
 [
-    ^(x + aPoint x) @ (y + aPoint y)
+    ^(first * aPair first) , (second * aPair second)
 ]
 
-Point rotatedBy: radians about: centrePoint
+Pair translatedBy: aPair
+[
+    ^(first + aPair first) , (second + aPair second)
+]
+
+Pair rotatedBy: radians about: centrePair
 [
     | cx cy dx dy sa ca |
-    cx := centrePoint x.
-    cy := centrePoint y.
-    dx := x - cx.
-    dy := y - cy.
+    cx := centrePair x.
+    cy := centrePair y.
+    dx := first  - cx.
+    dy := second - cy.
     sa := radians sin.
     ca := radians cos.
     ^     (cx + ((dx * ca) - (dy * sa)))
-	@ (cy + ((dx * sa) + (dy * ca)))
+	, (cy + ((dx * sa) + (dy * ca)))
 ]
 
-Point printOn: aStream
+Pair transformedBy: aTransform
 [
-    aStream print: x; nextPut: $@; print: y
+    ^aTransform transform: self
 ]
+
+Pair printOn: aStream
+[
+    aStream print: first; nextPutAll: ' , '; print: second
+]
+
+Pair do: unaryBlock
+[
+    unaryBlock value: first; value: second
+]
+
+Pair at: index
+[
+    ^index == 0
+	ifTrue: [first]
+	ifFalse:
+	    [index == 1
+		 ifTrue: [second]
+		 ifFalse: [self errorOutOfBounds: index ]]
+]
+
+Pair at: index put: aValue
+[
+    ^index == 0
+	ifTrue: [first := aValue]
+	ifFalse:
+	    [index == 1
+		 ifTrue: [second := aValue]
+		 ifFalse: [self errorOutOfBounds: index ]]
+]
+
+Pair , anObject	[ ^OrderedCollection with: first with: second with: anObject ]

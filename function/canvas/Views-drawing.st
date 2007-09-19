@@ -19,68 +19,116 @@ CompositeView bounds
     ^rect
 ]
 
+CompositeView hAdvance
+[
+    self isEmpty ifTrue: [^0].
+    ^self inject: 0 into: [:a :v | a + v hAdvance]
+]
+
+CompositeView referencePoint
+[
+    ^self isEmpty
+	ifTrue:  [^Pair zero]
+	ifFalse: [self first referencePoint]
+]
+
+"----------------------------------------------------------------"
+
+ComposableView hAdvance		[ ^self bounds width ]
+ComposableView referencePoint	[ ^Pair zero ]
+
 "----------------------------------------------------------------"
 
 TransformView drawOn: aCanvas in: clipRectangle
 [
-    | clip |
-    aCanvas save.
-    clip := clipRectangle.
-    translation
-	ifTrue:
-	   [clip := clip translatedBy: translation negated.
-	    aCanvas translate: translation].
-    rotation
-	ifTrue:
-	   [clip := clip boundsRotatedBy: rotation negated about: Point zero.
-	    aCanvas rotate: rotation].
-    contents drawOn: aCanvas in: clip.
+    aCanvas save; transform: transform.
+    self drawContentsOn: aCanvas in: (clipRectangle boundsTransformedBy: inverse).
     aCanvas restore.
 ]
 
-TransformView bounds
-[
-    | rect |
-    rect := contents bounds.
-    rotation	ifTrue: [rect := rect boundsRotatedBy: rotation about: Point zero].
-    translation	ifTrue: [rect := rect translatedBy: translation].
-    ^rect
-]
+TransformView bounds		[ ^contents bounds boundsTransformedBy: transform ]
+TransformView localBounds	[ ^contents bounds ]
+
+TransformView hAdvance		[ ^contents hAdvance ]
+TransformView referencePoint	[ ^self translation ]
 
 "----------------------------------------------------------------"
 
 View drawOn: aCanvas in: clipRectangle
 [
-    | bounds |
+    | fill stroke bounds |
     bounds := self bounds.
-    (bounds intersects: clipRectangle)
+    (clipRectangle intersects: bounds)
 	ifTrue:
-	   [fillColour
+	   [(fill := self fillColour)
 		ifTrue:
-		   [aCanvas setSource: fillColour.
+		   [aCanvas setSource: fill.
 		    self pathOn: aCanvas.
 		    aCanvas fill].
-	    contents drawOn: aCanvas in: clipRectangle.
-	    strokeColour
+	    self drawContentsOn: aCanvas in: (self bounds intersect: clipRectangle).
+	    (stroke := self strokeColour)
 		ifTrue:
 		   [strokeWidth ifTrue: [aCanvas setStrokeWidth: strokeWidth].
-		    aCanvas setSource: strokeColour.
+		    aCanvas setSource: stroke.
 		    self pathOn: aCanvas.
 		    aCanvas stroke]]
 ]
 
-View bounds
+ComposableView drawContentsOn: aCanvas in: clipRectangle
 [
-    self subtypeResponsibility: 'bounds'
+    | start end |
+    ((start := self propertyAt: #selectionStart) and: [end := self propertyAt: #selectionEnd])
+	ifTrue: [self drawSelectionFrom: start to: end on: aCanvas in: clipRectangle].
+    contents drawOn: aCanvas in: clipRectangle.
 ]
 
-View pathOn: aCanvas
+ComposableView drawSelectionFrom: start to: end on: aCanvas in: clipRectangle
 [
-    self subtypeResponsibility: 'pathOn: aCanvas'
+    | rect |
+    aCanvas save; setSource: (self propertyAt: #selectionColour ifAbsent: [Colour green]).
+    rect := start layoutBounds bottomLeft extent: 0,0.
+    [start and: [start prevLink ~~ end]]
+	whileTrue:
+	   [| b |
+	    b := start layoutBounds.
+	    start isLineBreak
+		ifTrue:
+		   [rect encompass: clipRectangle right, rect bottom.
+		    aCanvas rectangle: rect; fill.
+		    rect := clipRectangle left,rect bottom extent: 0,0]
+		ifFalse:
+		   [(clipRectangle intersects: b)
+			ifTrue:
+			   [b left < rect left
+				ifTrue:
+				    [aCanvas rectangle: rect; fill.
+				     rect := clipRectangle left,rect bottom extent: 0,0]
+				ifFalse:
+				    [rect encompass: b bottomLeft; encompass: b topRight]]].
+	      start := start nextLink].
+    aCanvas rectangle: rect; fill; restore.
 ]
+
+View bounds		[ ^self shape bounds ]
+
+View pathOn: aCanvas	[ ^self shape pathOn: aCanvas ]
+
+View shape		[ ^self subtypeResponsibility: 'shape' ]
 
 "----------------------------------------------------------------"
 
+ShapedView hAdvance		[ ^shape hAdvance ]
+
 ShapedView bounds		[ ^shape bounds ]
 
-ShapedView pathOn: aCanvas	[ shape pathOn: aCanvas ]
+ShapedView pathOn: aCanvas	[  shape pathOn: aCanvas ]
+
+"----------------------------------------------------------------"
+
+ComposableView damaged	[ self damaged: self bounds ]
+CompositeView damaged	[ self damaged: self bounds ]
+TransformView damaged	[ self damaged: self localBounds ]
+
+ComposableView damaged: aRectangle	[ "container ifTrue: ["container damaged: aRectangle"]" ]
+CompositeView  damaged: aRectangle	[ containers do: [:v | v damaged: aRectangle] ]
+TransformView  damaged: aRectangle	[ super damaged: (aRectangle boundsTransformedBy: transform) ]

@@ -1,7 +1,7 @@
-{ import: XCairo }
+{ import: HostWindow }
 { import: View }
 
-GravityVector := [ 0.03 @ -0.5 ]
+GravityVector := [ 0.03 , -0.5 ]
 
 Recycling := [ false ]
 
@@ -16,15 +16,28 @@ Particle new
 
 "----------------------------------------------------------------"
 
-ParticleView : TransformView ( velocityVector rotationSpeed locked )
+ParticleView : TransformView ( translation rotation velocityVector rotationSpeed locked )
+
+ParticleView new
+[
+    (self := super new) initialise.
+]
 
 ParticleView initialise
 [
-    self translate: 500@20.
-    self rotate: 0.
-    velocityVector := (Random next - 0.5 * 4.0) @ (2.0 + Random next * 8.0).
+    translation := 500,20.
+    rotation := 0.
+    velocityVector := (Random next - 0.5 * 4.0) , (2.0 + Random next * 8.0).
     rotationSpeed := velocityVector x / -20.
 ]
+
+ParticleView translation	[ ^translation ]
+ParticleView rotation		[ ^rotation ]
+
+ParticleView translation: aPair	[ translation := aPair.  self reposition ]
+ParticleView rotation: aNumber	[ rotation := aNumber.  self reposition ]
+
+ParticleView reposition		[ super translation: translation; rotateBy: rotation ]
 
 ParticleView step
 [
@@ -36,9 +49,11 @@ ParticleView step
 	    contents first fillColour: (Colour withR: fillColour g G: fillColour b B: fillColour r).
 	    Recycling := true].
     rotation := rotation + rotationSpeed.
-    locked ifTrue: [^self].
-    translation := translation + velocityVector.
-    velocityVector := velocityVector + GravityVector.
+    locked
+	ifFalse:
+	   [translation := translation + velocityVector.
+	    velocityVector := velocityVector + GravityVector].
+    self reposition
 ]
 
 "----------------------------------------------------------------"
@@ -53,12 +68,12 @@ World new
 
 World bounds
 [
-    ^Rectangle origin: 0@0 corner: window extent
+    ^Rectangle origin: 0,0 corner: window extent
 ]
 
 World pathOn: aCanvas
 [
-    ^aCanvas rectangle: (0@0 corner: window extent)
+    ^aCanvas rectangle: (0,0 corner: window extent)
 ]
 
 World setup
@@ -70,10 +85,9 @@ World setup
        [polygon := ShapedView withShape: (Polygon newStar: 24 innerRadius: 10 outerRadius: 100).
 	polygon fillColour: Colour yellow.
 	polygon := ParticleView new add: polygon; yourself.
-	polygon translate: 430@430.
-	polygon rotate: 0.
+	polygon translation: 430,430; rotation: 0.
 	self add: (polygons add: polygon)].
-    "self add: (((0@0 corner: 300@400) shapedView fillColour: Colour blue lighter) transformView translate: 200@200)."
+    "self add: (((0,0 corner: 300,400) shapedView fillColour: Colour blue lighter) transformView translation: 200,200)."
 ]
 
 World step
@@ -86,7 +100,7 @@ World step
 	    self addFirst: pv.
 	    particles add: pv].
     particles do: [:pv | pv step].
-    polygons do: [:polygon | polygon rotate: polygon rotation + 0.01745329251994329576].
+    polygons do: [:polygon | polygon rotateBy: 0.01745329251994329576].
 ]
 
 World drawIn: clipRectangle
@@ -94,11 +108,18 @@ World drawIn: clipRectangle
     | ctx view |
     clipRectangle
 	ifTrue:
-	   [ctx := window newCairoContext.
+	   [ctx := window newCPainter.
+"
+	    ctx setSource: Colour white; rectangle: (10,10 extent: 100,100); fill.
+	    ctx setSource: Colour red;   rectangle: (110,110 extent: 100,100); fill.
+	    ctx setSource: Colour green; rectangle: (210,210 extent: 100,100); fill.
+	    ctx setSource: Colour blue;  rectangle: (310,310 extent: 100,100); fill.
+""
 	    (clipRectangle contains: window bounds)
 		ifFalse:
 		   [ctx setSource: Colour black; rectangle: (clipRectangle outsetBy: 1.0) expanded; stroke.
 		    ctx setClipRectangle: (clipRectangle outsetBy: 1.0) expanded].
+"
 	    self drawOn: ctx in: clipRectangle.
 	    ctx destroy.
 	    window swapBuffers"; sync".
@@ -115,7 +136,7 @@ World draw	[ self drawIn: window bounds ]
 World run
 [
     | evt |
-    window := XWindow withExtent: 1024@768"1600@1000".
+    window := HostWindow withExtent: 1024,768"1600,1000".
     self setup.
     self draw.
     [window sync.
@@ -135,7 +156,7 @@ World dispatchEvent: anEvent
 [
     | view |
     anEvent ifFalse: [^self].
-    anEvent context: self.
+    anEvent handler: self.
     target
 	ifTrue:  [self dragEvent: anEvent]
 	ifFalse: [self handleEvent: anEvent].
@@ -143,7 +164,7 @@ World dispatchEvent: anEvent
 
 World dragEvent: anEvent
 [
-    target translate: (target translation translatedBy: anEvent position - targetPosition).
+    target translation: target translation + anEvent position - targetPosition.
     targetPosition := anEvent position.
     anEvent isPointerUpEvent
 	ifTrue:
@@ -156,9 +177,10 @@ ParticleView unlock	[ locked := false ]
 
 ParticleView pointerDownEvent :anEvent
 [
-    (self bounds containsPoint: anEvent localPosition) ifFalse: [^super pointerDownEvent :anEvent].
+    StdOut print: anEvent position; tab; println: self bounds.
+    (self bounds containsPoint: anEvent position) ifFalse: [^super pointerDownEvent :anEvent].
     locked := true.
-    anEvent context drag: self at: anEvent position.
+    anEvent handler drag: self at: anEvent position.
 ]
 
 [ World new run ]

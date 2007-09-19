@@ -1,0 +1,8 @@
+To run the examples either:
+
+1. copy 'cairo/*.dll' (three files) to a directory where the OS can
+   find them (e.g., C:\WINDOWS\system32); or
+
+2. add the 'cairo' directory to some environment variable that
+   contains the list of places that the dynamic loader searches for dlls
+   (don't ask me how to do this, I haven't the faintest idea).

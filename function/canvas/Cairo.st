@@ -1,4 +1,3 @@
-{ import: XWindow }
 { import: Geometry }
 { import: Font }
 { import: _cairo }
@@ -51,6 +50,8 @@ Cairo setSource_: _ptn			[ libcairo _cairo_set_source		:_cr :_ptn ]
 
 Cairo identityMatrix			[ libcairo _cairo_identity_matrix	:_cr ]
 
+Cairo transform: t			[ libcairo _cairo_transform		:_cr :t asTransform2D ]
+
 Cairo rotate: a				[ libcairo _cairo_rotate		:_cr :a asFloat ]
 
 Cairo translateX: x Y: y		[ libcairo _cairo_translate		:_cr :x asFloat :y asFloat ]
@@ -81,7 +82,7 @@ Cairo deviceToUser: pt
     x := pt x copy asFloat.
     y := pt y copy asFloat.
     libcairo _cairo_device_to_user :_cr :x :y.
-    ^Point x: x y: y
+    ^x,y
 ]
 
 "----------------------------------------------------------------"
@@ -162,7 +163,7 @@ Cairo string: aString font: aFont
 	    save;
 	    glyph: (g := aFont glyphAt: c);
 	    restore;
-	    translate: g metrics hAdvance @ 0]
+	    translate: g metrics hAdvance , 0]
 ]
 
 Cairo glyph: aGlyph

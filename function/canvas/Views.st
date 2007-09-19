@@ -30,11 +30,28 @@ CompositeView addContainer: aView
     containers add: aView.
 ]
 
-CompositeView addFirst: aView	[ aView container: self.  ^super addFirst: aView ]
-CompositeView addLast: aView	[ aView container: self.  ^super addLast: aView ]
-CompositeView add: aView	[ aView container: self.  ^super addLast: aView ]
+CompositeView addFirst: aView		[ aView container: self.  ^super addFirst: aView ]
+CompositeView addLast: aView		[ aView container: self.  ^super addLast: aView ]
+CompositeView add: aView		[ aView container: self.  ^super addLast: aView ]
+CompositeView add: aView before: bView	[ aView container: self.  ^super add: aView before: bView ]
+CompositeView add: aView after: bView	[ aView container: self.  ^super add: aView after: bView ]
+
+CompositeView remove: aView
+[
+    super remove: aView.
+    aView container: nil.
+    ^aView
+]
 
 CompositeView printContentsOn: aStream	[]
+
+_object asOop	{ _return((oop)((long)self << 1 | 1)); }
+
+CompositeView printOn: aStream
+[
+    super printOn: aStream.
+    aStream nextPut: $-; print: self asOop
+]
 
 "----------------------------------------------------------------"
 
@@ -56,59 +73,86 @@ ComposableView withContents: contentsCollection
 
 ComposableView new
 [
-    self := super new.
-    contents := CompositeView withContainer: self.
+    ^self withContents: CompositeView new.
 ]
 
-ComposableView contents	[ ^contents ]
-
-ComposableView container
-[
-    ^container
-]
+ComposableView contents		[ ^contents ]
+ComposableView container	[ ^container ]
 
 ComposableView container: aView
 [
-    container ifTrue: [self error: 'this view already has a container'].
+    (aView and: [container]) ifTrue: [self error: 'this view already has a container'].
     container := aView.
 ]
 
-ComposableView add: aView	[ ^contents addLast: aView ]
-ComposableView addFirst: aView	[ ^contents addFirst: aView ]
-ComposableView addLast: aView	[ ^contents addLast: aView ]
+ComposableView add: aView		[ ^contents addLast: aView ]
+ComposableView addFirst: aView		[ ^contents addFirst: aView ]
+ComposableView addLast: aView		[ ^contents addLast: aView ]
+ComposableView add: aView before: bView	[ ^contents add: aView before: bView ]
+ComposableView add: aView after: bView	[ ^contents add: aView after: bView ]
+
+ComposableView removeFirst		[ ^contents removeFirst ]
+ComposableView removeLast		[ ^contents removeLast ]
+ComposableView remove: aView		[ ^contents remove: aView ]
+
+ComposableView removeFrom: firstView to: lastView
+[
+    | next |
+    [next := firstView nextLink.
+     self remove: firstView.
+     firstView ~~ lastView and: [firstView := next]]
+	whileTrue
+]
 
 ComposableView isEmpty		[ ^contents isEmpty ]
 ComposableView notEmpty		[ ^contents notEmpty ]
 ComposableView first		[ ^contents first ]
+ComposableView last		[ ^contents last ]
+
+ComposableView printOn: aStream
+[
+    super printOn: aStream.
+    aStream nextPut: $-; print: self asOop
+]
 
 "----------------------------------------------------------------"
+
+{ import: Transform }
 
 " A TransformView modifies the coordinate system of its contents. "
 
 TransformView : ComposableView (
-    translation	"Point vector by which I translate the coordinate system's origin"
-    rotation	"Number giving the angle in radians by which rotate the coordinate system about the (possibly translated) origin"
+    transform	"Transform2D -- transforms my coordinate system into that of my inferior views"
+    inverse	"Transform2D -- the inverse of my transform (cached for speed)"
 )
+
+TransformView withContents: aCompositeView
+[
+    self := super withContents: aCompositeView.
+    inverse := transform := Transform2D withIdentity.
+]
 
 TransformView isTransformView	[ ^self ]
 Object isTransformView		[ ^nil ]
 
-TransformView translate: aPoint	[  translation := aPoint ]
-TransformView translation	[ ^translation ifNil: [0@0] ]
-TransformView rotate: aNumber	[  rotation := aNumber ]
-TransformView rotation		[ ^rotation ifNil: [0] ]
+TransformView translation: aPair	[  inverse := (transform := Transform2D withTranslation: aPair) inverted ]
+TransformView rotation: aNumber		[  inverse := (transform := Transform2D withRotation: aNumber) inverted ]
+TransformView scaling: aPair		[  inverse := (transform := Transform2D withScaling: aPair) inverted ]
 
-ComposableView transformView
-[
-    ^TransformView new
-	add: self;
-	yourself
-]
+TransformView translateBy: aPair	[  inverse := (transform translateBy: aPair) inverted ]
+TransformView rotateBy: aNumber		[  inverse := (transform rotateBy: aNumber) inverted ]
+TransformView scaleBy: aPair		[  inverse := (transform scaleBy: aPair) inverted ]
 
-CompositeView transformView
-[
-    ^TransformView withContents: self
-]
+ComposableView transformView	[ ^TransformView new add: self; yourself ]
+CompositeView  transformView	[ ^TransformView withContents: self ]
+
+ComposableView translateBy: aPair	[ ^self transformView translateBy: aPair ]
+ComposableView rotateBy: aPair		[ ^self transformView rotateBy: aPair ]
+ComposableView scaleBy: aPair		[ ^self transformView scaleBy: aPair ]
+
+CompositeView  translateBy: aPair	[ ^self transformView translateBy: aPair ]
+CompositeView  rotateBy: aPair		[ ^self transformView rotateBy: aPair ]
+CompositeView  scaleBy: aPair		[ ^self transformView scaleBy: aPair ]
 
 "----------------------------------------------------------------"
 
@@ -152,4 +196,13 @@ ShapedView shape: aShape	[  shape := aShape ]
 Shape shapedView
 [
     ^ShapedView withShape: self
+]
+
+ShapedView printOn: aStream
+[
+    super printOn: aStream.
+    aStream
+	nextPut: $(;
+	print: shape;
+	nextPut: $)
 ]

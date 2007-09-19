@@ -39,7 +39,7 @@ FontMetrics vAdvanceMax		[ ^vAdvanceMax ]
 FontMetrics underlinePosition	[ ^underlinePosition ]
 FontMetrics underlineDepth	[ ^underlineDepth ]
 
-FontMetrics bounds		[ ^bbMinX @ bbMinY corner: bbMaxX @ bbMaxY ]
+FontMetrics bounds		[ ^bbMinX , bbMinY corner: bbMaxX , bbMaxY ]
 
 FontMetrics withMetrics: fontMetrics scaledBy: scalePoint
 [
@@ -166,7 +166,6 @@ Typeface loadIfAbsent: errorBlock
 [
     | name |
     name := 'fonts/', self name.
-    "StdOut nextPutAll: 'loading typeface '; println: name."
     (_face := self _load_: name _stringValue) ifFalse: [^errorBlock value].
     metrics := FontMetrics new initialiseFrom_: _face.
 ]
@@ -292,7 +291,9 @@ Typeface glyphNamed: nameSymbol	[ ^self glyphNamed: nameSymbol ifAbsent: [self e
 "The default Typeface"
 
 [
-    Typeface := Typeface family: 'serif' series: 'medium' shape: 'roman' ifAbsent: [Typeface error: 'cannot find default typeface: serif-medium-roman']
+    "Typeface := Typeface family: 'mono' series: 'medium' shape: 'roman' ifAbsent: [Typeface error: 'cannot find default typeface: serif-medium-roman']"
+    "Typeface := Typeface family: 'serif' series: 'medium' shape: 'roman' ifAbsent: [Typeface error: 'cannot find default typeface: serif-medium-roman']"
+    Typeface := Typeface family: 'sans' series: 'medium' shape: 'roman' ifAbsent: [Typeface error: 'cannot find default typeface: serif-medium-roman']
 ]
 
 Typeface default	[ ^self ]
@@ -328,7 +329,7 @@ Font withTypeface: aTypeface pointSize: aPointSize
     true
 	ifTrue:  [scale := aPointSize asFloat * 116.0 / 72.0 / metrics unitsPerEm asFloat]	"from fus to points"
 	ifFalse: [scale := aPointSize asFloat / metrics ascender asFloat].	"from fus to points"
-    scale := scale @ scale.
+    scale := scale , scale.
     metrics := metrics scaledBy: scale.	"metrics expressed in points"
     glyphs := IdentityDictionary new.
 ]
@@ -372,11 +373,10 @@ Font newGlyphAt: codePoint
 "The default Font"
 
 [
-    Font := Typeface pointSize: 12.0
+    Font := Typeface pointSize: 7.0
 ]
 
 Font default	[ ^self ]
-
 
 "----------------------------------------------------------------"
 
@@ -400,12 +400,12 @@ GlyphMetrics vBearingX	[ ^vBearingX ]
 GlyphMetrics vBearingY	[ ^vBearingY ]
 GlyphMetrics vAdvance	[ ^vAdvance ]
 
-GlyphMetrics hBearing	[ ^hBearingX @ hBearingY ]
-GlyphMetrics vBearing	[ ^vBearingX @ vBearingY ]
+GlyphMetrics hBearing	[ ^hBearingX , hBearingY ]
+GlyphMetrics vBearing	[ ^vBearingX , vBearingY ]
 
 GlyphMetrics ascent	[ ^hBearingY ]
 GlyphMetrics descent	[ ^hBearingY - height ]
-GlyphMetrics bounds	[ ^(hBearingX) @ (hBearingY - height) corner: (hBearingX + width) @ (hBearingY) ]
+GlyphMetrics bounds	[ ^(hBearingX) , (hBearingY - height) corner: (hBearingX + width) , (hBearingY) ]
 
 GlyphMetrics newFrom_: _glyph
 [
@@ -477,6 +477,8 @@ Glyph font	[ ^font ]
 Glyph codePoint	[ ^codePoint ]
 Glyph name	[ ^name ]
 Glyph metrics	[ ^metrics ]
+
+Glyph hAdvance	[ ^metrics hAdvance ]
 
 Glyph withGlyph_: _aGlyph font: aFont codePoint: codePointInteger name: nameString metrics: glyphMetrics
 [

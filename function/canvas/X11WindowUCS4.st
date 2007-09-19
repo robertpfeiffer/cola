@@ -1,4 +1,9 @@
-XEvent ucs4	[ ^SmallInteger value_: self _ucs4 ]
+XEvent ucs4
+[
+    | ucs4 |
+    ucs4 := SmallInteger value_: self _ucs4.
+    ^ucs4 > 0 ifTrue: [ucs4]
+]
 
 XEvent _ucs4
 {

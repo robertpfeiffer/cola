@@ -5,21 +5,11 @@
 { include <X11/Xutil.h> }
 { include <X11/extensions/Xdbe.h> }
 
-XWindow : HostWindow ( _dpy _win _buf _vis _gc _dbeMode windowWidth windowHeight )
+X11Window : HostWindow ( _dpy _win _buf _vis _gc _dbeMode )
 
-XWindow extent
-[
-    ^windowWidth @ windowHeight
-]
+HostWindow withExtent: extent	[ ^X11Window withExtent: extent swapAction: 3 "XdbeCopied" ]
 
-XWindow bounds
-[
-    ^Point zero corner: self extent
-]
-
-XWindow withExtent: extent	[ ^self withExtent: extent swapAction: 3 "XdbeCopied" ]
-
-XWindow withExtent: extent swapAction: swapAction
+X11Window withExtent: extent swapAction: swapAction
 [
     self   := super new.
     windowWidth  := extent x rounded.
@@ -77,72 +67,7 @@ XWindow withExtent: extent swapAction: swapAction
     _dbeMode := swapAction _integerValue.
 ]
 
-XWindow width	[ ^windowWidth ]
-XWindow height	[ ^windowHeight ]
-
-XWindow widthInMillimetres	[ ^SmallInteger value_: self _widthInMillimetres ]
-XWindow heightInMillimetres	[ ^SmallInteger value_: self _heightInMillimetres ]
-
-XWindow _widthInMillimetres	{ _return (oop)DisplayWidthMM((Display *)self->v__dpy, DefaultScreen((Display *)self->v__dpy)); }
-XWindow _heightInMillimetres	{ _return (oop)DisplayHeightMM((Display *)self->v__dpy, DefaultScreen((Display *)self->v__dpy)); }
-
-XWindow dpi			[ ^25.4 / self widthInMillimetres asFloat * self width ]
-
-XWindow setClippingRectangle: aRectangle
-[
-    | x y w h |
-    x := aRectangle x rounded.
-    y := aRectangle y rounded.
-    w := aRectangle width rounded.
-    h := aRectangle height rounded.
-    {
-	XRectangle r = { (long)v_x >> 1, (long)v_y >> 1, (long)v_w >> 1, (long)v_h >> 1 };
-	XSetClipRectangles((Display *)self->v__dpy, (GC)self->v__gc, 0, 0, &r, 1, Unsorted);
-    }.
-]
-
-XWindow clear
-[
-    _win == _buf ifTrue: [{ XClearWindow((Display *)self->v__dpy, (Window)self->v__win); }].
-]
-
-XWindow fillStyle: styleString
-[
-    | _style |
-    _style := styleString asString _stringValue.
-    {
-	XColor exact, screen;
-	if (XAllocNamedColor((Display *)self->v__dpy,
-			     DefaultColormap((Display *)self->v__dpy, DefaultScreen((Display *)self->v__dpy)),
-			     (char *)v__style, &screen, &exact))
-	    XSetForeground((Display *)self->v__dpy, (GC)self->v__gc, screen.pixel);
-    }
-]
-
-XWindow backgroundStyle: styleString
-[
-    | _style |
-    _style := styleString asString _stringValue.
-    {
-	XColor exact, screen;
-	if (XAllocNamedColor((Display *)self->v__dpy,
-			     DefaultColormap((Display *)self->v__dpy, DefaultScreen((Display *)self->v__dpy)),
-			     (char *)v__style, &screen, &exact))
-	    XSetWindowBackground((Display *)self->v__dpy, (Window)self->v__win, screen.pixel);
-    }
-]
-
-XWindow setLineWidth: w
-[
-    w := w rounded.
-    {
-	XGCValues xgcv;
-	xgcv.line_width= (long)v_w >> 1;
-	XChangeGC((Display *)self->v__dpy, (GC)self->v__gc, GCLineWidth, &xgcv);
-    }
-]
-
-XWindow swapBuffers
+X11Window swapBuffers
 {
     if (self->v__buf != self->v__win)
     {
@@ -151,53 +76,9 @@ XWindow swapBuffers
     }
 }
 
-XWindow flush
-{
-    XFlush((Display *)self->v__dpy);
-}
-
-XWindow sync
-{
-    XSync((Display *)self->v__dpy, False);
-}
-
-XWindow purge
-{
-    XSync((Display *)self->v__dpy, True);
-}
-
-XWindow renderText: text in: aRectangle
-[
-    | width origin size start stop |
-    width := aRectangle width.
-    origin := aRectangle origin.
-    size := text string size.
-    start := 0.
-    [start < size and: [origin y < aRectangle bottom]]
-	whileTrue:
-	   [stop := text stopIndex: width at: start.
-	    self renderText: text from: start for: stop - start at: origin.
-	    origin := origin + (0 @ text height).
-	    start := stop].
-]
-
-XWindow renderText: text from: offset for: length at: aPoint
-[
-    | _string x y |
-    _string := text string _stringValue.
-    x 	    := aPoint x rounded.
-    y 	    := aPoint y rounded.
-    {
-	XDrawString((Display *)self->v__dpy, (Drawable)self->v__buf, (GC)self->v__gc,
-		    (long)v_x >> 1, (long)v_y >> 1,
-		    (char *)v__string + ((long)v_offset >> 1), (long)v_length >> 1);
-    }.
-]
-
-XWindow depth
-{
-    _return (oop)(XDefaultDepth((Display *)self->v__dpy, DefaultScreen((Display *)self->v__dpy)) << 1 | 1);
-}
+X11Window flush	{ XFlush((Display *)self->v__dpy); }
+X11Window sync	{ XSync((Display *)self->v__dpy, False); }
+X11Window purge	{ XSync((Display *)self->v__dpy, True); }
 
 { import: Event }
 
@@ -246,13 +127,13 @@ XEvent keyString
     {
 	char buf[32];
 	v__n= (oop)XLookupString((XKeyEvent *)self, buf, sizeof(buf), 0, 0);
-	v__string= (oop)_balloc((long)v__n);
+	v__string= (oop)_libid->balloc((long)v__n);
 	strncpy((char *)v__string, buf, (long)v__n);
     }.
     ^String size_: _n value_: _string
 ]
 
-{ input: XWindowUCS4 }
+{ input: X11WindowUCS4 }
 
 PointerMotionEvent initXEvent: xev
 [
@@ -263,7 +144,7 @@ PointerMotionEvent initXEvent: xev
 	v_y		  = (oop)(xev->y      << 1 | 1);
 	self->v_state	  = (oop)(xev->state  << 1 | 1);
     }.
-    globalPosition := localPosition := x @ y.
+    globalPosition := localPosition := x , y.
 ]
 
 ButtonEvent initXEvent: xev
@@ -276,7 +157,7 @@ ButtonEvent initXEvent: xev
 	self->v_state	  = (oop)(xev->state  << 1 | 1);
 	self->v_button	  = (oop)(xev->button << 1 | 1);
     }.
-   globalPosition := localPosition := x @ y.
+   globalPosition := localPosition := x , y.
 ]
 
 KeyEvent initXEvent: xev
@@ -291,7 +172,7 @@ KeyEvent initXEvent: xev
 	self->v_key	= (oop)(xev->keycode << 1 | 1);
 	self->v_ucs4	= (oop)(   v_ucs4val         );
     }.
-    globalPosition := localPosition := x @ y.
+    globalPosition := localPosition := x , y.
 ]
 
 DamageEvent initXEvent: xev
@@ -304,32 +185,32 @@ DamageEvent initXEvent: xev
 	self->v_width	  = (oop)(xev->width  << 1 | 1);
 	self->v_height	  = (oop)(xev->height << 1 | 1);
     }.
-    globalPosition := localPosition := x @ y.
+    globalPosition := localPosition := x , y.
 ]
 
-XWindow eventPending	{ _return XPending((Display *)self->v__dpy) ? v_self : 0; }
+X11Window eventPending	{ _return XPending((Display *)self->v__dpy) ? v_self : 0; }
 
-XWindow nextEvent_: _evt
+X11Window nextEvent_: _evt
 {
     XNextEvent((Display *)self->v__dpy, (XEvent *)v__evt);
     _return v__evt;
 }
 
-XWindow pollEvent
+X11Window pollEvent
 [
     ^self eventPending
 	ifTrue:  [self nextEvent]
         ifFalse: [^nil]
 ]
 
-XWindow waitEvent
+X11Window waitEvent
 [
     | event |
     [event := self nextEvent] whileFalse.
     ^event
 ]
 
-XWindow nextEvent
+X11Window nextEvent
 [
     | xEvent event position |
     self nextEvent_: (xEvent := XEvent new).
@@ -344,7 +225,7 @@ XWindow nextEvent
 
 XGC : Object ( _dpy _buf _gc canvasWidth canvasHeight )
 
-XWindow newContext
+X11Window newContext
 [
     ^XGC withDisplay_: _dpy window_: _buf width: windowWidth height: windowHeight
 ]
@@ -377,7 +258,7 @@ XGC setSourceColour: aColour
 
 XGC paint
 [
-    self fillRectangle: (0@0 corner: canvasWidth@canvasHeight).
+    self fillRectangle: (0,0 corner: canvasWidth,canvasHeight).
 ]
 
 XGC fillRectangle: rect
@@ -455,11 +336,6 @@ XGC destroy
     XFreeGC((Display *)self->v__dpy, (GC)self->v__gc);
 }
 
-XWindow newImage: extent
-[
-    ^XPixmap withDisplay_: _dpy window_: _win width: extent x height: extent y depth: self depth
-]
-
 "----------------------------------------------------------------"
 
 XPixmap : Object ( _dpy _buf pixmapWidth pixmapHeight )
@@ -483,3 +359,106 @@ XPixmap newContext
 [
     ^XGC withDisplay_: _dpy window_: _buf width: pixmapWidth height: pixmapHeight
 ]
+
+"----------------------------------------------------------------"
+
+{ import: Cairo }
+
+X11Window newPainter
+[
+    ^(Cairo withX11Window: self)
+	translate:	 (0".5") , (windowHeight" - 0.5");
+	scale:		 1 , -1
+]
+
+X11Window newCPainter
+[
+    ^(Cairo withX11Window: self)
+	translate:	 (0".5") , (windowHeight" - 0.5");
+	scale:		 1 , -1
+]
+
+Cairo withX11Window: xWindow	[ ^self withSurface_: xWindow _cairoSurface ]
+
+{ include <cairo.h> }
+{ include <cairo-features.h> }
+{ include <cairo-xlib.h> }
+
+libcairo _cairo_xlib_surface_create :_dpy :_drawable :_visual :_width :_height {
+  cairo_surface_t * _;
+  _=(cairo_surface_t *)cairo_xlib_surface_create((Display *)(long)v__dpy, (Drawable)(long)v__drawable, (Visual *)(long)v__visual, (int)(long)v__width, (int)(long)v__height);
+  _return (oop)(long)_;
+}
+libcairo _cairo_xlib_surface_create_for_bitmap :_dpy :_bitmap :_screen :_width :_height {
+  cairo_surface_t * _;
+  _=(cairo_surface_t *)cairo_xlib_surface_create_for_bitmap((Display *)(long)v__dpy, (Pixmap)(long)v__bitmap, (Screen *)(long)v__screen, (int)(long)v__width, (int)(long)v__height);
+  _return (oop)(long)_;
+}
+libcairo cairo_xlib_surface_set_size :surface :width :height [
+    | _ |
+    _ := self _cairo_xlib_surface_set_size : surface : width _integerValue : height _integerValue.
+    ^_
+]
+libcairo _cairo_xlib_surface_set_size :_surface :_width :_height {
+  cairo_xlib_surface_set_size((cairo_surface_t *)(long)v__surface, (int)(long)v__width, (int)(long)v__height);
+}
+libcairo cairo_xlib_surface_set_drawable :surface :drawable :width :height [
+    | _ |
+    _ := self _cairo_xlib_surface_set_drawable : surface : drawable : width _integerValue : height _integerValue.
+    ^_
+]
+libcairo _cairo_xlib_surface_set_drawable :_surface :_drawable :_width :_height {
+  cairo_xlib_surface_set_drawable((cairo_surface_t *)(long)v__surface, (Drawable)(long)v__drawable, (int)(long)v__width, (int)(long)v__height);
+}
+libcairo _cairo_xlib_surface_get_display :_surface {
+  Display * _;
+  _=(Display *)cairo_xlib_surface_get_display((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+libcairo _cairo_xlib_surface_get_drawable :_surface {
+  Drawable _;
+  _=(Drawable)cairo_xlib_surface_get_drawable((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+libcairo _cairo_xlib_surface_get_screen :_surface {
+  Screen * _;
+  _=(Screen *)cairo_xlib_surface_get_screen((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+libcairo _cairo_xlib_surface_get_visual :_surface {
+  Visual * _;
+  _=(Visual *)cairo_xlib_surface_get_visual((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+libcairo cairo_xlib_surface_get_depth :surface [
+    | _ |
+    _ := self _cairo_xlib_surface_get_depth : surface.
+    ^SmallInteger value_: _
+]
+libcairo _cairo_xlib_surface_get_depth :_surface {
+  int _;
+  _=(int)cairo_xlib_surface_get_depth((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+libcairo cairo_xlib_surface_get_width :surface [
+    | _ |
+    _ := self _cairo_xlib_surface_get_width : surface.
+    ^SmallInteger value_: _
+]
+libcairo _cairo_xlib_surface_get_width :_surface {
+  int _;
+  _=(int)cairo_xlib_surface_get_width((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+libcairo cairo_xlib_surface_get_height :surface [
+    | _ |
+    _ := self _cairo_xlib_surface_get_height : surface.
+    ^SmallInteger value_: _
+]
+libcairo _cairo_xlib_surface_get_height :_surface {
+  int _;
+  _=(int)cairo_xlib_surface_get_height((cairo_surface_t *)(long)v__surface);
+  _return (oop)(long)_;
+}
+
+X11Window _cairoSurface		[ ^libcairo _cairo_xlib_surface_create :_dpy :_buf :_vis :windowWidth :windowHeight ]

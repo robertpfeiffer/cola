@@ -1,7 +1,7 @@
 #!/bin/sh
 
-if test -x ../../../object/stage2/idc; then
-  exec ../../../object/stage2/idc -B ../../../object/stage2/ -I../../objects -I../../jolt-burg $*
+if test -x ../../object/stage2/idc; then
+  ../../object/stage2/idc -B ../../object/stage2/ -I../objects -I../jolt-burg $*
 else
-  exec idc $*
+  idc $*
 fi

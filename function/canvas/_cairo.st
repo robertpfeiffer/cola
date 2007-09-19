@@ -6,7 +6,6 @@ libcairo : Object ()
 
 { include <cairo.h> }
 { include <cairo-features.h> }
-{ include <cairo-xlib.h> }
 
 libcairo CAIRO_VERSION_MAJOR [ ^SmallInteger value_: self _CAIRO_VERSION_MAJOR ]
 libcairo _CAIRO_VERSION_MAJOR { _return (oop)(1); }
@@ -1968,82 +1967,6 @@ libcairo cairo_debug_reset_static_data [
 ]
 libcairo _cairo_debug_reset_static_data {
   cairo_debug_reset_static_data();
-}
-libcairo _cairo_xlib_surface_create :_dpy :_drawable :_visual :_width :_height {
-  cairo_surface_t * _;
-  _=(cairo_surface_t *)cairo_xlib_surface_create((Display *)(long)v__dpy, (Drawable)(long)v__drawable, (Visual *)(long)v__visual, (int)(long)v__width, (int)(long)v__height);
-  _return (oop)(long)_;
-}
-libcairo _cairo_xlib_surface_create_for_bitmap :_dpy :_bitmap :_screen :_width :_height {
-  cairo_surface_t * _;
-  _=(cairo_surface_t *)cairo_xlib_surface_create_for_bitmap((Display *)(long)v__dpy, (Pixmap)(long)v__bitmap, (Screen *)(long)v__screen, (int)(long)v__width, (int)(long)v__height);
-  _return (oop)(long)_;
-}
-libcairo cairo_xlib_surface_set_size :surface :width :height [
-    | _ |
-    _ := self _cairo_xlib_surface_set_size : surface : width _integerValue : height _integerValue.
-    ^_
-]
-libcairo _cairo_xlib_surface_set_size :_surface :_width :_height {
-  cairo_xlib_surface_set_size((cairo_surface_t *)(long)v__surface, (int)(long)v__width, (int)(long)v__height);
-}
-libcairo cairo_xlib_surface_set_drawable :surface :drawable :width :height [
-    | _ |
-    _ := self _cairo_xlib_surface_set_drawable : surface : drawable : width _integerValue : height _integerValue.
-    ^_
-]
-libcairo _cairo_xlib_surface_set_drawable :_surface :_drawable :_width :_height {
-  cairo_xlib_surface_set_drawable((cairo_surface_t *)(long)v__surface, (Drawable)(long)v__drawable, (int)(long)v__width, (int)(long)v__height);
-}
-libcairo _cairo_xlib_surface_get_display :_surface {
-  Display * _;
-  _=(Display *)cairo_xlib_surface_get_display((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
-}
-libcairo _cairo_xlib_surface_get_drawable :_surface {
-  Drawable _;
-  _=(Drawable)cairo_xlib_surface_get_drawable((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
-}
-libcairo _cairo_xlib_surface_get_screen :_surface {
-  Screen * _;
-  _=(Screen *)cairo_xlib_surface_get_screen((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
-}
-libcairo _cairo_xlib_surface_get_visual :_surface {
-  Visual * _;
-  _=(Visual *)cairo_xlib_surface_get_visual((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
-}
-libcairo cairo_xlib_surface_get_depth :surface [
-    | _ |
-    _ := self _cairo_xlib_surface_get_depth : surface.
-    ^SmallInteger value_: _
-]
-libcairo _cairo_xlib_surface_get_depth :_surface {
-  int _;
-  _=(int)cairo_xlib_surface_get_depth((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
-}
-libcairo cairo_xlib_surface_get_width :surface [
-    | _ |
-    _ := self _cairo_xlib_surface_get_width : surface.
-    ^SmallInteger value_: _
-]
-libcairo _cairo_xlib_surface_get_width :_surface {
-  int _;
-  _=(int)cairo_xlib_surface_get_width((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
-}
-libcairo cairo_xlib_surface_get_height :surface [
-    | _ |
-    _ := self _cairo_xlib_surface_get_height : surface.
-    ^SmallInteger value_: _
-]
-libcairo _cairo_xlib_surface_get_height :_surface {
-  int _;
-  _=(int)cairo_xlib_surface_get_height((cairo_surface_t *)(long)v__surface);
-  _return (oop)(long)_;
 }
 
 libcairo cairo_get_reference_count :cr [

@@ -54,8 +54,21 @@ static void so_storeN(FILE *f, char *n)
   while (*n) fputc(*n++, f);
 }
 
-static int so_loadI(FILE *f)	{ return (getc(f) << 24) | (getc(f) << 16) | (getc(f) << 8) | (getc(f)); }
-static int so_loadS(FILE *f)	{ return (getc(f) << 8) | (getc(f)); }
+static int so_loadI(FILE *f)
+{
+  int i= getc(f)        << 24;
+  i |= 	(getc(f) & 255) << 16;
+  i |= 	(getc(f) & 255) <<  8;
+  i |= 	(getc(f) & 255) <<  0;
+  return i;
+}
+
+static int so_loadS(FILE *f)
+{
+  int i= (getc(f) & 255) << 8;
+  i |=   (getc(f) & 255) << 0;
+  return i;
+}
 
 static char *so_loadN(FILE *f)
 {
@@ -78,7 +91,7 @@ int soFont_save(soFont_t *font, char *name, char *type)
 
   snprintf(path, sizeof(path), "%s.%sa", name, type);
 
-  if (!(f= fopen(path, "w")))
+  if (!(f= fopen(path, "wb")))
     {
       perror(path);
       return 0;
@@ -111,7 +124,7 @@ int soFont_save(soFont_t *font, char *name, char *type)
 
   snprintf(path, sizeof(path), "%s.%sb", name, type);
 
-  if (!(f= fopen(path, "w")))
+  if (!(f= fopen(path, "wb")))
     {
       perror(path);
       return 0;
@@ -224,7 +237,7 @@ soFont_t *soFont_loadB(FILE *f, char *path)
 	}
       font->glyphs[i]= glyph;
     }
-  if (('\n' != (getc(f))) ||(EOF != getc(f)))
+  if (('\n' != (getc(f))) || (EOF != getc(f)))
     fprintf(stderr, "corrupt font file: %s?\n", path);
 
   return font;
@@ -247,12 +260,12 @@ soFont_t *soFont_load(char *name)
   soFont_t *font;
 
   snprintf(path, sizeof(path), "%s.sofb", name);
-  if ((f= fopen(path, "r")) && magic(f, "SOFB"))
+  if ((f= fopen(path, "rb")) && magic(f, "SOFB"))
     font= soFont_loadB(f, path);
   else
     {
       snprintf(path, sizeof(path), "%s.sofa", name);
-      if ((f= fopen(path, "r")) && magic(f, "SOFA"))
+      if ((f= fopen(path, "rb")) && magic(f, "SOFA"))
 	font= soFont_loadA(f, path);
       else
 	return 0;

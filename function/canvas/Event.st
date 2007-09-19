@@ -1,10 +1,19 @@
 { import: Object }
 { import: Geometry }
+{ import: Time }
 
-Event : Object ( context handled globalPosition localPosition )
+Event : Object ( time handler handled globalPosition localPosition )
 
-Event context: anObject		[ ^context := anObject ]
-Event context			[ ^context ]
+Event new
+[
+    self := super new.
+    time := Time millisecondClockValue.
+]
+
+Event time			[ ^time ]
+
+Event handler: anObject		[ ^handler := anObject ]
+Event handler			[ ^handler ]
 
 Event handled: aHandler		[ ^handled := aHandler ]
 Event handled			[ ^handled ]
@@ -32,6 +41,9 @@ Event printMembersOn: aStream
 
 PointerEvent : Event ( state )
 
+PointerEvent state: anObject	[ ^state := anObject ]
+PointerEvent state		[ ^state ]
+
 PointerEvent printMembersOn: aStream
 [
     super printMembersOn: aStream.
@@ -39,6 +51,9 @@ PointerEvent printMembersOn: aStream
 ]
 
 ButtonEvent : PointerEvent ( button )
+
+ButtonEvent button: anObject	[ ^button := anObject ]
+ButtonEvent button		[ ^button ]
 
 ButtonEvent printMembersOn: aStream
 [
@@ -50,7 +65,14 @@ ButtonEvent printMembersOn: aStream
 
 KeyEvent : Event ( state key ucs4 )
 
-KeyEvent ucs4	[ ^ucs4 ]
+KeyEvent state: anObject	[ ^state := anObject ]
+KeyEvent state			[ ^state ]
+
+KeyEvent key: anObject		[ ^key := anObject ]
+KeyEvent key			[ ^key ]
+
+KeyEvent ucs4: anObject		[ ^ucs4 := anObject ]
+KeyEvent ucs4			[ ^self modify: ucs4 ]
 
 KeyEvent printMembersOn: aStream
 [
@@ -58,9 +80,27 @@ KeyEvent printMembersOn: aStream
     aStream space; print: state; space; print: key; space; print: ucs4.
 ]
 
+KeyEvent modify: asciiCode
+[
+    asciiCode		ifFalse: [^nil].
+    asciiCode >= 128	ifTrue:  [^asciiCode].
+    self controlPressed	ifTrue:  [^asciiCode & 0x1F].
+    "self shiftPressed	ifTrue:  [^asciiCode & 0xDF]."
+    ^asciiCode
+]
+
+KeyEvent shiftPressed	[ ^state & 0x01 ~~ 0 ]
+KeyEvent controlPressed	[ ^state & 0x04 ~~ 0 ]
+
 "----------------------------------------------------------------"
 
 ConfigureEvent : Event ( width height )
+
+ConfigureEvent width: anObject	[ ^width := anObject ]
+ConfigureEvent width		[ ^width ]
+
+ConfigureEvent height: anObject	[ ^height := anObject ]
+ConfigureEvent height		[ ^height ]
 
 ConfigureEvent printMembersOn: aStream
 [
