@@ -1,10 +1,10 @@
 OFLAGS	= -g
-IDC	= ./idc -k $(OFLAGS) $(XFLAGS) -I../objects -I../jolt-burg
+IDC	= ./idc -k $(MFLAGS) $(OFLAGS) $(XFLAGS) -I../objects -I../jolt-burg
 SYSOS	= $(shell $(IDC) -C os)
 
 ifeq ($(SYSOS),win32)
 XFLAGS	= -Jcairo/cairo
-MFLAGS	= -w
+MFLAGS	= -Wc,-mwindows
 XOBJS	= WinWindow.o
 XLIBS	= cairo/*.dll -lgdi32
 else
