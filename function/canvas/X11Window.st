@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-18 20:12:07 by piumarta on emilia
+  Last edited: 2007-09-18 20:34:59 by piumarta on emilia
 "
 
 { import: HostWindow }
@@ -87,7 +87,7 @@ X11Window withExtent: extent swapAction: swapAction
     _dbeMode := swapAction _integerValue.
 ]
 
-X11Window swapBuffers
+X11Window swapBuffers: bounds
 {
     if (self->v__buf != self->v__win)
     {
