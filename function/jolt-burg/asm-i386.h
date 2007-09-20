@@ -15,7 +15,7 @@
  *
  * See the file COPYING for more details.
  *
- * Last edited: 2006-12-12 16:09:10 by piumarta on emilia.local
+ * Last edited: 2007-09-20 15:06:07 by piumarta on emilia.local
  */
 
 #ifndef __ccg_asm_i386_h
@@ -30,6 +30,7 @@
 */
 
 #include <sys/types.h>
+#include <stdint.h>
 
 typedef unsigned char insn;
 
