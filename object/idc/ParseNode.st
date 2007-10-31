@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-01-06 15:45:00 by piumarta on emilia.local
+  Last edited: 2007-10-31 15:33:41 by piumarta on emilia
 "
 
 { import: Object }
@@ -51,7 +51,7 @@ ParseNode location	[ ^location ]
 
 ParseNode printIndent: indent
 [
-    indent timesRepeat: ['  ' print].
+    indent timesRepeat: ['  ' put].
 ]
 
 ParseNode println: indent
