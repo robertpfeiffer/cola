@@ -1000,6 +1000,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.param		= _libid_param;
 
   _libid.bind		= _libid_bind;
+  _libid.bind2		= _libid_bind2;
 
   _libid.nlreturn	= _libid_nlreturn;
   _libid.nlresult	= _libid_nlresult;
