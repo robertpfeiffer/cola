@@ -12,11 +12,13 @@ XOBJS	= X11Window.o
 XLIBS	= -L/usr/local/lib -L/usr/X11R6/lib -lX11 -lXext -lreadline -lcairo
 endif
 
-OBJS	= $(XOBJS) _cairo.o Cairo.o CharacterMap.o Colour.o \
+COBJS	= CharacterMap.o Colour.o \
 	  Event.o EventHandler.o Font.o Geometry.o HostWindow.o \
 	  Model.o Shape.o Text.o Transform.o View.o Views.o \
 	  Views-button.o Views-drawing.o Views-events.o Views-layout.o \
 	  Views-properties.o Views-scrolling.o Views-world.o
+
+OBJS	= $(XOBJS) $(COBJS) _cairo.o Cairo.o
 
 LIBS	= ../jolt-burg/jolt.a canvas.a $(XLIBS)
 
@@ -44,6 +46,12 @@ world : systemWorkspace.st
 
 %.so : %.st
 	$(IDC) -s $<
+
+SRCS	= $(COBJS:.o=.st)
+
+stats : .FORCE
+	$(SHELL) -ec 'for i in $(COBJS); do printf "%8d %s\n" `sort -u $$i | wc -l` $$i; done'
+	sort -u $(COBJS) | wc -l
 
 tidy: .FORCE
 	rm -f *~
