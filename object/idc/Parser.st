@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-29 13:06:51 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-10-31 16:28:03 by piumarta on emilia
 "
 
 { import: Scanner }
@@ -322,7 +322,9 @@ Parser parseBlock
 
 Parser parseExec
 [
-    ^self scan; parseSequence: (ExecNode withPosition: self position).
+    | position |
+    position := self position.
+    ^self scan; parseSequence: (ExecNode withPosition: position).
 ]
 
 Parser parseExtern
