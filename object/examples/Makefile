@@ -1,4 +1,4 @@
-SUBDIRS	= avl dispatch echo forward hw ignore interp libs1 libs2 libs3 prototype reflect serialise slots sqvm system this traits typename weak x11
+SUBDIRS	= avl dispatch echo forward hw ignore interp libs1 libs2 libs3 parse prototype reflect serialise slots sqvm system this traits typename weak x11
 
 all : .FORCE
 	-$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) ); done'
