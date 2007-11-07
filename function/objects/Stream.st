@@ -15,22 +15,23 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-10 04:41:54 by piumarta on cygwin.piumarta.com
+  Last edited: 2007-11-07 07:37:37 by piumarta on emilia.local
 "
 
 { import: Objects }
 
 SinkStream : Object ()
 
-SinkStream cr			[]
-SinkStream tab			[]
-SinkStream space		[]
-SinkStream print: o		[]
-SinkStream println: o		[]
-SinkStream print: o base: b	[]
-SinkStream print_x: o		[]
-SinkStream nextPut: o		[]
-SinkStream nextPutAll: o	[]
+SinkStream cr				[]
+SinkStream tab				[]
+SinkStream space			[]
+SinkStream print: o			[]
+SinkStream println: o			[]
+SinkStream print: o base: b		[]
+SinkStream print: o base: b width: w	[]
+SinkStream print_x: o			[]
+SinkStream nextPut: o			[]
+SinkStream nextPutAll: o		[]
 
 "----------------------------------------------------------------"
 
@@ -100,13 +101,14 @@ WriteStream next: count putAll: seqCollection
     ^seqCollection
 ]
 
-WriteStream cr			[ self nextPut: $\n ]
-WriteStream tab			[ self nextPut: $\t ]
-WriteStream space		[ self nextPut: $   ]
-WriteStream print: o		[ o printOn: self ]
-WriteStream println: o		[ self print: o; cr ]
-WriteStream print: o base: b	[ o printOn: self base: b ]
-WriteStream print_x: o		[ self print: (Integer value_: o) base: 16 ]
+WriteStream cr				[ self nextPut: $\n ]
+WriteStream tab				[ self nextPut: $\t ]
+WriteStream space			[ self nextPut: $   ]
+WriteStream print: o			[ o printOn: self ]
+WriteStream println: o			[ self print: o; cr ]
+WriteStream print: o base: b		[ o printOn: self base: b ]
+WriteStream print: o base: b width: w	[ o printOn: self base: b width: w ]
+WriteStream print_x: o			[ self print: (Integer value_: o) base: 16 ]
 
 WriteStream grow		[ self grow: collection size ]
 
@@ -206,7 +208,6 @@ ConsoleFileStream refill
 	    { _return 0; }
 	if (!buffer)
 	    buffer= malloc(1024);
-	fprintf(stderr, "PROMPT\n");
 	printf("%s", (char *)self->v__prompt);
 	fflush(stdout);
 	if (fgets(buffer, 1024, stdin))
