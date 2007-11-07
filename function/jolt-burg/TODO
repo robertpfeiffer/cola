@@ -1,3 +1,9 @@
+Exceptions.
+
+Closures.
+
+----------------------------------------------------------------
+
 object: 1st-class selectors, selector inheritance, selector namespaces
 
 move SlotDictionary.basicNew into .new and rename the fast version as
