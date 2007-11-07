@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-03 09:35:16 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-11-05 09:27:24 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -89,6 +89,11 @@ IdentityDictionary keys
     keys := OrderedCollection new.
     self do: [:assoc | keys add: assoc key].
     ^keys
+]
+
+IdentityDictionary keysDo: aBlock
+[
+    self do: [:assoc | aBlock value: assoc key]
 ]
 
 IdentityDictionary valuesDo: aBlock
