@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-17 13:48:01 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-11-05 07:59:41 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -748,10 +748,26 @@ Integer printOn: aStream base: base
     num printUnsignedOn: aStream base: base
 ]
 
+Integer printOn: aStream base: base width: fieldWidth
+[
+    | digits num |
+    digits := self printStringBase: base.
+    fieldWidth - digits size timesRepeat: [aStream nextPut: $0].
+    aStream nextPutAll: digits
+]
+
 Integer printUnsignedOn: aStream base: base
 [
     self >= base ifTrue: [self // base printUnsignedOn: aStream base: base].
     aStream nextPut: (self \\ base) asDigit.
+]
+
+Integer printStringBase: base
+[
+    | stream |
+    stream := WriteStream on: (String new: 8).
+    self printOn: stream base: base.
+    ^stream contents
 ]
 
 Integer value_: _i
