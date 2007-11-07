@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 11:45:20 by piumarta on emilia
+  Last edited: 2007-11-05 14:59:22 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -74,4 +74,23 @@ ByteArray replaceFrom: firstIndex to: lastIndex with: aCollection startingAt: st
 	char *src= (char *)      v__src   + ((long)v_startIndex >> 1);
 	memcpy(dst, src, (long)v_count >> 1);
     }.
+]
+
+ByteArray setBit: n
+[
+    | offset |
+    offset := n // 8.
+    self at: offset put: ((self at: offset) | (1 << (n \\ 8))).
+]
+
+ByteArray bitAt: n
+[
+    | offset |
+    offset := n // 8.
+    ^((self at: offset) >> (n \\ 8)) & 1
+]
+
+ByteArray invertBits
+[
+    self doWithIndex: [:b :i | self at: i put: 255 - b].
 ]
