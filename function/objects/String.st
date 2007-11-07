@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-07 16:47:38 by piumarta on emilia.local
+  Last edited: 2007-11-06 08:27:21 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -90,6 +90,22 @@ String asSymbol		[ ^Symbol intern_: self _bytes size_: size _integerValue ]
 
 String printOn: aStream	[ ^aStream nextPut: $'; nextPutAll: self; nextPut: $' ]
 
+String printEscapedOn: aStream
+[
+    self printEscapedOn: aStream delimited: $'
+]
+
+String printEscapedOn: aStream delimited: delimiter
+[
+    aStream nextPut: delimiter.
+    self do: [:c |
+        (c < 32 or: [c > 127]) ifTrue: [aStream nextPut: $\\; print: c base: 8 width: 3]
+	      ifFalse:
+	          [c == delimiter ifTrue: [aStream nextPut: $\\].
+		   aStream nextPut: c]].
+    aStream nextPut: delimiter
+]
+
 String putln
 {
     puts((char *)self->v__bytes);
@@ -107,4 +123,22 @@ String dirname
 	ifTrue:
 	   [self at: size - 1 put: 0.
 	    size := size - 1].
+]
+
+String asCharacterClass
+[
+    | stream class complement c prev |
+    class := ByteArray new: 32 withAll: 0.
+    (stream := self readStream) atEnd ifTrue: [class].
+    (complement := stream peek == $^) ifTrue: [stream next].
+    [c := stream next]
+	whileTrue:
+	   [(c == $- and: [prev and: [stream atEnd not]])
+		ifTrue:
+		   [prev to: stream next do: [:n | class setBit: n].
+		    prev := nil]
+		ifFalse:
+		   [class setBit: (prev := c)]].
+    complement ifTrue: [class invertBits].
+    ^class
 ]
