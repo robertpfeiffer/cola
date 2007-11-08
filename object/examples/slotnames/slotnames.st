@@ -1,7 +1,5 @@
 { import: st80 }	"Gets the built-in types (SmallInteger, Symbol, etc.)"
 
-FooBar : Object ( x y z )
-
 Object slotNameAt: index
 [
     | _name |
