@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-10 16:54:32 by piumarta on cygwin.piumarta.com
+  Last edited: 2007-11-07 10:32:10 by piumarta on emilia.local
 "
 
 { import: Object }
@@ -203,7 +203,7 @@ SequenceableCollection with: aCollection replace: elementsBlock
 
 SequenceableCollection replaceFrom: first to: last with: aCollection
 [
-    ^self replaceFrom: first to: last with: aCollection startingAt: 0
+    self replaceFrom: first to: last with: aCollection startingAt: 0
 ]
 
 SequenceableCollection replaceFrom: first to: last with: aCollection startingAt: collectionStart
