@@ -127,7 +127,7 @@ FastInterpreter run
 	   [tmp := pc.
 	    pc := pc + 1.
 	    { _imp_t imp= ((_imp_t *)v__words)[(long)v_tmp >> 1];
-	      imp(0, v_self); }]
+	      imp(0, v_self, v_self); }]
 ]
 
 FastInterpreter implementationAt: aSymbol

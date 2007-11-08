@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-09-30 12:42:10 by piumarta on emilia.local
+  Last edited: 2007-11-08 10:57:56 by piumarta on emilia.local
 "
 
 
@@ -68,7 +68,8 @@ PrototypeNode encode: encoder
 	   [used := true.
 	    encoder
 		addSelector: '_sizeof';    noteImplementation: '_sizeof'    in: name at: position;
-		addSelector: '_debugName'; noteImplementation: '_debugName' in: name at: position].
+		addSelector: '_debugName'; noteImplementation: '_debugName' in: name at: position;
+		addSelector: '_slots';	   noteImplementation: '_slots'	    in: name at: position].
 ]
 
 "Do not generate anything (runtime import of external prorotype, local

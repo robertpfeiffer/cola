@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 13:03:48 by piumarta on ubuntu
+  Last edited: 2007-11-08 11:21:59 by piumarta on emilia.local
 "
 
 { import: CodeGenerator }
@@ -637,7 +637,12 @@ CCodeGenerator implementType: typeNode
 	gen: 'static size_t '; genType: name method: '_sizeof'; gen: '(oop _closure, oop '; genVariable: 'self'; gen: ') {';
 	gen: ' return sizeof('; genStruct: name; genl: '); }';
 	gen: 'static char *'; genType: name method: '_debugName'; gen: '(oop _closure, oop '; genVariable: 'self'; gen: ') {';
-	gen: ' return "'; gen: name; genl: '"; }'.
+	gen: ' return "'; gen: name; genl: '"; }';
+	gen: 'static struct __slotinfo *'; genType: name method: '_slots'; gen: '(oop _closure, oop '; genVariable: 'self'; gen: ') {';
+	gen: ' static struct __slotinfo info[]= {'.
+    typeNode slots doWithIndex: [:slot :index | self gen: ' { "', slot, '", '; gen: (index - 1 * 4) printString; gen: ', 4 },'].
+    self
+	genl: ' { 0, 0, 0 } };  return &info[0]; }'.
 ]
 
 CCodeGenerator initialiseExternal: typeName
@@ -655,6 +660,8 @@ CCodeGenerator initialiseType: typeName in: baseName
 	gen: ', (_imp_t)'; genType: typeName method: '_sizeof'; genl: ');';
 	gen: '  _libid->method('; genVariable: typeName; gen: ', '; genSelector: '_debugName';
 	gen: ', (_imp_t)'; genType: typeName method: '_debugName'; genl: ');';
+	gen: '  _libid->method('; genVariable: typeName; gen: ', '; genSelector: '_slots';
+	gen: ', (_imp_t)'; genType: typeName method: '_slots'; genl: ');';
 	gen: '  _libid->export("'; gen: typeName; gen: '", '; genVariable: typeName; genl: ');'.
 ]
 

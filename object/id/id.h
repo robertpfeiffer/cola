@@ -13,6 +13,13 @@ struct __lookup
   oop		    state;
 };
 
+struct __slotinfo
+{
+  const char	*name;
+  size_t	 offset;
+  size_t	 size;
+};
+
 struct __libid
 {
   /* bootstrap */
