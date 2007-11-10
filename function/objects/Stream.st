@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-07 07:37:37 by piumarta on emilia.local
+  Last edited: 2007-11-09 16:02:15 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -214,7 +214,7 @@ ConsoleFileStream refill
 	    {
 		long len= strlen(buffer);
 		if (len && buffer[len - 1] == '\n')
-		    buffer[len - 1]= '\0';
+		    buffer[--len]= '\0';
 		v_length= (oop)((len + 1) << 1 | 1);
 		v__buffer= (oop)buffer;
 	    }
