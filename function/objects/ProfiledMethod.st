@@ -39,11 +39,24 @@ ProfiledMethod do: unaryBlock
 
 ProfiledMethod report
 [
-    | stream |
+    | stream total |
     self sort.
+    total := self tally.
     stream := WriteStream on: (String new: 1024).
-    self do: [:method | method reportOn: stream].
+    self do: [:method | method reportOn: stream tally: total].
     ^stream contents
+]
+
+ProfiledMethod reportOn: aStream tally: tally
+[
+    count		 printOn: aStream base: 10 width: 5 padded: $ .
+    count * 100 // tally printOn: aStream base: 10 width: 3 padded: $ .
+    aStream
+	nextPut: $%;
+	space; nextPutAll: self type;
+	space; nextPutAll: self name;
+	cr.
+    ^count
 ]
 
 ProfiledMethod sort
@@ -53,6 +66,11 @@ ProfiledMethod sort
 	   [self exchange: next.
 	    next sort].
     ^count
+]
+
+ProfiledMethod tally
+[
+    ^count + (next ifTrue: [next count] ifFalse: [0])
 ]
 
 ProfiledMethod exchange: other
@@ -69,16 +87,6 @@ ProfiledMethod setMethod_: _m count: c
 [
     _method := _m.
     count := c.
-]
-
-ProfiledMethod reportOn: aStream
-[
-    count printOn: aStream base: 10 width: 5 padded: $ .
-    aStream
-	space; nextPutAll: self type;
-	space; nextPutAll: self name;
-	cr.
-    ^count
 ]
 
 ProfiledMethod type	[ ^String value_: self _type ]

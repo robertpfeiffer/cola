@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-24 08:03:45 by piumarta on emilia
+  Last edited: 2007-11-15 15:29:54 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -184,5 +184,10 @@ OrderedCollection at: offset put: anObject
 
 OrderedCollection do: unaryBlock
 [
-    firstIndex to: lastIndex - 1 do: [:index | unaryBlock value: (array at: index)]
+    | index |
+    index := firstIndex.
+    [index < lastIndex]
+	whileTrue:
+	   [unaryBlock value: (array at: index).
+	    index := index + 1]
 ]
