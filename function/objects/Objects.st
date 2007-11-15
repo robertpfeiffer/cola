@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:30:06 by piumarta on emilia
+  Last edited: 2007-11-15 11:58:12 by piumarta on emilia.local
 "
 
 { import: _object }
@@ -45,6 +45,7 @@ Object : _object ()					[ Object := _object ]	"alias"
   SlotDictionary : Object ( _size _tally _keys _values default )
   StaticBlockClosure : Object ( _function _arity )
     BlockClosure : StaticBlockClosure ( outer state _nlr )
+  ProfiledMethod : Object ( _method count next )
   SinkStream : Object ()
   ReadStream : Object ( collection position readLimit )
     WriteStream : ReadStream ( writeLimit )

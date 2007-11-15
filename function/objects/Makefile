@@ -7,7 +7,7 @@ OBJEXT_O        = .o
 OBJEXT_SO       = .so
 
 FILES		= _object.o Objects.o Object.o \
-		  SmallInteger.o String.o Symbol.o BlockClosure.o \
+		  SmallInteger.o String.o Symbol.o BlockClosure.o ProfiledMethod.o \
 		  Collection.o SequenceableCollection.o ArrayedCollection.o Array.o ByteArray.o \
 		  IdentitySet.o Association.o IdentityDictionary.o SlotDictionary.o MemoDictionary.o OrderedCollection.o \
 		  File.o Stream.o Link.o LinkedList.o \

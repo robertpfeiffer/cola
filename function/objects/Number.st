@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-05 07:59:41 by piumarta on emilia.local
+  Last edited: 2007-11-15 11:06:40 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -753,6 +753,14 @@ Integer printOn: aStream base: base width: fieldWidth
     | digits num |
     digits := self printStringBase: base.
     fieldWidth - digits size timesRepeat: [aStream nextPut: $0].
+    aStream nextPutAll: digits
+]
+
+Integer printOn: aStream base: base width: fieldWidth padded: padChar
+[
+    | digits num |
+    digits := self printStringBase: base.
+    fieldWidth - digits size timesRepeat: [aStream nextPut: padChar].
     aStream nextPutAll: digits
 ]
 

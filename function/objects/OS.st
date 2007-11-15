@@ -15,10 +15,12 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-17 17:53:55 by piumarta on emilia
+  Last edited: 2007-11-12 15:29:22 by piumarta on emilia.local
 "
 
 { import: Objects }
+
+{ include <errno.h> }
 
 OS : Object ()
 
@@ -71,22 +73,23 @@ OS getenv: aString
 OS _getenv_: _string	{ return (oop)getenv((char *)v__string); }
 
 OS sleep: seconds
-{
-#  if defined(WIN32)
-    Sleep(((long)v_seconds >> 1) * 1000);
-#  else
-    sleep((long)v_seconds >> 1);
+[
+    | s ns |
+    s := seconds asInteger.
+    ns := (seconds * 1000000000) asInteger \\ 1000000000.
+    {
+#     if defined(WIN32)
+	Sleep(((long)v_s >> 1) * 1000 + ((long)v_ns >> 1) / 1000000);
+#     else
+	struct timespec rqt= { (long)v_s >> 1, (long)v_ns >> 1 }, rmt;
+	while (nanosleep(&rqt, &rmt) < 1
+		&& EINTR == errno
+		&& (rmt.tv_sec || rmt.tv_nsec)
+		&& (rqt.tv_sec != rmt.tv_sec || rqt.tv_nsec != rmt.tv_nsec))
+	    rqt= rmt;
 #  endif
-}
-
-OS usleep: useconds
-{
-#  if defined(WIN32)
-    Sleep(((long)v_useconds >> 1) / 1000);
-#  else
-    usleep((long)v_useconds >> 1);
-#  endif
-}
+    }
+]
 
 OS exit: status
 {
