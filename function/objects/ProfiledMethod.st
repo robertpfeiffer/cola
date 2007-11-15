@@ -118,8 +118,16 @@ Object perform: aSymbol every: nSeconds
 	struct itimerval interval= { { s, us }, { s, us } };
 	sigalrmReceiver= v_self;
 	sigalrmSelector= v_aSymbol;
-	signal(SIGALRM, sigalrm);
-	setitimer(ITIMER_REAL, (v_aSymbol ? &interval : 0), 0);
+	if (v_aSymbol)
+	  {
+	    signal(SIGALRM, sigalrm);
+	    setitimer(ITIMER_REAL, &interval, 0);
+	  }
+	else
+	  {
+	    signal(SIGALRM, SIG_IGN);
+	    setitimer(ITIMER_REAL, 0, 0);
+	  }
 #     endif
     }
 ]

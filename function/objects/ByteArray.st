@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-05 14:59:22 by piumarta on emilia.local
+  Last edited: 2007-11-15 14:36:07 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -48,6 +48,15 @@ ByteArray _at_: _offset
 
 ByteArray at: offset put: anInteger
 [
+    {
+	int offset= (long)v_offset >> 1;
+	int anInteger= (long)v_anInteger >> 1;
+	if (((long)v_offset & (long)v_anInteger & 1) && 0 <= offset && v_offset < self->v_size && 0 <= anInteger && anInteger < 256)
+	{
+	    ((char *)self->v__bytes)[offset]= anInteger;
+	    return v_anInteger;
+	}
+    }.
     (0 <= offset and: [offset < size and: [0 <= anInteger and: [anInteger < 256]]])
 	ifTrue:  [self at_: offset _integerValue put_: anInteger _integerValue]
 	ifFalse: [self errorOutOfBounds: offset].
