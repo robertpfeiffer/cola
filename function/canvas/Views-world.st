@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-18 20:13:08 by piumarta on emilia
+  Last edited: 2007-11-12 15:32:06 by piumarta on emilia.local
 "
 
 { import: HostWindow }
@@ -48,15 +48,15 @@ WorldView damaged: aRectangle
     "
     ctx := window newPainter.
     2 timesRepeat: [
-	ctx rectangle: aRectangle; setSource: Colour white; fill.  window swapBuffers; flush.  OS usleep: 20000.
-	ctx rectangle: aRectangle; setSource: Colour blue;  fill.  window swapBuffers; flush.  OS usleep: 20000.
+	ctx rectangle: aRectangle; setSource: Colour white; fill.  window swapBuffers; flush.  OS sleep: 0.020000.
+	ctx rectangle: aRectangle; setSource: Colour blue;  fill.  window swapBuffers; flush.  OS sleep: 0.020000.
     ].
     "
     damage := damage ifTrue: [damage union: aRectangle] ifFalse: [aRectangle].
     "
     2 timesRepeat: [
-	ctx rectangle: damage; setSource: Colour white; fill.  window swapBuffers; flush.  OS usleep: 20000.
-	ctx rectangle: damage; setSource: Colour green; fill.  window swapBuffers; flush.  OS usleep: 20000.
+	ctx rectangle: damage; setSource: Colour white; fill.  window swapBuffers; flush.  OS sleep: 0.020000.
+	ctx rectangle: damage; setSource: Colour green; fill.  window swapBuffers; flush.  OS sleep: 0.020000.
     ].
     ctx destroy.
     "
@@ -86,8 +86,8 @@ WorldView forceToScreen: clipRectangle
 	    [ctx setClipRectangle: clipRectangle].
     "
     2 timesRepeat: [
-	ctx rectangle: clipRectangle; setSource: Colour white; fill.  window swapBuffers; sync.  OS usleep: 20000.
-	ctx rectangle: clipRectangle; setSource: Colour red;   fill.  window swapBuffers; sync.  OS usleep: 20000.
+	ctx rectangle: clipRectangle; setSource: Colour white; fill.  window swapBuffers; sync.  OS sleep: 0.020000.
+	ctx rectangle: clipRectangle; setSource: Colour red;   fill.  window swapBuffers; sync.  OS sleep: 0.020000.
     ].
     "
     self drawOn: ctx in: (clipRectangle outsetBy: (1,1)).
