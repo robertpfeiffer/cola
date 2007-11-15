@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-08 11:21:59 by piumarta on emilia.local
+  Last edited: 2007-11-15 12:07:31 by piumarta on emilia.local
 "
 
 { import: CodeGenerator }
@@ -96,7 +96,7 @@ typedef oop (*_imp_t)(oop _thunk, oop receiver, ...);
 static struct __libid *_libid= 0;
 
 #ifdef ID_DEBUG
-# define _enter(NM, TYPE, FILE)	void *__id_debug= _libid->enter(NM, TYPE, FILE)
+# define _enter(NM, TYPE, FILE)	static struct __methodinfo _methodinfo= { NM, TYPE, FILE, 0 };  void *__id_debug= _libid->enter(&_methodinfo)
 # define _line(lno)		_libid->line(lno)
 # define _leave()		_libid->leave(__id_debug)
 # define _backtrace()		_libid->backtrace()
@@ -122,7 +122,7 @@ CCodeGenerator sendText
     compiler error: 'unsupported cache level: ', compiler cacheLevel printString
 ]
 
-CCodeGenerator sendNoCacheText 
+CCodeGenerator sendNoCacheText
 [
     ^'
 #define _send(MSG, RCV, ARG...) ({					\\

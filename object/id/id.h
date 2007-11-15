@@ -20,6 +20,14 @@ struct __slotinfo
   size_t	 size;
 };
 
+struct __methodinfo
+{
+  const char	*name;
+  const char	*type;
+  const char	*file;
+  void		*meta;
+};
+
 struct __libid
 {
   /* bootstrap */
@@ -88,12 +96,12 @@ struct __libid
 
   /* debugging */
 
-  void		*(*enter)(char *name, char *type, char *file);
+  void		*(*enter)(struct __methodinfo *info);
   void		 (*line)(int line);
   void		 (*leave)(void *cookie);
   char		*(*backtrace)(void);
+  void		*(*methodAt)(int offset);
 
-  void		  *unused46;
   void		  *unused47;
   void		  *unused48;
   void		  *unused49;

@@ -64,7 +64,8 @@ struct __closure  *_libid_bind    (oop selector, oop receiver);
 struct __lookup    _libid_bind2   (oop selector, oop receiver);
 oop                _libid_nlreturn(oop nlr, oop result);
 oop                _libid_nlresult(void);
-void		  *_libid_enter(char *name, char *type, char *file);
+void		  *_libid_enter(struct __methodinfo *info);
+void		  *_libid_methodAt(int offset);
 void		   _libid_line(int line);
 void		   _libid_leave(void *cookie);
 char		  *_libid_backtrace(void);
@@ -386,6 +387,7 @@ static oop _selector__withCString_(oop _thunk, oop state, oop self, const char *
 
 static oop _selector___intern_(oop _thunk, oop state, oop self, const char *string)
 {
+#if 0
   oop *table= _selector_Table->vtable.bindings->vector.elements;
   size_t i= 0;
   assert(isMemberOf(self, _selector));
@@ -397,6 +399,31 @@ static oop _selector___intern_(oop _thunk, oop state, oop self, const char *stri
 	return table[i];
     }
   return _vtable__add_(0, _selector_Table, _selector_Table, _selector__withCString_(0, _selector, _selector, string));
+#else
+  oop *table= _selector_Table->vtable.bindings->vector.elements;
+  size_t low= 0;
+  size_t high= _selector_Table->vtable.tally;
+  assert(isMemberOf(self, _selector));
+  dprintf("_selector___intern_(%p, %p, %p, \"%s\")\n", _thunk, self, state, string);
+  while (low < high)
+    {
+      size_t mid= (low + high) / 2;
+      if (strcmp(table[mid]->selector.elements, string) < 0)
+	low= mid + 1; 
+      else
+	high= mid; 
+    }
+  if ((low < _selector_Table->vtable.tally) && !strcmp(table[low]->selector.elements, string))
+    return table[low];
+  if (_selector_Table->vtable.tally == _selector_Table->vtable.bindings->vector.size)
+    {
+      _selector_Table->vtable.bindings= _vector__grow(0, _selector_Table->vtable.bindings, _selector_Table->vtable.bindings);
+      table= _selector_Table->vtable.bindings->vector.elements;
+    }
+  memmove(table + low + 1, table + low, sizeof(oop) * (_selector_Table->vtable.tally - low));
+  _selector_Table->vtable.tally++;
+  return table[low]= _selector__withCString_(0, _selector, _selector, string);
+#endif
 }
 
 static oop _object___beTagType(oop _thunk, oop state, oop self)
@@ -803,15 +830,15 @@ void *_libid_param(int index)
 
 struct position
 {
-  char *name, *type, *file;
-  int   line;
+  struct __methodinfo	*info;
+  int			 line;
 };
 
 static struct position *positions= 0;
 static int position= 0;
 static int maxPosition= 0;
 
-void *_libid_enter(char *name, char *type, char *file)
+void *_libid_enter(struct __methodinfo *info)
 {
   struct position *p= 0;
   if (position >= maxPosition)
@@ -828,11 +855,14 @@ void *_libid_enter(char *name, char *type, char *file)
 	}
     }
   p= positions + position++;
-  p->name= name;
-  p->type= type;
-  p->file= file;
+  p->info= info;
   p->line= 0;
   return (void *)(position - 1);
+}
+
+void *_libid_methodAt(int offset)
+{
+  return ((0 <= offset) && (offset < position)) ? positions[position - offset - 1].info : 0;
 }
 
 void _libid_line(int line)
@@ -858,15 +888,15 @@ char *_libid_backtrace(void)
     result= _libid_balloc(size);
     for (i= position;  i--;)
       {
-	char *base= strrchr(positions[i].file, '/');
-	if (base) positions[i].file= base + 1;
-	if (indent < (len= strlen(positions[i].file)))
+	char *base= strrchr(positions[i].info->file, '/');
+	if (base) positions[i].info->file= base + 1;
+	if (indent < (len= strlen(positions[i].info->file)))
 	  indent= len;
       }
     indent += 9;
     for (i= position;  i--;)    /*for (i= 0;  i< position;  ++i)*/
       {
-	int width= snprintf(result + offset, size - offset, "  %s:%-4d ", positions[i].file, positions[i].line);
+	int width= snprintf(result + offset, size - offset, "  %s:%-4d ", positions[i].info->file, positions[i].line);
 	offset += width;
 	if (indent < width)
 	  indent= width;
@@ -875,7 +905,7 @@ char *_libid_backtrace(void)
 	    width= snprintf(result + offset, size - offset, "%*s", indent - width, "");
 	    offset += width;
 	  }
-	width= snprintf(result + offset, size - offset, "%s %s\n", positions[i].type, positions[i].name);
+	width= snprintf(result + offset, size - offset, "%s %s\n", positions[i].info->type, positions[i].info->name);
 	offset += width;
       }
     if (offset == size) goto grow;
@@ -1009,6 +1039,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.line		= _libid_line;
   _libid.leave		= _libid_leave;
   _libid.backtrace	= _libid_backtrace;
+  _libid.methodAt	= _libid_methodAt;
 
   _libid.gc_addRoots			    = _libid.dlsym(RTLD_DEFAULT, "GC_add_roots");
   _libid.gc_gcollect			    = _libid.dlsym(RTLD_DEFAULT, "GC_gcollect");
