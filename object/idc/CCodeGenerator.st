@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 12:07:31 by piumarta on emilia.local
+  Last edited: 2007-11-15 15:20:02 by piumarta on emilia.local
 "
 
 { import: CodeGenerator }
@@ -704,10 +704,18 @@ CCodeGenerator beginMethod: methodNode in: typeNode arguments: arguments variadi
     self genl: ')'.
 ]
 
-CCodeGenerator debugMethod: method	[ self genl: '  _enter("', method selector, '", "', method type name, '", "', method position file escaped, '");' ]
-CCodeGenerator debugBlock:  block	[ self genl: '  _enter("[]", "?", "', block position file escaped, '");' ]
+CCodeGenerator debugMethod: method	[ self genl: '  _enter("',    method selector, '", "', method type name, '", "', method position file escaped, '");' ]
 CCodeGenerator debugLine:   position	[ self genl: '  _line(', position line printString, ');' ]
 CCodeGenerator debugReturn: method	[ self genl: '  _leave();' ]
+
+CCodeGenerator debugBlock: block in: method
+[
+    self
+	genl: '  _enter("[] ',
+	(method ifTrue: [method selector] ifFalse: ['?']), '", "',
+	(method ifTrue: [method type name] ifFalse: ['?']), '", "',
+	block position file escaped, '");'
+]
 
 CCodeGenerator beginSequence: sequenceNode	[ self genl: ' {' ]
 CCodeGenerator endSequence: sequenceNode	[ self genl: ' }' ]

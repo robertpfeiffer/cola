@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 12:08:17 by piumarta on emilia
+  Last edited: 2007-11-15 15:15:44 by piumarta on emilia.local
 "
 
 { import: SequenceNode }
@@ -163,16 +163,16 @@ BlockNode genDefinition: gen
     scope blocks do: [:block | block genDefinition: gen].	"propagate to enclosed blocks"
 ]
 
-BlockNode genImplementation: gen
+BlockNode genImplementation: gen in: homeMethod
 [
     "generate the function part of a closure"
     "NOTE: since the body refers to enclosed block implementations
      when generating full closures, those implementations MUST be
      generated first."
-    scope blocks do: [:block | block genImplementation: gen].
+    scope blocks do: [:block | block genImplementation: gen in: homeMethod].
     gen beginBlock: self arguments: arguments variadic: false.
     gen beginSequence: self.
-    gen debugBlock: self.
+    gen debugBlock: self in: homeMethod.
     scope hasExports ifTrue: [gen createStateVector: scope stateVectorSize inScope: scope tag constructor: stateConstructor].
     temporaries do: [:var | var isFree ifFalse: [gen declareTemporary: var]].
     gen declareStack: scope stackSize.

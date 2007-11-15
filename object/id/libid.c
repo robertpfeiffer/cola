@@ -854,10 +854,10 @@ void *_libid_enter(struct __methodinfo *info)
 	  positions= malloc(sizeof(struct position) * maxPosition);
 	}
     }
-  p= positions + position++;
+  p= positions + position;
   p->info= info;
   p->line= 0;
-  return (void *)(position - 1);
+  return (void *)(position++);
 }
 
 void *_libid_methodAt(int offset)

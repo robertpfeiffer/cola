@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-24 16:52:14 by piumarta on emilia
+  Last edited: 2007-11-15 15:12:32 by piumarta on emilia.local
 "
 
 { import: BlockNode }
@@ -88,7 +88,7 @@ MethodNode genDefinition: gen
 
 MethodNode genImplementation: gen
 [
-    scope blocks do: [:block | block genImplementation: gen].
+    scope blocks do: [:block | block genImplementation: gen in: self].
     gen beginMethod: self in: type arguments: arguments variadic: variadic sequence: sequenceNumber.
     gen beginSequence: self.
     gen debugMethod: self.

@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-03-25 09:56:34 by piumarta on emilia.local
+  Last edited: 2007-11-15 15:17:28 by piumarta on emilia.local
 "
 
 { import: SequenceNode }
@@ -66,7 +66,7 @@ ExecNode genDefinition: gen
 
 ExecNode genImplementation: gen
 [
-    scope blocks do: [:block | block genImplementation: gen].
+    scope blocks do: [:block | block genImplementation: gen in: nil].
 ]
 
 ExecNode genInitialisation: gen
