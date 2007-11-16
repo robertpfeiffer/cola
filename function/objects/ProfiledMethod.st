@@ -4,6 +4,24 @@
 
 ProfiledMethod : Object ( _method count next )
 
+ProfiledMethod new
+{
+    oop clone= (oop)malloc(sizeof(oop) + sizeof(*self)) + 1;
+    clone->_vtable[-1]= self->_vtable[-1];
+    _return(clone);
+}
+
+ProfiledMethod delete
+{
+    free(v_self - 1);
+}
+
+ProfiledMethod release
+[
+    next ifTrue: [next release].
+    self delete
+]
+
 ProfiledMethods := [ nil ]
 
 ProfiledMethod withMethod_: _mi
@@ -44,13 +62,14 @@ ProfiledMethod report
     total := self tally.
     stream := WriteStream on: (String new: 1024).
     self do: [:method | method reportOn: stream tally: total].
+    self release.
     ^stream contents
 ]
 
 ProfiledMethod reportOn: aStream tally: tally
 [
     count		 printOn: aStream base: 10 width: 5 padded: $ .
-    count * 100 // tally printOn: aStream base: 10 width: 3 padded: $ .
+    count * 100 // tally printOn: aStream base: 10 width: 4 padded: $ .
     aStream
 	nextPut: $%;
 	space; nextPutAll: self type;
