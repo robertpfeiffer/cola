@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 11:06:40 by piumarta on emilia.local
+  Last edited: 2007-11-15 20:50:02 by piumarta on emilia
 "
 
 { import: Objects }
@@ -62,6 +62,8 @@ Number negated
 
 Object  isInteger	[ ^false ]
 Integer	isInteger	[ ^true ]
+
+Integer asInteger	[]
 
 "----------------------------------------------------------------"
 

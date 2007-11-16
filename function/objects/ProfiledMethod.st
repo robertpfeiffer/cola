@@ -1,5 +1,6 @@
 { import: Object }
 
+{ include <signal.h> }
 { include "sigalrm.h" }
 
 ProfiledMethod : Object ( _method count next )
