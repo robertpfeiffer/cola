@@ -29,7 +29,7 @@
 
 #include "gc/gc.h"
 
-#define GLOBAL_MCACHE	1
+#define GLOBAL_MCACHE	1024
 #define USE_GC		1
 #define DEBUG_ALL	0
 
@@ -171,12 +171,16 @@ oop _libid_tag_vtable= 0;
 static oop _selector_Table= 0;
 static oop _object_Table= 0;
 
+#if GLOBAL_MCACHE
+
 struct __entry
 {
   oop		 vtable;
   oop		 selector;
   _closure_t	*closure;
-} _libid_mcache[1024];
+} *_libid_mcache[GLOBAL_MCACHE];
+
+#endif
 
 #define isMemberOf(obj, type)	((0 == (obj)) || ((obj)->_vtable[-1] == type##_vtable))
 #define isKindOf(obj, type)	((0 == (obj)) || ((obj)->_vtable[-1] == type##_vtable) || (_libid_isKindOf(obj, type##_vtable)))
@@ -565,11 +569,13 @@ _"_libid_bind:					\n"
 "	movl	-4(%eax), %edx			\n"	// edx = recevier.vtable
 "__tok:	movl	4(%esp), %ecx			\n"	// ecx = selector
 "	movl	%edx, %eax			\n"	// eax = vtable
-"	shll	$4, %eax			\n"	// eax = vtable << 2+2
-"	shrl	$1, %ecx			\n"	// ecx = selector >> 3-2
+"	shll	$2, %eax			\n"	// eax = vtable << 2
+"	shrl	$3, %ecx			\n"	// ecx = selector >> 3
 "	xorl	%ecx, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3)
-"	andl	$0xffc, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
-"	leal	"_"_libid_mcache(%eax,%eax,2), %eax \n"	// eax = mcache + eax * sizeof(entry)
+"	andl	$1023, %eax			\n"	// eax = (vtable << 2) ^ (selector >> 3) & CacheSize
+"	movl	"_"_libid_mcache(,%eax,4), %eax	\n"	// eax = mcache[eax * sizeof(entry)]
+"	testl	%eax, %eax			\n"	// eax ?
+"	je	"_"_libid_bind_fill		\n"
 "	cmpl	(%eax), %edx			\n"	// eax.vtable == vtable ?
 "	jne	"_"_libid_bind_fill		\n"
 "	movl	4(%esp), %ecx			\n"	// ecx = selector
@@ -586,7 +592,7 @@ _"_libid_bind:					\n"
 # define _libid_bind _libid_bind_fill
 #endif
 
-#if GLOBAL_MCACHE && defined(__GNUC__) && defined(__ppc__)
+#if GLOBAL_MCACHExxx && defined(__GNUC__) && defined(__ppc__)	/* XXX FIX ME XXX */
 asm (
 "	.text						\n"
 "	.align	4					\n"
@@ -630,6 +636,7 @@ struct __closure *_libid_bind(oop selector, oop receiver)
 {
   static int recursionGuard= 0;
 #if GLOBAL_MCACHE
+  unsigned int    probe= 0;
   struct __entry *entry= 0;
 #endif
   oop assoc= 0;
@@ -639,11 +646,15 @@ struct __closure *_libid_bind(oop selector, oop receiver)
 
 #if GLOBAL_MCACHE
 # if 0
-  binary(vtable); putchar(' '); binary(selector); putchar('\n');
+  putchar(' ');
 # endif
-  entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
-  if (entry->selector == selector && entry->vtable == vtable)
+  probe= (((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & (GLOBAL_MCACHE - 1);
+  entry= _libid_mcache[probe];
+  if (entry && entry->selector == selector && entry->vtable == vtable)
     return (struct __closure *) entry->closure;
+# if 0
+  putchar('-');
+# endif
 #endif
 
   assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _send(s_lookup_, vtable, selector);
@@ -660,9 +671,15 @@ struct __closure *_libid_bind(oop selector, oop receiver)
       fatal("primitive error handling failed (%p %p)", receiver, selector);
     }
 #if GLOBAL_MCACHE
+# if USE_GC
+  entry= GC_malloc(sizeof(struct __entry));
+# else
+  entry= malloc(sizeof(struct __entry));	/* lossage */
+# endif
   entry->selector= selector;
   entry->vtable=   vtable;
   entry->closure= &assoc->assoc.value->closure;
+  _libid_mcache[probe]= entry;
 #endif
   return (struct __closure *)&assoc->assoc.value->closure;
 }
@@ -672,6 +689,7 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
   oop fragment= receiver;
   static int recursionGuard= 0;
 #if GLOBAL_MCACHE
+  unsigned int    probe= 0;
   struct __entry *entry= 0;
 #endif
   oop assoc= 0;
@@ -680,7 +698,8 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
     dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, fragment);
     if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(fragment));
 #  if GLOBAL_MCACHE
-    entry= _libid_mcache + ((((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & ((sizeof(_libid_mcache) / sizeof(struct __entry)) - 1));
+    probe= (((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & (GLOBAL_MCACHE - 1);
+    entry= _libid_mcache[probe];
     if (entry->selector == selector && entry->vtable == vtable)
       return (struct __lookup){ (struct __closure *)entry->closure, fragment };
 #  endif
@@ -690,9 +709,15 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
     if (assoc)
       {
 #      if GLOBAL_MCACHE
+#	if USE_GC
+	entry= GC_malloc(sizeof(struct __entry));
+#	else
+	entry= malloc(sizeof(struct __entry));	/* lossage */
+#	endif
 	entry->selector= selector;
 	entry->vtable=   vtable;
 	entry->closure= &assoc->assoc.value->closure;
+	_libid_mcache[probe]= entry;
 #      endif
 	return (struct __lookup){ (struct __closure *)&assoc->assoc.value->closure, fragment };
       }
@@ -712,16 +737,16 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
 void _libid_flush(oop selector)
 {
 #if GLOBAL_MCACHE
-  struct __entry *entry;
+  unsigned int probe;
   if (selector)
     {
-      for (entry= _libid_mcache;  entry < _libid_mcache + (sizeof(_libid_mcache) / sizeof(struct __entry));  ++entry)
-	if (entry->selector == selector)
-	  entry->selector= entry->vtable= 0;
+      for (probe= 0;  probe < GLOBAL_MCACHE;  ++probe)
+	if (_libid_mcache[probe] && _libid_mcache[probe]->selector == selector)
+	  _libid_mcache[probe]->selector=
+	    _libid_mcache[probe]->vtable= 0;
     }
   else
-    for (entry= _libid_mcache;  entry < _libid_mcache + (sizeof(_libid_mcache) / sizeof(struct __entry));  ++entry)
-      entry->selector= entry->vtable= 0;
+    memset(_libid_mcache, 0, sizeof(_libid_mcache));
 #endif
 }
 
