@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 12:11:37 by piumarta on emilia
+  Last edited: 2007-11-17 16:31:52 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -816,7 +816,8 @@ Compiler xLet: form
     block scope: self beginScope.
     specs do: [:binding |
 	| name var |
-	    (binding isExpression and: [binding size == 2 and: [(name := binding first) isSymbol]]) ifFalse: [self errorSyntax: form].
+	binding isSymbol ifTrue: [binding := Expression with: binding with: (CNSTI4 new arg: nil)].
+	(binding isExpression and: [binding size == 2 and: [(name := binding first) isSymbol]]) ifFalse: [self errorSyntax: form].
 	var := self defineVariable: name.
 	block add: (ASGNI4 new
 			lhs: (binding second translate: self);
