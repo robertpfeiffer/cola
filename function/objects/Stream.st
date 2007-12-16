@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-09 19:07:31 by piumarta on emilia.local
+  Last edited: 2007-12-16 12:57:56 by piumarta on emilia
 "
 
 { import: Objects }
@@ -49,15 +49,74 @@ ReadStream on: aCollection
 
 ReadStream readStream	[ ^self ]
 
-ReadStream peek		[ ^self atEnd ifFalse: [collection at: position] ]
-ReadStream peek: offset	[ ^position + offset < readLimit ifTrue: [collection at: position + offset] ]
-ReadStream next		[ ^self atEnd ifFalse: [collection at: (position := position + 1) - 1] ]
+ReadStream peek: offset
+[
+    | index |
+    index := position + offset.
+    [index >= readLimit and: [self refill]] whileTrue.
+    ^index < readLimit ifTrue: [collection at: position + offset]
+]
+
+ReadStream peek		[ [position >= readLimit and: [self refill]] whileTrue.  ^position < readLimit ifTrue: [collection at: position] ]
+ReadStream next		[ [position >= readLimit and: [self refill]] whileTrue.  ^position < readLimit ifTrue: [collection at: (position := position + 1) - 1] ]
 ReadStream atEnd	[ ^position >= readLimit and: [self refill not] ]
 ReadStream position	[ ^position ]
 ReadStream position: i	[ ^position := i ]
+ReadStream skip: count	[ position := position + count ]
 ReadStream refill	[ ^false ]
 
-ReadStream skip: count	[ count timesRepeat: [self next] ]
+ReadStream flush
+[
+    position > (collection size // 2)
+	ifTrue:
+	   [| newLimit |
+	    newLimit := readLimit - position.
+	    collection replaceFrom: 0 to: newLimit - 1 with: collection startingAt: position.
+	    readLimit := newLimit.
+	    position  := 0]
+]
+
+ReadStream grow		[ self grow: collection size ]
+
+ReadStream grow: count
+[
+    | collectionSize newCollection |
+    collectionSize := collection size.
+    newCollection := collection new: collectionSize + count.
+    newCollection replaceFrom: 0 to: collectionSize - 1 with: collection startingAt: 0.
+    collection := newCollection.
+]
+
+ReadStream matchAny
+[
+    ^self next
+]
+
+ReadStream match: anObject
+[
+    ^self peek == anObject
+	ifTrue:
+	   [position := position + 1.
+	    anObject]
+]
+
+ReadStream matchClass: characterClass
+[
+    | c |
+    ^((c := self peek) and: [0 ~~ (characterClass bitAt: c)])
+	ifTrue:
+	   [position := position + 1.
+	    c]
+]
+
+ReadStream matchSequence: aCollection
+[
+    aCollection doWithIndex: [:c :i | (self peek: i) == c ifFalse: [^nil]].
+    position := position + aCollection size.
+    ^aCollection
+]
+
+ReadStream contentsFrom: start	[ ^collection copyFrom: start to: position - 1 ]
 
 "----------------------------------------------------------------"
 
@@ -71,6 +130,12 @@ WriteStream on: aCollection
     self := super on: aCollection.
     writeLimit := collection size.
     readLimit := 0.
+]
+
+WriteStream with: aCollection
+[
+    self := super on: aCollection.
+    position := readLimit := writeLimit := collection size.
 ]
 
 WriteStream reset
@@ -110,38 +175,14 @@ WriteStream print: o base: b		[ o printOn: self base: b ]
 WriteStream print: o base: b width: w	[ o printOn: self base: b width: w ]
 WriteStream print_x: o			[ self print: (Integer value_: o) base: 16 ]
 
-WriteStream grow		[ self grow: collection size ]
-
 WriteStream grow: count
 [
-    | newCollection |
-    newCollection := collection new: (writeLimit := collection size + count).
-    newCollection replaceFrom: 0 to: collection size - 1 with: collection startingAt: 0.
-    collection := newCollection.
+    writeLimit := collection size + count.
+    super grow: count.
 ]
 
-WriteStream contents
-[
-    ^collection copyFrom: 0 to: position - 1
-]
-
-WriteStream fullContents
-[
-    ^collection copyFrom: 0 to: readLimit - 1
-]
-
-
-
-WriteStream dump
-[
-    StdOut nextPutAll: self debugName;
-	nextPutAll: '(collection='; nextPutAll: collection debugName; nextPut: $[; print: collection size; nextPut: $];
-	nextPutAll: ' position=';   print: position;
-	nextPutAll: ' readLimit=';  print: readLimit;
-	nextPutAll: ' writeLimit='; print: writeLimit;
-	nextPut: $); cr.
-]
-
+WriteStream contents		[ ^collection copyFrom: 0 to: position - 1 ]
+WriteStream fullContents	[ ^collection copyFrom: 0 to: readLimit - 1 ]
 
 "----------------------------------------------------------------"
 
@@ -150,16 +191,16 @@ FileStream : ReadStream ( file )
 FileStream refill
 [
     | n |
-    (n := file read: collection) > 0 ifFalse: [^false].
-    position := 0.
-    readLimit := n.
+    position == collection size ifTrue: [self grow].
+    (n := file read: collection at: position size: collection size - position) > 0 ifFalse: [^false].
+    readLimit := position + n.
 ]
 
 FileStream on: aFile
 [
     self := super on: (ByteArray new: 8192).
     file := aFile.
-    position := collection size.
+    readLimit := 0.
 ]
 
 FileStream contents
@@ -200,7 +241,7 @@ ConsoleFileStream prompt: aString
 
 ConsoleFileStream refill
 [
-    | length _buffer _bytes |
+    | length _buffer _bytes _position |
     {
 	static char *buffer= 0;
         static int   live= 1;
@@ -221,12 +262,12 @@ ConsoleFileStream refill
 	else
 	    { _return (oop)(live= 0); }
     }.
-    collection size <= length ifTrue: [collection := collection new: length + 1].
+    [collection size <= (position + length)] whileFalse: [self grow].
     _bytes := collection _bytes.
+    _position := position _integerValue.
     {
-	strcpy((char *)v__bytes, (char *)v__buffer);
+	strcpy((char *)v__bytes + (long)v__position, (char *)v__buffer);
     }.
-    collection at: length put: $\n.
-    position := 0.
-    readLimit := length + 1.
+    collection at: position + length put: $\n.
+    readLimit := position + length + 1.
 ]
