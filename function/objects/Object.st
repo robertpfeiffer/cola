@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 12:00:29 by piumarta on emilia.local
+  Last edited: 2007-11-30 17:56:18 by piumarta on emilia
 "
 
 { import: Objects }
@@ -220,10 +220,12 @@ Object errorKeyNotFound: aKey
 [ StdOut := File	withFd: 1 name: '<stdout>' ]
 [ StdErr := File	withFd: 2 name: '<stderr>' ]
 
-Object print	[ StdOut print: self ]
-Object println	[ StdOut print: self; cr ]
-Object put	[ StdOut nextPutAll: self ]
-Object putln	[ StdOut nextPutAll: self; cr ]
+Object print		[ StdOut print: self ]
+Object println		[ StdOut print: self; cr ]
+SmallInteger put	[ StdOut nextPut: self ]
+SmallInteger putln	[ StdOut nextPut: self; cr ]
+String put		[ StdOut nextPutAll: self ]
+String putln		[ StdOut nextPutAll: self; cr ]
 
 { import: ProfiledMethod }
 
