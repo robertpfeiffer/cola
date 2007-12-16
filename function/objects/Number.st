@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 20:50:02 by piumarta on emilia
+  Last edited: 2007-12-04 21:30:13 by piumarta on emilia
 "
 
 { import: Objects }
@@ -560,6 +560,33 @@ LargeInteger value_: anInteger
     }
 ]
 
+LargeInteger unsignedValue_: anInteger
+[
+    self := super new.
+    {
+        mp_init_set_int((mp_int *)self, (unsigned long)v_anInteger);
+    }
+]
+
+LargeInteger size_: _size value_: _bytes
+[
+    self := super new.
+    {
+	int size= (long)v__size;
+	unsigned char *bytes= (unsigned char *)v__bytes;
+	mp_int digit;
+        mp_init_set_int(&digit, (unsigned long)0);
+        mp_init_set_int((mp_int *)self, (unsigned long)0);
+	while (size--)
+	  {
+	    mp_set_int(&digit, bytes[size]);
+	    mp_mul_d((mp_int *)self, (mp_digit)256, (mp_int *)self);
+	    mp_add((mp_int *)self, &digit, (mp_int *)self);
+	  }
+        mp_clear(&digit);
+    }
+]
+
 LargeInteger new
 [
     self := super new.
@@ -786,6 +813,12 @@ Integer value_: _i
     ^LargeInteger value_: _i
 ]
 
+Integer unsignedValue_: _i
+[
+    { if ((unsigned long)v__i <= 0x3fffffff) { _return (oop)((long)v__i << 1 | 1); } }.
+    ^LargeInteger unsignedValue_: _i
+]
+
 "----------------------------------------------------------------"
 
 Object isNumber	[ ^false ]
@@ -857,7 +890,7 @@ Float ceiling
 
 Integer fromString: s
 [
-    ^self fromString: s base: 10
+    ^self fromString: s base: nil
 ]
 
 Integer fromString: s base: b
@@ -865,7 +898,7 @@ Integer fromString: s base: b
     | chars digit sign base value |
     chars := s readStream.
     sign  := 1.
-    base  := 10.
+    base  := b ifNil: [10].
     value := 0.
     chars peek == $+
 	ifTrue:  [chars next]
@@ -874,7 +907,7 @@ Integer fromString: s base: b
 		ifTrue:
 		   [sign := -1.
 		    chars next]].
-    chars peek == $0
+    (b isNil and: [chars peek == $0])
 	ifTrue:
 	   [base := 8.
 	    chars next.
