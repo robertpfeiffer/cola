@@ -15,7 +15,7 @@ else
 LIBS		= ../objects/objects.a readline.o jolt.a
 endif
 
-FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o Grammar.o \
+FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o ReductionGrammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o Options.o
 
 ifeq ($(OS),win32)
