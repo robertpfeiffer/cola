@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 13:04:33 by piumarta on emilia
+  Last edited: 2007-12-12 22:38:11 by piumarta on emilia
 "
 
 { import: Objects }
@@ -328,7 +328,7 @@ DynamicIntel32CodeGenerator defineVariable: name
 
 "----------------------------------------------------------------"
 
-{ import: Grammar }
+{ import: ReductionGrammar }
 
 Intel32CodeGenerator cl		[ ^cl  ]
 Intel32CodeGenerator cx		[ ^cx  ]

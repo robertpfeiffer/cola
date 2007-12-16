@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-24 18:08:51 by piumarta on emilia.lax04.mtt
+  Last edited: 2007-12-12 22:38:15 by piumarta on emilia
 "
 
 { import: Objects }
@@ -346,7 +346,7 @@ DynamicARMCodeGenerator defineVariable: name
 
 "----------------------------------------------------------------"
 
-{ import: Grammar }
+{ import: ReductionGrammar }
 
 ARMCodeGenerator r0		[ ^r0 ]
 ARMCodeGenerator r1		[ ^r1 ]

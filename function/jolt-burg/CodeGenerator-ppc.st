@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-05-22 13:12:49 by piumarta on emilia
+  Last edited: 2007-12-12 22:38:01 by piumarta on emilia
 "
 
 { import: Objects }
@@ -354,7 +354,7 @@ DynamicPowerPCCodeGenerator defineVariable: name
 
 "----------------------------------------------------------------"
 
-{ import: Grammar }
+{ import: ReductionGrammar }
 
 PowerPCCodeGenerator r0		[ ^r0 ]
 PowerPCCodeGenerator r1		[ ^r1 ]

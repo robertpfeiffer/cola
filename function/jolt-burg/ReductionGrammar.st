@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-12 17:21:06 by piumarta on emilia.local
+  Last edited: 2007-12-12 22:36:39 by piumarta on emilia
 "
 
 { import: Objects }
@@ -110,4 +110,3 @@ ReductionGrammar printOn: aStream
 	startSet value do: [:rule | aStream nextPutAll: '\n    ->\t'; print: rule pattern]].
     aStream cr; nextPut: $)
 ]
-
