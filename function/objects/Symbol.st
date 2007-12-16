@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 12:59:20 by piumarta on ubuntu
+  Last edited: 2007-12-15 00:44:31 by piumarta on emilia
 "
 
 { import: Objects }
@@ -68,3 +68,4 @@ Symbol isKeyword	[ ^(self at: self size - 1) == $: ]
 
 Symbol printOn: aStream	[ ^aStream nextPut: $#; nextPutAll: self asString ]
 
+Symbol do: unaryBlock	[ 0 to: self size - 1 do: [:i | unaryBlock value: (self at: i)] ]
