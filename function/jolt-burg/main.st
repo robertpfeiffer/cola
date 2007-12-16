@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-10 04:26:31 by piumarta on cygwin.piumarta.com
+  Last edited: 2007-12-16 12:51:21 by piumarta on emilia.local
 "
 
 { import: Object }
@@ -76,7 +76,8 @@ OS nextArgumentFile	[ ^OSArgumentFiles isEmpty ifFalse: [OSArgumentFiles removeF
 			   [Options verbose ifTrue: [StdErr print: expr; cr].
 			    Options compile ifTrue: [expr compile].
 			    expr := expr eval.
-			    echo ifTrue: [StdErr nextPutAll: ' => '; print: expr; cr]]]].
+			    echo ifTrue: [StdErr nextPutAll: ' => '; print: expr; cr].
+			    stream flush]]].
     interactive
 	ifTrue:
 	   [StdErr nextPutAll: '\nmorituri te salutant\n'].

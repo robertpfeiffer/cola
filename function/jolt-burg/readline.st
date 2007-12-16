@@ -9,7 +9,7 @@ ConsoleFileStream _atexit
 
 ConsoleFileStream refill
 [
-    | length _buffer _bytes |
+    | length _buffer _bytes _position |
     {
 	static char *buffer= 0;
         static int   live= 1;
@@ -33,12 +33,12 @@ ConsoleFileStream refill
 	v_length= (oop)((strlen(buffer) + 1) << 1 | 1);
 	v__buffer= (oop)buffer;
     }.
-    collection size < length ifTrue: [collection := collection new: length].
+    [collection size <= (position + length)] whileTrue: [self grow].
     _bytes := collection _bytes.
+    _position := position _integerValue.
     {
-	strcpy((char *)v__bytes, (char *)v__buffer);
+	strcpy((char *)v__bytes + (long)v__position, (char *)v__buffer);
     }.
-    collection at: length - 1 put: $\n.
-    position := 0.
-    readLimit := length.
+    collection at: position + length - 1 put: $\n.
+    readLimit := position + length.
 ]
