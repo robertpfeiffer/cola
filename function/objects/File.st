@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-05 07:58:05 by piumarta on emilia.local
+  Last edited: 2007-12-14 01:14:13 by piumarta on emilia
 "
 
 { import: Objects }
@@ -69,9 +69,14 @@ File nextPut: aByte
 
 File nextPutAll: aString
 [
+    self next: aString size putAll: aString
+]
+
+File next: size putAll: aString
+[
     | _bytes _size |
     _bytes := aString _bytes.
-    _size  := aString size _integerValue.
+    _size  := size _integerValue.
     { _return _O(write((int)self->v__fd, (void *)v__bytes, (size_t)v__size)); }.
 ]
 
@@ -82,11 +87,16 @@ File print_x: _pointer
     _return _O(write((int)self->v__fd, (void *)buf, (size_t)size));
 }
 
-File  read: aCollection			[ ^self read: aCollection size: aCollection size ]
-File  read: aCollection size: size	[ ^SmallInteger value_: (self _read_: aCollection _elements size_: size _integerValue) ]
-File _read_: _bytes size_: _size	{ _return (oop)read((int)self->v__fd, (void *)v__bytes, (size_t)v__size); }
+File  read: aCollection				[ ^self read: aCollection size: aCollection size ]
+File  read: aCollection size: size		[ ^self read: aCollection at: 0 size: size ]
+File  read: aCollection at: offset size: size	[ ^SmallInteger value_: (self _read_: aCollection _elements at_: offset _integerValue size_: size _integerValue) ]
+File _read_: _bytes at_: _offset size_: _size	{ _return (oop)(long)read((int)self->v__fd, (char *)v__bytes + (long)v__offset, (size_t)v__size); }
 
-File isInteractive			{ _return (oop)isatty((int)self->v__fd); }
+File  write: aCollection			[ ^self write: aCollection size: aCollection size ]
+File  write: aCollection size: size		[ ^SmallInteger value_: (self _write_: aCollection _elements size_: size _integerValue) ]
+File _write_: _bytes size_: _size		{ _return (oop)(long)write((int)self->v__fd, (void *)v__bytes, (size_t)v__size); }
+
+File isInteractive			{ _return (oop)(long)isatty((int)self->v__fd); }
 
 "
 File waitForInput: msTimeout
@@ -118,7 +128,7 @@ File open: pathString ifAbsent: errorBlock
     | descriptor |
     descriptor := self open_: pathString _stringValue.
     ^descriptor >= 0
-	ifTrue:  [File withFd: descriptor name: pathString]
+	ifTrue:  [self withFd: descriptor name: pathString]
 	ifFalse: [errorBlock value]
 ]
 
