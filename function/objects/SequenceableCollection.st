@@ -15,13 +15,13 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-07 10:32:10 by piumarta on emilia.local
+  Last edited: 2007-12-15 00:10:38 by piumarta on emilia
 "
 
 { import: Object }
 
-SequenceableCollection isSequenceableCollection       [ ^true ]
-Object isSequenceableCollection                       [ ^false ]
+SequenceableCollection isSequenceableCollection	[ ^true ]
+Object isSequenceableCollection			[ ^false ]
 
 SequenceableCollection first		[ ^self at: 0				]
 SequenceableCollection first: anObject	[ ^self at: 0 		  put: anObject	]
@@ -49,6 +49,57 @@ SequenceableCollection as: newType
 SequenceableCollection withAll: aCollection
 [
     ^(self new: aCollection size) replaceFrom: 0 to: aCollection size - 1 with: aCollection
+]
+
+SequenceableCollection withAll: aCollection with: anObject
+[
+    | aCollectionSize |
+    aCollectionSize := aCollection size.
+    (self := self new: aCollectionSize + 1)
+	replaceFrom: 0 to: aCollectionSize - 1 with: aCollection;
+	at: aCollectionSize put: anObject
+]
+
+SequenceableCollection with: anObject withAll: aCollection
+[
+    ^(self new: 1 + aCollection size)
+	at: 0 put: anObject;
+	replaceFrom: 1 to: aCollection size with: aCollection
+]
+
+SequenceableCollection with: anObject withAll: aCollection with: bnObject
+[
+    | aCollectionSize |
+    aCollectionSize := aCollection size.
+    self := self new: 2 + aCollectionSize.
+    self at: 0 put: anObject;
+	replaceFrom: 1 to: aCollectionSize with: aCollection;
+	at: aCollectionSize + 1 put: bnObject
+]
+
+SequenceableCollection with: anObject with: bnObject withAll: aCollection
+[
+    ^(self new: 2 + aCollection size)
+	at: 0 put: anObject;
+	at: 1 put: bnObject;
+	replaceFrom: 2 to: aCollection size + 1 with: aCollection
+]
+
+SequenceableCollection with: anObject with: bnObject withAll: aCollection from: startIndex
+[
+    ^(self new: 2 + aCollection size - startIndex)
+	at: 0 put: anObject;
+	at: 1 put: bnObject;
+	replaceFrom: 2 to: aCollection size + 1 - startIndex with: aCollection startingAt: startIndex
+]
+
+SequenceableCollection with: anObject with: bnObject with: cnObject withAll: aCollection from: startIndex
+[
+    ^(self new: 3 + aCollection size - startIndex)
+	at: 0 put: anObject;
+	at: 1 put: bnObject;
+	at: 2 put: cnObject;
+	replaceFrom: 3 to: aCollection size + 2 - startIndex with: aCollection startingAt: startIndex
 ]
 
 SequenceableCollection new: size withAll: value
