@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 14:36:07 by piumarta on emilia.local
+  Last edited: 2007-12-14 01:01:44 by piumarta on emilia
 "
 
 { import: Objects }
@@ -33,6 +33,8 @@ ByteArray new: capacity
 
 ByteArray _bytes	[ ^_bytes ]
 ByteArray _elements	[ ^_bytes ]
+
+ByteArray asSymbol	[ ^Symbol intern_: self _bytes size_: size _integerValue ]
 
 ByteArray at: offset
 [
