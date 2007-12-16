@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-06 08:27:21 by piumarta on emilia.local
+  Last edited: 2007-12-14 01:01:20 by piumarta on emilia
 "
 
 { import: Objects }
@@ -85,8 +85,6 @@ String endsWith: aString
     aString doWithIndex: [:e :i | (self at: start + i) == e ifFalse: [^false]].
     ^true
 ]
-
-String asSymbol		[ ^Symbol intern_: self _bytes size_: size _integerValue ]
 
 String printOn: aStream	[ ^aStream nextPut: $'; nextPutAll: self; nextPut: $' ]
 
