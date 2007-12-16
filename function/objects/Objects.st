@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 11:58:12 by piumarta on emilia.local
+  Last edited: 2007-12-04 04:45:16 by piumarta on emilia
 "
 
 { import: _object }
@@ -67,8 +67,10 @@ false : Object ()
 { pragma: type false false }
 
 { pragma: type character SmallInteger }
-{ pragma: type integer   SmallInteger }
-{ pragma: type float     Float }
+{ pragma: type integer SmallInteger }
+{ pragma: type largePositiveInteger LargeInteger }
+{ pragma: type largeNegativeInteger LargeInteger }
+{ pragma: type float Float }
 
 { pragma: type byteArray ByteArray }
 { pragma: type string String }
