@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-16 12:57:56 by piumarta on emilia
+  Last edited: 2007-12-17 12:34:23 by piumarta on emilia
 "
 
 { import: Objects }
@@ -262,7 +262,7 @@ ConsoleFileStream refill
 	else
 	    { _return (oop)(live= 0); }
     }.
-    [collection size <= (position + length)] whileFalse: [self grow].
+    [collection size <= (position + length)] whileTrue: [self grow].
     _bytes := collection _bytes.
     _position := position _integerValue.
     {
