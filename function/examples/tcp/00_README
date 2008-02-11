@@ -40,9 +40,9 @@ Quickstart:
 	ping 10.0.0.2
 
 	telnet 10.0.0.2 13
-	<press ENTER>
+	<press ENTER key>
 
 	open http://10.0.0.2
-	<press RELOAD a few times>
+	<press RELOAD buton a few times>
 
 Have fun!
