@@ -12,8 +12,14 @@ represented as literal grammar objects.  A grammar object, when
 evaluated, generates a parser that immediately takes control of the
 input stream.  The file structure.k contains an example of a grammar
 for parsing 'ASCII art' to create data structure accessors.  Note the
-use of quatation to protect the input stream from immediate evaluation
-of the grammar object.
+use of quotation to protect the input stream from immediate evaluation
+of the grammar object.  Rules in 'foreign' grammars are accessible
+through double-barrelled names 'grammarName-ruleName'.  The final rule
+in a grammar can be anonymous (unnamed) hence the rather nice paradigm
+
+	{ grammarName-ruleName } text to be parsed ...
+
+which is used in the definition of the TCP/IP headers.
 
 NetworkPseudoInterface is a wrapper around /dev/tap and /dev/tun.  It
 is horribly platform dependent.  The current version runs on Darwin as
