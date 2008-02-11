@@ -13,8 +13,9 @@ evaluated, generates a parser that immediately takes control of the
 input stream.  The file structure.k contains an example of a grammar
 for parsing 'ASCII art' to create data structure accessors.  Note the
 use of quatation (to protect the input stream) and the send of
-'match:' to the resulting grammar object to create a parser whose
-input is a stream over an s-expression within an AST.
+'match:' to the resulting grammar object to create a parser during
+syntax expansion and run it on an input stream whose collection is the
+syntax s-expression within the AST.
 
 NetworkPseudoInterface is a wrapper around /dev/tap and /dev/tun.  It
 is horribly platform dependent.  The current version runs on Darwin as
