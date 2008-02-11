@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-14 01:01:44 by piumarta on emilia
+  Last edited: 2007-12-17 23:54:44 by piumarta on emilia
 "
 
 { import: Objects }
@@ -105,3 +105,14 @@ ByteArray invertBits
 [
     self doWithIndex: [:b :i | self at: i put: 255 - b].
 ]
+
+ByteArray asPrototype
+{
+    int size= (long)self->v_size >> 1;
+    char buf[1024];
+    if (size >= sizeof(buf)) size= sizeof(buf) - 1;
+    strncpy(buf, (char *)self->v__bytes, size);
+    buf[size]= '\0';
+    _return(_libid->import(buf));
+}
+

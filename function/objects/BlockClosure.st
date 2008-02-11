@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 12:59:42 by piumarta on ubuntu
+  Last edited: 2007-12-17 00:46:06 by piumarta on emilia
 "
 
 { import: Objects }
@@ -38,37 +38,37 @@ StaticBlockClosure errorArgumentCount: given
 
 StaticBlockClosure value
 [
-    { if ((int)self->v__arity == 0) { _return ((_imp_t)(self->v__function))(v__closure, v_self); } }.
+    { if ((int)self->v__arity == 0) { _return ((oop(*)())(self->v__function))(v__closure, v_self); } }.
     ^self errorArgumentCount: 0
 ]
 
 StaticBlockClosure value: a
 [
-    { if ((int)self->v__arity == 1) { _return ((_imp_t)(self->v__function))(v__closure, v_self, v_a); } }.
+    { if ((int)self->v__arity == 1) { _return ((oop(*)())(self->v__function))(v__closure, v_self, v_a); } }.
     ^self errorArgumentCount: 1
 ]
 
 StaticBlockClosure value: a value: b
 [
-    { if ((int)self->v__arity == 2) { _return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b); } }.
+    { if ((int)self->v__arity == 2) { _return ((oop(*)())(self->v__function))(v__closure, v_self, v_a, v_b); } }.
     ^self errorArgumentCount: 2
 ]
 
 StaticBlockClosure value: a value: b value: c
 [
-    { if ((int)self->v__arity == 3) { _return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c); } }.
+    { if ((int)self->v__arity == 3) { _return ((oop(*)())(self->v__function))(v__closure, v_self, v_a, v_b, v_c); } }.
     ^self errorArgumentCount: 3
 ]
 
 StaticBlockClosure value: a value: b value: c value: d
 [
-    { if ((int)self->v__arity == 4) { _return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d); } }.
+    { if ((int)self->v__arity == 4) { _return ((oop(*)())(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d); } }.
     ^self errorArgumentCount: 4
 ]
 
 StaticBlockClosure value: a value: b value: c value: d value: e
 [
-    { if ((int)self->v__arity == 5) { _return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d, v_e); } }.
+    { if ((int)self->v__arity == 5) { _return ((oop(*)())(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d, v_e); } }.
     ^self errorArgumentCount: 5
 ]
 

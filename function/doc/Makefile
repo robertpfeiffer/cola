@@ -1,9 +1,9 @@
-all : reader.html
+all : reader.html parser.html
 
 %.html : %.html.in
 	awk -f ../../doc/number.awk $< > $@.num
 	awk -f ../../doc/top.awk $@.num > $@.top
-	cat $@.num | fgrep -v h1 | fgrep -v h4 | awk -f ../../doc/toc.awk > $@.toc
+	cat $@.num | fgrep -v h1 | awk -f ../../doc/toc.awk > $@.toc
 	awk -f ../../doc/bot.awk $@.num > $@.bot
 	cat $@.top $@.toc $@.bot > $@
 

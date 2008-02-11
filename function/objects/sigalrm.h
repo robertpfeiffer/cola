@@ -3,5 +3,5 @@ static oop sigalrmSelector= 0;
 
 static void sigalrm(int sig)
 {
-  _send(sigalrmSelector, sigalrmReceiver);
+  _sendv(sigalrmSelector, 1, sigalrmReceiver);
 }

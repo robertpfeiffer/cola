@@ -13,6 +13,15 @@ struct __lookup
   oop		    state;
 };
 
+struct __send
+{
+  oop		    selector;
+  int		    nArgs;
+  oop		    receiver;
+  oop		    state;
+  struct __closure *closure;
+};
+
 struct __slotinfo
 {
   const char	*name;
@@ -82,8 +91,8 @@ struct __libid
 
   struct __closure *(*bind )(oop selector, oop receiver);
   struct __lookup   (*bind2)(oop selector, oop receiver);
+  _imp_t	    (*bindv)(struct __send *send);
 
-  void		  *unused34;
   void		  *unused35;
 
   oop		 (*nlreturn)(oop nlr, oop result);

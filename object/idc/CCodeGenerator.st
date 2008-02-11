@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 15:20:02 by piumarta on emilia.local
+  Last edited: 2007-12-12 22:44:56 by piumarta on emilia
 "
 
 { import: CodeGenerator }
@@ -89,7 +89,8 @@ CCodeGenerator headerTextType: outputType
 
 typedef struct t__object *oop;
 
-typedef oop (*_imp_t)(oop _thunk, oop receiver, ...);
+struct __send;
+typedef oop (*_imp_t)(struct __send *_send, ...);
 
 #include <id/id.h>
 
@@ -108,10 +109,11 @@ static struct __libid *_libid= 0;
 #endif
 #define _return			_leave(); return
 ', self sendText, '
-#define _super(TYP, MSG, RCV, ARG...) ({				\\
-  register oop _r= (RCV);						\\
-  struct __closure *_c= (struct __closure *)_libid->bind((MSG), (TYP));	\\
-  (_c->method)((oop)_c, _r, _r, ##ARG);					\\
+#define _superv(TYP, MSG, N, RCV, ARG...) ({	\\
+  struct __send _s= { (MSG), (N), (TYP) };	\\
+  _imp_t _imp= _libid->bindv(&_s);		\\
+  _s.receiver= (RCV);				\\
+  _imp(&_s, _s.receiver, _s.receiver, ##ARG);	\\
 })
 ']
 
@@ -125,10 +127,9 @@ CCodeGenerator sendText
 CCodeGenerator sendNoCacheText
 [
     ^'
-#define _send(MSG, RCV, ARG...) ({					\\
-  register oop _r= (RCV);						\\
-  struct __closure *_c= (struct __closure *)_libid->bind((MSG), _r);	\\
-  (_c->method)((oop)_c, _r, _r, ##ARG);					\\
+#define _sendv(MSG, N, RCV, ARG...) ({					\\
+  struct __send _s= { (MSG), (N), (RCV) };				\\
+  ((_imp_t)(_libid->bindv(&_s)))(&_s, _s.receiver, _s.receiver, ##ARG);	\\
 })
 ']
 
@@ -141,12 +142,9 @@ struct __entry
   struct __closure *closure;
 };
 
-#define _send(MSG, RCV, ARG...) ({										\\
-  static struct __entry _e;											\\
-  register oop _r= (RCV);											\\
-  register oop _v= _r ? (((unsigned)_r & 1) ? *_libid->tag_vtable : ((oop *)_r)[-1]) : *_libid->nil_vtable;	\\
-  if (_v != _e.vtable) { _e.vtable= _v; _e.closure= _libid->bind((MSG), _r); }					\\
-  (_e.closure->method)((oop)_e.closure, _r, _r, ##ARG);								\\
+#define _sendv(MSG, N, RCV, ARG...) ({					\\
+  struct __send _s={ (MSG), (N), (RCV) };				\\
+  ((_imp_t)(_libid->bindv(&_s)))(&_s, _s.receiver, _s.receiver, ##ARG);	\\
 })
 ']
 
@@ -294,8 +292,8 @@ CCodeGenerator loadLiteral: tag to: loc
 CCodeGenerator initialiseInteger: tag constructor: constructor with: anInteger
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value; gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value; gen: ', 2, ';
 	genVariable: constructor key; gen: ', ';
 	print: anInteger; genl: ');'.
 ]
@@ -303,8 +301,8 @@ CCodeGenerator initialiseInteger: tag constructor: constructor with: anInteger
 CCodeGenerator initialiseLargeInteger: tag constructor: constructor with: anInteger
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value; gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value; gen: ', 3, ';
 	genVariable: constructor key; gen: ', ';
 	print: anInteger digitLength; gen: ', "'.
     anInteger bytes
@@ -326,8 +324,8 @@ CCodeGenerator defineFloat: tag withValue: aString
 CCodeGenerator initialiseFloat: tag constructor: constructor with: aString
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value; gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value; gen: ', 2, ';
 	genVariable: constructor key; gen: ', &d_';
 	print: tag; genl: ');'.
 ]
@@ -335,8 +333,8 @@ CCodeGenerator initialiseFloat: tag constructor: constructor with: aString
 CCodeGenerator initialiseCharacter: tag constructor: constructor with: aCharacter
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value; gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value; gen: ', 2, ';
 	genVariable: constructor key; gen: ', ';
 	print: aCharacter value; genl: ');'.
 ]
@@ -344,8 +342,8 @@ CCodeGenerator initialiseCharacter: tag constructor: constructor with: aCharacte
 CCodeGenerator initialiseString: tag constructor: constructor with: aString
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value;	gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value;	gen: ', 3, ';
 	genVariable: constructor key;   gen: ', ';
 	print:       aString size;      gen: ', "'.
     aString do: [:char |
@@ -370,8 +368,8 @@ CCodeGenerator initialiseString: tag constructor: constructor with: aString
 CCodeGenerator initialiseByteArray: tag constructor: constructor with: aByteArray
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value;	gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value;	gen: ', 3, ';
 	genVariable: constructor key;   gen: ', ';
 	print:       aByteArray size;   gen: ', "'.
     aByteArray
@@ -398,8 +396,8 @@ CCodeGenerator defineWordArray: tag withElements: aWordArray
 CCodeGenerator initialiseWordArray: tag constructor: constructor with: aWordArray
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value;	gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value;	gen: ', 3, ';
 	genVariable: constructor key;   gen: ', ';
 	print:       aWordArray size;   gen: ', ';
 	gen:  'w';   genLiteral: tag;
@@ -420,8 +418,8 @@ CCodeGenerator defineArray: tag withElements: anArray
 CCodeGenerator initialiseArray: tag constructor: constructor with: anArray
 [
     self
-	gen: '  '; genLiteral: tag; gen: '= _send(';
-	genSelector: constructor value;	gen: ', ';
+	gen: '  '; genLiteral: tag; gen: '= _sendv(';
+	genSelector: constructor value;	gen: ', 3, ';
 	genVariable: constructor key;   gen: ', ';
 	print:       anArray size;   gen: ', ';
 	gen:  'a';   genLiteral: tag;
@@ -433,8 +431,8 @@ CCodeGenerator initialiseArray: tag constructor: constructor with: anArray
 CCodeGenerator initialiseBlock: blockTag function: functionTag arity: arity constructor: constructor
 [
     self
-	gen: '  '; genLiteral: blockTag; gen: '= _send(';
-	genSelector: constructor value; gen: ', ';
+	gen: '  '; genLiteral: blockTag; gen: '= _sendv(';
+	genSelector: constructor value; gen: ', 3, ';
 	genVariable: constructor key;   gen: ', ';
 	genBlock:    functionTag;       gen: ', ';	"function"
 	print:       arity;				"arity"
@@ -456,10 +454,10 @@ CCodeGenerator makeBlock:   tag
 	       location:    location
 [
     self
-	gen: '  '; genLocation: location; gen: '= _send('; genSelector: constructor value;
-	gen: ', '; genVariable: constructor key;
-	gen: ', '; gen: '(oop)'; genBlock: functionTag;			"function"
-	gen: ', '; print: arity;					"arity"
+	gen: '  '; genLocation: location; gen: '= _sendv('; genSelector: constructor value;
+	gen: ', 6, ';	genVariable: constructor key;			"type"
+	gen: ', (oop)'; genBlock: functionTag;				"function"
+	gen: ', ';	print: arity;					"arity"
 	gen: ', '; gen: (outerFlag ifTrue: ['v__self'] ifFalse: ['0']).	"outer"
     scopeTagOrNil isNil
 	ifTrue:  [self gen: ', 0']					"state"
@@ -594,8 +592,9 @@ CCodeGenerator send: selector to: receiver withArguments: arguments forValue: va
     self gen: '  '.
     valueFlag ifTrue: [self genLocation: receiver location; gen: '='].
     superedType isNil
-	ifTrue:  [self gen: '_send('; genSelector: selector; gen: ', '; genLocation: receiver location]
-	ifFalse: [self gen: '_super('; genVariable: superedType; gen: ', '; genSelector: selector; gen: ', '; genLocation: receiver location].
+	ifTrue:  [self gen: '_sendv(']
+	ifFalse: [self gen: '_superv('; genVariable: superedType; gen: ', '].
+    self genSelector: selector; gen: ', '; print: 1 + arguments size; gen: ', '; genLocation: receiver location.
     arguments do: [:arg | self gen: ', '; genLocation: arg location].
     self genl: ');'.
 ]
@@ -606,7 +605,7 @@ CCodeGenerator import: name
 [
     self
 	gen: '  ';
-	gen: '_send('; genSelector: '_import:'; gen: ', ';
+	gen: '_sendv('; genSelector: '_import:'; gen: ', 3, ';
 	gen: '_libid->_object'; gen: ', "';
 	gen: name; gen: '", "';
 	gen: '__id__init__'; gen: (encoder mangleSelector: name);
@@ -723,8 +722,8 @@ CCodeGenerator endSequence: sequenceNode	[ self genl: ' }' ]
 CCodeGenerator createStateVector: size inScope: scopeTag constructor: constructor
 [
     self
-	gen: '  '; gen: 'oop _state'; print: scopeTag; gen: '= _send(';
-	genSelector: constructor value; gen: ', ';
+	gen: '  '; gen: 'oop _state'; print: scopeTag; gen: '= _sendv(';
+	genSelector: constructor value; gen: ', 2, ';
 	genVariable: constructor key; gen: ', ';
 	print: size + 1; genl: ');'.
 ]
@@ -830,7 +829,7 @@ CCodeGenerator tagged: rcv add: arg location: loc checking: tagCheck
 	gen: '  '; gen: 'if '; checkTags: tagCheck with: rcv with: arg; genl: ' {';
 	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((int)'; genLocation: rcv; gen: ' + (int)'; genLocation: arg; genl: ') - 1);';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: '+'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: '+'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 "
     self
 	genl: '  {';
@@ -840,7 +839,7 @@ CCodeGenerator tagged: rcv add: arg location: loc checking: tagCheck
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg; gen: ' && ((_s ^ (_s << 1)) >= 0))';
 	gen:       '  '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
 	gen:  '  else '; genLocation: loc; gen: '= ';
-	gen:       '_send('; genSelector: '+'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
+	gen:       '_sendv('; genSelector: '+'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
 ]
 
@@ -851,7 +850,7 @@ CCodeGenerator tagged: rcv sub: arg location: loc checking: tagCheck
 	gen: '  '; gen: 'if '; checkTags: tagCheck with: rcv with: arg; genl: ' {';
 	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((int)'; genLocation: rcv; gen: ' - (int)'; genLocation: arg; genl: ') + 1);';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: '-'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: '-'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 "
     self
 	genl: '  {';
@@ -861,7 +860,7 @@ CCodeGenerator tagged: rcv sub: arg location: loc checking: tagCheck
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg; gen: ' && ((_s ^ (_s << 1)) >= 0))';
 	gen:       '  '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
 	gen:  '  else '; genLocation: loc; gen: '= ';
-	gen:       '_send('; genSelector: '-'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
+	gen:       '_sendv('; genSelector: '-'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
 ]
 
@@ -873,7 +872,7 @@ CCodeGenerator tagged: rcv op: operator selector: sel with: arg location: loc ch
 	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((((int)'; genLocation: rcv; gen:  '>> 1) ';
 	gen:                                   operator; gen: ' ((int)'; genLocation: arg; genl: '>> 1)) << 1) | 1);';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: sel; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: sel; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
 
 CCodeGenerator tagged: rcv mul: arg location: loc checking: tagCheck
@@ -891,7 +890,7 @@ CCodeGenerator tagged: rcv mul: arg location: loc checking: tagCheck
 	gen:         ' && ((_s ^ (_s << 1)) >= 0))';
 	gen:       '  '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
 	gen:  '  else '; genLocation: loc; gen: '= ';
-	gen:       '_send('; genSelector: '*'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
+	gen:       '_sendv('; genSelector: '*'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
 ]
 
@@ -902,7 +901,7 @@ CCodeGenerator tagged: rcv div: arg location: loc checking: tagCheck
 "
     self
 	gen:  '  '; genLocation: loc; gen: '= ';
-	gen:  '_send('; genSelector: '//'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'
+	gen:  '_sendv('; genSelector: '//'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'
 ]
 
 CCodeGenerator tagged: rcv mod: arg location: loc checking: tagCheck
@@ -912,7 +911,7 @@ CCodeGenerator tagged: rcv mod: arg location: loc checking: tagCheck
 "
     self
 	gen: '  '; genLocation: loc; gen: '= ';
-	gen: '_send('; genSelector: '\\\\'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'
+	gen: '_sendv('; genSelector: '\\\\'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'
 ]
 
 CCodeGenerator tagged: rcv and: arg location: loc checking: tagCheck
@@ -923,7 +922,7 @@ CCodeGenerator tagged: rcv and: arg location: loc checking: tagCheck
 	gen:                ' && ('; genLocation: arg; genl: ' > 0)) {';
 	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)((int)'; genLocation: rcv; gen: ' & (int)'; genLocation: arg; genl: ');';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: 'bitAnd:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: 'bitAnd:'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
 
 CCodeGenerator tagged: rcv or: arg location: loc checking: tagCheck
@@ -934,7 +933,7 @@ CCodeGenerator tagged: rcv or: arg location: loc checking: tagCheck
 	gen:                ' && ('; genLocation: arg; genl: ' > 0)) {';
 	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)((int)'; genLocation: rcv; gen: ' | (int)'; genLocation: arg; genl: ');';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: 'bitOr:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: 'bitOr:'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
 
 CCodeGenerator tagged: rcv xor: arg location: loc checking: tagCheck
@@ -945,7 +944,7 @@ CCodeGenerator tagged: rcv xor: arg location: loc checking: tagCheck
 	gen:                ' && ('; genLocation: arg; genl: ' > 0)) {';
 	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((int)'; genLocation: rcv; gen: ' ^ (int)'; genLocation: arg; genl: ') | 1);';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: 'bitXor:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: 'bitXor:'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
 
 CCodeGenerator tagged: rcv shift: arg location: loc checking: tagCheck
@@ -961,7 +960,7 @@ CCodeGenerator tagged: rcv shift: arg location: loc checking: tagCheck
 	gen:              ' || ((_r < 0) && (_r >= -31)) )';
 	gen:         ') '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
 	gen:  ' else '; genLocation: loc; gen: '= ';
-	gen:       '_send('; genSelector: 'bitShift:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
+	gen:       '_sendv('; genSelector: 'bitShift:'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
 ]
 
@@ -978,7 +977,7 @@ CCodeGenerator tagged: rcv left: arg location: loc checking: tagCheck
 	gen:         ' && ((_s ^ (_s << 1)) >= 0)';
 	gen:         ') '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
 	gen:  ' else '; genLocation: loc; gen: '= ';
-	gen:       '_send('; genSelector: '<<'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
+	gen:       '_sendv('; genSelector: '<<'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
 ]
 
@@ -993,7 +992,7 @@ CCodeGenerator tagged: rcv right: arg location: loc checking: tagCheck
 	gen:         ' && (_r >= 0) && (_r <= 31)';
 	gen:         ') '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
 	gen:  ' else '; genLocation: loc; gen: '= ';
-	gen:       '_send('; genSelector: '>>'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
+	gen:       '_sendv('; genSelector: '>>'; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
 ]
 
@@ -1005,7 +1004,7 @@ CCodeGenerator tagged: rcv rel: operator selector: sel with: arg location: loc c
 	gen:                             operator; gen: ' (int)'; genLocation: arg;
 	gen:              ') ? '; genVariable: 'true'; gen: ' : '; genVariable: 'false'; genl: ');';
 	gen: '  '; gen: '} else '; genLocation: loc;
-	gen: '= _send('; genSelector: sel; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
+	gen: '= _sendv('; genSelector: sel; gen: ', 2, '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
 
 CCodeGenerator tagged: rcv lt: arg location: loc checking: tagCheck

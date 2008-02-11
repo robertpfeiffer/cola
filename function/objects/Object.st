@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-30 17:56:18 by piumarta on emilia
+  Last edited: 2007-12-17 00:46:49 by piumarta on emilia
 "
 
 { import: Objects }
@@ -112,35 +112,11 @@ Object halt
     { exit(1); }.
 ]
 
-Object perform: s
-{
-    struct __closure *c= _libid->bind(v_s, v_self);
-    _return (c->method)((oop)c, v_self, v_self);
-}
-
-Object perform: s with: a
-{
-    struct __closure *c= _libid->bind(v_s, v_self);
-    _return (c->method)((oop)c, v_self, v_self, v_a);
-}
-
-Object perform: s with: a with: b
-{
-    struct __closure *c= _libid->bind(v_s, v_self);
-    _return (c->method)((oop)c, v_self, v_self, v_a, v_b);
-}
-
-Object perform: s with: a with: b with: c
-{
-    struct __closure *c= _libid->bind(v_s, v_self);
-    _return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c);
-}
-
-Object perform: s with: a with: b with: c with: d
-{
-    struct __closure *c= _libid->bind(v_s, v_self);
-    _return (c->method)((oop)c, v_self, v_self, v_a, v_b, v_c, v_d);
-}
+Object perform: s					{ _return(_sendv(v_s, 1, v_self)); }
+Object perform: s with: a				{ _return(_sendv(v_s, 2, v_self, v_a)); }
+Object perform: s with: a with: b			{ _return(_sendv(v_s, 3, v_self, v_a, v_b)); }
+Object perform: s with: a with: b with: c		{ _return(_sendv(v_s, 4, v_self, v_a, v_b, v_c)); }
+Object perform: s with: a with: b with: c with: d	{ _return(_sendv(v_s, 5, v_self, v_a, v_b, v_c, v_d)); }
 
 Object error: reason
 [

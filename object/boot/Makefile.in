@@ -138,14 +138,14 @@ include/gc :
 	rm -rf include/gc
 	cp -pr ../$(GCDIR)/include include/gc
 
-gc.a : ../$(GCDIR)/gc.a
-	-$(SHELL) -ec 'ln -s ../$(GCDIR)/gc.a .'
+gc.a : ../$(GCDIR)/.libs/libgc.a
+	-$(SHELL) -ec 'ln -s ../$(GCDIR)/.libs/libgc.a ./gc.a'
 
-../$(GCDIR)/gc.a :
+../$(GCDIR)/.libs/libgc.a :
 ifeq ($(SYSOS),win32)
 	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) -f Makefile.win32 ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
 else
-	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
+	-$(SHELL) -ec 'cd ../$(GCDIR)/; test -f config.log || ABI_FLAG="$(MFLAGS)" ./configure --enable-threads=posix --enable-large-config; $(MAKE) ABI_FLAG="$(MFLAGS)"'
 endif
 
 install : all .FORCE

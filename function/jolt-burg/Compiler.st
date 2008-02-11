@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-17 16:31:52 by piumarta on emilia.local
+  Last edited: 2007-12-12 22:40:25 by piumarta on emilia
 "
 
 { import: Objects }
@@ -330,7 +330,7 @@ Compiler applySyntax: var with: form
 
 Compiler applySyntax_: _syntax with: form
 {
-    _return ((_imp_t)v__syntax)(v_form, v_self);
+    _return ((oop(*)(oop, oop))v__syntax)(v_form, v_self);
 }
 
 Compiler performSyntax: aSelector with: form
@@ -362,7 +362,7 @@ Compiler registerLambdaNamed: name
     | _name |
     LambdaRegistrar ifFalse: [^self].
     _name := name _stringValue.
-    { ((_imp_t)v_LambdaRegistrar)(v_LambdaStart, (oop)((long)v_LambdaStart + (long)v_LambdaSize), v__name); }.
+    { ((oop(*)(oop, oop, oop))v_LambdaRegistrar)(v_LambdaStart, (oop)((long)v_LambdaStart + (long)v_LambdaSize), v__name); }.
 ]
 
 "----------------------------------------------------------------"

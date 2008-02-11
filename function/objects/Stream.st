@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-17 12:34:23 by piumarta on emilia
+  Last edited: 2007-12-17 23:50:11 by piumarta on emilia
 "
 
 { import: Objects }
@@ -94,10 +94,17 @@ ReadStream matchAny
 
 ReadStream match: anObject
 [
-    ^self peek == anObject
+    ^anObject == self peek
 	ifTrue:
 	   [position := position + 1.
 	    anObject]
+]
+
+ReadStream matchEqual: anObject
+[
+    ^anObject = self peek
+	ifTrue:
+	   [self next]
 ]
 
 ReadStream matchClass: characterClass
@@ -107,6 +114,15 @@ ReadStream matchClass: characterClass
 	ifTrue:
 	   [position := position + 1.
 	    c]
+]
+
+ReadStream matchType: prototype
+[
+    | anObject |
+    ^((anObject := self peek) and: [anObject isKindOf: prototype])
+	ifTrue:
+	   [position := position + 1.
+	    anObject]
 ]
 
 ReadStream matchSequence: aCollection

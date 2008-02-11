@@ -46,7 +46,9 @@
 
 typedef struct t__object *oop;
 
-typedef oop (*_imp_t)(oop closure, oop state, oop receiver, ...);
+struct __send;
+
+typedef oop (*_imp_t)(struct __send *_send, ...);
 
 #include <id/id.h>
 
@@ -62,6 +64,7 @@ void  		  *_libid_balloc  (size_t size);
 void		   _libid_flush   (oop selector);
 struct __closure  *_libid_bind    (oop selector, oop receiver);
 struct __lookup    _libid_bind2   (oop selector, oop receiver);
+_imp_t		   _libid_bindv   (struct __send *send);
 oop                _libid_nlreturn(oop nlr, oop result);
 oop                _libid_nlresult(void);
 void		  *_libid_enter(struct __methodinfo *info);
@@ -70,10 +73,9 @@ void		   _libid_line(int line);
 void		   _libid_leave(void *cookie);
 char		  *_libid_backtrace(void);
 
-#define _send(MSG, RCV, ARG...) ({		\
-  oop _r= (RCV);				\
-  struct __closure *_c= _libid_bind((MSG), _r);	\
-  (_c->method)((oop)_c, _r, _r, ##ARG);		\
+#define _sendv(MSG, N, RCV, ARG...) ({					\
+  struct __send _s= { (MSG), (N), (RCV) };				\
+  ((_imp_t)(_libid_bindv(&_s)))(&_s, _s.receiver, _s.receiver, ##ARG);	\
 })
 
 static int    _argc= 0;
@@ -533,7 +535,7 @@ static char *nameOf(oop object)
 oop _libid_intern(const char *string)
 {
   dprintf("_libid_intern(\"%s\")\n", string);
-  return _send(s__intern_, _selector, string);
+  return _sendv(s__intern_, 2, _selector, string);
 }
 
 #if 0
@@ -657,14 +659,14 @@ struct __closure *_libid_bind(oop selector, oop receiver)
 # endif
 #endif
 
-  assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _send(s_lookup_, vtable, selector);
+  assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _sendv(s_lookup_, 2, vtable, selector);
 /*assoc= _vtable__lookup_(0, vtable, selector);*/
   --recursionGuard;
   if (!assoc)
     {
       if (selector != s_doesNotUnderstand_)
 	{
-	  oop result= _send(s_doesNotUnderstand_, receiver, selector);
+	  oop result= _sendv(s_doesNotUnderstand_, 2, receiver, selector);
 	  if (_object___vtable(0, result, result) == _closure->_vtable[-1])
 	    return (struct __closure *)result;
 	}
@@ -703,7 +705,7 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
     if (entry->selector == selector && entry->vtable == vtable)
       return (struct __lookup){ (struct __closure *)entry->closure, fragment };
 #  endif
-    assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _send(s_lookup_, vtable, selector);
+    assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _sendv(s_lookup_, 2, vtable, selector);
   /*assoc= _vtable__lookup_(0, vtable, selector);*/
     --recursionGuard;
     if (assoc)
@@ -721,17 +723,78 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
 #      endif
 	return (struct __lookup){ (struct __closure *)&assoc->assoc.value->closure, fragment };
       }
-    fragment= _send(s__delegate, fragment);
+    fragment= _sendv(s__delegate, 1, fragment);
   } while (fragment);
 
   if (selector != s_doesNotUnderstand_)
     {
-      oop result= _send(s_doesNotUnderstand_, receiver, selector);
+      oop result= _sendv(s_doesNotUnderstand_, 2, receiver, selector);
       if (_object___vtable(0, result, result) == _closure->_vtable[-1])
 	return (struct __lookup){ (struct __closure *)result, receiver };
     }
   fatal("primitive error handling failed (%p %p)", receiver, selector);
   return (struct __lookup){ 0, 0 };
+}
+
+_imp_t _libid_bindv(struct __send *send)
+{
+  register oop selector= send->selector;
+  register oop receiver= send->receiver;
+  static int recursionGuard= 0;
+#if GLOBAL_MCACHE
+  unsigned int    probe= 0;
+  struct __entry *entry= 0;
+#endif
+  oop assoc= 0;
+  oop vtable= receiver ? (((unsigned)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
+  dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, receiver);
+  if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(receiver));
+
+#if GLOBAL_MCACHE
+# if 0
+  putchar(' ');
+# endif
+  probe= (((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & (GLOBAL_MCACHE - 1);
+  entry= _libid_mcache[probe];
+  if (entry && entry->selector == selector && entry->vtable == vtable)
+    {
+      send->state= receiver;
+      return (send->closure= (struct __closure *)entry->closure)->method;
+    }
+# if 0
+  putchar('-');
+# endif
+#endif
+
+  assoc= recursionGuard++ ? _vtable__lookup_(0, vtable, vtable, selector) : _sendv(s_lookup_, 2, vtable, selector);
+/*assoc= _vtable__lookup_(0, vtable, selector);*/
+  --recursionGuard;
+  if (!assoc)
+    {
+      if (selector != s_doesNotUnderstand_)
+	{
+	  oop result= _sendv(s_doesNotUnderstand_, 2, receiver, selector);
+	  if (_object___vtable(0, result, result) == _closure->_vtable[-1])
+	    {
+	      send->state= receiver;
+	      return (send->closure= (struct __closure *)result)->method;
+	    }
+	}
+      fatal("primitive error handling failed (%p %p)", receiver, selector);
+    }
+#if GLOBAL_MCACHE
+# if USE_GC
+  entry= GC_malloc(sizeof(struct __entry));
+# else
+  entry= malloc(sizeof(struct __entry));	/* lossage */
+# endif
+  entry->selector= selector;
+  entry->vtable=   vtable;
+  entry->closure= &assoc->assoc.value->closure;
+  _libid_mcache[probe]= entry;
+#endif
+  send->state= receiver;
+  return (send->closure= (struct __closure *)&assoc->assoc.value->closure)->method;
 }
 
 void _libid_flush(oop selector)
@@ -752,7 +815,7 @@ void _libid_flush(oop selector)
 
 oop _libid_proto(oop base)
 {
-  return _send(s__delegated, (base ? base : _object));
+  return _sendv(s__delegated, 1, (base ? base : _object));
 }
 
 oop _libid_import(const char *key)
@@ -783,8 +846,8 @@ void _libid_method(oop type, oop selector, _imp_t method)
 {
   oop vt= 0;
   dprintf("_libid_method(%p, %p<%s>, %p)\n", type, selector, selector->selector.elements, method);
-  vt= _send(s__vtable, type);
-  _send(s_methodAt_put_with_, vt, selector, method, 0);
+  vt= _sendv(s__vtable, 1, type);
+  _sendv(s_methodAt_put_with_, 4, vt, selector, method, 0);
 }
 
 oop _libid_alloc(oop type, size_t size)
@@ -932,8 +995,8 @@ char *_libid_backtrace(void)
 	  }
 	width= snprintf(result + offset, size - offset, "%s %s\n", positions[i].info->type, positions[i].info->name);
 	offset += width;
+	if (offset >= size) goto grow;
       }
-    if (offset == size) goto grow;
   }
   return result;
 }
@@ -1004,7 +1067,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
 
 # define method(type, sel, var)								\
   s_##var= _selector___intern_(0, _selector, _selector, sel);				\
-  _send(s_methodAt_put_with_, type##_vtable, s_##var, (_imp_t)type##__##var, 0);
+  _sendv(s_methodAt_put_with_, 4, type##_vtable, s_##var, (_imp_t)type##__##var, 0);
 
   method(_selector, "_intern:",   	  _intern_);
   method(_object,   "_delegate", 	  _delegate);
@@ -1056,6 +1119,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
 
   _libid.bind		= _libid_bind;
   _libid.bind2		= _libid_bind2;
+  _libid.bindv		= _libid_bindv;
 
   _libid.nlreturn	= _libid_nlreturn;
   _libid.nlresult	= _libid_nlresult;

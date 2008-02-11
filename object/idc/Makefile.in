@@ -74,7 +74,7 @@ $(BIN)idc : ../idc/idc
 	-$(SHELL) -ec 'cp -p $< $@'
 
 $(BIN)gc.a : 
-	-$(SHELL) -ec 'cp -p ../$(GCDIR)/gc.a $(BIN).'
+	-$(SHELL) -ec 'cp -p ../$(GCDIR)/.libs/libgc.a $(BIN)gc.a'
 
 install : all .FORCE
 	mkdir -p $(PREFIX)
