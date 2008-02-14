@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-04-25 16:38:38 by piumarta on emilia.local
+  Last edited: 2008-02-13 14:26:35 by piumarta on emilia
 "
 
 { import: ArrayedCollection }
@@ -42,7 +42,12 @@ WordArray at: anInteger
     { unsigned int w;
       if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
         w= (((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]);
-      else return _send(s_primitiveFailed, v_self);
+      else
+#ifdef _sendv
+	return _sendv(s_primitiveFailed, 1, v_self);
+#else
+	return _send(s_primitiveFailed, v_self);
+#endif
       if (!(w & 0xc0000000)) return (oop)(w << 1 | 1);
       v__w= (oop)w;
     }.
