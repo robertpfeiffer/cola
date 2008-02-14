@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 11:30:39 by piumarta on ubuntu
+  Last edited: 2008-02-13 14:09:24 by piumarta on emilia
 "
 
 { import: Object }
@@ -50,37 +50,37 @@ StaticBlockClosure errorArgumentCount: actual
 
 StaticBlockClosure value
 [
-    { if ((int)self->v__arity == 0) return ((_imp_t)(self->v__function))(v__closure, v_self); }.
+    { if ((int)self->v__arity == 0) return ((_imp_t)(self->v__function))(0, v_self); }.
     ^self errorArgumentCount: 0
 ]
 
 StaticBlockClosure value: a
 [
-    { if ((int)self->v__arity == 1) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a); }.
+    { if ((int)self->v__arity == 1) return ((_imp_t)(self->v__function))(0, v_self, v_a); }.
     ^self errorArgumentCount: 1
 ]
 
 StaticBlockClosure value: a value: b
 [
-    { if ((int)self->v__arity == 2) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b); }.
+    { if ((int)self->v__arity == 2) return ((_imp_t)(self->v__function))(0, v_self, v_a, v_b); }.
     ^self errorArgumentCount: 1
 ]
 
 StaticBlockClosure value: a value: b value: c
 [
-    { if ((int)self->v__arity == 3) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c); }.
+    { if ((int)self->v__arity == 3) return ((_imp_t)(self->v__function))(0, v_self, v_a, v_b, v_c); }.
     ^self errorArgumentCount: 1
 ]
 
 StaticBlockClosure value: a value: b value: c value: d
 [
-    { if ((int)self->v__arity == 4) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d); }.
+    { if ((int)self->v__arity == 4) return ((_imp_t)(self->v__function))(0, v_self, v_a, v_b, v_c, v_d); }.
     ^self errorArgumentCount: 1
 ]
 
 StaticBlockClosure value: a value: b value: c value: d value: e
 [
-    { if ((int)self->v__arity == 5) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a, v_b, v_c, v_d, v_e); }.
+    { if ((int)self->v__arity == 5) return ((_imp_t)(self->v__function))(0, v_self, v_a, v_b, v_c, v_d, v_e); }.
     ^self errorArgumentCount: 1
 ]
 
