@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 11:35:57 by piumarta on ubuntu
+  Last edited: 2008-02-14 08:41:11 by piumarta on emilia
 "
 
 { import: Symbol }
@@ -51,27 +51,32 @@ Object perform: aSymbol with: a with: b with: c with: d with: e	[ ^self _perform
 
 Object _perform: s
 {
-#if STAGE1
+#ifdef _sendv
+# define V_SEND (struct __send *)v__closure
+#else
+# define V_SEND v__closure
+#endif
+#ifdef STAGE1
 # define V_SELF v_self
 #else
 # define V_SELF v_self, v_self
 #endif
   struct __closure *c= _libid->bind(v_s, v_self);
-  return (c->method)((oop)c, V_SELF);
+  return (c->method)(V_SEND, V_SELF);
 }
 
-Object _perform: s w: a				{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a); }
-Object _perform: s w: a w: b			{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b); }
-Object _perform: s w: a w: b w: c		{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c); }
-Object _perform: s w: a w: b w: c w: d		{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c, v_d); }
-Object _perform: s w: a w: b w: c w: d w: e	{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)((oop)c, V_SELF, v_a, v_b, v_c, v_d, v_e); }
+Object _perform: s w: a				{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)(V_SEND, V_SELF, v_a); }
+Object _perform: s w: a w: b			{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)(V_SEND, V_SELF, v_a, v_b); }
+Object _perform: s w: a w: b w: c		{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)(V_SEND, V_SELF, v_a, v_b, v_c); }
+Object _perform: s w: a w: b w: c w: d		{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)(V_SEND, V_SELF, v_a, v_b, v_c, v_d); }
+Object _perform: s w: a w: b w: c w: d w: e	{ struct __closure *c= _libid->bind(v_s, v_self);  return (c->method)(V_SEND, V_SELF, v_a, v_b, v_c, v_d, v_e); }
 
 Object in: aType perform: aSymbol	[ ^self in: aType _perform: (SelectorTable at: aSymbol) ]
 Object in: aType  perform: s with: a	[ ^self in: aType _perform: (SelectorTable at: s) with: a ]
 
-Object in: aType _perform: s		{ struct __closure *c= _libid->bind(v_s, v_aType);  return (c->method)((oop)c, V_SELF); }
+Object in: aType _perform: s		{ struct __closure *c= _libid->bind(v_s, v_aType);  return (c->method)(V_SEND, V_SELF); }
 
-Object in: aType _perform: s with: a	{ struct __closure *c= _libid->bind(v_s, v_aType);  return (c->method)((oop)c, V_SELF, v_a); }
+Object in: aType _perform: s with: a	{ struct __closure *c= _libid->bind(v_s, v_aType);  return (c->method)(V_SEND, V_SELF, v_a); }
 
 PerformWithArgumentsSelectors : Array ()
 [
