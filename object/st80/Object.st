@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 13:33:30 by piumarta on ubuntu
+  Last edited: 2008-02-13 14:09:51 by piumarta on emilia
 "
 
 { import: _object }
@@ -106,13 +106,13 @@ BlockClosure function_: _implementationAddress arity_: _argumentCount
 
 StaticBlockClosure value
 [
-    { if ((int)self->v__arity == 0) return ((_imp_t)(self->v__function))(v__closure, v_self); }.
+    { if ((int)self->v__arity == 0) return ((_imp_t)(self->v__function))(0, v_self); }.
     ^self errorArgumentCount: 0
 ]
 
 StaticBlockClosure value: a
 [
-    { if ((int)self->v__arity == 1) return ((_imp_t)(self->v__function))(v__closure, v_self, v_a); }.
+    { if ((int)self->v__arity == 1) return ((_imp_t)(self->v__function))(0, v_self, v_a); }.
     ^self errorArgumentCount: 1
 ]
 
