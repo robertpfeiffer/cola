@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-02-07 20:02:27 by piumarta on cygwin.piumarta.com
+  Last edited: 2008-02-14 08:26:21 by piumarta on emilia
 "
 
 "This file crowbars a bunch of bogus input/output methods into String."
@@ -53,7 +53,6 @@ String baseName
 
 String absolutePathName
 [
-
     "Answer the absolute path name to the file named by the receiver.
     The result starts with '/' and contains no '..' or '.'
     components."
@@ -61,7 +60,7 @@ String absolutePathName
     cPath := self _cString.
     {{
       char *path= (char *)v_cPath;
-      char buf[PATH_MAX];
+      static char buf[PATH_MAX];
 #    if defined(WIN32)
       if (!_fullpath(buf, path, PATH_MAX)) return 0;
 #    else
