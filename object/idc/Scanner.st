@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-02-05 00:41:39 by piumarta on emilia.local
+  Last edited: 2008-02-24 15:20:41 by piumarta on emilia
 "
 
 "I represent a scanner converting a stream of text into a stream of tokens."
@@ -139,9 +139,10 @@ Scanner xPunctuator
 
 Scanner xBinary
 [
+    | t |
     token nextPut: c.	"eat + or -, if present (see xSign)"
     self next.
-    [c notNil and: [(charTable at: c value) == #xBinary]]
+    [c notNil and: [(t := charTable at: c value) == #xBinary or: [t == #xSign]]]
 	whileTrue:
 	    [token nextPut: c.
 	     self next].
