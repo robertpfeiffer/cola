@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-27 18:53:26 by piumarta on ubuntu
+  Last edited: 2008-02-25 11:43:02 by piumarta on emilia
 "
 
 { import: Integer }
@@ -301,7 +301,7 @@ Integer bitClear: n
     ^(self bitOr: n) - n
 ]
 
-Integer bitInvert	[ ^-1 - self ]
+Integer bitInvert	[ ^ -1 - self ]
 
 Integer digitLogic: arg op: op length: len
 [
