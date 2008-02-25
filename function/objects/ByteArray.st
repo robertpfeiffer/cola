@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-17 23:54:44 by piumarta on emilia
+  Last edited: 2008-02-14 11:06:44 by piumarta on emilia
 "
 
 { import: Objects }
@@ -116,3 +116,9 @@ ByteArray asPrototype
     _return(_libid->import(buf));
 }
 
+ByteArray printOn: aStream
+[
+    aStream nextPutAll: '#['.
+    self do: [:b | b printOn: aStream] separatedBy: [aStream space].
+    aStream nextPut: $].
+]
