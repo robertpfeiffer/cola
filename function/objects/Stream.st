@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-17 23:50:11 by piumarta on emilia
+  Last edited: 2008-02-24 15:59:43 by piumarta on emilia
 "
 
 { import: Objects }
@@ -132,7 +132,9 @@ ReadStream matchSequence: aCollection
     ^aCollection
 ]
 
-ReadStream contentsFrom: start	[ ^collection copyFrom: start to: position - 1 ]
+ReadStream contentsFrom: start			[ ^collection copyFrom: start to: position - 1 ]
+
+ReadStream contentsFrom: start to: limit	[ ^collection copyFrom: start to: limit ]
 
 "----------------------------------------------------------------"
 
