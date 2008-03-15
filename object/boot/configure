@@ -176,7 +176,7 @@ linux () {
     PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
     CFLAGS=${CFLAGS:-"-g -Wall -Wreturn-type -Werror -D_GNU_SOURCE=1 -Wno-unused-value"}
     LDFLAGS=${LDFLAGS:-"-export-dynamic"}
-    LDLIBS=${LDLIBS:-"-ldl -lm"}
+    LDLIBS=${LDLIBS:-"-ldl -lm -lpthread"}
     CCFLAGS_O=${CCFLAGS_O:-"-c"}
     OBJEXT_O=${OBJEXT_O:-".o"}
     LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
