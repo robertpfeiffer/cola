@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-15 00:10:38 by piumarta on emilia
+  Last edited: 2008-03-06 16:02:23 by piumarta on emilia.local
 "
 
 { import: Object }
@@ -100,6 +100,13 @@ SequenceableCollection with: anObject with: bnObject with: cnObject withAll: aCo
 	at: 1 put: bnObject;
 	at: 2 put: cnObject;
 	replaceFrom: 3 to: aCollection size + 2 - startIndex with: aCollection startingAt: startIndex
+]
+
+SequenceableCollection withAllFrom: firstValue to: lastValue
+[
+    firstValue println.  lastValue println.
+    self := self new: lastValue - firstValue + 1.
+    firstValue to: lastValue doWithIndex: [:val :ind | self at: ind put: val].
 ]
 
 SequenceableCollection new: size withAll: value
@@ -286,6 +293,11 @@ SequenceableCollection copyFrom: first to: last
     ^(self new: size) replaceFrom: 0 to: size - 1 with: self startingAt: first
 ]
 
+SequenceableCollection trimmed
+[
+    ^self copyFrom: 1 to: self size - 2
+]
+
 SequenceableCollection , aCollection
 [
     ^(self new: self size + aCollection size)
@@ -325,4 +337,22 @@ SequenceableCollection flattenOn: aStream
     aStream collection _vtable == self _vtable
 	ifTrue:  [self do: [:elt | elt flattenOn: aStream]]
 	ifFalse: [super flattenOn: aStream]
+]
+
+SequenceableCollection asCharacterClass
+[
+    | stream class complement c prev |
+    class := ByteArray new: 32 withAll: 0.
+    (stream := self readStream) atEnd ifTrue: [class].
+    (complement := stream peek == $^) ifTrue: [stream next].
+    [c := stream next]
+	whileTrue:
+	   [(c == $- and: [prev and: [stream atEnd not]])
+		ifTrue:
+		   [prev to: stream next do: [:n | class setBit: n].
+		    prev := nil]
+		ifFalse:
+		   [class setBit: (prev := c)]].
+    complement ifTrue: [class invertBits].
+    ^class
 ]
