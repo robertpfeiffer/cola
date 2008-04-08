@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:49:08 by piumarta on emilia
+  Last edited: 2008-03-06 16:16:35 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -37,6 +37,14 @@ Expression printOn: aStream
 ]
 
 Array asExpression
+[
+    | expr |
+    expr := Expression new: self size.
+    0 to: self size - 1 do: [:i | expr at: i put: (self at: i) asExpression].
+    ^expr
+]
+
+OrderedCollection asExpression
 [
     | expr |
     expr := Expression new: self size.
