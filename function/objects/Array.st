@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 13:00:01 by piumarta on ubuntu
+  Last edited: 2008-04-07 23:41:10 by piumarta on emilia
 "
 
 { import: Objects }
@@ -26,7 +26,6 @@ Array isArray	[ ^true ]
 Array size_: _size value_: _value
 [
     self := self new: (SmallInteger value_: _size).
-    _oops := _value.
     {
       int i;
       for (i= 0;  i < (int)v__size;  ++i)
