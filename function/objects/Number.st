@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-18 00:15:44 by piumarta on emilia
+  Last edited: 2008-02-26 22:49:43 by piumarta on emilia
 "
 
 { import: Objects }
@@ -921,4 +921,11 @@ Integer fromString: s base: b
 	    (digit between: 0 and: base - 1) ifFalse: [^nil].
 	    value := value * base + digit].
     ^value * sign
+]
+
+Integer to: limit doWithIndex: binaryBlock
+[
+    | i |
+    i := -1.
+    self to: limit do: [:j | binaryBlock value: j value: (i := i + 1)]
 ]
