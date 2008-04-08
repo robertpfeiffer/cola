@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-02-24 15:59:43 by piumarta on emilia
+  Last edited: 2008-03-07 11:22:15 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -92,6 +92,11 @@ ReadStream matchAny
     ^self next
 ]
 
+ReadStream matchRest
+[
+    [self next] whileTrue.
+]
+
 ReadStream match: anObject
 [
     ^anObject == self peek
@@ -132,9 +137,9 @@ ReadStream matchSequence: aCollection
     ^aCollection
 ]
 
+ReadStream last					[ ^collection at: position - 1 ]
 ReadStream contentsFrom: start			[ ^collection copyFrom: start to: position - 1 ]
-
-ReadStream contentsFrom: start to: limit	[ ^collection copyFrom: start to: limit ]
+ReadStream contentsFrom: start to: limit	[ ^collection copyFrom: start to: (limit min: collection size - 1)]
 
 "----------------------------------------------------------------"
 
