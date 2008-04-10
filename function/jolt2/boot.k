@@ -1,4 +1,4 @@
-;;; boot.k -- construct default compilation and evaluation environment
+;;; boot.k -- construct the default environment
 
 ;;; Copyright (c) 2006, 2007 Ian Piumarta
 ;;; All rights reserved.
@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2008-03-25 10:35:08 by piumarta on emilia
+;;; Last edited: 2008-04-10 12:13:31 by piumarta on emilia.local
 
 (define __dlsym _dlsym)
 
@@ -37,8 +37,12 @@
 
 (define sprintf			(dlsym "sprintf"))
 (define malloc			(dlsym "malloc"))
+(define calloc			(dlsym "calloc"))
 (define realloc			(dlsym "realloc"))
 (define free			(dlsym "free"))
+(define strcpy			(dlsym "strcpy"))
+(define strcat			(dlsym "strcat"))
+(define strlen			(dlsym "strlen"))
 (define strcmp			(dlsym "strcmp"))
 (define usleep			(dlsym "usleep"))
 
@@ -82,13 +86,14 @@
 (define Object			(import "Object"))
 (define OS			(import "OS"))
 (define Options			(import "Options"))
-(define CokeScanner		(import "CokeScanner"))
+(define ColaEvaluator		(import "ColaEvaluator"))
 (define OrderedCollection	(import "OrderedCollection"))
 (define IdentitySet		(import "IdentitySet"))
 (define Expression		(import "Expression"))
 (define Compiler		(import "Compiler"))
 (define File			(import "File"))
 (define ReadStream		(import "ReadStream"))
+(define Time			(import "Time"))
 (define WriteStream		(import "WriteStream"))
 (define String			(import "String"))
 (define StdIn			(import "StdIn"))
@@ -122,44 +127,6 @@
 		       : 2))))
 	(Array__withParameters_ 0 send send params)))))
 
-(define CokeScanner		(import "CokeScanner"))
-
-(define open-bracket-reader
-  (lambda (_closure _self self stream)
-    (send 'next stream)
-    (let ((node (send 'read:list:delimited: self stream Expression '93))
-	  (list (send 'withAll: OrderedCollection node)))
-      (if (< (send 'size list) '2)
-	  (send 'errorSyntax: self node)
-	  (let ((receiver  (send 'removeFirst list))
-		(selector  (send 'removeFirst list))
-		(arguments (send 'new OrderedCollection)))
-	    (or (send 'isSymbol selector)
-		(send 'errorSyntax: self node))
-	    (and (send 'notEmpty list)
-		 (send 'addLast: arguments (send 'removeFirst list)))
-	    (while (and (>= (send 'size list) 2)
-			(send 'isKeyword selector)
-			(send 'isKeyword (send 'first list)))
-	      (set selector (send ', selector (send 'removeFirst list)))
-	      (send 'addLast: arguments (send 'removeFirst list)))
-	    (send 'addAllLast: arguments list)
-	    (let ((message (send 'on: WriteStream (send 'new: Expression '4))))
-	      (send 'nextPut: message 'send)
-	      (send 'nextPut: message (send 'with:with: Expression 'quote selector))
-	      (send 'nextPut: message receiver)
-	      (send 'nextPutAll: message arguments)
-	      ;(send 'print: StdOut (send 'contents message))
-	      ;(send 'cr StdOut)
-	      (send 'contents message)))))))
-
-(define close-bracket-reader
-  (lambda (_closure _self self stream)
-    (send 'error:unexpected: self stream '93)))
-
-(send 'readerAt:put: CokeScanner '91 open-bracket-reader)
-(send 'readerAt:put: CokeScanner '93 close-bracket-reader)
-
 (define herald
   (lambda (path)
     [StdErr nextPutAll: '"; loading: "]
@@ -172,14 +139,7 @@
 
 (define read
   (lambda (fileOrString)
-    (let ((stream [fileOrString readStream])
-	  (expr    0)
-	  (ticker  0))
-      (while (set expr [CokeScanner read: stream])
-	(if [Options verbose]
-	    (let () [StdOut print: expr][StdOut cr]))
-	(set expr [expr eval])
-	(if [Options verbose] (let () [StdOut nextPutAll: '"  => "][StdOut print: expr][StdOut cr]))))))
+    [ColaEvaluator readFile: fileOrString]))
 
 ;; read the contents of a file
 
@@ -193,13 +153,6 @@
 	    1)
 	  0))))
 
-;; (define load
-;;   (lambda (path)
-;;     (or (load-if-present path)
-;; 	(let ()
-;; 	  (printf "%s: No such file or directory\n" path)
-;; 	  (exit 1)))))
-
 (define load
   (lambda (path)
     (let ((file [File openIfPresent: [String value_: path]]))
@@ -212,24 +165,42 @@
 	    (printf "%s: No such file or directory\n" path)
 	    (exit 1))))))
 
-(load "quasiquote.k")	; enable backquote (`) syntax for quasiquotation
-(load "syntax.k")	; syntactic sugar for common constructs
-(load "number.k")	; numeric syntax
-(load "debug.k")	; debugging
-(load "object.k")	; object manipulation
+;; how to apply a Grammar to the current input stream
 
-(define *package-list* [IdentitySet new])
+(syntax apply-grammar	; grammar parser
+  (lambda (node compiler)
+    (let ((grammar [node second])
+	  (parser  [node third])
+	  (result  [grammar parse: parser]))
+      (or result [grammar parseError])
+      result)))
 
-(define %require
-  (lambda (package)
-    (or [*package-list* includes: [package asSymbol]]
-	(let ()
-	  (load [[[package asString] , '".k"] _stringValue])
-	  [*package-list* add: [package asSymbol]]))))
+;; quasiquotation
 
-(syntax require
-  (lambda (node comp)
-    (let ((requires [WriteStream on: [Expression new: '8]]))
-      (for (i '1 2 [[node size] - '1])
-	[requires nextPut: `(%require ,[node at: i])])
-      `(let () ,@[requires contents]))))
+(syntax quasiquote
+  (lambda (node)
+    ['{ error   =					<- [self error: '"quasiquotation syntax error"]
+	list	= #( element* ->0 )			<-[['(let ((_ [WriteStream on: [Expression new: '4]]))) , [self @ '0]] , '([_ contents])]
+	element	= #( #unquote . ->0 .* )	       	<-[Expression withAll: '(send 'nextPut:    _) with: [self @ '0]]
+		| #( #'unquote-splicing' . ->0 .* )	<-[Expression withAll: '(send 'nextPutAll: _) with: [self @ '0]]
+		| list					<-[Expression withAll: '(send 'nextPut:    _) with: result]
+		| . ->0					<-[Expression withAll: '(send 'nextPut:    _) with: [Expression with: 'quote with: [self @ '0]]] ;
+	#quasiquote ( #( #unquote . ->0 .* )		<-[self @ '0]
+		    | list
+		    | . ->0				<-[Expression with: 'quote with: [self @ '0]]
+		    | error )
+      } match: node]))
+
+;; methods
+
+(define add-method	; type selector implementation
+  (lambda (type selector implementation)
+    [[type _vtable] methodAt: selector put: implementation with: 0]))
+
+(syntax define-send ; selector type args... expr
+  (lambda (form compiler)
+    (let ((selector [form second])
+	  (type     [form third])
+	  (args     [form copyFrom: '3 to: [[form size] - '2]])
+	  (expr     [form last]))
+      `(add-method ,type ,selector (lambda (_closure _self self ,@args) ,expr)))))

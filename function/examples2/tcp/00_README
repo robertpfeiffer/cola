@@ -1,0 +1,52 @@
+This example demonstrates an alternate 'shell' for Jolt and how to
+build a tiny TCP/IP stack using it.
+
+Parsing is performed by 'interpreting' a data structure created from a
+parsing expression grammar (PEG).  The parser is bootstrapped in
+parse.st which defines syntaxes for the Lisp-like Jolt language
+(including the usual message-passing extension) and a PEG-like grammar
+definition language.
+
+New grammars are defined between curly braces { ... } and are
+represented as literal grammar objects.  A grammar object, when
+evaluated, generates a parser that immediately takes control of the
+input stream.  The file structure.k contains an example of a grammar
+for parsing 'ASCII art' to create data structure accessors.  Note the
+use of quotation to protect the input stream from immediate evaluation
+of the grammar object.  Rules in 'foreign' grammars are accessible
+through double-barrelled names 'grammarName-ruleName'.  The final rule
+in a grammar can be anonymous (unnamed) hence the rather nice paradigm
+
+	{ grammarName-ruleName } text to be parsed ...
+
+which is used in the definition of the TCP/IP headers.
+
+NetworkPseudoInterface is a wrapper around /dev/tap and /dev/tun.  It
+is horribly platform dependent.  The current version runs on Darwin as
+long as third-party kernel extensions supporting tun/tap device
+interfaces have been loaded.  For a known-working candidate see:
+
+	   http://www-user.rhrk.uni-kl.de/~nissler/tuntap/
+
+The tunnel device is created dynamically and so the example shell MUST
+be run as root.  The network side of the tunnel will show up at
+10.0.0.2 unless you edit tcp.k (and/or tcp2.k) to change the address.
+
+Quickstart:
+
+1. In a window, do this:
+
+	make
+	sudo ./parse < boot.k
+
+2. In another window, try each of the following:
+
+	ping 10.0.0.2
+
+	telnet 10.0.0.2 13
+	<press ENTER key>
+
+	open http://10.0.0.2
+	<press RELOAD buton a few times>
+
+Have fun!
