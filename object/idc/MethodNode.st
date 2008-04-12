@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 15:12:32 by piumarta on emilia.local
+  Last edited: 2008-04-11 18:37:31 by piumarta on emilia
 "
 
 { import: BlockNode }
@@ -51,6 +51,10 @@ MethodNode encode: encoder
     type := encoder encodeType: type position: position.
     type noteUsed.
     sequenceNumber := encoder noteImplementation: selector in: type name at: position.
+    ('_sizeof' = selector)
+	ifTrue:
+	   [type noteResized.
+	    (position printString, ': WARNING: redefining _sizeof can break object allocation; check _sizeof carefully in all subtypes') putln].
     "push a new scope and increase level"
     scope := encoder beginMethod: self in: type.
     arguments addFirst: 'self'.		"<--------"

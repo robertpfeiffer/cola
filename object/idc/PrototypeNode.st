@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-08 10:57:56 by piumarta on emilia.local
+  Last edited: 2008-04-11 18:34:52 by piumarta on emilia
 "
 
 
@@ -29,6 +29,7 @@ PrototypeNode : ParseNode (
     slots	"OrderedCollection of my slot names, including all base slots"
     used	"true if the corresponding global value is referenced"
     external	"true if the value is defined in an imported library"
+    resized	"true if the _sizeof method has been redefined"
 )
 
 Object isPrototypeNode [ ^false ]
@@ -42,6 +43,7 @@ PrototypeNode withName: nameString base: baseString slots: slotStrings position:
     slots := slotStrings.
     used := false.
     external := false.
+    resized := false.
 ]
 
 PrototypeNode name		[ ^name ]
@@ -52,6 +54,9 @@ PrototypeNode noteUsed		[  used := true ]
 PrototypeNode beExternal	[  external := true ]
 PrototypeNode isExternal	[ ^external ]
 
+PrototypeNode noteResized	[  resized := true ]
+PrototypeNode isResized		[ ^resized ]
+
 PrototypeNode slots: slotCollection	[ ^slots := slotCollection ]
 
 PrototypeNode = aPrototypeNode		[ ^aPrototypeNode isPrototypeNode and: [slots = aPrototypeNode slots] ]
@@ -60,12 +65,18 @@ PrototypeNode addTo: client		[ client addType: self ]
 
 PrototypeNode encode: encoder
 [
+    | baseProto |
     "make sure the base type has been declared"
-    base notNil ifTrue: [encoder encode: base position: position].
+    base notNil ifTrue: [baseProto := encoder encode: base position: position; encodeType: base position: position].
     "make sure we can install the implicit methods if defining the type"
     external
 	ifFalse:
 	   [used := true.
+	    (baseProto and: [baseProto isResized])
+		ifTrue:
+		   [(position printString,
+			 ': WARNING: _sizeof method redefined in parent type ', base,
+			 '; check if subtype ', name, ' should redefine it too') putln].
 	    encoder
 		addSelector: '_sizeof';    noteImplementation: '_sizeof'    in: name at: position;
 		addSelector: '_debugName'; noteImplementation: '_debugName' in: name at: position;
