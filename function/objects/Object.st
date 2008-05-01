@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-04-09 07:37:35 by piumarta on emilia.local
+  Last edited: 2008-05-01 15:15:09 by piumarta on emilia
 "
 
 { import: Objects }
@@ -39,19 +39,7 @@ ByteArray size_: _size value_: _value
     _bytes := _value.
 ]
 
-Object debugnew
-[
-    | _n |
-    { printf("Object.new %p\n", self); }.
-     _n := self _debugName.
-    { printf("<%s>\n", (char *)v__n); }.
-    ^self _vtable _alloc: self _sizeof
-]
-
-Object new
-[
-    ^self _vtable _alloc: self _sizeof
-]
+Object new			[ | _vt | { v__vt= (oop)self->_vtable[-1]; }.  ^_vt _alloc: self _sizeof ]
 
 " Object "
 
