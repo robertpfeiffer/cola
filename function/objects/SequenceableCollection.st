@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-03-06 16:02:23 by piumarta on emilia.local
+  Last edited: 2008-04-28 14:59:11 by piumarta on emilia
 "
 
 { import: Object }
@@ -212,6 +212,8 @@ SequenceableCollection from: start do: elementBlock separatedBy: betweenBlock
 	first ifTrue: [first := false] ifFalse: [betweenBlock value].
 	elementBlock value: e].
 ]
+
+SequenceableCollection by2do: elementBlock	[ 0 by: 2 to: self size - 2 do: [:i | elementBlock value: (self at: i) value: (self at: i + 1)] ]
 
 SequenceableCollection inject: result into: binaryBlock
 [
