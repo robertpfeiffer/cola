@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-02-26 22:49:43 by piumarta on emilia
+  Last edited: 2008-05-01 15:12:23 by piumarta on emilia
 "
 
 { import: Objects }
@@ -152,19 +152,19 @@ SmallInteger \\ aNumber
 SmallInteger bitAnd: anInteger
 [
     { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))  { _return (oop)(((int)v_self & (int)v_anInteger) | 1); } }.
-    ^super bitAnd: self
+    ^super bitAnd: anInteger
 ]
 
 SmallInteger bitOr: anInteger
 [
     { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))  { _return (oop)(((int)v_self | (int)v_anInteger) | 1); } }.
-    ^super bitOr: self
+    ^super bitOr: anInteger
 ]
 
 SmallInteger bitXor: anInteger
 [
     { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))  { _return (oop)(((int)v_self ^ (int)v_anInteger) | 1); } }.
-    ^super bitXor: self
+    ^super bitXor: anInteger
 ]
 
 SmallInteger bitShift: displacement
