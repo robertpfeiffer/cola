@@ -88,6 +88,7 @@ static oop s_init= 0;
 static oop s_flush= 0;
 static oop s_lookup_= 0;
 static oop s_findKeyOrNil_= 0;
+static oop s_delegated= 0;
 static oop s__delegated= 0;
 static oop s__vtable= 0;
 static oop s__alloc_= 0;
@@ -1075,6 +1076,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   method(_object,   "_vtable",    	  _vtable);
   method(_vtable,   "init",		  init);
   method(_vtable,   "_alloc:",    	  _alloc_);
+  method(_vtable,   "delegated",    	  delegated);
   method(_vtable,   "findKeyOrNil:",      findKeyOrNil_);
   method(_vtable,   "flush",		  flush);
   method(_object,   "_beTagType", 	  _beTagType);
