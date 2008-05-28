@@ -15,11 +15,12 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-05-01 15:15:09 by piumarta on emilia
+  Last edited: 2008-05-21 09:11:59 by piumarta on emilia.local
 "
 
 { import: Objects }
 { include "tag.h" }
+
 
 [ Object := _object ]	"alias"
 [ Symbol := _selector ]	"alias"
@@ -271,3 +272,33 @@ Object _slotAt: index put: anObject
     long index= (long)v_index >> 1;
     return ((oop *)(v_self))[index]= v_anObject;
 }
+
+
+
+_object _vtable: aVtable	{ _return (((oop *)self)[-1]= v_aVtable); }
+
+_object _delegated		[ ^self _vtable delegated _alloc: self _sizeof ]
+
+_vtable bindings		[ ^bindings ]
+_vtable delegate: aVtable	[ delegate := aVtable ]
+
+_vtable copy: selectors from: aVtable
+[
+    selectors do: [:sel | self methodAt: sel put: (aVtable lookup: sel)	value _method with: nil ]
+]
+
+_vtable _clone		[ ^self _vtable _alloc: self _sizeof ]
+_vtable _clone: size	[ ^self _vtable _alloc: size _integerValue ]
+_vtable new		[ ^self _clone init ]
+
+_vtable copyEmpty
+[
+    ^self new copyEmpty: self
+]
+
+_vtable copyEmpty: aVT
+[
+    self
+	delegate: aVT delegate;
+	copy: #(_sizeof _debugName _slots) from: aVT
+]
