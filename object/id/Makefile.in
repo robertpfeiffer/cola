@@ -1,6 +1,6 @@
-CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
-PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
-GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
+CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS) -fno-strict-aliasing
+PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS) -fno-strict-aliasing
+GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS) -fno-strict-aliasing
 PREFIX = @PREFIX@
 GCDIR  = @GCDIR@
 
