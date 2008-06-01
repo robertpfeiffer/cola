@@ -140,7 +140,9 @@ Object perform: aSymbol every: nSeconds
     s  := nSeconds asInteger.
     us := (nSeconds * 1000000) asInteger \\ 1000000.
     {
-#     if !defined(WIN32)
+#     if defined(WIN32)
+	(void)sigalrm;
+#     else
 	long s=  (long)v_s  >> 1;
 	long us= (long)v_us >> 1;
 	struct itimerval interval= { { s, us }, { s, us } };
