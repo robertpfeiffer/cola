@@ -64,4 +64,5 @@
 ;;; bring the network interface up
 ;;; 
 
-(ifconfig '"/dev/tun0" '"10.0.0.1" '"10.0.0.2" ip-receive)
+;(ifconfig '"/dev/tun0" '"10.0.2.1" '"10.0.2.2" ip-receive)
+(ifconfig '"Local Area Connection 12" '"10.0.2.1" '"10.0.2.2" ip-receive)

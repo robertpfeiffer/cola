@@ -8,7 +8,7 @@ LIBS = NetworkPseudoInterfaceWin.o
 all : $(LIBS) $(PROGRAM)
 
 test : $(LIBS) $(PROGRAM) .FORCE
-	./$(PROGRAM) $(JOLT)/boot.k tcp.k
+	./$(PROGRAM) boot.k tcp.k
 
 .SUFFIXES :
 

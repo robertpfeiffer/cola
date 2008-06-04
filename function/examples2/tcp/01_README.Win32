@@ -1,0 +1,64 @@
+0. BUILDING
+
+  Use Makefile.win32 instead of Makefile.
+
+1. INSTALL THE TUN/TAP DRIVER
+
+  Open a DOS shell with administrator privileges.
+
+  'cd' to the tap-win32 folder and run this from the DOS prompt:
+
+    tapinstall.exe install OemWin2k.inf tap0801
+
+  Open the 'Control Panel' and then 'Network Connections'
+
+  Find the new network interface (TAP-Win32 Adapter V8) and note its
+  name; for sake of illustration let's pretend it's called "Local Area
+  Connection 42".
+
+  Back at the DOS prompt, run:
+
+    netsh interface ip set address "Local Area Connection 42" static 10.0.2.1 255.255.255.0 10.0.2.2 10
+
+  (substituting your actual device name in the obvious place).
+
+  Close your administrator DOS window by typing 'exit' at the prompt.
+
+2. TELL THE TCP EXAMPLE WHAT DEVICE TO USE
+
+  Back in your usual account, open "tcp.k" with your favorite text editor
+  and modify first argument of the last line to be the actual name of your
+  new network tunnel device as noted above; e.g:
+
+    (ifconfig '"Local Area Connection 42" '"10.0.2.1" '"10.0.2.2" ip-receive)
+
+  Save the file.
+
+  Open a DOS prompt (no admin privileges required) and cd to this folder
+  then then run:
+
+    main.exe boot.k tcp.k
+
+  In another DOS window try:
+
+    ping 10.0.2.2
+
+  or:
+
+    telnet 10.0.2.2 13
+
+  (then press RETURN) or open a web browser and point it at
+
+    http://10.0.2.2
+
+3. REMOVE THE TUN/TAP DRIVER
+
+  Open a DOS shell with administrator privileges
+
+  'cd' to the tap-win32 folder and run this from the DOS prompt:
+
+    tapinstall.exe remove tap0801
+
+  Type 'exit' to leave the DOS shell.
+
+Enjoy!

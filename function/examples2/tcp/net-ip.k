@@ -32,7 +32,8 @@
     (printf "proto=%02x " (ip-protocol ip))
     (printf "sum=%04x "   (ip-checksum ip))
     (printf "src=%08x "   (ip-sourceAddress ip))
-    (printf "dst=%08x\n"  (ip-destinationAddress ip))))
+    (printf "dst=%08x"    (ip-destinationAddress ip))
+    (printf "\n")))
 
 (define checksum
   (lambda (addr stop)
