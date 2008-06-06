@@ -15,7 +15,7 @@
 ;;;
 ;;; THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-;;; Last edited: 2008-04-10 12:13:31 by piumarta on emilia.local
+;;; Last edited: 2008-06-06 05:42:37 by piumarta on WINDOWS-XP.piumarta.com
 
 (define __dlsym _dlsym)
 
@@ -44,7 +44,6 @@
 (define strcat			(dlsym "strcat"))
 (define strlen			(dlsym "strlen"))
 (define strcmp			(dlsym "strcmp"))
-(define usleep			(dlsym "usleep"))
 
 (define _dlopen			(dlsym "dlopen"))
 (define dlclose			(dlsym "dlclose"))
