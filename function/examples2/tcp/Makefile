@@ -3,7 +3,7 @@ OBJECTS = ../../objects
 
 PROGRAM = main
 
-LIBS = NetworkPseudoInterfaceWin.o
+LIBS = NetworkPseudoInterface.o
 
 all : $(LIBS) $(PROGRAM)
 
@@ -12,15 +12,15 @@ test : $(LIBS) $(PROGRAM) .FORCE
 
 .SUFFIXES :
 
-IDC		= ../idc # -O
-IDFLAGS		= -g -k -I$(OBJECTS) -I$(JOLT) -Wc,-DWINVER=0x0501
-IDLIBS		= $(OBJECTS)/objects.a $(JOLT)/jolt.a -lWs2_32 # $(JOLT)/readline.o -lreadline
+IDC		= ../idc -O
+IDFLAGS		= -g -k -I$(OBJECTS) -I$(JOLT)
+IDLIBS		= $(OBJECTS)/objects.a $(JOLT)/jolt.a $(JOLT)/readline.o -lreadline
 
 % : %.st $(LIBS)
 	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@
 
 main : $(JOLT)/main.st $(LIBS)
-	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ # -L/usr/X11R6/lib -lX11 -lXext
+	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ -L/usr/X11R6/lib -lX11 -lXext
 
 %.o : %.st
 	$(IDC) $(IDFLAGS) -c $< -o $@
