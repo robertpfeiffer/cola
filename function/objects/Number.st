@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-05-01 15:12:23 by piumarta on emilia
+  Last edited: 2008-06-06 22:01:16 by piumarta on WINDOWS-XP.piumarta.com
 "
 
 { import: Objects }
@@ -33,6 +33,11 @@ Number quo: aNumber
 Number \\ aNumber 
 [
     ^self - (self // aNumber * aNumber)
+]
+
+Number compare: aNumber
+[
+    ^self < aNumber ifTrue: [-1] ifFalse: [self = aNumber ifTrue: [0] ifFalse: [1]].
 ]
 
 Number < aNumber
@@ -53,10 +58,11 @@ Number timesRepeat: aBlock
     [(count := count + 1) <= self] whileTrue: [aBlock value]
 ]
 
-Number negated
-[
-    ^0 - self
-]
+Number abs	[ ^self < 0 ifTrue: [self negated] ifFalse: [self] ]
+Number negated	[ ^0 - self ]
+
+Number squared	[ ^self * self ]
+Number cubed	[ ^self * self * self ]
 
 "----------------------------------------------------------------"
 
