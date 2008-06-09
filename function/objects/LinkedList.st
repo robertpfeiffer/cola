@@ -15,12 +15,12 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-15 16:33:45 by piumarta on emilia.lax04.mtt
+  Last edited: 2008-06-09 12:54:01 by piumarta on emilia
 "
 
 { import: Objects }
 
-LinkedList : Object ( firstLink lastLink )
+LinkedList : SequenceableCollection ( firstLink lastLink )
 
 LinkedList first	[ ^firstLink ]
 LinkedList last		[ ^lastLink ]

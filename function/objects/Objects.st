@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-04 04:45:16 by piumarta on emilia
+  Last edited: 2008-06-09 12:53:19 by piumarta on emilia
 "
 
 { import: _object }
@@ -32,8 +32,10 @@ Object : _object ()					[ Object := _object ]	"alias"
         LargeInteger : Integer ()
   Symbol : Object ( _size _elements )			[ Symbol := _selector ]	"alias"
   Association : Object ( key value )
+  Link : Object ( prevLink nextLink )
   Collection : Object ()
     SequenceableCollection : Collection ()
+      LinkedList : SequenceableCollection ( firstLink lastLink )
       ArrayedCollection : SequenceableCollection ( size )
         Array : ArrayedCollection ( _oops )
         ByteArray : ArrayedCollection ( _bytes )
@@ -54,8 +56,6 @@ Object : _object ()					[ Object := _object ]	"alias"
   File : Object ( _fd name )
   Function : Object ()
   Random : Object ( seed a m q r )
-  Link : Object ( prevLink nextLink )
-  LinkedList : Object ( firstLink lastLink )
   OS : Object ()
 
 nil   : UndefinedObject ()
