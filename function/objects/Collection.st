@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:35:29 by piumarta on emilia
+  Last edited: 2008-06-09 12:49:53 by piumarta on emilia
 "
 
 { import: Objects }
@@ -30,6 +30,20 @@ Collection emptyCheck
 
 Collection addAll: aCollection		[ aCollection do: [:elt | self add: elt] ]
 Collection removeAll: aCollection	[ aCollection do: [:elt | self remove: elt] ]
+
+Collection minimum: valueBlock
+[
+    | minElement minValue |
+    self emptyCheck.
+    minElement := self anyElement.
+    minValue := valueBlock value: minElement.
+    self do: [:element || value |
+	(value := valueBlock value: element) < minValue
+	    ifTrue:
+	       [minElement := element.
+		minValue := value]].
+    ^minElement
+]
 
 Collection printOn: aStream
 [
