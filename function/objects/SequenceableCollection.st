@@ -15,13 +15,15 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-04-28 14:59:11 by piumarta on emilia
+  Last edited: 2008-06-09 12:53:39 by piumarta on emilia
 "
 
 { import: Object }
 
 SequenceableCollection isSequenceableCollection	[ ^true ]
 Object isSequenceableCollection			[ ^false ]
+
+SequenceableCollection anyElement	[ ^self first ]
 
 SequenceableCollection first		[ ^self at: 0				]
 SequenceableCollection first: anObject	[ ^self at: 0 		  put: anObject	]
