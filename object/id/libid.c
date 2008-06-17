@@ -90,6 +90,7 @@ static oop s_lookup_= 0;
 static oop s_findKeyOrNil_= 0;
 static oop s_delegated= 0;
 static oop s__delegated= 0;
+static oop s__delegated_= 0;
 static oop s__vtable= 0;
 static oop s__alloc_= 0;
 static oop s__beTagType= 0;
@@ -321,6 +322,12 @@ static oop _object___delegated(oop _thunk, oop state, oop self)
 {
   oop obj= _vtable__delegated(0, self->_vtable[-1], self->_vtable[-1]);
   return _vtable___alloc_(0, obj, obj, 0);
+}
+
+static oop _object___delegated_(oop _thunk, oop state, oop self, size_t size)
+{
+  oop obj= _vtable__delegated(0, self->_vtable[-1], self->_vtable[-1]);
+  return _vtable___alloc_(0, obj, obj, size);
 }
 
 static oop _vtable__findKeyOrNil_(oop _thunk, oop state, oop self, oop key)
@@ -819,6 +826,11 @@ oop _libid_proto(oop base)
   return _sendv(s__delegated, 1, (base ? base : _object));
 }
 
+oop _libid_proto2(oop base, size_t size)
+{
+  return _sendv(s__delegated_, 2, (base ? base : _object), size);
+}
+
 oop _libid_import(const char *key)
 {
   oop name= _selector___intern_(0, _selector, _selector, key);
@@ -1073,6 +1085,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   method(_selector, "_intern:",   	  _intern_);
   method(_object,   "_delegate", 	  _delegate);
   method(_object,   "_delegated", 	  _delegated);
+  method(_object,   "_delegated:", 	  _delegated_);
   method(_object,   "_vtable",    	  _vtable);
   method(_vtable,   "init",		  init);
   method(_vtable,   "_alloc:",    	  _alloc_);
@@ -1114,6 +1127,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.alloc		= _libid_alloc;
   _libid.palloc		= _libid_palloc;
   _libid.balloc		= _libid_balloc;
+  _libid.proto2		= _libid_proto2;
 
   _libid.import		= _libid_import;
   _libid.export		= _libid_export;

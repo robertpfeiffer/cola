@@ -71,8 +71,7 @@ struct __libid
   oop		 (*alloc)(oop type, size_t size);
   oop		*(*palloc)(size_t size);
   void		*(*balloc)(size_t size);
-
-  void		  *unused22;
+  oop		 (*proto2)(oop base, size_t size);
   void		  *unused23;
 
   /* environment */

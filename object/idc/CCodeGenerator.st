@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-12 22:44:56 by piumarta on emilia
+  Last edited: 2008-06-17 14:34:01 by piumarta on emilia
 "
 
 { import: CodeGenerator }
@@ -169,7 +169,7 @@ void __id__init__', (outputType == #object ifTrue: [encoder mangleSelector: (fil
 CCodeGenerator mainText
 [
     ^'
-int main(int argc, char **argv, char **envp)
+int main(int argc, char *argv[], char **envp)
 {
 #if defined(WIN32)
   void *init= GetProcAddress(GetModuleHandle(0), "_libid_init");
@@ -651,9 +651,11 @@ CCodeGenerator initialiseExternal: typeName
 
 CCodeGenerator initialiseType: typeName in: baseName
 [
-    self gen: '  '; genVariable: typeName; gen: '= _libid->proto('.
+    self gen: '  '; genVariable: typeName; gen: '= _libid->proto2('.
     baseName isNil ifTrue: [self gen: '0'] ifFalse: [self genVariable: baseName].
-    self genl: ');'.
+    self
+	gen:  ', '; genType: typeName method: '_sizeof'; gen: '(0, 0)';
+	genl: ');'.
     self
 	gen: '  _libid->method('; genVariable: typeName; gen: ', '; genSelector: '_sizeof';
 	gen: ', (_imp_t)'; genType: typeName method: '_sizeof'; genl: ');';
