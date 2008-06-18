@@ -1,5 +1,5 @@
 "							-*- Smalltalk -*-
-  Copyright (c) 2005 Ian Piumarta
+  Copyright (c) 2005, 2008 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-10-31 16:28:03 by piumarta on emilia
+  Last edited: 2008-06-18 12:08:22 by piumarta on emilia.local
 "
 
 { import: Scanner }
@@ -440,6 +440,7 @@ Parser parseMethod: typeName
 		      ifTrue:  [node external: self parsePrimitive]
 		      ifFalse: [self error: 'method body expected']].
     self note: 'METHOD-3'.
+    node sourceEnd: line.
     ^node
 ]
 

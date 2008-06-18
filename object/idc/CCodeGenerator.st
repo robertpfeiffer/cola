@@ -1,5 +1,5 @@
 "							-*- Smalltalk -*-
-  Copyright (c) 2005, 2006 Ian Piumarta
+  Copyright (c) 2005-2008 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-17 14:34:01 by piumarta on emilia
+  Last edited: 2008-06-18 12:08:34 by piumarta on emilia.local
 "
 
 { import: CodeGenerator }
@@ -22,11 +22,20 @@
 "I am a code generator for target machines that understand C program source."
 
 CCodeGenerator : CodeGenerator (
-    output	"WriteStream on the output program text"
+    output		"WriteStream on the output program text"
+    firstInfoTag	"Integer sequence number of first info structure emitted"
+    lastInfoTag		"Integer sequence number of last info structure emitted"
 )
 
 [
     CodeGenerators at: #native put: CCodeGenerator
+]
+
+CCodeGenerator new
+[
+    self := super new.
+    firstInfoTag := nil.
+    lastInfoTag := nil.
 ]
 
 CCodeGenerator generate: program on: aStream for: aCompiler outputType: outputType fileName: fileName
@@ -97,15 +106,15 @@ typedef oop (*_imp_t)(struct __send *_send, ...);
 static struct __libid *_libid= 0;
 
 #ifdef ID_DEBUG
-# define _enter(NM, TYPE, FILE)	static struct __methodinfo _methodinfo= { NM, TYPE, FILE, 0 };  void *__id_debug= _libid->enter(&_methodinfo)
-# define _line(lno)		_libid->line(lno)
-# define _leave()		_libid->leave(__id_debug)
-# define _backtrace()		_libid->backtrace()
+# define _enter(info) void *__id_debug= _libid->enter(info)
+# define _line(lno)			_libid->line(lno)
+# define _leave()			_libid->leave(__id_debug)
+# define _backtrace()			_libid->backtrace()
 #else
-# define _enter(NM, TYPE, FILE)
+# define _enter(info)			(void)info
 # define _line(lno)
 # define _leave()
-# define _backtrace()		"(no debugging information)"
+# define _backtrace()			"(no debugging information)"
 #endif
 #define _return			_leave(); return
 ', self sendText, '
@@ -151,6 +160,8 @@ struct __entry
 CCodeGenerator initTextType: outputType fileName: fileName
 [
     ^'
+static struct __methodinfo __info= { "__id__init__", "<initialisation>", "', fileName escaped, '", 0, 0, 0, ',
+(lastInfoTag ifTrue: ['&__info', lastInfoTag printString] ifFalse: ['0']), ' };
 void __id__init__', (outputType == #object ifTrue: [encoder mangleSelector: (fileName withoutSuffix: '.st')] ifFalse: ['']), '(struct __libid *__libid)
 {
   if (_libid) return;
@@ -163,7 +174,8 @@ void __id__init__', (outputType == #object ifTrue: [encoder mangleSelector: (fil
     for (s= _Selectors;  s->name;  ++s)
       *s->addr= _libid->intern(s->name);
   }
-  _enter("__id__init__", "<initialisation>", "', fileName escaped, '");
+  _enter(&__info);
+  _libid->infos(&__info, &__info', (firstInfoTag ifTrue: [firstInfoTag printString] ifFalse: ['']), ');
 ']
 
 CCodeGenerator mainText
@@ -689,8 +701,20 @@ CCodeGenerator initialiseVariable: varName location: loc
 
 "sequences: methods and blocks"
 
-CCodeGenerator beginBlock: blockNode arguments: arguments variadic: variadic
+CCodeGenerator beginBlock: blockNode in: methodNode arguments: arguments variadic: variadic
 [
+    self
+	gen:  'static struct __methodinfo __info'; print: blockNode tag; gen: '= { ';
+	gen:  '"[] ';	 gen:   (methodNode ifTrue: [methodNode selector ] ifFalse: ['?']);
+	gen:  '", "';    gen:   (methodNode ifTrue: [methodNode type name] ifFalse: ['?']);
+	gen:  '", "';    gen:   blockNode position file escaped;
+	gen:  '", ';     gen:   '0';
+	gen:   ', ';     print: (methodNode ifTrue: [methodNode position line] ifFalse: [0]);
+	gen:   ', ';     print: (methodNode ifTrue: [methodNode sourceEnd]     ifFalse: [0]);
+	gen:   ', ';     gen:   (lastInfoTag ifTrue: ['&__info', lastInfoTag printString] ifFalse: ['0']);
+	genl: ' };'.
+    lastInfoTag := blockNode tag.
+    firstInfoTag ifFalse: [firstInfoTag := lastInfoTag].
     self gen: 'static oop '; genBlock: blockNode tag; gen: '(oop v__closure, oop v__self'.
     arguments do: [:arg | self gen: ', oop '; genVariable: arg name].
     variadic ifTrue: [self gen: ', ...'].
@@ -699,24 +723,31 @@ CCodeGenerator beginBlock: blockNode arguments: arguments variadic: variadic
 
 CCodeGenerator beginMethod: methodNode in: typeNode arguments: arguments variadic: variadic sequence: sequenceNumber
 [
+    self
+	gen:  'static struct __methodinfo __info'; print: methodNode tag; gen: '= { ';
+	gen:     '"';	 gen:   methodNode selector;
+	gen:  '", "';    gen:   methodNode type name;
+	gen:  '", "';    gen:   methodNode position file escaped;
+	gen:  '", ';     gen:   '0';
+	gen:   ', ';     print: methodNode position line;
+	gen:   ', ';     print: methodNode sourceEnd;
+	gen:   ', '.
+    lastInfoTag
+	ifTrue:  [self gen: '&__info'; print: lastInfoTag]
+	ifFalse: [self gen: '0'].
+    self genl: ' };'.
+    lastInfoTag := methodNode tag.
+    firstInfoTag ifFalse: [firstInfoTag := lastInfoTag].
     self gen: 'static oop '; genType: typeNode name sequence: sequenceNumber method: methodNode selector; gen: '(oop v__closure'.
     arguments do: [:arg | self gen: ', oop '; genVariable: arg name].
     variadic ifTrue: [self gen: ', ...'].
     self genl: ')'.
 ]
 
-CCodeGenerator debugMethod: method	[ self genl: '  _enter("',    method selector, '", "', method type name, '", "', method position file escaped, '");' ]
-CCodeGenerator debugLine:   position	[ self genl: '  _line(', position line printString, ');' ]
-CCodeGenerator debugReturn: method	[ self genl: '  _leave();' ]
-
-CCodeGenerator debugBlock: block in: method
-[
-    self
-	genl: '  _enter("[] ',
-	(method ifTrue: [method selector] ifFalse: ['?']), '", "',
-	(method ifTrue: [method type name] ifFalse: ['?']), '", "',
-	block position file escaped, '");'
-]
+CCodeGenerator debugMethod: method		[ self gen:  '  _enter(&__info'; print: method tag; genl: ');' ]
+CCodeGenerator debugLine:   position		[ self gen:  '  _line('; print: position line; genl: ');' ]
+CCodeGenerator debugReturn: method		[ self genl: '  _leave();' ]
+CCodeGenerator debugBlock: block in: method	[ self gen:  '  _enter(&__info'; print: block tag; genl: ');' ]
 
 CCodeGenerator beginSequence: sequenceNode	[ self genl: ' {' ]
 CCodeGenerator endSequence: sequenceNode	[ self genl: ' }' ]

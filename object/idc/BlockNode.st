@@ -1,5 +1,5 @@
 "							-*- Smalltalk -*-
-  Copyright (c) 2005 Ian Piumarta
+  Copyright (c) 2005, 2008 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 15:15:44 by piumarta on emilia.local
+  Last edited: 2008-06-18 12:08:11 by piumarta on emilia.local
 "
 
 { import: SequenceNode }
@@ -170,7 +170,7 @@ BlockNode genImplementation: gen in: homeMethod
      when generating full closures, those implementations MUST be
      generated first."
     scope blocks do: [:block | block genImplementation: gen in: homeMethod].
-    gen beginBlock: self arguments: arguments variadic: false.
+    gen beginBlock: self in: homeMethod arguments: arguments variadic: false.
     gen beginSequence: self.
     gen debugBlock: self in: homeMethod.
     scope hasExports ifTrue: [gen createStateVector: scope stateVectorSize inScope: scope tag constructor: stateConstructor].

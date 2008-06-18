@@ -1,5 +1,5 @@
 "							-*- Smalltalk -*-
-  Copyright (c) 2005 Ian Piumarta
+  Copyright (c) 2005, 2008 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-04-11 18:37:31 by piumarta on emilia
+  Last edited: 2008-06-18 12:08:17 by piumarta on emilia.local
 "
 
 { import: BlockNode }
@@ -24,6 +24,7 @@ MethodNode : BlockNode (
     selector		"String - method selector"
     sequenceNumber	"Integer - method sequence number"
     variadic		"Boolean - true if method accepts arguments beyond last named"
+    sourceEnd		"Integer - line number of first token following method source"
 )
 
 MethodNode withType: typeString selector: selectorString arguments: argumentStrings position: aPosition
@@ -34,14 +35,18 @@ MethodNode withType: typeString selector: selectorString arguments: argumentStri
     sequenceNumber := 0.
     arguments := argumentStrings.
     variadic := false.
+    sourceEnd := aPosition line.
 ]
 
 MethodNode type			[ ^type ]
 MethodNode selector		[ ^selector ]
 MethodNode sequenceNumber	[ ^sequenceNumber ]
 MethodNode isVariadic		[ ^variadic ]
+MethodNode sourceEnd		[ ^sourceEnd ]
 
-MethodNode beVariadic			[ variadic := true ]
+MethodNode beVariadic		[ variadic := true ]
+MethodNode sourceEnd: lineNum	[ sourceEnd := lineNum ]
+
 MethodNode external: externalNode	[ ^self addStatement: externalNode ]
 MethodNode addTo: client		[ client addMethod: self ]
 
@@ -51,6 +56,7 @@ MethodNode encode: encoder
     type := encoder encodeType: type position: position.
     type noteUsed.
     sequenceNumber := encoder noteImplementation: selector in: type name at: position.
+    tag := encoder nextLiteralTag.
     ('_sizeof' = selector)
 	ifTrue:
 	   [type noteResized.

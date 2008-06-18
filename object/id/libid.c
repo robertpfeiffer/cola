@@ -72,6 +72,8 @@ void		  *_libid_methodAt(int offset);
 void		   _libid_line(int line);
 void		   _libid_leave(void *cookie);
 char		  *_libid_backtrace(void);
+void		   _libid_infos(struct __methodinfo *first, struct __methodinfo *last);
+void		  *_libid_infoList(void);
 
 #define _sendv(MSG, N, RCV, ARG...) ({					\
   struct __send _s= { (MSG), (N), (RCV) };				\
@@ -938,6 +940,22 @@ struct position
 static struct position *positions= 0;
 static int position= 0;
 static int maxPosition= 0;
+static struct __methodinfo *infoList= 0;
+static struct __methodinfo *lastInfo= 0;
+
+void _libid_infos(struct __methodinfo *first, struct __methodinfo *last)
+{
+  if (lastInfo)
+    lastInfo->next= first;
+  else
+    infoList= first;
+  lastInfo= last;
+}
+
+void *_libid_infoList(void)
+{
+  return infoList;
+}
 
 void *_libid_enter(struct __methodinfo *info)
 {
@@ -1145,6 +1163,8 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.leave		= _libid_leave;
   _libid.backtrace	= _libid_backtrace;
   _libid.methodAt	= _libid_methodAt;
+  _libid.infos		= _libid_infos;
+  _libid.infoList	= _libid_infoList;
 
   _libid.gc_addRoots			    = _libid.dlsym(RTLD_DEFAULT, "GC_add_roots");
   _libid.gc_gcollect			    = _libid.dlsym(RTLD_DEFAULT, "GC_gcollect");

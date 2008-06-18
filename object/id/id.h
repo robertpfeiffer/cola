@@ -31,10 +31,12 @@ struct __slotinfo
 
 struct __methodinfo
 {
-  const char	*name;
-  const char	*type;
-  const char	*file;
-  void		*meta;
+  const char		*name;
+  const char		*type;
+  const char		*file;
+  void			*meta;
+  size_t		 sourceStart, sourceEnd;
+  struct __methodinfo	*next;
 };
 
 struct __libid
@@ -109,9 +111,9 @@ struct __libid
   void		 (*leave)(void *cookie);
   char		*(*backtrace)(void);
   void		*(*methodAt)(int offset);
+  void		 (*infos)(struct __methodinfo *first, struct __methodinfo *last);
+  void		*(*infoList)(void);
 
-  void		  *unused47;
-  void		  *unused48;
   void		  *unused49;
   void		  *unused50;
   void		  *unused51;
