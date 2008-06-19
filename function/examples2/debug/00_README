@@ -1,0 +1,59 @@
+EX1
+
+    Stops when it tries to nextPutAll: a SmallInteger to the console.
+    Type 'where' (or 'w') at the prompt to see where.
+
+
+EX2
+
+    Prints a string in a loop.  Type '^C' to interrupt it and 'where'
+    (or 'w') at the prompt to see where it is.  To set a breakpoint by
+    method/selector, type:
+
+	break File nextPutAll:
+
+    and to continue execution type 'continue' (or 'c').  When the
+    breakpoint is reached, press ENTER to repeat the last command
+    ('continue') to run the program until it reaches the breakpoint
+    again.  To set a breakpoint by file/line, type:
+
+	break ex2.st 4
+
+    and type 'continue' as above, followed by ENTER any number of
+    times.  To see a list of breakpoints, type 'break' on its own;
+    this will show each breakpoint and its associated numeric id.  To
+    clear a breakpoint, type 'break clear' followed by its numeric id,
+    or by either the method/selector name or the file/line as
+    appropriate.  For example, if you followed the above to the letter
+    then the three commands below will all delete the breakpoint in
+    Object.sleep:
+
+	break clear 2
+	break clear Object sleep
+	break clear ex.st 4
+
+    Typing 'break clear' with no arguments will clear all your
+    breakpoints (without asking).  To set implicit breakpoints
+    at every message send, type
+
+	break sends
+
+    and type 'continue' and then press ENTER a few times.  To set
+    implicit breakpoints at every new source line in the program, type
+
+	break lines
+
+    and type 'continue' and then press ENTER until you're bored.  To
+    remove all implicit breakpoints, type:
+
+	break off
+
+
+CAVEATS
+
+    Breakpoints by line currently don't work in the middle of a
+    method.  This will be fixed soon.
+
+    It probably works under Win32 except I can't persuade the bash
+    that came with my msys to deliver SIGINT to ex2 in order to prove
+    it.  Ho hum.
