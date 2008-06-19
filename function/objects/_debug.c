@@ -1,5 +1,37 @@
 #include <signal.h>
-#include <readline/readline.h>
+
+#if HAVE_READLINE
+# include <readline/readline.h>
+#else
+  char *readline(char *prompt)
+  {
+    static char line[1024];
+    int n;
+    fputs(prompt, stdout);
+    fflush(stdout);
+    if (!fgets(line, sizeof(line), stdin))
+      return 0;
+    for (n= strlen(line);  n-- > 0;)
+      if ('\n' != line[n] && '\r' != line[n])
+	break;
+      else
+	line[n]= '\0';
+    return line;
+  }
+#endif
+
+#ifdef WIN32
+char *strsep(char **stringp, char *delim)
+{
+  char *string= *stringp, *spanp;
+  if (!string) return 0;
+  if (!*string) return *stringp= 0, string;
+  spanp= string + strcspn(string, delim);
+  *stringp= *spanp ? spanp + 1 : spanp;
+  *spanp= '\0';
+  return string;
+}
+#endif
 
 static void enterDebugger(void);
 
@@ -358,21 +390,22 @@ static void signalDebugger(int n)
   char *who= "UNKNOWN";
   switch (n)
     {
-    case SIGHUP:	who= "hangup";				break;
     case SIGINT:	who= "interrupt";			break;
-    case SIGQUIT:	who= "quit";				break;
     case SIGILL:	who= "illegal instruction";		break;
-    case SIGTRAP:	who= "trace trap";			break;
     case SIGABRT:	who= "abort";				break;
-  /*case SIGEMT:	who= "emulate instruction";		break;*/
     case SIGFPE:	who= "floating-point exception";	break;
+    case SIGSEGV:	who= "segmentation fault";		break;
+    case SIGTERM:	who= "termination";			break;
+#ifndef WIN32
+    case SIGHUP:	who= "hangup";				break;
+    case SIGQUIT:	who= "quit";				break;
+    case SIGTRAP:	who= "trace trap";			break;
+  /*case SIGEMT:	who= "emulate instruction";		break;*/
     case SIGKILL:	who= "kill";				break;
     case SIGBUS:	who= "bus error";			break;
-    case SIGSEGV:	who= "segmentation fault";		break;
     case SIGSYS:	who= "non-existent system call";	break;
     case SIGPIPE:	who= "pipe closed";			break;
     case SIGALRM:	who= "alarm";				break;
-    case SIGTERM:	who= "termination";			break;
     case SIGURG:	who= "urgent condition";		break;
     case SIGSTOP:	who= "stop";				break;
     case SIGTSTP:	who= "keyboard stop";			break;
@@ -389,10 +422,13 @@ static void signalDebugger(int n)
   /*case SIGINFO:	who= "status request";			break;*/
     case SIGUSR1:	who= "user-defined 1";			break;
     case SIGUSR2:	who= "user-defined 2";			break;
+#endif
     }
   printf("\n\nsignal: %s\n", who);
   enterDebugger();
 }
+
+#if HAVE_READLINE
 
 static char *commandGenerator(const char *text, int state)
 {
@@ -478,12 +514,18 @@ static char **debugCompletion(const char *text, int start, int end)
   return rl_completion_matches(text, start ? argumentGenerator : commandGenerator);
 }
 
+#endif /* HAVE_READLINE */
+
 static void initDebugger(void)
 {
   libidEnter= _libid->enter;
   libidLine=  _libid->line;
   libidLeave= _libid->leave;
   signal(SIGINT, signalDebugger);
+  setvbuf(stdout, 0, _IONBF, 0);
+  setvbuf(stderr, 0, _IONBF, 0);
+#if HAVE_READLINE
   rl_readline_name= "Pepsi";
   rl_attempted_completion_function= debugCompletion;
+#endif
 }
