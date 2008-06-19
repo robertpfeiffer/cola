@@ -975,13 +975,18 @@ void *_libid_enter(struct __methodinfo *info)
     }
   p= positions + position;
   p->info= info;
-  p->line= 0;
+  p->line= info->sourceStart;
   return (void *)(position++);
 }
 
 void *_libid_methodAt(int offset)
 {
   return ((0 <= offset) && (offset < position)) ? positions[position - offset - 1].info : 0;
+}
+
+int _libid_lineAt(int offset)
+{
+  return ((0 <= offset) && (offset < position)) ? positions[position - offset - 1].line : -1;
 }
 
 void _libid_line(int line)
@@ -1163,6 +1168,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.leave		= _libid_leave;
   _libid.backtrace	= _libid_backtrace;
   _libid.methodAt	= _libid_methodAt;
+  _libid.lineAt		= _libid_lineAt;
   _libid.infos		= _libid_infos;
   _libid.infoList	= _libid_infoList;
 

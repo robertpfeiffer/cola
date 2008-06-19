@@ -113,8 +113,8 @@ struct __libid
   void		*(*methodAt)(int offset);
   void		 (*infos)(struct __methodinfo *first, struct __methodinfo *last);
   void		*(*infoList)(void);
+  int		 (*lineAt)(int offset);
 
-  void		  *unused49;
   void		  *unused50;
   void		  *unused51;
 
