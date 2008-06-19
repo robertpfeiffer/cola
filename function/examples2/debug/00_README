@@ -1,7 +1,8 @@
 EX1
 
     Stops when it tries to nextPutAll: a SmallInteger to the console.
-    Type 'where' (or 'w') at the prompt to see where.
+    Type 'where' (or 'w') at the prompt to see where.  Type 'quit' (or
+    'q') to quit.
 
 
 EX2
@@ -56,4 +57,4 @@ CAVEATS
 
     It probably works under Win32 except I can't persuade the bash
     that came with my msys to deliver SIGINT to ex2 in order to prove
-    it.  Ho hum.
+    it, and was too lazy to type 'kill' in another terminal.
