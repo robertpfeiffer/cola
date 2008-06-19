@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-06 22:01:16 by piumarta on WINDOWS-XP.piumarta.com
+  Last edited: 2008-06-10 09:36:15 by piumarta on emilia
 "
 
 { import: Objects }
@@ -45,11 +45,8 @@ Number < aNumber
     self error: 'illegal argument: ', self printString, ' < ', aNumber printString
 ]
 
-Number isEven		[ ^self \\ 2 = 0 ]
-
-Integer isEven		[ ^((self digitAt: 1) bitAnd: 1) = 0 ]
-
-SmallInteger isEven	[ ^(self bitAnd: 1) = 0 ]
+Number  isEven	[ ^self \\ 2 = 0 ]
+Integer isEven	[ ^(self bitAnd: 1) = 0 ]
 
 Number timesRepeat: aBlock
 [
@@ -298,6 +295,14 @@ SmallInteger copy	[ ]
 
 Float        asFloat	[ ]
 SmallInteger asFloat	[ ^Float new setIntegerValue_: self _integerValue ]
+Integer      asFloat	[ ^self asFloatScaled: 1.0 ]
+
+Integer asFloatScaled: scale
+[
+    ^self = 0
+	ifTrue:  [0.0]
+	ifFalse: [(self >> 1 asFloatScaled: scale * 2.0) + (scale * (self isEven ifTrue: [0.0] ifFalse: [1.0]))]
+]
 
 Float        asInteger	[ ^self truncated ]
 SmallInteger asInteger	[ ]
@@ -744,12 +749,12 @@ LargeInteger normalize
     _return v_self;
 }
 
-LargeInteger <  aNumber	[ ^(self mpCmp: aNumber asLargeInteger) <  0 ]
-LargeInteger <= aNumber	[ ^(self mpCmp: aNumber asLargeInteger) <= 0 ]
-LargeInteger  = aNumber	[ ^(self mpCmp: aNumber asLargeInteger) == 0 ]
-LargeInteger ~= aNumber	[ ^(self mpCmp: aNumber asLargeInteger) ~~ 0 ]
-LargeInteger >= aNumber	[ ^(self mpCmp: aNumber asLargeInteger) >= 0 ]
-LargeInteger >  aNumber	[ ^(self mpCmp: aNumber asLargeInteger) >  0 ]
+LargeInteger <  aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) <  0] ifFalse: [aNumber adaptToInteger: self andSend: #< ] ]
+LargeInteger <= aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) <= 0] ifFalse: [aNumber adaptToInteger: self andSend: #<=] ]
+LargeInteger  = aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) == 0] ifFalse: [aNumber adaptToInteger: self andSend: # =] ]
+LargeInteger ~= aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) ~~ 0] ifFalse: [aNumber adaptToInteger: self andSend: #~=] ]
+LargeInteger >= aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) >= 0] ifFalse: [aNumber adaptToInteger: self andSend: #>=] ]
+LargeInteger >  aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) >  0] ifFalse: [aNumber adaptToInteger: self andSend: #> ] ]
 
 LargeInteger mpCmp: aLargeInteger
 {
