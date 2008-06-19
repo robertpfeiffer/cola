@@ -288,10 +288,10 @@ static int noCommand(int argc, char *argv[])
 }
 
 static command commands[]= {
-  { breakCommand,  "break",    "[ off | line | send | <type> <name> | <file> <line> | clear <type> <name> | clear <file> <line> ]",  "control single-step and breakpoints; without args, show current status" },
-  { contCommand,   "continue", "",		   "return from the debugger and continue (or single-step) the application" },
+  { breakCommand,  "break",    "[ off | line | send | [ clear ] <type> <name> | [ clear ] <file> <line> ]",  "control single-step and breakpoints; without args, show current status" },
+  { contCommand,   "continue", "",		   "return from the debugger and continue (or single-step) the program" },
   { helpCommand,   "help",     "[ <command> ]",	   "print help; if <command> is given, print help for it only" },
-  { quitCommand,   "quit",     "",		   "quit the entire application" },
+  { quitCommand,   "quit",     "",		   "quit the entire program" },
   { stackCommand,  "where",    "",		   "print the execution stack" },
   { yesCommand,    "yes",      "",		   0 },
   { noCommand,     "no",       "",		   0 },
