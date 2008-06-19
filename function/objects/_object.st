@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-10 04:20:58 by piumarta on cygwin.piumarta.com
+  Last edited: 2008-06-18 20:35:45 by piumarta on emilia
 "
 
 { external }
@@ -61,12 +61,17 @@ _object doesNotUnderstand: aSelector
     _cName := self _debugName.
     _cSelector := aSelector _stringValue.
     {
-	fprintf(stderr, "\n");
-	fputs(_backtrace(), stderr);
 	fprintf(stderr, "\n%s does not understand '%s'\n", (char *)v__cName, (char *)v__cSelector);
-	exit(1);
-    }
+    }.
+    ^self _debug
 ]
+
+_object _debug
+{
+  fprintf(stderr, "\n");
+  fputs(_backtrace(), stderr);
+  exit(1);
+}
 
 _selector size_: _stringSize value_: _stringValue
 {

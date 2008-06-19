@@ -11,7 +11,7 @@ FILES		= _object.o Objects.o Object.o \
 		  Collection.o SequenceableCollection.o ArrayedCollection.o Array.o ByteArray.o \
 		  IdentitySet.o Association.o IdentityDictionary.o SlotDictionary.o MemoDictionary.o OrderedCollection.o \
 		  File.o Stream.o Link.o LinkedList.o \
-		  Number.o OS.o Date.o Function.o Random.o Time.o deprecated.o
+		  Number.o OS.o Date.o Function.o Random.o Time.o debug.o deprecated.o
 
 ARCH		= $(shell $(IDC) -C arch)
 
@@ -34,6 +34,8 @@ test : objects.a test.st
 Number$(OBJEXT_O) : Number.st
 	$(IDC) -Jmpint $(IDFLAGS) -c $< -o $@
 
+debug.o : _debug.c
+
 objects.a : $(FILES) mpint/mpint.a
 	ar rc $@.new $(FILES) mpint/*.o
 	mv $@.new $@
@@ -42,7 +44,7 @@ mpint/mpint.a :
 	$(SHELL) -ec 'cd mpint; $(MAKE)'
 
 tidy : .FORCE
-	-rm -f *.o *.d *~ .gdb* *.stackdump *.c *.new
+	-rm -f *.o *.d *~ .gdb* *.stackdump $(FILES:.o=.c) *.new
 
 clean : tidy
 	-rm -f $(FILES) objects.a test
