@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-09 12:54:01 by piumarta on emilia
+  Last edited: 2008-06-10 07:54:25 by piumarta on emilia
 "
 
 { import: Objects }
@@ -27,6 +27,7 @@ LinkedList last		[ ^lastLink ]
 
 LinkedList addFirst: aLink
 [
+    aLink reset.
     firstLink isNil ifTrue: [^firstLink := lastLink := aLink].
     firstLink prevLink: aLink.
     aLink     nextLink: firstLink.
@@ -36,6 +37,7 @@ LinkedList addFirst: aLink
 
 LinkedList addLast: aLink
 [
+    aLink reset.
     lastLink isNil ifTrue: [^firstLink := lastLink := aLink].
     lastLink nextLink: aLink.
     aLink    prevLink: lastLink.
@@ -50,6 +52,7 @@ LinkedList add: aLink
 
 LinkedList add: aLink before: anotherLink
 [
+    aLink reset.
     anotherLink == firstLink
 	ifTrue:
 	   [aLink nextLink: anotherLink.
@@ -65,6 +68,7 @@ LinkedList add: aLink before: anotherLink
 
 LinkedList add: aLink after: anotherLink
 [
+    aLink reset.
     anotherLink == lastLink
 	ifTrue:
 	   [aLink prevLink: anotherLink.
