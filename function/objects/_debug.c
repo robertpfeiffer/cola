@@ -313,9 +313,9 @@ static void enterDebugger(void)
 	{
 	  int   argc;
 	  char *argv[32];
-	  for (argc= 0;  (argv[argc]= strsep(&line, " \t"));  ++argc)
+	  for (argc= 0;  (argv[argc]= strsep(&line, " \t"));)
 	    if (*argv[argc])
-	      if (argc > (sizeof(argv) / sizeof(argv[0]) - 1))
+	      if (++argc >= (sizeof(argv) / sizeof(argv[0]) - 1))
 		break;
 	  if (argc)
 	    {
