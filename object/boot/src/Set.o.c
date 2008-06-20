@@ -485,8 +485,8 @@ static oop Set__findElementOrNil_(oop v__closure, oop v_stateful_self, oop v_sel
   _1= 0;
   _2= v_index;
   _3= l_10;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l3;
  {
@@ -525,8 +525,8 @@ static oop b_14(oop v__closure, oop v__self, oop v_index)
  {
   _2= v_element;
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2];  /* anObject */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l5:;
@@ -565,8 +565,8 @@ static oop b_15(oop v__closure, oop v__self, oop v_index)
  {
   _2= v_element;
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2];  /* anObject */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l7:;
@@ -611,10 +611,10 @@ static oop Set__scanFor_(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _1= _sendv(s__5c_5c, 2, _1, _2);
   _2= l_13;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_start= _1;
   _1= v_start;
@@ -658,10 +658,10 @@ static oop Set__atNewIndex_put_(oop v__closure, oop v_stateful_self, oop v_self,
   _1= ((struct t_Set *)v_stateful_self)->v_tally;
   _2= l_18;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Set *)v_stateful_self)->v_tally= _1;
   _1= v_self;
@@ -689,10 +689,10 @@ static oop Set__fullCheck(oop v__closure, oop v_stateful_self, oop v_self)
   _2=_sendv(s_size, 1, _2);
   _3= ((struct t_Set *)v_stateful_self)->v_tally;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_20;
   _4= ((struct t_Set *)v_stateful_self)->v_array;
@@ -702,8 +702,8 @@ static oop Set__fullCheck(oop v__closure, oop v_stateful_self, oop v_self)
   _4= _sendv(s__2f_2f, 2, _4, _5);
   _line(90);
   _3=_sendv(s_max_, 2, _3, _4);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l8;
  {
@@ -781,10 +781,10 @@ static oop Set__grow(oop v__closure, oop v_stateful_self, oop v_self)
   _line(101);
   _3=_sendv(s_growSize, 1, _3);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(101);
   _1=_sendv(s_new_, 2, _1, _2);
@@ -824,10 +824,10 @@ static oop Set__noCheckAdd_(oop v__closure, oop v_stateful_self, oop v_self, oop
   _1= ((struct t_Set *)v_stateful_self)->v_tally;
   _2= l_27;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Set *)v_stateful_self)->v_tally= _1;
   _1= v_self;
@@ -875,10 +875,10 @@ static oop Set__remove_ifAbsent_(oop v__closure, oop v_stateful_self, oop v_self
   _1= ((struct t_Set *)v_stateful_self)->v_tally;
   _2= l_29;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_Set *)v_stateful_self)->v_tally= _1;
   _1= v_self;
@@ -925,8 +925,8 @@ static oop Set__fixCollisionsFrom_(oop v__closure, oop v_stateful_self, oop v_se
   _1= 0;
   _2= v_oldIndex;
   _3= v_newIndex;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l13;
  {
@@ -943,8 +943,8 @@ static oop Set__fixCollisionsFrom_(oop v__closure, oop v_stateful_self, oop v_se
   /* ifTrue:ifFalse: */
   _1= v_oldIndex;
   _2= v_length;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l14;
  {
@@ -957,10 +957,10 @@ static oop Set__fixCollisionsFrom_(oop v__closure, oop v_stateful_self, oop v_se
   _1= v_oldIndex;
   _2= l_31;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_oldIndex= _1;
  }
@@ -1051,8 +1051,8 @@ static oop Set__do_(oop v__closure, oop v_stateful_self, oop v_self, oop v_unary
   _1= 0;
   _2= ((struct t_Set *)v_stateful_self)->v_tally;
   _3= l_35;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l17;
  {
@@ -1091,8 +1091,8 @@ static oop Set__like_(oop v__closure, oop v_stateful_self, oop v_self, oop v_anO
   _1= 0;
   _2= v_index;
   _3= l_38;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (_2) goto _l18;
  {

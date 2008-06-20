@@ -377,8 +377,8 @@ static oop PositionableStream__atEnd(oop v__closure, oop v_stateful_self, oop v_
   _line(39);
   _1= ((struct t_PositionableStream *)v_stateful_self)->v_position;
   _2= ((struct t_PositionableStream *)v_stateful_self)->v_readLimit;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 >= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 >= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e_3d, 2, _1, _2);
   _leave();
   return _1;
@@ -428,10 +428,10 @@ static oop PositionableStream__skip_(oop v__closure, oop v_stateful_self, oop v_
   _2= ((struct t_PositionableStream *)v_stateful_self)->v_position;
   _3= v_anInteger;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(63);
   _1=_sendv(s_position_, 2, _1, _2);
@@ -507,10 +507,10 @@ static oop PositionableStream__peek(oop v__closure, oop v_stateful_self, oop v_s
   _1= ((struct t_PositionableStream *)v_stateful_self)->v_position;
   _2= l_14;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_PositionableStream *)v_stateful_self)->v_position= _1;
   _1= v_nextObject;

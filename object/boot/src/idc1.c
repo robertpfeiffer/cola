@@ -1305,8 +1305,8 @@ void __id__init__(struct __libid *__libid)
   _line(47);
   _2=_sendv(s_size, 1, _2);
   _3= l_31;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l1;
  {
@@ -1322,8 +1322,8 @@ void __id__init__(struct __libid *__libid)
   _line(48);
   _2=_sendv(s_size, 1, _2);
   _3= l_31;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l2;
  {

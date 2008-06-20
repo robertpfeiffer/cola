@@ -1019,18 +1019,18 @@ static oop Float__abs(oop v__closure, oop v_stateful_self, oop v_self)
   /* ifTrue:ifFalse: */
   _1= v_self;
   _2= l_36;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l11;
  {
   _1= l_36;
   _2= v_self;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
  }
   goto _l12;
@@ -1053,10 +1053,10 @@ static oop Float__negated(oop v__closure, oop v_stateful_self, oop v_self)
   _1= l_38;
   _2= v_self;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   _leave();
   return _1;

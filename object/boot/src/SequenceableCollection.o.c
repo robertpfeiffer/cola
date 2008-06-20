@@ -416,20 +416,20 @@ static oop b_6(oop v__closure, oop v__self, oop v_prev, oop v_elt)
   _1= v_prev;
   _2= l_8;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _2= v_elt;
   _line(35);
   _2=_sendv(s_hash, 1, _2);
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)(((int)_1 ^ (int)_2) | 1);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)(((long)_1 ^ (long)_2) | 1);
   } else _1= _sendv(s_bitXor_, 2, _1, _2);
   _2= l_7;
-  if ((1 & (int)_1) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -448,8 +448,8 @@ static oop SequenceableCollection__hash(oop v__closure, oop v_stateful_self, oop
   _line(33);
   _1=_sendv(s_size, 1, _1);
   _2= l_4;
-  if (1 & (int)_1) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
   if (!_1) goto _l1;
  {
@@ -468,10 +468,10 @@ static oop SequenceableCollection__hash(oop v__closure, oop v_stateful_self, oop
   _2=_sendv(s_size, 1, _2);
   _3= l_5;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   _3= v_self;
   _line(35);
@@ -479,10 +479,10 @@ static oop SequenceableCollection__hash(oop v__closure, oop v_stateful_self, oop
   _line(35);
   _3=_sendv(s_identityHash, 1, _3);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= l_6;
   _line(35);
@@ -490,8 +490,8 @@ static oop SequenceableCollection__hash(oop v__closure, oop v_stateful_self, oop
  }
  _l2:;
   _2= l_7;
-  if ((1 & (int)_1) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -509,8 +509,8 @@ static oop b_10(oop v__closure, oop v__self, oop v_a, oop v_b)
   _1= 0;
   _2= v_a;
   _3= v_b;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l3;
  {
@@ -811,8 +811,8 @@ static oop b_31(oop v__closure, oop v__self, oop v_i)
   _4= v_i;
   _line(66);
   _3=_sendv(s_at_, 2, _3, _4);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l8;
  {
@@ -875,10 +875,10 @@ static oop SequenceableCollection__from_to_put_(oop v__closure, oop v_stateful_s
   _1= v_pos;
   _2= l_33;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_pos= _1;
  }
@@ -886,8 +886,8 @@ static oop SequenceableCollection__from_to_put_(oop v__closure, oop v_stateful_s
  {
   _1= v_pos;
   _2= v_last;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 <= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 <= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c_3d, 2, _1, _2);
  }
   if (_1) goto _l9;
@@ -1018,10 +1018,10 @@ static oop SequenceableCollection___2c(oop v__closure, oop v_stateful_self, oop 
   _line(90);
   _3=_sendv(s_size, 1, _3);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(90);
   _1=_sendv(s_new_, 2, _1, _2);
@@ -1037,10 +1037,10 @@ static oop SequenceableCollection___2c(oop v__closure, oop v_stateful_self, oop 
   _2=_sendv(s_size, 1, _2);
   _3= l_41;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= v_self;
   _line(92);
@@ -1049,10 +1049,10 @@ static oop SequenceableCollection___2c(oop v__closure, oop v_stateful_self, oop 
   _line(92);
   _4=_sendv(s_size, 1, _4);
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3 & (int)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _4= v_aCollection;
   _sendv(s_replaceFrom_to_with_, 4, _1, _2, _3, _4);
@@ -1136,10 +1136,10 @@ static oop b_46(oop v__closure, oop v__self, oop v_index)
   _1= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[4];  /* startIndex */
   _2= l_47;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[4]= _1;  /* startIndex */
   _leave();
@@ -1189,17 +1189,17 @@ static oop SequenceableCollection__copyFrom_to_(oop v__closure, oop v_stateful_s
   _1= v_stop;
   _2= v_start;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   _2= l_49;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_newSize= _1;
   _1= v_self;
@@ -1280,17 +1280,17 @@ static oop SequenceableCollection__collect_startingAt_(oop v__closure, oop v_sta
   _2=_sendv(s_size, 1, _2);
   _3= v_offset;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_52;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(138);
   _1=_sendv(s_new_, 2, _1, _2);
@@ -1391,8 +1391,8 @@ static oop b_58(oop v__closure, oop v__self, oop v_element, oop v_index)
   _line(155);
   _2=_sendv(s_at_, 2, _2, _3);
   _3= v_element;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l12;
  {
@@ -1428,8 +1428,8 @@ static oop SequenceableCollection__beginsWith_(oop v__closure, oop v_stateful_se
   _3= v_prefix;
   _line(154);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l13;
  {
@@ -1467,10 +1467,10 @@ static oop b_61(oop v__closure, oop v__self, oop v_index)
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[3];  /* start */
   _4= v_index;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3 & (int)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _line(165);
   _2=_sendv(s_at_, 2, _2, _3);
@@ -1478,8 +1478,8 @@ static oop b_61(oop v__closure, oop v__self, oop v_index)
   _4= v_index;
   _line(165);
   _3=_sendv(s_at_, 2, _3, _4);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l14;
  {
@@ -1516,8 +1516,8 @@ static oop SequenceableCollection__endsWith_(oop v__closure, oop v_stateful_self
   _3= ((oop *)_state1)[4];  /* suffix */
   _line(163);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l15;
  {
@@ -1533,10 +1533,10 @@ static oop SequenceableCollection__endsWith_(oop v__closure, oop v_stateful_self
   _line(164);
   _2=_sendv(s_size, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((oop *)_state1)[3]= _1;  /* start */
   _1= l_60;
@@ -1581,10 +1581,10 @@ static oop SequenceableCollection__withoutSuffix_(oop v__closure, oop v_stateful
   _line(172);
   _4=_sendv(s_size, 1, _4);
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_3 & (int)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2d, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2d, 2, _3, _4);
   }
   _line(172);
   _1=_sendv(s_copyFrom_to_, 3, _1, _2, _3);

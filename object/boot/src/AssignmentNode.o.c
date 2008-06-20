@@ -368,10 +368,10 @@ static oop AssignmentNode__println_(oop v__closure, oop v_stateful_self, oop v_s
   _2= v_indent;
   _3= l_6;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(52);
   _1=_sendv(s_println_, 2, _1, _2);
@@ -379,10 +379,10 @@ static oop AssignmentNode__println_(oop v__closure, oop v_stateful_self, oop v_s
   _2= v_indent;
   _3= l_6;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(53);
   _1=_sendv(s_println_, 2, _1, _2);

@@ -462,17 +462,17 @@ static oop OrderedCollection__size(oop v__closure, oop v_stateful_self, oop v_se
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   _2= l_8;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -496,10 +496,10 @@ static oop OrderedCollection__reset(oop v__closure, oop v_stateful_self, oop v_s
   ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex= _1;
   _2= l_11;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex= _1;
   _1= v_self;
@@ -519,32 +519,32 @@ static oop OrderedCollection__at_(oop v__closure, oop v_stateful_self, oop v_sel
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _2= v_anInteger;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _2= l_13;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   v_position= _1;
   /* ifTrue:ifFalse: */
   /* or: */
   _1= v_anInteger;
   _2= l_13;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (_1) goto _l3;
  {
   _1= v_position;
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
  _l3:;
@@ -580,32 +580,32 @@ static oop OrderedCollection__at_put_(oop v__closure, oop v_stateful_self, oop v
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _2= v_anInteger;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _2= l_15;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   v_position= _1;
   /* ifTrue:ifFalse: */
   /* or: */
   _1= v_anInteger;
   _2= l_15;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (_1) goto _l6;
  {
   _1= v_position;
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
  _l6:;
@@ -656,8 +656,8 @@ static oop OrderedCollection__addFirst_(oop v__closure, oop v_stateful_self, oop
   _1= 0;
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _3= l_18;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l7;
  {
@@ -670,10 +670,10 @@ static oop OrderedCollection__addFirst_(oop v__closure, oop v_stateful_self, oop
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _3= l_18;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex= _2;
   _3= v_anObject;
@@ -697,8 +697,8 @@ static oop OrderedCollection__addLast_(oop v__closure, oop v_stateful_self, oop 
   _3= ((struct t_OrderedCollection *)v_stateful_self)->v_array;
   _line(73);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l8;
  {
@@ -711,10 +711,10 @@ static oop OrderedCollection__addLast_(oop v__closure, oop v_stateful_self, oop 
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
   _3= l_20;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex= _2;
   _3= v_anObject;
@@ -750,10 +750,10 @@ static oop OrderedCollection__removeFirst(oop v__closure, oop v_stateful_self, o
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _2= l_22;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex= _1;
   _1= v_first;
@@ -787,10 +787,10 @@ static oop OrderedCollection__removeLast(oop v__closure, oop v_stateful_self, oo
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
   _2= l_24;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex= _1;
   _1= v_last;
@@ -832,8 +832,8 @@ static oop OrderedCollection__copyFrom_to_(oop v__closure, oop v_stateful_self, 
   _1= 0;
   _2= v_last;
   _3= v_first;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l9;
  {
@@ -853,17 +853,17 @@ static oop OrderedCollection__copyFrom_to_(oop v__closure, oop v_stateful_self, 
   _2= v_last;
   _3= l_27;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= v_first;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _line(101);
   _1=_sendv(s_new_, 2, _1, _2);
@@ -897,10 +897,10 @@ static oop b_31(oop v__closure, oop v__self, oop v_offset)
   _3= ((struct t_OrderedCollection *)((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2])->v_firstIndex;  /* firstIndex */
   _4= v_offset;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3 & (int)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _line(108);
   _2=_sendv(s_at_, 2, _2, _3);
@@ -925,10 +925,10 @@ static oop OrderedCollection__do_(oop v__closure, oop v_stateful_self, oop v_sel
   _2= ((struct t_OrderedCollection *)((oop *)_state1)[2])->v_lastIndex;  /* lastIndex */
   _3= ((struct t_OrderedCollection *)((oop *)_state1)[2])->v_firstIndex;  /* firstIndex */
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   /* Scope('offset'->ArgumentVariableNode) */
   /* Scope('self'->ArgumentVariableNode 'firstIndex'->SlotVariableNode 'lastIndex'->SlotVariableNode 'unaryBlock'->ArgumentVariableNode 'stateful_self'->ArgumentVariableNode 'array'->SlotVariableNode) */
@@ -957,20 +957,20 @@ static oop b_34(oop v__closure, oop v__self, oop v_offset)
   _3= ((struct t_OrderedCollection *)((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2])->v_firstIndex;  /* firstIndex */
   _4= v_offset;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3 & (int)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _line(113);
   _2=_sendv(s_at_, 2, _2, _3);
   _3= v_offset;
   _4= l_35;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _line(113);
   _1=_sendv(s_value_value_, 3, _1, _2, _3);
@@ -993,10 +993,10 @@ static oop OrderedCollection__doWithIndex_(oop v__closure, oop v_stateful_self, 
   _2= ((struct t_OrderedCollection *)((oop *)_state1)[2])->v_lastIndex;  /* lastIndex */
   _3= ((struct t_OrderedCollection *)((oop *)_state1)[2])->v_firstIndex;  /* firstIndex */
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   /* Scope('offset'->ArgumentVariableNode) */
   /* Scope('stateful_self'->ArgumentVariableNode 'self'->ArgumentVariableNode 'firstIndex'->SlotVariableNode 'lastIndex'->SlotVariableNode 'binaryBlock'->ArgumentVariableNode 'array'->SlotVariableNode) */
@@ -1039,8 +1039,8 @@ static oop OrderedCollection__makeRoomAtFirst(oop v__closure, oop v_stateful_sel
   _line(128);
   _2=_sendv(s_size, 1, _2);
   _3= l_37;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
  }
  _l11:;
@@ -1060,16 +1060,16 @@ static oop OrderedCollection__makeRoomAtFirst(oop v__closure, oop v_stateful_sel
   _2=_sendv(s_size, 1, _2);
   _3= l_38;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   _3= ((struct t_OrderedCollection *)v_stateful_self)->v_array;
   _line(129);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l12;
  {
@@ -1090,28 +1090,28 @@ static oop OrderedCollection__makeRoomAtFirst(oop v__closure, oop v_stateful_sel
   _2=_sendv(s_size, 1, _2);
   _3= v_delta;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(131);
   _1=_sendv(s_new_, 2, _1, _2);
   _2= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _3= v_delta;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
   _4= v_delta;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3 & (int)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _4= ((struct t_OrderedCollection *)v_stateful_self)->v_array;
   _5= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
@@ -1123,19 +1123,19 @@ static oop OrderedCollection__makeRoomAtFirst(oop v__closure, oop v_stateful_sel
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex;
   _2= v_delta;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex= _1;
   _1= ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex;
   _2= v_delta;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex= _1;
   _1= v_self;
@@ -1167,8 +1167,8 @@ static oop OrderedCollection__makeRoomAtLast(oop v__closure, oop v_stateful_self
   _line(139);
   _2=_sendv(s_size, 1, _2);
   _3= l_40;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
  }
  _l14:;
@@ -1188,16 +1188,16 @@ static oop OrderedCollection__makeRoomAtLast(oop v__closure, oop v_stateful_self
   _2=_sendv(s_size, 1, _2);
   _3= l_41;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   _3= ((struct t_OrderedCollection *)v_stateful_self)->v_array;
   _line(140);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l15;
  {
@@ -1216,10 +1216,10 @@ static oop OrderedCollection__makeRoomAtLast(oop v__closure, oop v_stateful_self
   _line(141);
   _3=_sendv(s_growSize, 1, _3);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(141);
   _1=_sendv(s_new_, 2, _1, _2);
@@ -1252,10 +1252,10 @@ static oop b_44(oop v__closure, oop v__self, oop v_index)
   _4= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2];  /* delta */
   _5= v_index;
   {
-    int _l= (int)_4 >> 1;
-    int _r= (int)_5 >> 1;
+    int _l= (long)_4 >> 1;
+    int _r= (long)_5 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_4 & (int)_5) && ((_s ^ (_s << 1)) >= 0))  _4= (oop)(_s << 1 | 1);  else _4= _sendv(s__2b, 2, _4, _5);
+    if ((1 & (long)_4 & (long)_5) && ((_s ^ (_s << 1)) >= 0))  _4= (oop)(long)(_s << 1 | 1);  else _4= _sendv(s__2b, 2, _4, _5);
   }
   _line(150);
   _3=_sendv(s_at_, 2, _3, _4);
@@ -1278,10 +1278,10 @@ static oop OrderedCollection__shiftToBeginning(oop v__closure, oop v_stateful_se
   _1= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_firstIndex;  /* firstIndex */
   _2= l_43;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((oop *)_state1)[2]= _1;  /* delta */
   _1= l_43;
@@ -1299,19 +1299,19 @@ static oop OrderedCollection__shiftToBeginning(oop v__closure, oop v_stateful_se
   _1= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_firstIndex;  /* firstIndex */
   _2= ((oop *)_state1)[2];  /* delta */
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_firstIndex= _1;  /* firstIndex */
   _1= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_lastIndex;  /* lastIndex */
   _2= ((oop *)_state1)[2];  /* delta */
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_lastIndex= _1;  /* lastIndex */
   _1= v_self;
@@ -1332,10 +1332,10 @@ static oop b_46(oop v__closure, oop v__self, oop v_index)
   _2= v_index;
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2];  /* delta */
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= ((struct t_OrderedCollection *)((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[1])->v_array;  /* array */
   _4= v_index;
@@ -1362,10 +1362,10 @@ static oop OrderedCollection__shiftToEnd(oop v__closure, oop v_stateful_self, oo
   _1=_sendv(s_size, 1, _1);
   _2= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_lastIndex;  /* lastIndex */
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((oop *)_state1)[2]= _1;  /* delta */
   _1= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_lastIndex;  /* lastIndex */
@@ -1381,19 +1381,19 @@ static oop OrderedCollection__shiftToEnd(oop v__closure, oop v_stateful_self, oo
   _1= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_firstIndex;  /* firstIndex */
   _2= ((oop *)_state1)[2];  /* delta */
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_firstIndex= _1;  /* firstIndex */
   _1= ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_lastIndex;  /* lastIndex */
   _2= ((oop *)_state1)[2];  /* delta */
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)((oop *)_state1)[1])->v_lastIndex= _1;  /* lastIndex */
   _1= v_self;
@@ -1425,10 +1425,10 @@ static oop OrderedCollection__resetToBegining(oop v__closure, oop v_stateful_sel
   ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex= _1;
   _2= l_49;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex= _1;
   _1= v_self;
@@ -1449,10 +1449,10 @@ static oop OrderedCollection__resetToEnd(oop v__closure, oop v_stateful_self, oo
   ((struct t_OrderedCollection *)v_stateful_self)->v_lastIndex= _1;
   _2= l_51;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_OrderedCollection *)v_stateful_self)->v_firstIndex= _1;
   _1= v_self;

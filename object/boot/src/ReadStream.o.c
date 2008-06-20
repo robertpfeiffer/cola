@@ -308,10 +308,10 @@ static oop ReadStream__next(oop v__closure, oop v_stateful_self, oop v_self)
   _2= ((struct t_ReadStream *)v_stateful_self)->v_position;
   _3= l_2;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   ((struct t_ReadStream *)v_stateful_self)->v_position= _2;
   _line(31);
@@ -337,10 +337,10 @@ static oop ReadStream__next_(oop v__closure, oop v_stateful_self, oop v_self, oo
   _1= ((struct t_ReadStream *)v_stateful_self)->v_position;
   _2= v_anInteger;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _2= ((struct t_ReadStream *)v_stateful_self)->v_readLimit;
   _line(39);
@@ -350,10 +350,10 @@ static oop ReadStream__next_(oop v__closure, oop v_stateful_self, oop v_self, oo
   _2= ((struct t_ReadStream *)v_stateful_self)->v_position;
   _3= l_4;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= v_lastPosition;
   _line(40);

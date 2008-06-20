@@ -1079,10 +1079,10 @@ static oop String__escaped(oop v__closure, oop v_stateful_self, oop v_self)
   _3=_sendv(s_size, 1, _3);
   _4= l_41;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2a, 2, _3, _4);
+    if ((1 & (long)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2a, 2, _3, _4);
   }
   _line(231);
   _2=_sendv(s_new_, 2, _2, _3);

@@ -540,8 +540,8 @@ static oop String___3c(oop v__closure, oop v_stateful_self, oop v_self, oop v_aS
   /* or: */
   _1= v_cmp;
   _2= l_13;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (_1) goto _l2;
  {
@@ -557,8 +557,8 @@ static oop String___3c(oop v__closure, oop v_stateful_self, oop v_self, oop v_aS
   _2= v_aString;
   _line(64);
   _2=_sendv(s_size, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
  _l3:;
@@ -665,8 +665,8 @@ static oop String___3e(oop v__closure, oop v_stateful_self, oop v_self, oop v_aS
   /* or: */
   _1= v_cmp;
   _2= l_17;
-  if (1 & (int)_1) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
   if (_1) goto _l7;
  {
@@ -682,8 +682,8 @@ static oop String___3e(oop v__closure, oop v_stateful_self, oop v_self, oop v_aS
   _2= v_aString;
   _line(78);
   _2=_sendv(s_size, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
  _l8:;
@@ -703,15 +703,15 @@ static oop String___3c_3d(oop v__closure, oop v_stateful_self, oop v_self, oop v
   /* or: */
   _1= v_self;
   _2= v_aString;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (_1) goto _l9;
  {
   _1= v_self;
   _2= v_aString;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
  _l9:;
@@ -729,15 +729,15 @@ static oop String___3e_3d(oop v__closure, oop v_stateful_self, oop v_self, oop v
   /* or: */
   _1= v_self;
   _2= v_aString;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (_1) goto _l10;
  {
   _1= v_self;
   _2= v_aString;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
  _l10:;

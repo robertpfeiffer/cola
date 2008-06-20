@@ -274,8 +274,8 @@ static oop Magnitude__min_(oop v__closure, oop v_stateful_self, oop v_self, oop 
   /* ifTrue:ifFalse: */
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l1;
  {
@@ -301,8 +301,8 @@ static oop Magnitude__max_(oop v__closure, oop v_stateful_self, oop v_self, oop 
   /* ifTrue:ifFalse: */
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l3;
  {
@@ -328,15 +328,15 @@ static oop Magnitude__between_and_(oop v__closure, oop v_stateful_self, oop v_se
   /* and: */
   _1= v_self;
   _2= v_lower;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 >= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 >= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e_3d, 2, _1, _2);
   if (!_1) goto _l5;
  {
   _1= v_self;
   _2= v_upper;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 <= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 <= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c_3d, 2, _1, _2);
  }
  _l5:;
@@ -369,15 +369,15 @@ static oop Magnitude___3c_3d(oop v__closure, oop v_stateful_self, oop v_self, oo
   /* or: */
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (_1) goto _l6;
  {
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
  _l6:;
@@ -394,8 +394,8 @@ static oop Magnitude___7e_3d(oop v__closure, oop v_stateful_self, oop v_self, oo
   _line(35);
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   _line(35);
   _1=_sendv(s_not, 1, _1);
@@ -412,8 +412,8 @@ static oop Magnitude___3e_3d(oop v__closure, oop v_stateful_self, oop v_self, oo
   _line(36);
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   _line(36);
   _1=_sendv(s_not, 1, _1);
@@ -430,8 +430,8 @@ static oop Magnitude___3e(oop v__closure, oop v_stateful_self, oop v_self, oop v
   _line(37);
   _1= v_self;
   _2= v_aMagnitude;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 <= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 <= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c_3d, 2, _1, _2);
   _line(37);
   _1=_sendv(s_not, 1, _1);

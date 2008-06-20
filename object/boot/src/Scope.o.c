@@ -519,10 +519,10 @@ static oop Scope__withOuter_(oop v__closure, oop v_stateful_self, oop v_self, oo
   _1=_sendv(s_tag, 1, _1);
   _2= l_4;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Scope *)v_stateful_self)->v_tag= _1;
   _1= v_self;
@@ -628,10 +628,10 @@ static oop Scope__increaseLevel(oop v__closure, oop v_stateful_self, oop v_self)
   _1= ((struct t_Scope *)v_stateful_self)->v_level;
   _2= l_13;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Scope *)v_stateful_self)->v_level= _1;
   _1= v_self;
@@ -660,10 +660,10 @@ static oop Scope__nextOffset(oop v__closure, oop v_stateful_self, oop v_self)
   _1= ((struct t_Scope *)v_stateful_self)->v_lastOffset;
   _2= l_16;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Scope *)v_stateful_self)->v_lastOffset= _1;
   _leave();
@@ -813,10 +813,10 @@ static oop b_28(oop v__closure, oop v__self, oop v_var)
   _1= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[1];  /* size */
   _2= l_29;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[1]= _1;  /* size */
  }
@@ -1131,10 +1131,10 @@ static oop Scope__declareArgument_position_(oop v__closure, oop v_stateful_self,
   _2= ((struct t_Scope *)v_stateful_self)->v_argumentCount;
   _3= l_38;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   ((struct t_Scope *)v_stateful_self)->v_argumentCount= _2;
   _line(163);
@@ -1173,10 +1173,10 @@ static oop Scope__declareTemporary_position_(oop v__closure, oop v_stateful_self
   _2= ((struct t_Scope *)v_stateful_self)->v_temporaryCount;
   _3= l_40;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   ((struct t_Scope *)v_stateful_self)->v_temporaryCount= _2;
   _line(170);

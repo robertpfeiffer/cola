@@ -1292,10 +1292,10 @@ static oop Dictionary__noCheckAdd_(oop v__closure, oop v_stateful_self, oop v_se
   _1= ((struct t_Dictionary *)v_stateful_self)->v_tally;
   _2= l_42;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Dictionary *)v_stateful_self)->v_tally= _1;
   _1= v_self;
@@ -1377,8 +1377,8 @@ static oop b_47(oop v__closure, oop v__self, oop v_index)
   _line(209);
   _2=_sendv(s_key, 1, _2);
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[3];  /* anObject */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l14:;
@@ -1417,8 +1417,8 @@ static oop b_48(oop v__closure, oop v__self, oop v_index)
   _line(213);
   _2=_sendv(s_key, 1, _2);
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[3];  /* anObject */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l16:;
@@ -1461,10 +1461,10 @@ static oop Dictionary__scanFor_(oop v__closure, oop v_stateful_self, oop v_self,
   _1= _sendv(s__5c_5c, 2, _1, _2);
   _2= l_46;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_start= _1;
   _1= ((struct t_Dictionary *)((oop *)_state1)[1])->v_array;  /* array */
@@ -1485,10 +1485,10 @@ static oop Dictionary__scanFor_(oop v__closure, oop v_stateful_self, oop v_self,
   _2= v_start;
   _3= l_46;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   /* Scope('index'->ArgumentVariableNode) */
   /* Scope('finish'->TemporaryVariableNode 'element'->TemporaryVariableNode 'tally'->SlotVariableNode 'start'->TemporaryVariableNode 'stateful_self'->ArgumentVariableNode 'array'->SlotVariableNode 'self'->ArgumentVariableNode 'anObject'->ArgumentVariableNode) */
@@ -1540,8 +1540,8 @@ static oop b_51(oop v__closure, oop v__self, oop v_assoc)
   _3= v_assoc;
   _line(223);
   _3=_sendv(s_value, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l17;
  {
@@ -1588,8 +1588,8 @@ static oop Dictionary___3d(oop v__closure, oop v_stateful_self, oop v_self, oop 
   _3= ((oop *)_state1)[1];  /* aDictionary */
   _line(221);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l19;
  {
@@ -1694,10 +1694,10 @@ static oop Dictionary__removeKey_ifAbsent_(oop v__closure, oop v_stateful_self, 
   _1= ((struct t_Dictionary *)v_stateful_self)->v_tally;
   _2= l_56;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_Dictionary *)v_stateful_self)->v_tally= _1;
   _1= v_self;

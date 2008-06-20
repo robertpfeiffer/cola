@@ -922,8 +922,8 @@ static oop Scanner__xDot(oop v__closure, oop v_stateful_self, oop v_self)
   /* and: */
   _1= ((struct t_Scanner *)v_stateful_self)->v_c;
   _2= l_57;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l12;
  {
@@ -931,8 +931,8 @@ static oop Scanner__xDot(oop v__closure, oop v_stateful_self, oop v_self)
   _line(113);
   _1=_sendv(s_peek, 1, _1);
   _2= l_57;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
  _l12:;
@@ -1810,19 +1810,19 @@ static oop b_105(oop v__closure, oop v__self)
   _1= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[3];  /* char */
   _2= l_110;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _2= ((struct t_Scanner *)((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2])->v_c;  /* c */
   _line(261);
   _2=_sendv(s_digitValue, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[3]= _1;  /* char */
   _leave();
@@ -1976,10 +1976,10 @@ static oop Scanner__xBrace(oop v__closure, oop v_stateful_self, oop v_self)
   _1= v_nest;
   _2= l_117;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_nest= _1;
  }
@@ -2022,15 +2022,15 @@ static oop Scanner__xBrace(oop v__closure, oop v_stateful_self, oop v_self)
   _2= v_nest;
   _3= l_117;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   v_nest= _2;
   _3= l_118;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l75;
  {
@@ -2045,8 +2045,8 @@ static oop Scanner__xBrace(oop v__closure, oop v_stateful_self, oop v_self)
  {
   _1= v_nest;
   _2= l_118;
-  if (1 & (int)_1) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
   if (_1) goto _l68;

@@ -2432,8 +2432,8 @@ static oop CCodeGenerator__genType_sequence_method_(oop v__closure, oop v_statef
   _1= 0;
   _2= v_sequenceNumber;
   _3= l_91;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l14;
  {
@@ -2906,16 +2906,16 @@ static oop b_162(oop v__closure, oop v__self)
   /* and: */
   _1= v_ascii;
   _2= l_164;
-  if (1 & (int)_1) {
-    _1= (((int)_1 >= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 >= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e_3d, 2, _1, _2);
   if (!_1) goto _l19;
  {
   /* and: */
   _1= v_ascii;
   _2= l_165;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l20;
  {
@@ -2991,8 +2991,8 @@ static oop b_158(oop v__closure, oop v__self, oop v_char)
   _line(361);
   _1= ((oop *)_state2)[1];  /* char */
   _2= l_160;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   /* Scope() */
   /* Scope('char'->ArgumentVariableNode) */
@@ -4075,8 +4075,8 @@ static oop CCodeGenerator__genFreeState_outer_offset_(oop v__closure, oop v_stat
   /* ifTrue:ifFalse: */
   _1= v_indir;
   _2= l_305;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l34;
  {
@@ -4096,10 +4096,10 @@ static oop CCodeGenerator__genFreeState_outer_offset_(oop v__closure, oop v_stat
   _1= v_indir;
   _2= l_307;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   /* Scope() */
   /* Scope('indir'->ArgumentVariableNode 'compiler'->SlotVariableNode 'encoder'->SlotVariableNode 'stateful_self'->ArgumentVariableNode 'output'->SlotVariableNode 'firstInfoTag'->SlotVariableNode 'scopeTag'->ArgumentVariableNode 'self'->ArgumentVariableNode 'offset'->ArgumentVariableNode 'lastInfoTag'->SlotVariableNode 'nextLabel'->SlotVariableNode) */
@@ -4116,10 +4116,10 @@ static oop CCodeGenerator__genFreeState_outer_offset_(oop v__closure, oop v_stat
   _1= v_indir;
   _2= l_307;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   /* Scope() */
   /* Scope('indir'->ArgumentVariableNode 'compiler'->SlotVariableNode 'encoder'->SlotVariableNode 'stateful_self'->ArgumentVariableNode 'output'->SlotVariableNode 'firstInfoTag'->SlotVariableNode 'scopeTag'->ArgumentVariableNode 'self'->ArgumentVariableNode 'offset'->ArgumentVariableNode 'lastInfoTag'->SlotVariableNode 'nextLabel'->SlotVariableNode) */
@@ -4276,10 +4276,10 @@ static oop CCodeGenerator__send_to_withArguments_forValue_supered_(oop v__closur
   _line(609);
   _3=_sendv(s_size, 1, _3);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _sendv(s_print_, 2, _1, _2);
   _2= l_328;
@@ -4448,17 +4448,17 @@ static oop b_367(oop v__closure, oop v__self, oop v_slot, oop v_index)
   _2= v_index;
   _3= l_371;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_372;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   _line(654);
   _2=_sendv(s_printString, 1, _2);
@@ -5286,10 +5286,10 @@ static oop CCodeGenerator__createStateVector_inScope_constructor_(oop v__closure
   _2= v_size;
   _3= l_463;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _sendv(s_print_, 2, _1, _2);
   _2= l_464;
@@ -5649,10 +5649,10 @@ static oop CCodeGenerator__pushLabel(oop v__closure, oop v_stateful_self, oop v_
   _1= ((struct t_CCodeGenerator *)v_stateful_self)->v_nextLabel;
   _2= l_516;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_CCodeGenerator *)v_stateful_self)->v_nextLabel= _1;
   _leave();
@@ -5898,7 +5898,7 @@ static oop CCodeGenerator__checkTags_with_with_(oop v__closure, oop v_stateful_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info553= { "tagged:add:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 858, 879, &__info546 };
+static struct __methodinfo __info553= { "tagged:add:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 858, 872, &__info546 };
 static oop CCodeGenerator__tagged_add_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info553);
@@ -5909,7 +5909,7 @@ static oop CCodeGenerator__tagged_add_location_checking_(oop v__closure, oop v_s
   _line(858);
   _1= v_self;
   _2= l_554;
-  _line(868);
+  _line(861);
   _sendv(s_genl_, 2, _1, _2);
   _2= l_555;
   _sendv(s_gen_, 2, _1, _2);
@@ -5966,7 +5966,7 @@ static oop CCodeGenerator__tagged_add_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info571= { "tagged:sub:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 879, 900, &__info553 };
+static struct __methodinfo __info571= { "tagged:sub:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 872, 886, &__info553 };
 static oop CCodeGenerator__tagged_sub_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info571);
@@ -5974,10 +5974,10 @@ static oop CCodeGenerator__tagged_sub_location_checking_(oop v__closure, oop v_s
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(879);
+  _line(872);
   _1= v_self;
   _2= l_572;
-  _line(889);
+  _line(875);
   _sendv(s_genl_, 2, _1, _2);
   _2= l_573;
   _sendv(s_gen_, 2, _1, _2);
@@ -6034,7 +6034,7 @@ static oop CCodeGenerator__tagged_sub_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info589= { "tagged:op:selector:with:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 900, 911, &__info571 };
+static struct __methodinfo __info589= { "tagged:op:selector:with:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 886, 897, &__info571 };
 static oop CCodeGenerator__tagged_op_selector_with_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_operator, oop v_sel, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info589);
@@ -6042,10 +6042,10 @@ static oop CCodeGenerator__tagged_op_selector_with_location_checking_(oop v__clo
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(900);
+  _line(886);
   _1= v_self;
   _2= l_590;
-  _line(904);
+  _line(890);
   _sendv(s_gen_, 2, _1, _2);
   _2= l_591;
   _sendv(s_gen_, 2, _1, _2);
@@ -6100,7 +6100,7 @@ static oop CCodeGenerator__tagged_op_selector_with_location_checking_(oop v__clo
   return _1;
   _leave();
  }
-static struct __methodinfo __info602= { "tagged:mul:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 911, 930, &__info589 };
+static struct __methodinfo __info602= { "tagged:mul:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 897, 916, &__info589 };
 static oop CCodeGenerator__tagged_mul_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info602);
@@ -6108,10 +6108,10 @@ static oop CCodeGenerator__tagged_mul_location_checking_(oop v__closure, oop v_s
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(911);
+  _line(897);
   _1= v_self;
   _2= l_603;
-  _line(917);
+  _line(903);
   _sendv(s_genl_, 2, _1, _2);
   _2= l_604;
   _sendv(s_gen_, 2, _1, _2);
@@ -6170,16 +6170,16 @@ static oop CCodeGenerator__tagged_mul_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info621= { "tagged:div:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 930, 940, &__info602 };
+static struct __methodinfo __info621= { "tagged:div:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 916, 926, &__info602 };
 static oop CCodeGenerator__tagged_div_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info621);
   oop _1= 0;
   oop _2= 0;
-  _line(930);
+  _line(916);
   _1= v_self;
   _2= l_622;
-  _line(936);
+  _line(922);
   _sendv(s_gen_, 2, _1, _2);
   _2= v_loc;
   _sendv(s_genLocation_, 2, _1, _2);
@@ -6204,16 +6204,16 @@ static oop CCodeGenerator__tagged_div_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info629= { "tagged:mod:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 940, 950, &__info621 };
+static struct __methodinfo __info629= { "tagged:mod:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 926, 936, &__info621 };
 static oop CCodeGenerator__tagged_mod_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info629);
   oop _1= 0;
   oop _2= 0;
-  _line(940);
+  _line(926);
   _1= v_self;
   _2= l_630;
-  _line(946);
+  _line(932);
   _sendv(s_gen_, 2, _1, _2);
   _2= v_loc;
   _sendv(s_genLocation_, 2, _1, _2);
@@ -6238,7 +6238,7 @@ static oop CCodeGenerator__tagged_mod_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info637= { "tagged:and:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 950, 961, &__info629 };
+static struct __methodinfo __info637= { "tagged:and:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 936, 947, &__info629 };
 static oop CCodeGenerator__tagged_and_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info637);
@@ -6246,10 +6246,10 @@ static oop CCodeGenerator__tagged_and_location_checking_(oop v__closure, oop v_s
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(950);
+  _line(936);
   _1= v_self;
   _2= l_638;
-  _line(953);
+  _line(939);
   _sendv(s_gen_, 2, _1, _2);
   _2= l_639;
   _sendv(s_gen_, 2, _1, _2);
@@ -6310,7 +6310,7 @@ static oop CCodeGenerator__tagged_and_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info651= { "tagged:or:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 961, 972, &__info637 };
+static struct __methodinfo __info651= { "tagged:or:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 947, 958, &__info637 };
 static oop CCodeGenerator__tagged_or_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info651);
@@ -6318,10 +6318,10 @@ static oop CCodeGenerator__tagged_or_location_checking_(oop v__closure, oop v_st
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(961);
+  _line(947);
   _1= v_self;
   _2= l_652;
-  _line(964);
+  _line(950);
   _sendv(s_gen_, 2, _1, _2);
   _2= l_653;
   _sendv(s_gen_, 2, _1, _2);
@@ -6382,7 +6382,7 @@ static oop CCodeGenerator__tagged_or_location_checking_(oop v__closure, oop v_st
   return _1;
   _leave();
  }
-static struct __methodinfo __info665= { "tagged:xor:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 972, 983, &__info651 };
+static struct __methodinfo __info665= { "tagged:xor:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 958, 969, &__info651 };
 static oop CCodeGenerator__tagged_xor_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info665);
@@ -6390,10 +6390,10 @@ static oop CCodeGenerator__tagged_xor_location_checking_(oop v__closure, oop v_s
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(972);
+  _line(958);
   _1= v_self;
   _2= l_666;
-  _line(975);
+  _line(961);
   _sendv(s_gen_, 2, _1, _2);
   _2= l_667;
   _sendv(s_gen_, 2, _1, _2);
@@ -6454,7 +6454,7 @@ static oop CCodeGenerator__tagged_xor_location_checking_(oop v__closure, oop v_s
   return _1;
   _leave();
  }
-static struct __methodinfo __info680= { "tagged:shift:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 983, 1000, &__info665 };
+static struct __methodinfo __info680= { "tagged:shift:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 969, 986, &__info665 };
 static oop CCodeGenerator__tagged_shift_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info680);
@@ -6462,10 +6462,10 @@ static oop CCodeGenerator__tagged_shift_location_checking_(oop v__closure, oop v
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(983);
+  _line(969);
   _1= v_self;
   _2= l_681;
-  _line(986);
+  _line(972);
   _sendv(s_gen_, 2, _1, _2);
   _2= v_rcv;
   _sendv(s_genLocation_, 2, _1, _2);
@@ -6526,7 +6526,7 @@ static oop CCodeGenerator__tagged_shift_location_checking_(oop v__closure, oop v
   return _1;
   _leave();
  }
-static struct __methodinfo __info700= { "tagged:left:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1000, 1017, &__info680 };
+static struct __methodinfo __info700= { "tagged:left:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 986, 1003, &__info680 };
 static oop CCodeGenerator__tagged_left_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info700);
@@ -6534,10 +6534,10 @@ static oop CCodeGenerator__tagged_left_location_checking_(oop v__closure, oop v_
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(1000);
+  _line(986);
   _1= v_self;
   _2= l_701;
-  _line(1003);
+  _line(989);
   _sendv(s_genl_, 2, _1, _2);
   _2= l_702;
   _sendv(s_gen_, 2, _1, _2);
@@ -6598,7 +6598,7 @@ static oop CCodeGenerator__tagged_left_location_checking_(oop v__closure, oop v_
   return _1;
   _leave();
  }
-static struct __methodinfo __info720= { "tagged:right:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1017, 1032, &__info700 };
+static struct __methodinfo __info720= { "tagged:right:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1003, 1018, &__info700 };
 static oop CCodeGenerator__tagged_right_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info720);
@@ -6606,10 +6606,10 @@ static oop CCodeGenerator__tagged_right_location_checking_(oop v__closure, oop v
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(1017);
+  _line(1003);
   _1= v_self;
   _2= l_721;
-  _line(1020);
+  _line(1006);
   _sendv(s_genl_, 2, _1, _2);
   _2= l_722;
   _sendv(s_gen_, 2, _1, _2);
@@ -6666,7 +6666,7 @@ static oop CCodeGenerator__tagged_right_location_checking_(oop v__closure, oop v
   return _1;
   _leave();
  }
-static struct __methodinfo __info738= { "tagged:rel:selector:with:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1032, 1043, &__info720 };
+static struct __methodinfo __info738= { "tagged:rel:selector:with:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1018, 1029, &__info720 };
 static oop CCodeGenerator__tagged_rel_selector_with_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_operator, oop v_sel, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info738);
@@ -6674,10 +6674,10 @@ static oop CCodeGenerator__tagged_rel_selector_with_location_checking_(oop v__cl
   oop _2= 0;
   oop _3= 0;
   oop _4= 0;
-  _line(1032);
+  _line(1018);
   _1= v_self;
   _2= l_739;
-  _line(1035);
+  _line(1021);
   _sendv(s_gen_, 2, _1, _2);
   _2= l_740;
   _sendv(s_gen_, 2, _1, _2);
@@ -6740,7 +6740,7 @@ static oop CCodeGenerator__tagged_rel_selector_with_location_checking_(oop v__cl
   return _1;
   _leave();
  }
-static struct __methodinfo __info754= { "tagged:lt:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1043, 1048, &__info738 };
+static struct __methodinfo __info754= { "tagged:lt:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1029, 1034, &__info738 };
 static oop CCodeGenerator__tagged_lt_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info754);
@@ -6751,7 +6751,7 @@ static oop CCodeGenerator__tagged_lt_location_checking_(oop v__closure, oop v_st
   oop _5= 0;
   oop _6= 0;
   oop _7= 0;
-  _line(1043);
+  _line(1029);
   _1= v_self;
   _2= v_rcv;
   _3= l_755;
@@ -6759,14 +6759,14 @@ static oop CCodeGenerator__tagged_lt_location_checking_(oop v__closure, oop v_st
   _5= v_arg;
   _6= v_loc;
   _7= v_tagCheck;
-  _line(1045);
+  _line(1031);
   _1=_sendv(s_tagged_rel_selector_with_location_checking_, 7, _1, _2, _3, _4, _5, _6, _7);
   _1= v_self;
   _leave();
   return _1;
   _leave();
  }
-static struct __methodinfo __info756= { "tagged:le:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1048, 1053, &__info754 };
+static struct __methodinfo __info756= { "tagged:le:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1034, 1039, &__info754 };
 static oop CCodeGenerator__tagged_le_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info756);
@@ -6777,7 +6777,7 @@ static oop CCodeGenerator__tagged_le_location_checking_(oop v__closure, oop v_st
   oop _5= 0;
   oop _6= 0;
   oop _7= 0;
-  _line(1048);
+  _line(1034);
   _1= v_self;
   _2= v_rcv;
   _3= l_757;
@@ -6785,14 +6785,14 @@ static oop CCodeGenerator__tagged_le_location_checking_(oop v__closure, oop v_st
   _5= v_arg;
   _6= v_loc;
   _7= v_tagCheck;
-  _line(1050);
+  _line(1036);
   _1=_sendv(s_tagged_rel_selector_with_location_checking_, 7, _1, _2, _3, _4, _5, _6, _7);
   _1= v_self;
   _leave();
   return _1;
   _leave();
  }
-static struct __methodinfo __info758= { "tagged:eq:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1053, 1058, &__info756 };
+static struct __methodinfo __info758= { "tagged:eq:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1039, 1044, &__info756 };
 static oop CCodeGenerator__tagged_eq_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info758);
@@ -6803,7 +6803,7 @@ static oop CCodeGenerator__tagged_eq_location_checking_(oop v__closure, oop v_st
   oop _5= 0;
   oop _6= 0;
   oop _7= 0;
-  _line(1053);
+  _line(1039);
   _1= v_self;
   _2= v_rcv;
   _3= l_759;
@@ -6811,14 +6811,14 @@ static oop CCodeGenerator__tagged_eq_location_checking_(oop v__closure, oop v_st
   _5= v_arg;
   _6= v_loc;
   _7= v_tagCheck;
-  _line(1055);
+  _line(1041);
   _1=_sendv(s_tagged_rel_selector_with_location_checking_, 7, _1, _2, _3, _4, _5, _6, _7);
   _1= v_self;
   _leave();
   return _1;
   _leave();
  }
-static struct __methodinfo __info761= { "tagged:ne:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1058, 1063, &__info758 };
+static struct __methodinfo __info761= { "tagged:ne:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1044, 1049, &__info758 };
 static oop CCodeGenerator__tagged_ne_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info761);
@@ -6829,7 +6829,7 @@ static oop CCodeGenerator__tagged_ne_location_checking_(oop v__closure, oop v_st
   oop _5= 0;
   oop _6= 0;
   oop _7= 0;
-  _line(1058);
+  _line(1044);
   _1= v_self;
   _2= v_rcv;
   _3= l_762;
@@ -6837,14 +6837,14 @@ static oop CCodeGenerator__tagged_ne_location_checking_(oop v__closure, oop v_st
   _5= v_arg;
   _6= v_loc;
   _7= v_tagCheck;
-  _line(1060);
+  _line(1046);
   _1=_sendv(s_tagged_rel_selector_with_location_checking_, 7, _1, _2, _3, _4, _5, _6, _7);
   _1= v_self;
   _leave();
   return _1;
   _leave();
  }
-static struct __methodinfo __info764= { "tagged:ge:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1063, 1068, &__info761 };
+static struct __methodinfo __info764= { "tagged:ge:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1049, 1054, &__info761 };
 static oop CCodeGenerator__tagged_ge_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info764);
@@ -6855,7 +6855,7 @@ static oop CCodeGenerator__tagged_ge_location_checking_(oop v__closure, oop v_st
   oop _5= 0;
   oop _6= 0;
   oop _7= 0;
-  _line(1063);
+  _line(1049);
   _1= v_self;
   _2= v_rcv;
   _3= l_765;
@@ -6863,14 +6863,14 @@ static oop CCodeGenerator__tagged_ge_location_checking_(oop v__closure, oop v_st
   _5= v_arg;
   _6= v_loc;
   _7= v_tagCheck;
-  _line(1065);
+  _line(1051);
   _1=_sendv(s_tagged_rel_selector_with_location_checking_, 7, _1, _2, _3, _4, _5, _6, _7);
   _1= v_self;
   _leave();
   return _1;
   _leave();
  }
-static struct __methodinfo __info766= { "tagged:gt:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1068, 1072, &__info764 };
+static struct __methodinfo __info766= { "tagged:gt:location:checking:", "CCodeGenerator", "/Users/piumarta/src/idst/object/idc/CCodeGenerator.st", 0, 1054, 1058, &__info764 };
 static oop CCodeGenerator__tagged_gt_location_checking_(oop v__closure, oop v_stateful_self, oop v_self, oop v_rcv, oop v_arg, oop v_loc, oop v_tagCheck)
  {
   _enter(&__info766);
@@ -6881,7 +6881,7 @@ static oop CCodeGenerator__tagged_gt_location_checking_(oop v__closure, oop v_st
   oop _5= 0;
   oop _6= 0;
   oop _7= 0;
-  _line(1068);
+  _line(1054);
   _1= v_self;
   _2= v_rcv;
   _3= l_767;
@@ -6889,7 +6889,7 @@ static oop CCodeGenerator__tagged_gt_location_checking_(oop v__closure, oop v_st
   _5= v_arg;
   _6= v_loc;
   _7= v_tagCheck;
-  _line(1070);
+  _line(1056);
   _1=_sendv(s_tagged_rel_selector_with_location_checking_, 7, _1, _2, _3, _4, _5, _6, _7);
   _1= v_self;
   _leave();
@@ -7485,19 +7485,19 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_547= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "(1");
   l_548= _sendv(s_size_5f_value_5f_, 3, v_Symbol, 4, "left");
   l_549= _sendv(s_size_5f_value_5f_, 3, v_Symbol, 4, "both");
-  l_550= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " & (int)");
+  l_550= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, " & (long)");
   l_551= _sendv(s_size_5f_value_5f_, 3, v_Symbol, 5, "right");
   l_552= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 1, ")");
   _libid->method(v_CCodeGenerator, s_checkTags_with_with_, (_imp_t)CCodeGenerator__checkTags_with_with_);
   l_554= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  {");
-  l_555= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _l= (int)");
+  l_555= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _l= (long)");
   l_556= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " >> 1;");
-  l_557= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _r= (int)");
+  l_557= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _r= (long)");
   l_558= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 20, "    int _s= _l + _r;");
   l_559= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, "    if (");
   l_560= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 28, " && ((_s ^ (_s << 1)) >= 0))");
   l_561= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "  ");
-  l_562= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 21, "= (oop)(_s << 1 | 1);");
+  l_562= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, "= (oop)(long)(_s << 1 | 1);");
   l_563= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "  else ");
   l_564= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "= ");
   l_565= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "_sendv(");
@@ -7508,14 +7508,14 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_570= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  }");
   _libid->method(v_CCodeGenerator, s_tagged_add_location_checking_, (_imp_t)CCodeGenerator__tagged_add_location_checking_);
   l_572= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  {");
-  l_573= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _l= (int)");
+  l_573= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _l= (long)");
   l_574= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " >> 1;");
-  l_575= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _r= (int)");
+  l_575= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _r= (long)");
   l_576= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 22, "    int _s= (_l - _r);");
   l_577= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, "    if (");
   l_578= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 28, " && ((_s ^ (_s << 1)) >= 0))");
   l_579= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "  ");
-  l_580= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 21, "= (oop)(_s << 1 | 1);");
+  l_580= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, "= (oop)(long)(_s << 1 | 1);");
   l_581= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "  else ");
   l_582= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "= ");
   l_583= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "_sendv(");
@@ -7528,9 +7528,9 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_590= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "  ");
   l_591= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "if ");
   l_592= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, " {");
-  l_593= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 16, "= (oop)(((((int)");
+  l_593= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "= (oop)(((((long)");
   l_594= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, ">> 1) ");
-  l_595= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, " ((int)");
+  l_595= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " ((long)");
   l_596= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, ">> 1)) << 1) | 1);");
   l_597= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "} else ");
   l_598= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, "= _sendv(");
@@ -7539,15 +7539,15 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_601= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ");");
   _libid->method(v_CCodeGenerator, s_tagged_op_selector_with_location_checking_, (_imp_t)CCodeGenerator__tagged_op_selector_with_location_checking_);
   l_603= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  {");
-  l_604= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _l= (int)");
+  l_604= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _l= (long)");
   l_605= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " >> 1;");
-  l_606= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _r= (int)");
+  l_606= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _r= (long)");
   l_607= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 22, "    int _s= (_l * _r);");
   l_608= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, "    if (");
   l_609= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 34, " && ((_r == 0) || (_s / _r == _l))");
   l_610= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 28, " && ((_s ^ (_s << 1)) >= 0))");
   l_611= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "  ");
-  l_612= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 21, "= (oop)(_s << 1 | 1);");
+  l_612= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, "= (oop)(long)(_s << 1 | 1);");
   l_613= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "  else ");
   l_614= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "= ");
   l_615= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "_sendv(");
@@ -7578,8 +7578,8 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_640= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 5, " && (");
   l_641= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 5, " > 0)");
   l_642= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " > 0)) {");
-  l_643= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 13, "= (oop)((int)");
-  l_644= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " & (int)");
+  l_643= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 14, "= (oop)((long)");
+  l_644= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, " & (long)");
   l_645= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ");");
   l_646= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "} else ");
   l_647= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, "= _sendv(");
@@ -7592,8 +7592,8 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_654= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 5, " && (");
   l_655= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 5, " > 0)");
   l_656= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " > 0)) {");
-  l_657= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 13, "= (oop)((int)");
-  l_658= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " | (int)");
+  l_657= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 14, "= (oop)((long)");
+  l_658= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, " | (long)");
   l_659= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ");");
   l_660= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "} else ");
   l_661= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, "= _sendv(");
@@ -7606,8 +7606,8 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_668= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 5, " && (");
   l_669= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 5, " > 0)");
   l_670= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " > 0)) {");
-  l_671= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 14, "= (oop)(((int)");
-  l_672= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, " ^ (int)");
+  l_671= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 15, "= (oop)(((long)");
+  l_672= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, " ^ (long)");
   l_673= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, ") | 1);");
   l_674= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "} else ");
   l_675= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, "= _sendv(");
@@ -7616,9 +7616,9 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_678= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ", ");
   l_679= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ");");
   _libid->method(v_CCodeGenerator, s_tagged_xor_location_checking_, (_imp_t)CCodeGenerator__tagged_xor_location_checking_);
-  l_681= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "  { int _l= (int)");
+  l_681= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "  { int _l= (long)");
   l_682= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, " >> 1, ");
-  l_683= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 10, " _r= (int)");
+  l_683= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 11, " _r= (long)");
   l_684= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 43, " _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));");
   l_685= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, "    if (");
   l_686= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 37, " && (   (    (_r >= 0) && (_r <= 31) ");
@@ -7626,7 +7626,7 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_688= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 29, " && ((_s ^ (_s << 1)) >= 0) )");
   l_689= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 31, " || ((_r < 0) && (_r >= -31)) )");
   l_690= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ") ");
-  l_691= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 21, "= (oop)(_s << 1 | 1);");
+  l_691= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, "= (oop)(long)(_s << 1 | 1);");
   l_692= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " else ");
   l_693= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "= ");
   l_694= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "_sendv(");
@@ -7637,16 +7637,16 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_699= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  }");
   _libid->method(v_CCodeGenerator, s_tagged_shift_location_checking_, (_imp_t)CCodeGenerator__tagged_shift_location_checking_);
   l_701= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 1, "{");
-  l_702= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _l= (int)");
+  l_702= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _l= (long)");
   l_703= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " >> 1,");
-  l_704= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 10, " _r= (int)");
+  l_704= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 11, " _r= (long)");
   l_705= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 16, " _s= (_l << _r);");
   l_706= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, "    if (");
   l_707= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, " && (_r >= 0) && (_r <= 31)");
   l_708= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 22, " && (_l == (_s >> _r))");
   l_709= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, " && ((_s ^ (_s << 1)) >= 0)");
   l_710= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ") ");
-  l_711= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 21, "= (oop)(_s << 1 | 1);");
+  l_711= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, "= (oop)(long)(_s << 1 | 1);");
   l_712= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " else ");
   l_713= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "= ");
   l_714= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "_sendv(");
@@ -7657,14 +7657,14 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_719= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  }");
   _libid->method(v_CCodeGenerator, s_tagged_left_location_checking_, (_imp_t)CCodeGenerator__tagged_left_location_checking_);
   l_721= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "  {");
-  l_722= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 17, "    int _l= (int)");
+  l_722= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 18, "    int _l= (long)");
   l_723= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " >> 1,");
-  l_724= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 10, " _r= (int)");
+  l_724= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 11, " _r= (long)");
   l_725= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 16, " _s= (_l >> _r);");
   l_726= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 8, "    if (");
   l_727= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, " && (_r >= 0) && (_r <= 31)");
   l_728= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, ") ");
-  l_729= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 21, "= (oop)(_s << 1 | 1);");
+  l_729= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 27, "= (oop)(long)(_s << 1 | 1);");
   l_730= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " else ");
   l_731= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "= ");
   l_732= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, "_sendv(");
@@ -7677,9 +7677,9 @@ void __id__init__CCodeGenerator(struct __libid *__libid)
   l_739= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, "  ");
   l_740= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, "if ");
   l_741= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 2, " {");
-  l_742= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 9, "= (((int)");
+  l_742= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 10, "= (((long)");
   l_743= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 1, " ");
-  l_744= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 6, " (int)");
+  l_744= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 7, " (long)");
   l_745= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 4, ") ? ");
   l_746= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 4, "true");
   l_747= _sendv(s_size_5f_value_5f_, 3, v_ImmutableString, 3, " : ");

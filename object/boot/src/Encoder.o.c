@@ -1021,10 +1021,10 @@ static oop Encoder__mangleSelector_(oop v__closure, oop v_stateful_self, oop v_s
   _2=_sendv(s_size, 1, _2);
   _3= l_20;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   _line(123);
   _1=_sendv(s_new_, 2, _1, _2);
@@ -1102,8 +1102,8 @@ static oop Encoder__mangleOther_to_(oop v__closure, oop v_stateful_self, oop v_s
   _1= 0;
   _2= v_ascii;
   _3= l_27;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l8;
  {
@@ -1337,8 +1337,8 @@ static oop Encoder__noteImplementation_in_at_(oop v__closure, oop v_stateful_sel
   _1= 0;
   _2= v_count;
   _3= l_37;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (_2) goto _l11;
  {
@@ -1363,10 +1363,10 @@ static oop Encoder__noteImplementation_in_at_(oop v__closure, oop v_stateful_sel
   _3= v_count;
   _4= l_40;
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
+    if ((1 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2b, 2, _3, _4);
   }
   _line(166);
   _1=_sendv(s_at_put_, 3, _1, _2, _3);
@@ -1723,18 +1723,18 @@ static oop Encoder__push(oop v__closure, oop v_stateful_self, oop v_self)
   _1= ((struct t_Encoder *)v_stateful_self)->v_tempCount;
   _2= l_59;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Encoder *)v_stateful_self)->v_tempCount= _1;
   /* ifTrue: */
   _1= 0;
   _2= ((struct t_Encoder *)v_stateful_self)->v_tempCount;
   _3= ((struct t_Encoder *)v_stateful_self)->v_tempMax;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l16;
  {
@@ -1759,8 +1759,8 @@ static oop Encoder__pop_(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _1= 0;
   _2= ((struct t_Encoder *)v_stateful_self)->v_tempCount;
   _3= v_count;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l17;
  {
@@ -1773,10 +1773,10 @@ static oop Encoder__pop_(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _1= ((struct t_Encoder *)v_stateful_self)->v_tempCount;
   _2= v_count;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   ((struct t_Encoder *)v_stateful_self)->v_tempCount= _1;
   _leave();
@@ -1874,10 +1874,10 @@ static oop Encoder__nextLiteralTag(oop v__closure, oop v_stateful_self, oop v_se
   _1= ((struct t_Encoder *)v_stateful_self)->v_literalTag;
   _2= l_66;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((struct t_Encoder *)v_stateful_self)->v_literalTag= _1;
   _leave();

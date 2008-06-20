@@ -430,10 +430,10 @@ static oop IdentityDictionary__scanFor_(oop v__closure, oop v_stateful_self, oop
   _1= _sendv(s__5c_5c, 2, _1, _2);
   _2= l_2;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_start= _1;
   _1= ((struct t_IdentityDictionary *)((oop *)_state1)[1])->v_array;  /* array */
@@ -454,10 +454,10 @@ static oop IdentityDictionary__scanFor_(oop v__closure, oop v_stateful_self, oop
   _2= v_start;
   _3= l_2;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   /* Scope('index'->ArgumentVariableNode) */
   /* Scope('finish'->TemporaryVariableNode 'element'->TemporaryVariableNode 'tally'->SlotVariableNode 'start'->TemporaryVariableNode 'stateful_self'->ArgumentVariableNode 'array'->SlotVariableNode 'self'->ArgumentVariableNode 'anObject'->ArgumentVariableNode) */

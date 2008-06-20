@@ -1517,8 +1517,8 @@ static oop Compiler__pragma_(oop v__closure, oop v_stateful_self, oop v_self, oo
   _line(168);
   _2=_sendv(s_size, 1, _2);
   _3= l_57;
-  if (1 & (int)_2) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l8;
  {
@@ -1529,8 +1529,8 @@ static oop Compiler__pragma_(oop v__closure, oop v_stateful_self, oop v_self, oo
   _line(170);
   _2=_sendv(s_second, 1, _2);
   _3= l_58;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l10;
  {
@@ -1633,8 +1633,8 @@ static oop Compiler__pragmaType_(oop v__closure, oop v_stateful_self, oop v_self
   _line(181);
   _2=_sendv(s_size, 1, _2);
   _3= l_65;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l12;
  {
@@ -2051,8 +2051,8 @@ static oop Compiler__addType_(oop v__closure, oop v_stateful_self, oop v_self, o
   _1= 0;
   _2= v_base;
   _3= ((oop *)_state1)[3];  /* typeNode */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (_2) goto _l29;
  {

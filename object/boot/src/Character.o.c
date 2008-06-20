@@ -976,10 +976,10 @@ static oop Character__hash(oop v__closure, oop v_stateful_self, oop v_self)
   _1= ((struct t_Character *)v_stateful_self)->v_value;
   _2= l_7;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -1026,8 +1026,8 @@ static oop Character___3c(oop v__closure, oop v_stateful_self, oop v_self, oop v
   _2= v_aCharacter;
   _line(54);
   _2=_sendv(s_asciiValue, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
  _l2:;
@@ -1052,8 +1052,8 @@ static oop Character___3e(oop v__closure, oop v_stateful_self, oop v_self, oop v
   _2= v_aCharacter;
   _line(55);
   _2=_sendv(s_asciiValue, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
  _l3:;
@@ -1073,15 +1073,15 @@ static oop Character__asUppercase(oop v__closure, oop v_stateful_self, oop v_sel
   /* and: */
   _1= l_12;
   _2= ((struct t_Character *)v_stateful_self)->v_value;
-  if (1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l6;
  {
   _1= ((struct t_Character *)v_stateful_self)->v_value;
   _2= l_13;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
  _l6:;
@@ -1091,10 +1091,10 @@ static oop Character__asUppercase(oop v__closure, oop v_stateful_self, oop v_sel
   _2= ((struct t_Character *)v_stateful_self)->v_value;
   _3= l_14;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _line(57);
   _1=_sendv(s_value_, 2, _1, _2);
@@ -1121,15 +1121,15 @@ static oop Character__asLowercase(oop v__closure, oop v_stateful_self, oop v_sel
   /* and: */
   _1= l_16;
   _2= ((struct t_Character *)v_stateful_self)->v_value;
-  if (1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l9;
  {
   _1= ((struct t_Character *)v_stateful_self)->v_value;
   _2= l_17;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
  _l9:;
@@ -1139,10 +1139,10 @@ static oop Character__asLowercase(oop v__closure, oop v_stateful_self, oop v_sel
   _2= ((struct t_Character *)v_stateful_self)->v_value;
   _3= l_18;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(58);
   _1=_sendv(s_value_, 2, _1, _2);
@@ -1184,8 +1184,8 @@ static oop Character__digitValue_(oop v__closure, oop v_stateful_self, oop v_sel
   /* ifTrue:ifFalse: */
   _2= v_anInteger;
   _3= l_21;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l10;
  {
@@ -1199,10 +1199,10 @@ static oop Character__digitValue_(oop v__closure, oop v_stateful_self, oop v_sel
  _l11:;
   _3= v_anInteger;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(63);
   _1=_sendv(s_value_, 2, _1, _2);
@@ -1224,10 +1224,10 @@ static oop Character__digitValue(oop v__closure, oop v_stateful_self, oop v_self
   _line(88);
   _3=_sendv(s_asciiValue, 1, _3);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(88);
   _1=_sendv(s_at_, 2, _1, _2);
@@ -1358,8 +1358,8 @@ static oop b_81(oop v__closure, oop v__self)
   /* ifTrue:ifFalse: */
   _1= v_digit;
   _2= l_82;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l13;
  {
@@ -1367,8 +1367,8 @@ static oop b_81(oop v__closure, oop v__self)
   _1= 0;
   _2= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2];  /* value */
   _3= l_83;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l15;
  {
@@ -1395,15 +1395,15 @@ static oop b_81(oop v__closure, oop v__self)
   /* or: */
   _2= v_digit;
   _3= l_76;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (_2) goto _l17;
  {
   _2= v_digit;
   _3= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[5];  /* base */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
  }
  _l17:;
@@ -1423,17 +1423,17 @@ static oop b_81(oop v__closure, oop v__self)
   _1= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2];  /* value */
   _2= ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[5];  /* base */
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _2= v_digit;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   ((oop *)((struct t_BlockClosure *)((struct t_BlockClosure *)v__self)->v_state))[2]= _1;  /* value */
  }
@@ -1466,8 +1466,8 @@ static oop Integer__readFrom_base_(oop v__closure, oop v_stateful_self, oop v_se
   _line(109);
   _1=_sendv(s_peek, 1, _1);
   _2= l_77;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l18;
  {
@@ -1485,8 +1485,8 @@ static oop Integer__readFrom_base_(oop v__closure, oop v_stateful_self, oop v_se
   _line(112);
   _2=_sendv(s_peek, 1, _2);
   _3= l_79;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l20;
  {

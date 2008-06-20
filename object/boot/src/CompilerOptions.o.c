@@ -408,8 +408,8 @@ static oop CompilerOptions__cacheLevel_(oop v__closure, oop v_stateful_self, oop
   _1= 0;
   _2= v_aString;
   _3= l_7;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l1;
  {
@@ -423,8 +423,8 @@ static oop CompilerOptions__cacheLevel_(oop v__closure, oop v_stateful_self, oop
   _1= 0;
   _2= v_aString;
   _3= l_9;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l2;
  {
@@ -613,8 +613,8 @@ static oop CompilerOptions__executionModel_(oop v__closure, oop v_stateful_self,
   _1= 0;
   _2= v_aString;
   _3= l_26;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l3;
  {
@@ -628,8 +628,8 @@ static oop CompilerOptions__executionModel_(oop v__closure, oop v_stateful_self,
   _1= 0;
   _2= v_aString;
   _3= l_28;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l4;
  {

@@ -369,8 +369,8 @@ static oop VariableNode__isSuper(oop v__closure, oop v_stateful_self, oop v_self
   _line(41);
   _1= ((struct t_VariableNode *)v_stateful_self)->v_name;
   _2= l_6;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   _leave();
   return _1;
@@ -396,8 +396,8 @@ static oop VariableNode__isThis(oop v__closure, oop v_stateful_self, oop v_self)
   _line(44);
   _1= ((struct t_VariableNode *)v_stateful_self)->v_name;
   _2= l_9;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   _leave();
   return _1;

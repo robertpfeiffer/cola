@@ -531,8 +531,8 @@ static oop GetOpt__parseArgument_with_(oop v__closure, oop v_stateful_self, oop 
   _line(93);
   _1=_sendv(s_first, 1, _1);
   _2= l_10;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l3;
  {
@@ -540,8 +540,8 @@ static oop GetOpt__parseArgument_with_(oop v__closure, oop v_stateful_self, oop 
   _line(93);
   _1=_sendv(s_size, 1, _1);
   _2= l_11;
-  if (1 & (int)_1) {
-    _1= (((int)_1 > (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 > (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e, 2, _1, _2);
  }
  _l3:;
@@ -641,8 +641,8 @@ static oop GetOpt__parseOption_with_(oop v__closure, oop v_stateful_self, oop v_
   _line(102);
   _1=_sendv(s_arity, 1, _1);
   _2= l_14;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l4;
  {
@@ -680,8 +680,8 @@ static oop GetOpt__applyOption_to_(oop v__closure, oop v_stateful_self, oop v_se
   _line(109);
   _1=_sendv(s_size, 1, _1);
   _2= l_18;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l6;
  {
@@ -725,8 +725,8 @@ static oop GetOpt__applyOption_to_with_(oop v__closure, oop v_stateful_self, oop
   _line(116);
   _1=_sendv(s_size, 1, _1);
   _2= l_22;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l8;
  {

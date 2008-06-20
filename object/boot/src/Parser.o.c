@@ -2288,8 +2288,8 @@ static oop Parser__parseTemporaries_(oop v__closure, oop v_stateful_self, oop v_
   _line(270);
   _2=_sendv(s_contents, 1, _2);
   _3= l_88;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l55:;
@@ -2334,8 +2334,8 @@ static oop Parser__parseSequence_(oop v__closure, oop v_stateful_self, oop v_sel
   _line(279);
   _2=_sendv(s_contents, 1, _2);
   _3= l_93;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l57:;
@@ -2385,8 +2385,8 @@ static oop Parser__parseSequence_(oop v__closure, oop v_stateful_self, oop v_sel
   _line(287);
   _2=_sendv(s_contents, 1, _2);
   _3= l_98;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l64:;
@@ -2557,8 +2557,8 @@ static oop Parser__parseBlockParameters_(oop v__closure, oop v_stateful_self, oo
   _line(307);
   _1=_sendv(s_contents, 1, _1);
   _2= l_109;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
  _l76:;
@@ -2585,8 +2585,8 @@ static oop Parser__parseBlockParameters_(oop v__closure, oop v_stateful_self, oo
   _line(310);
   _2=_sendv(s_contents, 1, _2);
   _3= l_111;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l78:;
@@ -3311,8 +3311,8 @@ static oop Parser__parseMethod_(oop v__closure, oop v_stateful_self, oop v_self,
   _line(434);
   _2=_sendv(s_contents, 1, _2);
   _3= l_156;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l120:;

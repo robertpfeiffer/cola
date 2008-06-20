@@ -390,8 +390,8 @@ static oop Integer___2f(oop v__closure, oop v_stateful_self, oop v_self, oop v_a
   _line(39);
   _1=_sendv(s_at_, 2, _1, _2);
   _2= l_7;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l2;
  {
@@ -444,8 +444,8 @@ static oop Integer__print(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= v_self;
   _3= l_11;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l4;
  {
@@ -459,10 +459,10 @@ static oop Integer__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(49);
   _2=_sendv(s_print, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -472,8 +472,8 @@ static oop Integer__print(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= v_self;
   _3= l_14;
-  if (1 & (int)_2) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l5;
  {
@@ -484,10 +484,10 @@ static oop Integer__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(50);
   _2=_sendv(s_print, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_n= _1;
  }
@@ -502,10 +502,10 @@ static oop Integer__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(51);
   _2=_sendv(s_put, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -524,8 +524,8 @@ static oop Integer__printOn_radix_(oop v__closure, oop v_stateful_self, oop v_se
   _1= 0;
   _2= v_self;
   _3= l_16;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l6;
  {
@@ -545,8 +545,8 @@ static oop Integer__printOn_radix_(oop v__closure, oop v_stateful_self, oop v_se
   _1= 0;
   _2= v_self;
   _3= v_radix;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l7;
  {

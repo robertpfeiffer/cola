@@ -512,17 +512,17 @@ static oop ByteArray__replaceFrom_to_with_startingAt_(oop v__closure, oop v_stat
   _1= v_last;
   _2= v_first;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   _2= l_16;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_count= _1;
   /* ifFalse: */
@@ -536,16 +536,16 @@ static oop ByteArray__replaceFrom_to_with_startingAt_(oop v__closure, oop v_stat
   /* and: */
   _2= l_16;
   _3= v_first;
-  if (1 & (int)_3) {
-    _2= (((int)_2 <= (int)_3) ? v_true : v_false);
+  if (1 & (long)_3) {
+    _2= (((long)_2 <= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c_3d, 2, _2, _3);
   if (!_2) goto _l3;
  {
   /* and: */
   _2= v_first;
   _3= v_last;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 <= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 <= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c_3d, 2, _2, _3);
   if (!_2) goto _l4;
  {
@@ -554,39 +554,39 @@ static oop ByteArray__replaceFrom_to_with_startingAt_(oop v__closure, oop v_stat
   _3= v_self;
   _line(84);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 <= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 <= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c_3d, 2, _2, _3);
   if (!_2) goto _l5;
  {
   /* and: */
   _2= l_16;
   _3= v_offset;
-  if (1 & (int)_3) {
-    _2= (((int)_2 <= (int)_3) ? v_true : v_false);
+  if (1 & (long)_3) {
+    _2= (((long)_2 <= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c_3d, 2, _2, _3);
   if (!_2) goto _l6;
  {
   _2= v_offset;
   _3= v_count;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _3= l_16;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= v_bytes;
   _line(86);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 <= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 <= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c_3d, 2, _2, _3);
  }
  _l6:;

@@ -419,8 +419,8 @@ static oop SmallInteger__hash(oop v__closure, oop v_stateful_self, oop v_self)
   _line(30);
   _1= v_self;
   _2= l_4;
-  if ((1 & (int)_1) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -435,8 +435,8 @@ static oop SmallInteger__identityHash(oop v__closure, oop v_stateful_self, oop v
   _line(31);
   _1= v_self;
   _2= l_6;
-  if ((1 & (int)_1) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -489,15 +489,15 @@ static oop SmallInteger__digitLength(oop v__closure, oop v_stateful_self, oop v_
   /* and: */
   _2= v_self;
   _3= l_10;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l2;
  {
   _2= v_self;
   _3= l_11;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
  }
  _l2:;
@@ -513,15 +513,15 @@ static oop SmallInteger__digitLength(oop v__closure, oop v_stateful_self, oop v_
   /* and: */
   _2= v_self;
   _3= l_13;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l4;
  {
   _2= v_self;
   _3= l_14;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
  }
  _l4:;
@@ -537,15 +537,15 @@ static oop SmallInteger__digitLength(oop v__closure, oop v_stateful_self, oop v_
   /* and: */
   _2= v_self;
   _3= l_16;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l6;
  {
   _2= v_self;
   _3= l_17;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
  }
  _l6:;
@@ -573,8 +573,8 @@ static oop SmallInteger__digitAt_(oop v__closure, oop v_stateful_self, oop v_sel
   _1= 0;
   _2= v_n;
   _3= l_21;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l7;
  {
@@ -586,8 +586,8 @@ static oop SmallInteger__digitAt_(oop v__closure, oop v_stateful_self, oop v_sel
   /* ifTrue:ifFalse: */
   _1= v_self;
   _2= l_22;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l8;
  {
@@ -597,8 +597,8 @@ static oop SmallInteger__digitAt_(oop v__closure, oop v_stateful_self, oop v_sel
   _3= v_self;
   _line(49);
   _3=_sendv(s_minVal, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l10;
  {
@@ -613,32 +613,32 @@ static oop SmallInteger__digitAt_(oop v__closure, oop v_stateful_self, oop v_sel
   _1= l_22;
   _2= v_self;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   _2= l_24;
   _3= v_n;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_25;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
-  { int _l= (int)_1 >> 1,  _r= (int)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
-    if ((1 & (int)_1 & (int)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
+  { int _l= (long)_1 >> 1,  _r= (long)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
+    if ((1 & (long)_1 & (long)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
   }
   _2= l_26;
-  if ((1 & (int)_1) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -650,24 +650,24 @@ static oop SmallInteger__digitAt_(oop v__closure, oop v_stateful_self, oop v_sel
   _2= l_24;
   _3= v_n;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_25;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
-  { int _l= (int)_1 >> 1,  _r= (int)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
-    if ((1 & (int)_1 & (int)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
+  { int _l= (long)_1 >> 1,  _r= (long)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
+    if ((1 & (long)_1 & (long)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
   }
   _2= l_26;
-  if ((1 & (int)_1) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -771,8 +771,8 @@ static oop SmallInteger___2f(oop v__closure, oop v_stateful_self, oop v_self, oo
   _1= 0;
   _2= v_aNumber;
   _3= l_31;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l11;
  {
@@ -910,8 +910,8 @@ static oop SmallInteger__quo_(oop v__closure, oop v_stateful_self, oop v_self, o
   _1= 0;
   _2= v_aNumber;
   _3= l_35;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l14;
  {
@@ -985,15 +985,15 @@ static oop SmallInteger__bitAnd_(oop v__closure, oop v_stateful_self, oop v_self
   _1= 0;
   _2= v_self;
   _3= l_38;
-  if (1 & (int)_2) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l18;
  {
   _1= v_anInteger;
   _2= v_self;
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _leave();
   return _1;
@@ -1005,8 +1005,8 @@ static oop SmallInteger__bitAnd_(oop v__closure, oop v_stateful_self, oop v_self
   _2= v_anInteger;
   _line(163);
   _2=_sendv(s_bitInvert, 1, _2);
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 | (int)_2);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 | (long)_2);
   } else _1= _sendv(s_bitOr_, 2, _1, _2);
   _line(163);
   _1=_sendv(s_bitInvert, 1, _1);
@@ -1033,15 +1033,15 @@ static oop SmallInteger__bitOr_(oop v__closure, oop v_stateful_self, oop v_self,
   _1= 0;
   _2= v_self;
   _3= l_40;
-  if (1 & (int)_2) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l19;
  {
   _1= v_anInteger;
   _2= v_self;
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 | (int)_2);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 | (long)_2);
   } else _1= _sendv(s_bitOr_, 2, _1, _2);
   _leave();
   return _1;
@@ -1050,8 +1050,8 @@ static oop SmallInteger__bitOr_(oop v__closure, oop v_stateful_self, oop v_self,
   /* ifTrue:ifFalse: */
   _1= v_anInteger;
   _2= l_40;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l20;
  {
@@ -1061,8 +1061,8 @@ static oop SmallInteger__bitOr_(oop v__closure, oop v_stateful_self, oop v_self,
   _2= v_anInteger;
   _line(172);
   _2=_sendv(s_bitInvert, 1, _2);
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)((int)_1 & (int)_2);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)((long)_1 & (long)_2);
   } else _1= _sendv(s_bitAnd_, 2, _1, _2);
   _line(172);
   _1=_sendv(s_bitInvert, 1, _1);
@@ -1103,15 +1103,15 @@ static oop SmallInteger__bitXor_(oop v__closure, oop v_stateful_self, oop v_self
   _1= 0;
   _2= v_self;
   _3= l_42;
-  if (1 & (int)_2) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l22;
  {
   _1= v_anInteger;
   _2= v_self;
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)(((int)_1 ^ (int)_2) | 1);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)(((long)_1 ^ (long)_2) | 1);
   } else _1= _sendv(s_bitXor_, 2, _1, _2);
   _leave();
   return _1;
@@ -1120,8 +1120,8 @@ static oop SmallInteger__bitXor_(oop v__closure, oop v_stateful_self, oop v_self
   /* ifTrue:ifFalse: */
   _1= v_anInteger;
   _2= l_42;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l23;
  {
@@ -1131,8 +1131,8 @@ static oop SmallInteger__bitXor_(oop v__closure, oop v_stateful_self, oop v_self
   _2= v_anInteger;
   _line(182);
   _2=_sendv(s_bitInvert, 1, _2);
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)(((int)_1 ^ (int)_2) | 1);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)(((long)_1 ^ (long)_2) | 1);
   } else _1= _sendv(s_bitXor_, 2, _1, _2);
  }
   goto _l24;
@@ -1195,8 +1195,8 @@ static oop SmallInteger__bitShift_(oop v__closure, oop v_stateful_self, oop v_se
   _1= 0;
   _2= v_self;
   _3= l_45;
-  if (1 & (int)_2) {
-    _2= (((int)_2 >= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 >= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e_3d, 2, _2, _3);
   if (!_2) goto _l26;
  {
@@ -1212,8 +1212,8 @@ static oop SmallInteger__bitShift_(oop v__closure, oop v_stateful_self, oop v_se
   _line(201);
   _1=_sendv(s_negated, 1, _1);
   _2= v_displacement;
-  { int _l= (int)_1 >> 1,  _r= (int)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
-    if ((1 & (int)_1 & (int)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
+  { int _l= (long)_1 >> 1,  _r= (long)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
+    if ((1 & (long)_1 & (long)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
   }
   _line(201);
   _1=_sendv(s_negated, 1, _1);
@@ -1434,17 +1434,17 @@ static oop SmallInteger__highBitOfPositiveReceiver(oop v__closure, oop v_statefu
   _1= v_shifted;
   _2= l_58;
   {
-    int _l= (int)_1 >> 1, _r= (int)_2 >> 1, _s= (_l >> _r);
-    if ((1 & (int)_1) && (_r >= 0) && (_r <= 31)) _1= (oop)(_s << 1 | 1); else _1= _sendv(s__3e_3e, 2, _1, _2);
+    int _l= (long)_1 >> 1, _r= (long)_2 >> 1, _s= (_l >> _r);
+    if ((1 & (long)_1) && (_r >= 0) && (_r <= 31)) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s__3e_3e, 2, _1, _2);
   }
   v_shifted= _1;
   _1= v_bitNo;
   _2= l_58;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_bitNo= _1;
  }
@@ -1452,8 +1452,8 @@ static oop SmallInteger__highBitOfPositiveReceiver(oop v__closure, oop v_statefu
  {
   _1= v_shifted;
   _2= l_57;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
   if (!_1) goto _l27;
@@ -1465,17 +1465,17 @@ static oop SmallInteger__highBitOfPositiveReceiver(oop v__closure, oop v_statefu
   _1= v_shifted;
   _2= l_59;
   {
-    int _l= (int)_1 >> 1, _r= (int)_2 >> 1, _s= (_l >> _r);
-    if ((1 & (int)_1) && (_r >= 0) && (_r <= 31)) _1= (oop)(_s << 1 | 1); else _1= _sendv(s__3e_3e, 2, _1, _2);
+    int _l= (long)_1 >> 1, _r= (long)_2 >> 1, _s= (_l >> _r);
+    if ((1 & (long)_1) && (_r >= 0) && (_r <= 31)) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s__3e_3e, 2, _1, _2);
   }
   v_shifted= _1;
   _1= v_bitNo;
   _2= l_59;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_bitNo= _1;
  }
@@ -1483,8 +1483,8 @@ static oop SmallInteger__highBitOfPositiveReceiver(oop v__closure, oop v_statefu
  {
   _1= v_shifted;
   _2= l_56;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
   if (!_1) goto _l29;
@@ -1523,8 +1523,8 @@ static oop SmallInteger__gcd_(oop v__closure, oop v_stateful_self, oop v_self, o
  {
   _1= v_n;
   _2= l_61;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
   if (!_1) goto _l31;
@@ -1558,10 +1558,10 @@ static oop SmallInteger__to_do_(oop v__closure, oop v_stateful_self, oop v_self,
   _1= v_index;
   _2= l_63;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_index= _1;
  }
@@ -1569,8 +1569,8 @@ static oop SmallInteger__to_do_(oop v__closure, oop v_stateful_self, oop v_self,
  {
   _1= v_index;
   _2= v_anInteger;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 <= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 <= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c_3d, 2, _1, _2);
  }
   if (_1) goto _l33;
@@ -1602,10 +1602,10 @@ static oop SmallInteger__downTo_do_(oop v__closure, oop v_stateful_self, oop v_s
   _1= v_index;
   _2= l_65;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   v_index= _1;
  }
@@ -1613,8 +1613,8 @@ static oop SmallInteger__downTo_do_(oop v__closure, oop v_stateful_self, oop v_s
  {
   _1= v_index;
   _2= v_anInteger;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 >= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 >= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e_3d, 2, _1, _2);
  }
   if (_1) goto _l35;
@@ -1636,8 +1636,8 @@ static oop SmallInteger__to_by_do_(oop v__closure, oop v_stateful_self, oop v_se
   /* ifTrue:ifFalse: */
   _1= v_stepInteger;
   _2= l_67;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   if (!_1) goto _l37;
  {
@@ -1686,10 +1686,10 @@ static oop SmallInteger__upTo_by_do_(oop v__closure, oop v_stateful_self, oop v_
   _1= v_index;
   _2= v_stepInteger;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_index= _1;
  }
@@ -1697,8 +1697,8 @@ static oop SmallInteger__upTo_by_do_(oop v__closure, oop v_stateful_self, oop v_
  {
   _1= v_index;
   _2= v_anInteger;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 <= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 <= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c_3d, 2, _1, _2);
  }
   if (_1) goto _l39;
@@ -1730,10 +1730,10 @@ static oop SmallInteger__downTo_by_do_(oop v__closure, oop v_stateful_self, oop 
   _1= v_index;
   _2= v_stepInteger;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_index= _1;
  }
@@ -1741,8 +1741,8 @@ static oop SmallInteger__downTo_by_do_(oop v__closure, oop v_stateful_self, oop 
  {
   _1= v_index;
   _2= v_anInteger;
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 >= (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 >= (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3e_3d, 2, _1, _2);
  }
   if (_1) goto _l41;
@@ -1776,15 +1776,15 @@ static oop SmallInteger__timesRepeat_(oop v__closure, oop v_stateful_self, oop v
   _1= v_count;
   _2= l_71;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
+    if ((1 & (long)_1) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2d, 2, _1, _2);
   }
   v_count= _1;
   _2= l_72;
-  if (1 & (int)_1) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
  }
   if (!_1) goto _l43;

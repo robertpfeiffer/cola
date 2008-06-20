@@ -406,10 +406,10 @@ static oop EncodedVariableNode__generate_freeIn_location_(oop v__closure, oop v_
   _line(59);
   _5=_sendv(s_level, 1, _5);
   {
-    int _l= (int)_4 >> 1;
-    int _r= (int)_5 >> 1;
+    int _l= (long)_4 >> 1;
+    int _r= (long)_5 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_4 & (int)_5) && ((_s ^ (_s << 1)) >= 0))  _4= (oop)(_s << 1 | 1);  else _4= _sendv(s__2d, 2, _4, _5);
+    if ((1 & (long)_4 & (long)_5) && ((_s ^ (_s << 1)) >= 0))  _4= (oop)(long)(_s << 1 | 1);  else _4= _sendv(s__2d, 2, _4, _5);
   }
   _5= ((struct t_EncodedVariableNode *)v_stateful_self)->v_offset;
   _6= v_location;
@@ -440,10 +440,10 @@ static oop EncodedVariableNode__generateStore_freeIn_location_(oop v__closure, o
   _line(65);
   _5=_sendv(s_level, 1, _5);
   {
-    int _l= (int)_4 >> 1;
-    int _r= (int)_5 >> 1;
+    int _l= (long)_4 >> 1;
+    int _r= (long)_5 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_4 & (int)_5) && ((_s ^ (_s << 1)) >= 0))  _4= (oop)(_s << 1 | 1);  else _4= _sendv(s__2d, 2, _4, _5);
+    if ((1 & (long)_4 & (long)_5) && ((_s ^ (_s << 1)) >= 0))  _4= (oop)(long)(_s << 1 | 1);  else _4= _sendv(s__2d, 2, _4, _5);
   }
   _5= ((struct t_EncodedVariableNode *)v_stateful_self)->v_offset;
   _6= v_location;

@@ -388,8 +388,8 @@ static oop LiteralNode___3d(oop v__closure, oop v_stateful_self, oop v_self, oop
   _2= v_aLiteralNode;
   _line(47);
   _2=_sendv(s_value, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
  _l1:;

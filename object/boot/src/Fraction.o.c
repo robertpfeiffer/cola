@@ -425,8 +425,8 @@ static oop Fraction__numerator_denominator_(oop v__closure, oop v_stateful_self,
   /* ifTrue:ifFalse: */
   _1= v_d;
   _2= l_7;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   if (!_1) goto _l1;
  {
@@ -451,8 +451,8 @@ static oop Fraction__numerator_denominator_(oop v__closure, oop v_stateful_self,
   _1= 0;
   _2= v_d;
   _3= l_7;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l3;
  {
@@ -508,10 +508,10 @@ static oop Fraction___2b(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _2= _sendv(s__2f_2f, 2, _2, _3);
   v_d1= _2;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _2= v_aNumber;
   _line(50);
@@ -521,25 +521,25 @@ static oop Fraction___2b(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _3= _sendv(s__2f_2f, 2, _3, _4);
   v_d2= _3;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2 & (int)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_n= _1;
   _1= v_d1;
   _2= v_d2;
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   v_d1= _1;
   _1= v_n;
@@ -557,15 +557,15 @@ static oop Fraction___2b(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _4= v_d2;
   _3= _sendv(s__2f_2f, 2, _3, _4);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2 & (int)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   v_d= _2;
   _3= l_9;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l5;
  {
@@ -612,10 +612,10 @@ static oop Fraction___2d(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _line(60);
   _2=_sendv(s_negated, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -670,8 +670,8 @@ static oop Fraction___2a(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   /* and: */
   _2= v_d2;
   _3= ((struct t_Fraction *)v_stateful_self)->v_denominator;
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l9;
  {
@@ -679,8 +679,8 @@ static oop Fraction___2a(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _3= v_aNumber;
   _line(71);
   _3=_sendv(s_denominator, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
  }
  _l9:;
@@ -695,10 +695,10 @@ static oop Fraction___2a(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _3= v_d2;
   _2= _sendv(s__2f_2f, 2, _2, _3);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -714,10 +714,10 @@ static oop Fraction___2a(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _4= v_d2;
   _3= _sendv(s__2f_2f, 2, _3, _4);
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2 & (int)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
   _3= ((struct t_Fraction *)v_stateful_self)->v_denominator;
   _4= v_d2;
@@ -728,10 +728,10 @@ static oop Fraction___2a(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _5= v_d1;
   _4= _sendv(s__2f_2f, 2, _4, _5);
   {
-    int _l= (int)_3 >> 1;
-    int _r= (int)_4 >> 1;
+    int _l= (long)_3 >> 1;
+    int _r= (long)_4 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_3 & (int)_4) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(_s << 1 | 1);  else _3= _sendv(s__2a, 2, _3, _4);
+    if ((1 & (long)_3 & (long)_4) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _3= (oop)(long)(_s << 1 | 1);  else _3= _sendv(s__2a, 2, _3, _4);
   }
   _line(73);
   _1=_sendv(s_numerator_denominator_, 3, _1, _2, _3);
@@ -768,10 +768,10 @@ static oop Fraction___2f(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _line(80);
   _2=_sendv(s_reciprocal, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _leave();
   return _1;
@@ -817,8 +817,8 @@ static oop Fraction__reciprocal(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= ((struct t_Fraction *)v_stateful_self)->v_numerator;
   _3= l_19;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l11;
  {
@@ -832,8 +832,8 @@ static oop Fraction__reciprocal(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= ((struct t_Fraction *)v_stateful_self)->v_numerator;
   _3= l_19;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l12;
  {
@@ -846,8 +846,8 @@ static oop Fraction__reciprocal(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= ((struct t_Fraction *)v_stateful_self)->v_numerator;
   _3= l_21;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l13;
  {
@@ -887,23 +887,23 @@ static oop Fraction___3c(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _line(102);
   _2=_sendv(s_denominator, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _2= v_aNumber;
   _line(102);
   _2=_sendv(s_numerator, 1, _2);
   _3= ((struct t_Fraction *)v_stateful_self)->v_denominator;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2 & (int)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   _leave();
   return _1;
@@ -949,8 +949,8 @@ static oop Fraction___3d(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _1= 0;
   _2= ((struct t_Fraction *)v_stateful_self)->v_numerator;
   _3= l_25;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l17;
  {
@@ -958,8 +958,8 @@ static oop Fraction___3d(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _line(111);
   _1=_sendv(s_numerator, 1, _1);
   _2= l_25;
-  if (1 & (int)_1) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   _leave();
   return _1;
@@ -970,23 +970,23 @@ static oop Fraction___3d(oop v__closure, oop v_stateful_self, oop v_self, oop v_
   _line(112);
   _2=_sendv(s_denominator, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   _2= v_aNumber;
   _line(112);
   _2=_sendv(s_numerator, 1, _2);
   _3= ((struct t_Fraction *)v_stateful_self)->v_denominator;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2 & (int)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2a, 2, _2, _3);
   }
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
   _leave();
   return _1;
@@ -1014,8 +1014,8 @@ static oop Fraction__hash(oop v__closure, oop v_stateful_self, oop v_self)
   _2= ((struct t_Fraction *)v_stateful_self)->v_denominator;
   _line(118);
   _2=_sendv(s_hash, 1, _2);
-  if ((1 & (int)_1 & (int)_2) && (_1 > 0) && (_2 > 0)) {
-    _1= (oop)(((int)_1 ^ (int)_2) | 1);
+  if ((1 & (long)_1 & (long)_2) && (_1 > 0) && (_2 > 0)) {
+    _1= (oop)(((long)_1 ^ (long)_2) | 1);
   } else _1= _sendv(s_bitXor_, 2, _1, _2);
   _leave();
   return _1;
@@ -1077,27 +1077,27 @@ static oop Fraction__asFloat(oop v__closure, oop v_stateful_self, oop v_self)
   _2=_sendv(s_digitLength, 1, _2);
   _3= l_31;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_32;
   _line(141);
   _2=_sendv(s_max_, 2, _2, _3);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   v_nScaleBits= _1;
   _1= ((struct t_Fraction *)v_stateful_self)->v_numerator;
   _2= v_nScaleBits;
   _line(142);
   _2=_sendv(s_negated, 1, _2);
-  { int _l= (int)_1 >> 1,  _r= (int)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
-    if ((1 & (int)_1 & (int)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
+  { int _l= (long)_1 >> 1,  _r= (long)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
+    if ((1 & (long)_1 & (long)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
   }
   _line(142);
   _1=_sendv(s_asFloat, 1, _1);
@@ -1108,27 +1108,27 @@ static oop Fraction__asFloat(oop v__closure, oop v_stateful_self, oop v_self)
   _2=_sendv(s_digitLength, 1, _2);
   _3= l_31;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _3= l_32;
   _line(144);
   _2=_sendv(s_max_, 2, _2, _3);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= (_l * _r);
-    if ((1 & (int)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
+    if ((1 & (long)_2) && ((_r == 0) || (_s / _r == _l)) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2a, 2, _1, _2);
   }
   v_dScaleBits= _1;
   _1= ((struct t_Fraction *)v_stateful_self)->v_denominator;
   _2= v_dScaleBits;
   _line(145);
   _2=_sendv(s_negated, 1, _2);
-  { int _l= (int)_1 >> 1,  _r= (int)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
-    if ((1 & (int)_1 & (int)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
+  { int _l= (long)_1 >> 1,  _r= (long)_2 >> 1,  _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));
+    if ((1 & (long)_1 & (long)_2) && (   (    (_r >= 0) && (_r <= 31)  && (_l == (_s >> _r)) && ((_s ^ (_s << 1)) >= 0) ) || ((_r < 0) && (_r >= -31)) )) _1= (oop)(long)(_s << 1 | 1); else _1= _sendv(s_bitShift_, 2, _1, _2);
   }
   _line(145);
   _1=_sendv(s_asFloat, 1, _1);
@@ -1140,10 +1140,10 @@ static oop Fraction__asFloat(oop v__closure, oop v_stateful_self, oop v_self)
   _2= v_nScaleBits;
   _3= v_dScaleBits;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_2 & (int)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
+    if ((1 & (long)_2 & (long)_3) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2d, 2, _2, _3);
   }
   _line(148);
   _1=_sendv(s_timesTwoPower_, 2, _1, _2);
@@ -1169,8 +1169,8 @@ static oop Fraction__reduced(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= ((struct t_Fraction *)v_stateful_self)->v_numerator;
   _3= l_34;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l18;
  {
@@ -1196,8 +1196,8 @@ static oop Fraction__reduced(oop v__closure, oop v_stateful_self, oop v_self)
   _1= 0;
   _2= v_denom;
   _3= l_35;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l19;
  {
@@ -1228,8 +1228,8 @@ static oop Fraction__raisedToInteger_(oop v__closure, oop v_stateful_self, oop v
   _1= 0;
   _2= v_anInteger;
   _3= l_37;
-  if (1 & (int)_2) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l20;
  {
@@ -1242,8 +1242,8 @@ static oop Fraction__raisedToInteger_(oop v__closure, oop v_stateful_self, oop v
   _1= 0;
   _2= v_anInteger;
   _3= l_37;
-  if (1 & (int)_2) {
-    _2= (((int)_2 < (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 < (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c, 2, _2, _3);
   if (!_2) goto _l21;
  {
@@ -1345,10 +1345,10 @@ static oop Fraction__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(193);
   _2=_sendv(s_print, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_n= _1;
   _1= v_n;
@@ -1356,10 +1356,10 @@ static oop Fraction__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(194);
   _2=_sendv(s_put, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_n= _1;
   _1= v_n;
@@ -1367,10 +1367,10 @@ static oop Fraction__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(195);
   _2=_sendv(s_print, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_n= _1;
   _1= v_n;
@@ -1378,10 +1378,10 @@ static oop Fraction__print(oop v__closure, oop v_stateful_self, oop v_self)
   _line(196);
   _2=_sendv(s_put, 1, _2);
   {
-    int _l= (int)_1 >> 1;
-    int _r= (int)_2 >> 1;
+    int _l= (long)_1 >> 1;
+    int _r= (long)_2 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
+    if ((1 & (long)_1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _1= (oop)(long)(_s << 1 | 1);  else _1= _sendv(s__2b, 2, _1, _2);
   }
   v_n= _1;
   _1= v_n;

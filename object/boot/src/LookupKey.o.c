@@ -343,8 +343,8 @@ static oop LookupKey___3c(oop v__closure, oop v_stateful_self, oop v_self, oop v
   _2= v_aLookupKey;
   _line(33);
   _2=_sendv(s_key, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 < (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 < (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3c, 2, _1, _2);
   _leave();
   return _1;
@@ -367,8 +367,8 @@ static oop LookupKey___3d(oop v__closure, oop v_stateful_self, oop v_self, oop v
   _2= v_anObject;
   _line(34);
   _2=_sendv(s_key, 1, _2);
-  if (1 & (int)_1 & (int)_2) {
-    _1= (((int)_1 == (int)_2) ? v_true : v_false);
+  if (1 & (long)_1 & (long)_2) {
+    _1= (((long)_1 == (long)_2) ? v_true : v_false);
   } else _1= _sendv(s__3d, 2, _1, _2);
  }
  _l1:;

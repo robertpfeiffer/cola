@@ -792,8 +792,8 @@ static oop MethodNode__encode_(oop v__closure, oop v_stateful_self, oop v_self, 
   _1= 0;
   _2= l_13;
   _3= ((struct t_MethodNode *)((oop *)_state1)[2])->v_selector;  /* selector */
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 == (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 == (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3d, 2, _2, _3);
   if (!_2) goto _l1;
  {
@@ -1451,10 +1451,10 @@ static oop MethodNode__println_(oop v__closure, oop v_stateful_self, oop v_self,
   _2= v_indent;
   _3= l_43;
   {
-    int _l= (int)_2 >> 1;
-    int _r= (int)_3 >> 1;
+    int _l= (long)_2 >> 1;
+    int _r= (long)_3 >> 1;
     int _s= _l + _r;
-    if ((1 & (int)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
+    if ((1 & (long)_2) && ((_s ^ (_s << 1)) >= 0))  _2= (oop)(long)(_s << 1 | 1);  else _2= _sendv(s__2b, 2, _2, _3);
   }
   _line(145);
   _1=_superv(v_BlockNode, s_println_, 2, _1, _2);

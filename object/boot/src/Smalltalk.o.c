@@ -683,10 +683,10 @@ static oop b_22(oop v__closure, oop v__self, oop v_i)
   _5= v_i;
   _6= l_21;
   {
-    int _l= (int)_5 >> 1;
-    int _r= (int)_6 >> 1;
+    int _l= (long)_5 >> 1;
+    int _r= (long)_6 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_5) && ((_s ^ (_s << 1)) >= 0))  _5= (oop)(_s << 1 | 1);  else _5= _sendv(s__2d, 2, _5, _6);
+    if ((1 & (long)_5) && ((_s ^ (_s << 1)) >= 0))  _5= (oop)(long)(_s << 1 | 1);  else _5= _sendv(s__2d, 2, _5, _6);
   }
   _line(72);
   _5=_sendv(s__5fintegerValue, 1, _5);
@@ -750,8 +750,8 @@ static oop Smalltalk__argumentAt_(oop v__closure, oop v_stateful_self, oop v_sel
   /* and: */
   _2= v_index;
   _3= l_24;
-  if (1 & (int)_2) {
-    _2= (((int)_2 > (int)_3) ? v_true : v_false);
+  if (1 & (long)_2) {
+    _2= (((long)_2 > (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3e, 2, _2, _3);
   if (!_2) goto _l2;
  {
@@ -761,8 +761,8 @@ static oop Smalltalk__argumentAt_(oop v__closure, oop v_stateful_self, oop v_sel
   _3=_sendv(s_argumentVector, 1, _3);
   _line(76);
   _3=_sendv(s_size, 1, _3);
-  if (1 & (int)_2 & (int)_3) {
-    _2= (((int)_2 <= (int)_3) ? v_true : v_false);
+  if (1 & (long)_2 & (long)_3) {
+    _2= (((long)_2 <= (long)_3) ? v_true : v_false);
   } else _2= _sendv(s__3c_3d, 2, _2, _3);
  }
  _l2:;

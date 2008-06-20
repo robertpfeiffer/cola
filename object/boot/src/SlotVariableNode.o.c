@@ -475,10 +475,10 @@ static oop SlotVariableNode__generate_freeIn_location_(oop v__closure, oop v_sta
   _line(79);
   _6=_sendv(s_level, 1, _6);
   {
-    int _l= (int)_5 >> 1;
-    int _r= (int)_6 >> 1;
+    int _l= (long)_5 >> 1;
+    int _r= (long)_6 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_5 & (int)_6) && ((_s ^ (_s << 1)) >= 0))  _5= (oop)(_s << 1 | 1);  else _5= _sendv(s__2d, 2, _5, _6);
+    if ((1 & (long)_5 & (long)_6) && ((_s ^ (_s << 1)) >= 0))  _5= (oop)(long)(_s << 1 | 1);  else _5= _sendv(s__2d, 2, _5, _6);
   }
   _6= ((struct t_SlotVariableNode *)v_stateful_self)->v_receiver;
   _line(79);
@@ -515,10 +515,10 @@ static oop SlotVariableNode__generateStore_freeIn_location_(oop v__closure, oop 
   _line(84);
   _6=_sendv(s_level, 1, _6);
   {
-    int _l= (int)_5 >> 1;
-    int _r= (int)_6 >> 1;
+    int _l= (long)_5 >> 1;
+    int _r= (long)_6 >> 1;
     int _s= (_l - _r);
-    if ((1 & (int)_5 & (int)_6) && ((_s ^ (_s << 1)) >= 0))  _5= (oop)(_s << 1 | 1);  else _5= _sendv(s__2d, 2, _5, _6);
+    if ((1 & (long)_5 & (long)_6) && ((_s ^ (_s << 1)) >= 0))  _5= (oop)(long)(_s << 1 | 1);  else _5= _sendv(s__2d, 2, _5, _6);
   }
   _6= ((struct t_SlotVariableNode *)v_stateful_self)->v_receiver;
   _line(84);
