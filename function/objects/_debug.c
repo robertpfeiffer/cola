@@ -176,8 +176,9 @@ static struct __methodinfo *findBreakpointInfo(char *typeOrFile, char *nameOrLin
   else
     {
       int flen= strlen(typeOrFile);
+      int ilen;
       while (info)
-	if ((info->sourceStart == line) && !strncmp(info->file, typeOrFile, flen))
+	if ((info->sourceStart == line) && (flen <= (ilen= strlen(info->file))) && (!strcmp(info->file + ilen - flen, typeOrFile)))
 	  break;
 	else
 	  info= info->next;
@@ -237,13 +238,13 @@ static int breakCommand(int argc, char *argv[])
 	    disableStepping();
 	    return printBreakMode();
 	  }
-	if (!strncasecmp(argv[1], "send", n))
+	if (!strncasecmp(argv[1], "sends", n))
 	  {
 	    enableStepping();
 	    breakMode= SEND;
 	    return printBreakMode();
 	  }
-	if (!strncasecmp(argv[1], "line", n))
+	if (!strncasecmp(argv[1], "lines", n))
 	  {
 	    enableStepping();
 	    breakMode= LINE;
@@ -320,7 +321,7 @@ static int noCommand(int argc, char *argv[])
 }
 
 static command commands[]= {
-  { breakCommand,  "break",    "[ off | line | send | [ clear ] <type> <name> | [ clear ] <file> <line> ]",  "control single-step and breakpoints; without args, show current status" },
+  { breakCommand,  "break",    "[ off | lines | sends | [ clear ] <type> <name> | [ clear ] <file> <line> ]",  "control single-step and breakpoints; without args, show current status" },
   { contCommand,   "continue", "",		   "return from the debugger and continue (or single-step) the program" },
   { helpCommand,   "help",     "[ <command> ]",	   "print help; if <command> is given, print help for it only" },
   { quitCommand,   "quit",     "",		   "quit the entire program" },
