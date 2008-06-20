@@ -111,27 +111,27 @@ SYSOS		= @SYSOS@
 
 all : $(FILES)
 
-libid.o : src/libid.c
+libid.o : src/libid.c include/gc
 	$(CC) -Iinclude -DPREFIX='"$(PREFIX)"' $(CFLAGS) $(O3FLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
-libid_g.o : src/libid.c
+libid_g.o : src/libid.c include/gc
 	$(CC) -Iinclude -DPREFIX='"$(PREFIX)"' $(CFLAGS) $(GFLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
-idc : src/idc
+idc : ../idc/idc
 	cp -p $< .
 
 .SUFFIXES :
 
-st80$(OBJEXT_SO) : src/st80$(OBJEXT_SO).c $(ST80_FILES)
+st80$(OBJEXT_SO) : src/st80$(OBJEXT_SO).c $(ST80_FILES) include/gc
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_SO) $(LDFLAGS_SO) $< $(ST80_FILES) $(LDLIBS_SO) -o $@
 
-idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES)
+idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES) include/gc
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_SO) $(LDFLAGS_SO) $< $(IDST_FILES) $(LDLIBS_SO) -o $@
 
-%$(OBJEXT_O) : src/%$(OBJEXT_O).c
+%$(OBJEXT_O) : src/%$(OBJEXT_O).c include/gc
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
-%$(OBJEXT) : src/%.c gc.a libid.o libid_g.o
+%$(OBJEXT) : src/%.c gc.a libid.o libid_g.o include/gc
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS) $(LDFLAGS) $< $(LDLIBS) -o $@ libid.o gc.a -lm
 
 include/gc :

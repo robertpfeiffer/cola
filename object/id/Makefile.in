@@ -11,13 +11,13 @@ $(BIN)./include :
 		mkdir $(BIN)./include/id;  cp -pr ../id/*.h $(BIN)./include/id; \
 		cp -pr ../$(GCDIR)/include $(BIN)./include/gc;  find $(BIN)./include/gc -name .svn -exec rm -rf {} \;'
 
-$(BIN)libid.o : libid.c
+$(BIN)libid.o : libid.c $(BIN)./include
 	$(CC) $(CFLAGS) -DPREFIX='"@PREFIX@"' $< -c -o $@
 
-$(BIN)libid_p.o : libid.c
+$(BIN)libid_p.o : libid.c $(BIN)./include
 	$(CC) $(PFLAGS) -pg -DPREFIX='"@PREFIX@"' $< -c -o $@
 
-$(BIN)libid_g.o : libid.c
+$(BIN)libid_g.o : libid.c $(BIN)./include
 	$(CC) $(GFLAGS) -g -DPREFIX='"@PREFIX@"' $< -c -o $@
 
 install : $(PREFIX)libid.o $(PREFIX)libid_p.o $(PREFIX)libid_g.o
