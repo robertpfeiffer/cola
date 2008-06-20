@@ -67,7 +67,9 @@ stage1/gc.a : boot/gc.a
 	-ranlinb -t $@
 
 
-boot/idc : boot/Makefile
+boot/idc : boot/idc1
+
+boot/idc1 : boot/Makefile
 	-$(SHELL) -ec '( cd boot; $(MAKE) )'
 
 $(CONFIG) : .config-stamp
