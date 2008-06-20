@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-05 09:27:24 by piumarta on emilia.local
+  Last edited: 2008-06-19 18:31:25 by piumarta on emilia
 "
 
 { import: Objects }
@@ -27,7 +27,7 @@ IdentityDictionary compare: anEntry with: anObject
 
 IdentityDictionary at: aKey
 [
-    ^self at: aKey ifAbsent: [self errorKeyNotFound]
+    ^self at: aKey ifAbsent: [self errorKeyNotFound: aKey]
 ]
 
 IdentityDictionary at: aKey ifAbsent: failBlock
