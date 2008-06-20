@@ -915,7 +915,7 @@ void *_libid_param(int index)
     case  1:	return (void *)_argv;
     case  2:	return (void *)_envp;
 #  if USE_GC
-    case  3:	return (void *)(GC_gcollect(), 0);
+    case  3:	return (void *)(long)(GC_gcollect(), 0);
     case  4:	return (void *)GC_get_free_bytes();
 #  endif
     case  5:	return (void *)SYSARCH;
