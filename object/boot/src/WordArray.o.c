@@ -425,7 +425,7 @@ static oop WordArray__at_put_(oop v__closure, oop v_stateful_self, oop v_self, o
 
       if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size) && ((long)v_aWord & 1))
         {
-          ((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]= (unsigned int)v_aWord >> 1;
+          ((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]= (unsigned int)(long)v_aWord >> 1;
           return v_aWord;
         }
     
