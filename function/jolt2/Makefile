@@ -22,7 +22,7 @@ FILES		= Expression.o CompilerOptions.o Compiler.o Instruction.o ReductionGramma
 ifeq ($(OS),win32)
 LDLIBS		= jolt.a # -lopcodes -lintl
 else
-LDLIBS		= readline.o jolt.a -lreadline -ltermcap # -lopcodes -lintl
+LDLIBS		= readline.o jolt.a -L/usr/local/lib -lreadline # -ltermcap # -lopcodes -lintl
 endif
 
 all : main$(OBJEXT)

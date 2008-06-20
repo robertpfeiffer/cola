@@ -1,6 +1,17 @@
 IDC		= ./idc $(OFLAGS)
 OFLAGS		= -g
+
+OS		= $(shell $(IDC) -C os)
+
+ifeq ($(OS),win32)
 IDFLAGS		= -k
+LDLIBS		= 
+else
+IDFLAGS		= -k -Wc,-DHAVE_READLINE=1 -J/usr/local/include
+LDLIBS		= -L/usr/local/lib -lreadline
+endif
+
+
 
 OBJEXT          = 
 OBJEXT_O        = .o
@@ -18,7 +29,7 @@ ARCH		= $(shell $(IDC) -C arch)
 all : objects.a
 
 test : objects.a test.st
-	$(IDC) $(IDFLAGS) test.st objects.a -lreadline
+	$(IDC) $(IDFLAGS) test.st objects.a $(LDLIBS)
 
 .SUFFIXES :
 

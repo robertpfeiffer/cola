@@ -11,18 +11,14 @@ OS		= $(shell $(IDC) -C os)
 
 ifeq ($(OS),win32)
 LIBS		= ../objects/objects.a jolt.a
+LDLIBS		= jolt.a # -lopcodes -lintl
 else
 LIBS		= ../objects/objects.a readline.o jolt.a
+LDLIBS		= readline.o jolt.a -L/usr/local/lib -lreadline # -ltermcap # -lopcodes -lintl
 endif
 
 FILES		= Expression.o Scanner.o CompilerOptions.o Compiler.o Instruction.o ReductionGrammar.o \
 		  Resource.o CodeGenerator.o CodeGenerator-local.o Options.o
-
-ifeq ($(OS),win32)
-LDLIBS		= jolt.a # -lopcodes -lintl
-else
-LDLIBS		= readline.o jolt.a -lreadline -ltermcap # -lopcodes -lintl
-endif
 
 all : main$(OBJEXT)
 
