@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-09 12:53:39 by piumarta on emilia
+  Last edited: 2008-06-19 22:56:41 by piumarta on emilia
 "
 
 { import: Object }
@@ -37,6 +37,13 @@ SequenceableCollection fifth		[ ^self at: 4 		  		]
 SequenceableCollection fifth: anObject	[ ^self at: 4 		  put: anObject	]
 SequenceableCollection last		[ ^self at: self size - 1		]
 SequenceableCollection last: anObject	[ ^self at: self size - 1 put: anObject	]
+
+SequenceableCollection at: index ifAbsent: errorBlock
+[
+    ^(index between: 0 and: self size - 1)
+	ifTrue:  [self at: index]
+	ifFalse: [errorBlock value]
+]
 
 SequenceableCollection asString		[ ^self as: String ]
 SequenceableCollection asArray		[ ^self as: Array ]
@@ -220,6 +227,12 @@ SequenceableCollection by2do: elementBlock	[ 0 by: 2 to: self size - 2 do: [:i |
 SequenceableCollection inject: result into: binaryBlock
 [
     self do: [:element | result := binaryBlock value: result value: element].
+    ^result
+]
+
+SequenceableCollection from: index inject: result into: binaryBlock
+[
+    self from: index do: [:element | result := binaryBlock value: result value: element].
     ^result
 ]
 
