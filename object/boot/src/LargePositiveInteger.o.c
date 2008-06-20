@@ -445,10 +445,10 @@ static oop LargePositiveInteger__value_5f_(oop v__closure, oop v_stateful_self, 
  {
 # define self ((struct t_LargePositiveInteger *)v_self)
 
-	((unsigned char *)v__bytes)[0]= ((unsigned int)v__word >>  0) & 0xff;
-	((unsigned char *)v__bytes)[1]= ((unsigned int)v__word >>  8) & 0xff;
-	((unsigned char *)v__bytes)[2]= ((unsigned int)v__word >> 16) & 0xff;
-	((unsigned char *)v__bytes)[3]= ((unsigned int)v__word >> 24) & 0xff;
+	((unsigned char *)v__bytes)[0]= ((unsigned long)v__word >>  0) & 0xff;
+	((unsigned char *)v__bytes)[1]= ((unsigned long)v__word >>  8) & 0xff;
+	((unsigned char *)v__bytes)[2]= ((unsigned long)v__word >> 16) & 0xff;
+	((unsigned char *)v__bytes)[3]= ((unsigned long)v__word >> 24) & 0xff;
     
 # undef self
  }
