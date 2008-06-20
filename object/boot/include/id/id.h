@@ -13,6 +13,32 @@ struct __lookup
   oop		    state;
 };
 
+struct __send
+{
+  oop		    selector;
+  int		    nArgs;
+  oop		    receiver;
+  oop		    state;
+  struct __closure *closure;
+};
+
+struct __slotinfo
+{
+  const char	*name;
+  size_t	 offset;
+  size_t	 size;
+};
+
+struct __methodinfo
+{
+  const char		*name;
+  const char		*type;
+  const char		*file;
+  void			*meta;
+  size_t		 sourceStart, sourceEnd;
+  struct __methodinfo	*next;
+};
+
 struct __libid
 {
   /* bootstrap */
@@ -47,8 +73,7 @@ struct __libid
   oop		 (*alloc)(oop type, size_t size);
   oop		*(*palloc)(size_t size);
   void		*(*balloc)(size_t size);
-
-  void		  *unused22;
+  oop		 (*proto2)(oop base, size_t size);
   void		  *unused23;
 
   /* environment */
@@ -67,8 +92,8 @@ struct __libid
 
   struct __closure *(*bind )(oop selector, oop receiver);
   struct __lookup   (*bind2)(oop selector, oop receiver);
+  _imp_t	    (*bindv)(struct __send *send);
 
-  void		  *unused34;
   void		  *unused35;
 
   oop		 (*nlreturn)(oop nlr, oop result);
@@ -81,15 +106,15 @@ struct __libid
 
   /* debugging */
 
-  void		*(*enter)(char *name, char *type, char *file);
+  void		*(*enter)(struct __methodinfo *info);
   void		 (*line)(int line);
   void		 (*leave)(void *cookie);
   char		*(*backtrace)(void);
+  void		*(*methodAt)(int offset);
+  void		 (*infos)(struct __methodinfo *first, struct __methodinfo *last);
+  void		*(*infoList)(void);
+  int		 (*lineAt)(int offset);
 
-  void		  *unused46;
-  void		  *unused47;
-  void		  *unused48;
-  void		  *unused49;
   void		  *unused50;
   void		  *unused51;
 
