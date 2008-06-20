@@ -80,7 +80,7 @@ void		  *_libid_infoList(void);
   ((_imp_t)(_libid_bindv(&_s)))(&_s, _s.receiver, _s.receiver, ##ARG);	\
 })
 
-static int    _argc= 0;
+static long   _argc= 0;
 static char **_argv= 0;
 static char **_envp= 0;
 
@@ -312,7 +312,7 @@ static oop _vtable__delegated(oop _thunk, oop state, oop self)
 
 static oop _object___vtable(oop _thunk, oop state, oop self)
 {
-  return self ? (((unsigned)self & 1) ? _libid_tag_vtable :  self->_vtable[-1]) : _libid_nil_vtable;
+  return self ? (((long)self & 1) ? _libid_tag_vtable :  self->_vtable[-1]) : _libid_nil_vtable;
 }
 
 static oop _object___delegate(oop _thunk, oop state, oop self)
@@ -523,8 +523,8 @@ static char *nameOf(oop object)
   static char buf[32];
   char *name= buf;
   oop vtable= 0;
-  if      (object == 0)			     name= "(0x0)";
-  else if ((unsigned)object & 1)	     sprintf(buf, "(#%p=0x%x=%d)", object, (int)object >> 1, (int)object >> 1);
+  if      (object == 0)				 name= "(0x0)";
+  else if ((long)object & 1)			 sprintf(buf, "(#%p=0x%lx=%ld)", object, (long)object >> 1, (long)object >> 1);
   else
     {
       vtable= object->_vtable[-1];
@@ -652,7 +652,7 @@ struct __closure *_libid_bind(oop selector, oop receiver)
   struct __entry *entry= 0;
 #endif
   oop assoc= 0;
-  oop vtable= receiver ? (((unsigned)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
+  oop vtable= receiver ? (((long)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
   dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, receiver);
   if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(receiver));
 
@@ -660,7 +660,7 @@ struct __closure *_libid_bind(oop selector, oop receiver)
 # if 0
   putchar(' ');
 # endif
-  probe= (((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & (GLOBAL_MCACHE - 1);
+  probe= (((unsigned long)vtable << 2) ^ ((unsigned long)selector >> 3)) & (GLOBAL_MCACHE - 1);
   entry= _libid_mcache[probe];
   if (entry && entry->selector == selector && entry->vtable == vtable)
     return (struct __closure *) entry->closure;
@@ -706,11 +706,11 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
 #endif
   oop assoc= 0;
   do {
-    oop vtable= fragment ? (((unsigned)fragment & 1) ? _libid_tag_vtable : fragment->_vtable[-1]) : _libid_nil_vtable;
+    oop vtable= fragment ? (((long)fragment & 1) ? _libid_tag_vtable : fragment->_vtable[-1]) : _libid_nil_vtable;
     dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, fragment);
     if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(fragment));
 #  if GLOBAL_MCACHE
-    probe= (((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & (GLOBAL_MCACHE - 1);
+    probe= (((unsigned long)vtable << 2) ^ ((unsigned long)selector >> 3)) & (GLOBAL_MCACHE - 1);
     entry= _libid_mcache[probe];
     if (entry->selector == selector && entry->vtable == vtable)
       return (struct __lookup){ (struct __closure *)entry->closure, fragment };
@@ -756,7 +756,7 @@ _imp_t _libid_bindv(struct __send *send)
   struct __entry *entry= 0;
 #endif
   oop assoc= 0;
-  oop vtable= receiver ? (((unsigned)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
+  oop vtable= receiver ? (((long)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
   dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, receiver);
   if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(receiver));
 
@@ -764,7 +764,7 @@ _imp_t _libid_bindv(struct __send *send)
 # if 0
   putchar(' ');
 # endif
-  probe= (((unsigned)vtable << 2) ^ ((unsigned)selector >> 3)) & (GLOBAL_MCACHE - 1);
+  probe= (((unsigned long)vtable << 2) ^ ((unsigned long)selector >> 3)) & (GLOBAL_MCACHE - 1);
   entry= _libid_mcache[probe];
   if (entry && entry->selector == selector && entry->vtable == vtable)
     {
@@ -910,7 +910,7 @@ void *_libid_param(int index)
 {
   switch (index)
     {
-    case -1:	return (void *)errno;
+    case -1:	return (void *)(long)errno;
     case  0:	return (void *)_argc;
     case  1:	return (void *)_argv;
     case  2:	return (void *)_envp;
@@ -976,7 +976,7 @@ void *_libid_enter(struct __methodinfo *info)
   p= positions + position;
   p->info= info;
   p->line= info->sourceStart;
-  return (void *)(position++);
+  return (void *)(long)position++;
 }
 
 void *_libid_methodAt(int offset)
