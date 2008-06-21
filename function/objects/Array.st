@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-04-07 23:41:10 by piumarta on emilia
+  Last edited: 2008-06-20 18:24:09 by piumarta on emilia
 "
 
 { import: Objects }
@@ -28,7 +28,7 @@ Array size_: _size value_: _value
     self := self new: (SmallInteger value_: _size).
     {
       int i;
-      for (i= 0;  i < (int)v__size;  ++i)
+      for (i= 0;  i < (long)v__size;  ++i)
         ((oop *)self->v__oops)[i]= *((oop **)v__value)[i];
     }.
 ]
@@ -51,7 +51,7 @@ Array at: offset
 
 Array at_: _offset
 {
-    _return ((oop *)self->v__oops)[(int)v__offset];
+    _return ((oop *)self->v__oops)[(long)v__offset];
 }
 
 Array at: offset put: anObject
@@ -63,13 +63,13 @@ Array at: offset put: anObject
 
 Array at_: _offset put: anObject
 {
-    _return ((oop *)self->v__oops)[(int)v__offset]= v_anObject;
+    _return ((oop *)self->v__oops)[(long)v__offset]= v_anObject;
 }
 
 Array  argumentVectorSize	[ ^SmallInteger value_: self _argumentVectorSize ]
 Array _argumentVectorSize	{ _return (oop)_libid->param(0); }
 Array  argumentVectorAt: offset	[ ^String value_: (self _argumentVectorAt_: offset _integerValue) ]
-Array _argumentVectorAt_: _off	{ _return (oop)(((char **)_libid->param(1))[(int)v__off]); }
+Array _argumentVectorAt_: _off	{ _return (oop)(((char **)_libid->param(1))[(long)v__off]); }
 
 Array argumentVector
 [
