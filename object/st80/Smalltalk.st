@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 11:32:13 by piumarta on ubuntu
+  Last edited: 2008-06-20 14:26:31 by piumarta on emilia.local
 "
 
 { import: Object }
@@ -47,8 +47,8 @@ Smalltalk abort
 
 Smalltalk _osError			{ return (oop)_libid->param(-1); }
 Smalltalk _argumentCount		{ return (oop)_libid->param(0); }
-Smalltalk _argumentAt_: _index		{ return (oop)(((char **)_libid->param(1))[(int)v__index]); }
-Smalltalk _osErrorString_: _errno	{ return (oop)strerror((int)v__errno); }
+Smalltalk _argumentAt_: _index		{ return (oop)(((char **)_libid->param(1))[(long)v__index]); }
+Smalltalk _osErrorString_: _errno	{ return (oop)strerror((long)v__errno); }
 Smalltalk _directoryDelimiter		{ return (oop)_libid->param(7); }
 
 Smalltalk directoryDelimiter		[ ^Character value_: self _directoryDelimiter ]

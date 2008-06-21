@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-01-25 03:17:20 by piumarta on emilia.local
+  Last edited: 2008-06-20 14:41:29 by piumarta on emilia.local
 "
 
 { import: ArrayedCollection }
@@ -38,21 +38,21 @@ Array _elements	[ ^_pointers ]
 
 Array at: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        return ((oop *)self->v__pointers)[((int)v_anInteger >> 1) - 1]; }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        return ((oop *)self->v__pointers)[((long)v_anInteger >> 1) - 1]; }.
     ^self primitiveFailed
 ]
 
 Array at: anInteger put: anObject
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        return ((oop *)self->v__pointers)[((int)v_anInteger >> 1) - 1]= v_anObject; }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        return ((oop *)self->v__pointers)[((long)v_anInteger >> 1) - 1]= v_anObject; }.
     ^self primitiveFailed
 ]
 
 Array elementSize
 {
-    return (oop)(sizeof(oop) << 1 | 1);
+    return (oop)(long)(sizeof(oop) << 1 | 1);
 }
 
 Array printOn: aStream
@@ -80,9 +80,9 @@ Array replaceFrom: first to: last with: ptrs startingAt: offset
 
 Array replaceFrom_: _first for_: _count with_: _source startingAt_: _offset
 {
-    memcpy((char *)self->v__pointers + sizeof(oop) * ((int)v__first - 1),
-	   (char *)v__source + sizeof(oop) * ((int)v__offset - 1),
-	   sizeof(oop) * (int)v__count);
+    memcpy((char *)self->v__pointers + sizeof(oop) * ((long)v__first - 1),
+	   (char *)v__source + sizeof(oop) * ((long)v__offset - 1),
+	   sizeof(oop) * (long)v__count);
 }
 
 
@@ -95,7 +95,7 @@ ImmutableArray size_: _size value_: _value	"Array constructor"
     _pointers := _value.
     {
       int i;
-      for (i= 0;  i < (int)v__size;  ++i)
+      for (i= 0;  i < (long)v__size;  ++i)
         ((oop *)self->v__pointers)[i]= *((oop **)v__value)[i];
     }.
 ]

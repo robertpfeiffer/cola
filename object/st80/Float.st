@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-08-18 14:36:28 by piumarta on emilia.local
+  Last edited: 2008-06-20 14:40:50 by piumarta on emilia.local
 "
 
 { import: Number }
@@ -27,7 +27,7 @@ Float : Number ()
 Float isFloat	[ ^true ]
 Object isFloat	[ ^false ]
 
-Float _sizeof { return (oop)sizeof(double); }
+Float _sizeof { return (oop)(long)sizeof(double); }
 
 Float value_: _fp
 [
@@ -48,7 +48,7 @@ Float hash
     hash  += ((unsigned int *)self)[1];
     hash >>= 7;
     hash  &= 0x01FFFFFE;
-    return (oop)(hash | 1);
+    return (oop)(long)(hash | 1);
 }
 
 Float setIntegerValue_: _integer
@@ -200,7 +200,7 @@ Float exponent
     int pwr;
     memcpy(&rcvr, v_self, sizeof(double));
     frac= frexp(rcvr, &pwr);
-    return (oop)(((pwr - 1) << 1) | 1);
+    return (oop)(long)(((pwr - 1) << 1) | 1);
 }
 
 Float sin
@@ -237,6 +237,6 @@ Float print
 {
     double d;
     memcpy(&d, self, sizeof(d));
-/*  return (oop)(fprintf(stdout, "%f", d) << 1 | 1);  */
-    return (oop)(fprintf(stdout, "%.16g", d) << 1 | 1);
+/*  return (oop)(long)(fprintf(stdout, "%f", d) << 1 | 1);  */
+    return (oop)(long)(fprintf(stdout, "%.16g", d) << 1 | 1);
 }

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-04-02 12:07:45 by piumarta on alan-kays-computer.local
+  Last edited: 2008-06-20 14:38:24 by piumarta on emilia.local
 "
 
 { import: Integer }
@@ -57,36 +57,36 @@ SmallInteger digitAt: n
 
 SmallInteger + aNumber
 [
-    { if ((int)v_aNumber & 1) {
-	int s= ((int)v_self >> 1) + ((int)v_aNumber >> 1);
-        if ((s ^ (s << 1)) >= 0) return (oop)(s << 1 | 1);
+    { if ((long)v_aNumber & 1) {
+	int s= ((int)(long)v_self >> 1) + ((int)(long)v_aNumber >> 1);
+        if ((s ^ (s << 1)) >= 0) return (oop)(long)(s << 1 | 1);
     } }.
     ^super + aNumber
 ]
 
 SmallInteger - aNumber
 [
-    { if ((int)v_aNumber & 1) {
-	int s= ((int)v_self >> 1) - ((int)v_aNumber >> 1);
-        if ((s ^ (s << 1)) >= 0) return (oop)(s << 1 | 1);
+    { if ((long)v_aNumber & 1) {
+	int s= ((int)(long)v_self >> 1) - ((int)(long)v_aNumber >> 1);
+        if ((s ^ (s << 1)) >= 0) return (oop)(long)(s << 1 | 1);
     } }.
     ^super - aNumber
 ]
 
 SmallInteger * aNumber
 [
-    { if ((int)v_aNumber & 1) {
-	int l= (int)v_self >> 1, r= (int)v_aNumber >> 1, s= l * r;
-        if (((s ^ (s << 1)) >= 0) && ((r == 0) || (s / r == l))) return (oop)(s << 1 | 1);
+    { if ((long)v_aNumber & 1) {
+	int l= (int)(long)v_self >> 1, r= (int)(long)v_aNumber >> 1, s= l * r;
+        if (((s ^ (s << 1)) >= 0) && ((r == 0) || (s / r == l))) return (oop)(long)(s << 1 | 1);
     } }.
     ^super * aNumber
 ]
 
 SmallInteger / aNumber
 [
-    { if (((int)v_aNumber & 1) && ((int)v_aNumber != 1)) {
-	int l= (int)v_self >> 1, r= (int)v_aNumber >> 1, s= l / r;
-	if (s * r == l) return (oop)(s << 1 | 1);
+    { if (((long)v_aNumber & 1) && ((long)v_aNumber != 1)) {
+	int l= (long)v_self >> 1, r= (long)v_aNumber >> 1, s= l / r;
+	if (s * r == l) return (oop)(long)(s << 1 | 1);
     } }.
     aNumber = 0 ifTrue: [^self errorDivisionByZero].
     ^aNumber isSmallInteger
@@ -96,8 +96,8 @@ SmallInteger / aNumber
 
 SmallInteger // aNumber
 [
-    { if (((int)v_aNumber & 1) && ((int)v_aNumber != 1)) {
-        int rcvr= (int)v_self >> 1, arg= (int)v_aNumber >> 1, result;
+    { if (((long)v_aNumber & 1) && ((long)v_aNumber != 1)) {
+        int rcvr= (long)v_self >> 1, arg= (long)v_aNumber >> 1, result;
 	if (rcvr > 0) {
 	  if (arg > 0) {
 	    result= rcvr / arg;
@@ -115,22 +115,22 @@ SmallInteger // aNumber
 	  }
 	}
 	if ((result ^ (result << 1)) >= 0)
-	  return (oop)(result << 1 | 1);
+	  return (oop)(long)(result << 1 | 1);
     } }.
     ^super // aNumber
 ]
 
 SmallInteger \\ aNumber
 [
-    { if (((int)v_aNumber & 1) && ((int)v_aNumber != 1)) {
-	int rem= ((int)v_self >> 1) % ((int)v_aNumber >> 1);
-	if ((int)v_aNumber < 0) {
-	  if (rem > 0) rem += ((int)v_aNumber >> 1);
+    { if (((long)v_aNumber & 1) && ((long)v_aNumber != 1)) {
+	int rem= ((long)v_self >> 1) % ((long)v_aNumber >> 1);
+	if ((long)v_aNumber < 0) {
+	  if (rem > 0) rem += ((long)v_aNumber >> 1);
 	} else {
-	  if (rem < 0) rem += ((int)v_aNumber >> 1);
+	  if (rem < 0) rem += ((long)v_aNumber >> 1);
 	}
 	if ((rem ^ (rem << 1)) >= 0)
-	  return (oop)(rem << 1 | 1);
+	  return (oop)(long)(rem << 1 | 1);
     } }.
     ^super \\ aNumber
 ]
@@ -138,15 +138,15 @@ SmallInteger \\ aNumber
 SmallInteger quo: aNumber 
 [
     {
-      if ((int)v_self & (int)v_aNumber & 1)
+      if ((long)v_self & (long)v_aNumber & 1)
         {
-	  int integerRcvr   = (int)v_self    >> 1;
-	  int integerArg    = (int)v_aNumber >> 1;
+	  int integerRcvr   = (long)v_self    >> 1;
+	  int integerArg    = (long)v_aNumber >> 1;
 	  int integerResult = ((integerRcvr > 0)
 	    ? (((integerArg > 0) ? (integerRcvr / integerArg) : (0 - (integerRcvr / (0 - integerArg)))))
             : (((integerArg > 0) ? (0 - ((0 - integerRcvr) / integerArg)) : ((0 - integerRcvr) / (0 - integerArg)))));
 	  if ((integerResult ^ (integerResult << 1)) >= 0)
-	    return (oop)(integerResult << 1 | 1);
+	    return (oop)(long)(integerResult << 1 | 1);
         }
     }.
     aNumber = 0 ifTrue: [self errorZeroDivide].
@@ -157,16 +157,16 @@ SmallInteger quo: aNumber
 
 SmallInteger bitAnd: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))
-        return (oop)(((int)v_self & (int)v_anInteger) | 1); }.
+    { if (((long)v_anInteger & 1) && ((long)v_self > 0) && ((long)v_anInteger > 0))
+        return (oop)(((long)v_self & (long)v_anInteger) | 1); }.
     self >= 0 ifTrue: [^anInteger bitAnd: self].
     ^(self bitInvert bitOr: anInteger bitInvert) bitInvert
 ]
 
 SmallInteger bitOr: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))
-        return (oop)(((int)v_self | (int)v_anInteger) | 1); }.
+    { if (((long)v_anInteger & 1) && ((long)v_self > 0) && ((long)v_anInteger > 0))
+        return (oop)(((long)v_self | (long)v_anInteger) | 1); }.
     self >= 0 ifTrue: [^anInteger bitOr: self].
     ^anInteger < 0
 	ifTrue:  [(self bitInvert bitAnd: anInteger bitInvert) bitInvert]
@@ -175,8 +175,8 @@ SmallInteger bitOr: anInteger
 
 SmallInteger bitXor: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_self > 0) && ((int)v_anInteger > 0))
-        return (oop)(((int)v_self ^ (int)v_anInteger) | 1); }.
+    { if (((long)v_anInteger & 1) && ((long)v_self > 0) && ((long)v_anInteger > 0))
+        return (oop)(((long)v_self ^ (long)v_anInteger) | 1); }.
     self >= 0 ifTrue: [^anInteger bitXor: self].
     ^anInteger < 0
 	ifTrue:  [self bitInvert bitXor: anInteger bitInvert]
@@ -186,15 +186,15 @@ SmallInteger bitXor: anInteger
 SmallInteger bitShift: displacement
 [
     displacement isSmallInteger ifFalse: [^self error: 'non-Integer displacement'].
-    { int l= (int)v_self >> 1, r= (int)v_displacement >> 1;
+    { int l= (long)v_self >> 1, r= (long)v_displacement >> 1;
       if (r >= 0) {
         if (r <= 31) {
           int s= l << r;
-          if ((l == (s >> r)) && ((s ^ (s << 1)) >= 0)) return (oop)(s << 1 | 1);
+          if ((l == (s >> r)) && ((s ^ (s << 1)) >= 0)) return (oop)(long)(s << 1 | 1);
         }
       } else if (r >= -31) {
   	int s= l >> r;
-        return (oop)(s << 1 | 1);
+        return (oop)(long)(s << 1 | 1);
       }
     }.
     self >= 0 ifTrue: [^super bitShift: displacement].
@@ -204,9 +204,9 @@ SmallInteger bitShift: displacement
 SmallInteger << displacement
 [
     {
-      if ((int)v_self & (int)v_displacement & 1) {
-	int l= (int)v_self >> 1, r= (int)v_displacement >> 1, s= (l << r);
-	if ((r >= 0) && (r <= 31) && ((s ^ (s << 1)) >= 0) && ((s >> r) == l)) return (oop)(s << 1 | 1);
+      if ((long)v_self & (long)v_displacement & 1) {
+	int l= (long)v_self >> 1, r= (long)v_displacement >> 1, s= (l << r);
+	if ((r >= 0) && (r <= 31) && ((s ^ (s << 1)) >= 0) && ((s >> r) == l)) return (oop)(long)(s << 1 | 1);
     } }.
     ^super << displacement
 ]
@@ -214,46 +214,46 @@ SmallInteger << displacement
 SmallInteger >> displacement
 [
     {
-      if ((int)v_self & (int)v_displacement & 1) {
-	int l= (int)v_self >> 1, r= (int)v_displacement >> 1, s= (l >> r);
-	if ((r >= 0) && (r <= 31)) return (oop)(s << 1 | 1);
+      if ((long)v_self & (long)v_displacement & 1) {
+	int l= (long)v_self >> 1, r= (long)v_displacement >> 1, s= (l >> r);
+	if ((r >= 0) && (r <= 31)) return (oop)(long)(s << 1 | 1);
     } }.
     ^super >> displacement
 ]
 
 SmallInteger < aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self < (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self < (long)v_aNumber) ? v_true : v_false; }.
     ^super < aNumber
 ]
 
 SmallInteger <= aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self <= (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self <= (long)v_aNumber) ? v_true : v_false; }.
     ^super <= aNumber
 ]
 
 SmallInteger = aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self == (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self == (long)v_aNumber) ? v_true : v_false; }.
     ^super = aNumber
 ]
 
 SmallInteger ~= aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self != (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self != (long)v_aNumber) ? v_true : v_false; }.
     ^super ~= aNumber
 ]
 
 SmallInteger >= aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self >= (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self >= (long)v_aNumber) ? v_true : v_false; }.
     ^super >= aNumber
 ]
 
 SmallInteger > aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self > (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self > (long)v_aNumber) ? v_true : v_false; }.
     ^super > aNumber
 ]
 

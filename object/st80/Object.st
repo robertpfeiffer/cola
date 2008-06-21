@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-02-13 14:09:51 by piumarta on emilia
+  Last edited: 2008-06-20 14:39:31 by piumarta on emilia.local
 "
 
 { import: _object }
@@ -67,10 +67,10 @@ Object _newPointers: anInteger	{ return (oop)_libid->palloc(((size_t)v_anInteger
 Object _newWords: anInteger	{ return (oop)_libid->balloc(((size_t)v_anInteger >> 1) * sizeof(int)); }
 Object _newBytes: anInteger	{ return (oop)_libid->balloc(((size_t)v_anInteger >> 1) * sizeof(char)); }
 
-SmallInteger value_: _int	{ return (oop)((((int)v__int) << 1) | 1); }
-SmallInteger _integerValue	{ return (oop)(((int)self) >> 1); }
+SmallInteger value_: _int	{ return (oop)(long)((((int)(long)v__int) << 1) | 1); }
+SmallInteger _integerValue	{ return (oop)(long)(((int)(long)self) >> 1); }
 
-SmallInteger print		{ return (oop)(fprintf(stdout, "%d", (int)self >> 1) << 1 | 1); }
+SmallInteger print		{ return (oop)(long)(fprintf(stdout, "%d", (int)(long)self >> 1) << 1 | 1); }
 
 Object yourself	[]
 
@@ -106,13 +106,13 @@ BlockClosure function_: _implementationAddress arity_: _argumentCount
 
 StaticBlockClosure value
 [
-    { if ((int)self->v__arity == 0) return ((_imp_t)(self->v__function))(0, v_self); }.
+    { if ((long)self->v__arity == 0) return ((_imp_t)(self->v__function))(0, v_self); }.
     ^self errorArgumentCount: 0
 ]
 
 StaticBlockClosure value: a
 [
-    { if ((int)self->v__arity == 1) return ((_imp_t)(self->v__function))(0, v_self, v_a); }.
+    { if ((long)self->v__arity == 1) return ((_imp_t)(self->v__function))(0, v_self, v_a); }.
     ^self errorArgumentCount: 1
 ]
 
@@ -143,15 +143,15 @@ Array initialize: anInteger
 
 Array at: anInteger put: anObject
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        return ((oop *)self->v__pointers)[((int)v_anInteger >> 1) - 1]= v_anObject; }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        return ((oop *)self->v__pointers)[((long)v_anInteger >> 1) - 1]= v_anObject; }.
     ^self primitiveFailed
 ]
 
 Array at: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        return ((oop *)self->v__pointers)[((int)v_anInteger >> 1) - 1]; }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        return ((oop *)self->v__pointers)[((long)v_anInteger >> 1) - 1]; }.
     ^self primitiveFailed
 ]
 
@@ -169,7 +169,7 @@ ImmutableArray size_: _size value_: _value
     _pointers := _value.
     {
       int i;
-      for (i= 0;  i < (int)v__size;  ++i)
+      for (i= 0;  i < (long)v__size;  ++i)
         ((oop *)self->v__pointers)[i]= *((oop **)v__value)[i];
     }.
 ]
@@ -206,13 +206,13 @@ SmallInteger to: anInteger do: unaryBlock
 
 SmallInteger <= aNumber
 [
-    { if ((int)v_aNumber & 1) return ((int)v_self <= (int)v_aNumber) ? v_true : v_false; }.
+    { if ((long)v_aNumber & 1) return ((long)v_self <= (long)v_aNumber) ? v_true : v_false; }.
     ^super <= aNumber
 ]
 
 SmallInteger + aNumber
 [
-    { if ((int)v_aNumber & 1) return (oop)((int)v_self + (int)v_aNumber - 1); }.
+    { if ((long)v_aNumber & 1) return (oop)(long)((int)(long)v_self + (int)(long)v_aNumber - 1); }.
     ^super + aNumber
 ]
 
@@ -238,7 +238,7 @@ Character value_: _int		[ ^self value: (SmallInteger value_: _int) ]
 { import: String }		"ditto -- loads ByteArray for us"
 { import: WordArray }		"program literals"
 
-Character put	{ fputc((int)self->v_value >> 1, stdout);  fflush(stdout);  return (oop)(1 << 1 | 1); }
+Character put	{ fputc((long)self->v_value >> 1, stdout);  fflush(stdout);  return (oop)(1L << 1 | 1L); }
 Character print	[ $$ put.  self put.  ^2 ]
 
 Object debugName	[ ^ImmutableString value_: self _debugName ]
@@ -318,9 +318,9 @@ Object errorNoSuchElement		[ ^self error: 'attempt to index non-existent element
 Object errorArgumentCount: argCount	[ ^self error: 'wrong number of block arguments' ]
 
 Object hash		[ ^self identityHash ]
-Object identityHash	{ return (oop)((((unsigned int)self >> 2) & 0x01FFFFFE) | 1); }
+Object identityHash	{ return (oop)((((unsigned long)self >> 2) & 0x01FFFFFEL) | 1L); }
 
-_object identityHash	{ return (oop)((((unsigned int)self >> 2) & 0x01FFFFFE) | 1); }	"so we can put vtables in dictionaries"
+_object identityHash	{ return (oop)((((unsigned long)self >> 2) & 0x01FFFFFEL) | 1L); }	"so we can put vtables in dictionaries"
 
 Object == anObject	{ return (v_self == v_anObject) ? v_true : v_false; }
 Object ~~ anObject	{ return (v_self != v_anObject) ? v_true : v_false; }

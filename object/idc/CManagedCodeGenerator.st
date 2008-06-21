@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-09-27 19:19:17 by piumarta on emilia.local
+  Last edited: 2008-06-20 15:13:06 by piumarta on emilia.local
 "
 
 { import: CodeGenerator }
@@ -808,8 +808,8 @@ CManagedCodeGenerator compare: loc1 notIdentical: loc2 location: loc
 CManagedCodeGenerator checkTags: check with: lhs with: rhs
 [
     self gen: '(1'.
-    (check == #left  or: [check == #both]) ifTrue: [self gen: ' & (int)'; genLocation: lhs].
-    (check == #right or: [check == #both]) ifTrue: [self gen: ' & (int)'; genLocation: rhs].
+    (check == #left  or: [check == #both]) ifTrue: [self gen: ' & (long)'; genLocation: lhs].
+    (check == #right or: [check == #both]) ifTrue: [self gen: ' & (long)'; genLocation: rhs].
     self gen: ')'.
 ]
 
@@ -818,17 +818,17 @@ CManagedCodeGenerator tagged: rcv add: arg location: loc checking: tagCheck
 "
     self
 	gen: '  '; gen: 'if '; checkTags: tagCheck with: rcv with: arg; genl: ' {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((int)'; genLocation: rcv; gen: ' + (int)'; genLocation: arg; genl: ') - 1);';
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((long)'; genLocation: rcv; gen: ' + (long)'; genLocation: arg; genl: ') - 1L);';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: '+'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 "
     self
 	genl: '  {';
-	gen:  '    int _l= (int)'; genLocation: rcv; genl: ' >> 1;';
-	gen:  '    int _r= (int)'; genLocation: arg; genl: ' >> 1;';
+	gen:  '    int _l= (long)'; genLocation: rcv; genl: ' >> 1;';
+	gen:  '    int _r= (long)'; genLocation: arg; genl: ' >> 1;';
 	genl: '    int _s= _l + _r;';
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg; gen: ' && ((_s ^ (_s << 1)) >= 0))';
-	gen:       '  '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
+	gen:       '  '; genLocation: loc; gen: '= (oop)(long)(_s << 1 | 1);';
 	gen:  '  else '; genLocation: loc; gen: '= ';
 	gen:       '_send('; genSelector: '+'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
@@ -839,17 +839,17 @@ CManagedCodeGenerator tagged: rcv sub: arg location: loc checking: tagCheck
 "
     self
 	gen: '  '; gen: 'if '; checkTags: tagCheck with: rcv with: arg; genl: ' {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((int)'; genLocation: rcv; gen: ' - (int)'; genLocation: arg; genl: ') + 1);';
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((long)'; genLocation: rcv; gen: ' - (long)'; genLocation: arg; genl: ') + 1L);';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: '-'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 "
     self
 	genl: '  {';
-	gen:  '    int _l= (int)'; genLocation: rcv; genl: ' >> 1;';
-	gen:  '    int _r= (int)'; genLocation: arg; genl: ' >> 1;';
+	gen:  '    int _l= (long)'; genLocation: rcv; genl: ' >> 1;';
+	gen:  '    int _r= (long)'; genLocation: arg; genl: ' >> 1;';
 	genl: '    int _s= (_l - _r);';
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg; gen: ' && ((_s ^ (_s << 1)) >= 0))';
-	gen:       '  '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
+	gen:       '  '; genLocation: loc; gen: '= (oop)(long)(_s << 1 | 1);';
 	gen:  '  else '; genLocation: loc; gen: '= ';
 	gen:       '_send('; genSelector: '-'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
@@ -860,8 +860,8 @@ CManagedCodeGenerator tagged: rcv op: operator selector: sel with: arg location:
 
     self
 	gen: '  '; gen: 'if '; checkTags: tagCheck with: rcv with: arg; genl: ' {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((((int)'; genLocation: rcv; gen:  '>> 1) ';
-	gen:                                   operator; gen: ' ((int)'; genLocation: arg; genl: '>> 1)) << 1) | 1);';
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((((long)'; genLocation: rcv; gen:  '>> 1) ';
+	gen:                                   operator; gen: ' ((long)'; genLocation: arg; genl: '>> 1)) << 1) | 1);';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: sel; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
@@ -873,13 +873,13 @@ CManagedCodeGenerator tagged: rcv mul: arg location: loc checking: tagCheck
 "
     self
 	genl: '  {';
-	gen:  '    int _l= (int)'; genLocation: rcv; genl: ' >> 1;';
-	gen:  '    int _r= (int)'; genLocation: arg; genl: ' >> 1;';
+	gen:  '    int _l= (long)'; genLocation: rcv; genl: ' >> 1;';
+	gen:  '    int _r= (long)'; genLocation: arg; genl: ' >> 1;';
 	genl: '    int _s= (_l * _r);';
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:         ' && ((_r == 0) || (_s / _r == _l))';
 	gen:         ' && ((_s ^ (_s << 1)) >= 0))';
-	gen:       '  '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
+	gen:       '  '; genLocation: loc; gen: '= (oop)(long)(_s << 1 | 1);';
 	gen:  '  else '; genLocation: loc; gen: '= ';
 	gen:       '_send('; genSelector: '*'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
@@ -911,7 +911,7 @@ CManagedCodeGenerator tagged: rcv and: arg location: loc checking: tagCheck
 	gen: '  '; gen: 'if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:                ' && ('; genLocation: rcv; gen: ' > 0)';
 	gen:                ' && ('; genLocation: arg; genl: ' > 0)) {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)((int)'; genLocation: rcv; gen: ' & (int)'; genLocation: arg; genl: ');';
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)((long)'; genLocation: rcv; gen: ' & (long)'; genLocation: arg; genl: ');';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: 'bitAnd:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
@@ -922,7 +922,7 @@ CManagedCodeGenerator tagged: rcv or: arg location: loc checking: tagCheck
 	gen: '  '; gen: 'if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:                ' && ('; genLocation: rcv; gen: ' > 0)';
 	gen:                ' && ('; genLocation: arg; genl: ' > 0)) {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)((int)'; genLocation: rcv; gen: ' | (int)'; genLocation: arg; genl: ');';
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)((long)'; genLocation: rcv; gen: ' | (long)'; genLocation: arg; genl: ');';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: 'bitOr:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
@@ -933,7 +933,7 @@ CManagedCodeGenerator tagged: rcv xor: arg location: loc checking: tagCheck
 	gen: '  '; gen: 'if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:                ' && ('; genLocation: rcv; gen: ' > 0)';
 	gen:                ' && ('; genLocation: arg; genl: ' > 0)) {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((int)'; genLocation: rcv; gen: ' ^ (int)'; genLocation: arg; genl: ') | 1);';
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (oop)(((long)'; genLocation: rcv; gen: ' ^ (long)'; genLocation: arg; genl: ') | 1);';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: 'bitXor:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.
 ]
@@ -941,15 +941,15 @@ CManagedCodeGenerator tagged: rcv xor: arg location: loc checking: tagCheck
 CManagedCodeGenerator tagged: rcv shift: arg location: loc checking: tagCheck
 [
     self
-	gen:  '  { int _l= (int)'; genLocation: rcv; gen: ' >> 1, ';
-	gen:         ' _r= (int)'; genLocation: arg; gen: ' >> 1, ';
+	gen:  '  { int _l= (long)'; genLocation: rcv; gen: ' >> 1, ';
+	gen:         ' _r= (long)'; genLocation: arg; gen: ' >> 1, ';
 	genl:        ' _s= ((_r < 0) ? (_l >> -_r) : (_l << _r));';
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:          ' && (   (    (_r >= 0) && (_r <= 31) ';
 	gen:                   ' && (_l == (_s >> _r))';
 	gen:                   ' && ((_s ^ (_s << 1)) >= 0) )';
 	gen:              ' || ((_r < 0) && (_r >= -31)) )';
-	gen:         ') '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
+	gen:         ') '; genLocation: loc; gen: '= (oop)(long)(_s << 1 | 1);';
 	gen:  ' else '; genLocation: loc; gen: '= ';
 	gen:       '_send('; genSelector: 'bitShift:'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
@@ -959,14 +959,14 @@ CManagedCodeGenerator tagged: rcv left: arg location: loc checking: tagCheck
 [
     self
 	genl: '{';
-	gen:  '    int _l= (int)'; genLocation: rcv; gen: ' >> 1,';
-	gen:         ' _r= (int)'; genLocation: arg; gen: ' >> 1,';
+	gen:  '    int _l= (long)'; genLocation: rcv; gen: ' >> 1,';
+	gen:         ' _r= (long)'; genLocation: arg; gen: ' >> 1,';
 	genl:        ' _s= (_l << _r);';
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:         ' && (_r >= 0) && (_r <= 31)';
 	gen:         ' && (_l == (_s >> _r))';
 	gen:         ' && ((_s ^ (_s << 1)) >= 0)';
-	gen:         ') '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
+	gen:         ') '; genLocation: loc; gen: '= (oop)(long)(_s << 1 | 1);';
 	gen:  ' else '; genLocation: loc; gen: '= ';
 	gen:       '_send('; genSelector: '<<'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
@@ -976,12 +976,12 @@ CManagedCodeGenerator tagged: rcv right: arg location: loc checking: tagCheck
 [
     self
 	genl: '  {';
-	gen:  '    int _l= (int)'; genLocation: rcv; gen: ' >> 1,';
-	gen:         ' _r= (int)'; genLocation: arg; gen: ' >> 1,';
+	gen:  '    int _l= (long)'; genLocation: rcv; gen: ' >> 1,';
+	gen:         ' _r= (long)'; genLocation: arg; gen: ' >> 1,';
 	genl:        ' _s= (_l >> _r);';
 	gen:  '    if ('; checkTags: tagCheck with: rcv with: arg;
 	gen:         ' && (_r >= 0) && (_r <= 31)';
-	gen:         ') '; genLocation: loc; gen: '= (oop)(_s << 1 | 1);';
+	gen:         ') '; genLocation: loc; gen: '= (oop)(long)(_s << 1 | 1);';
 	gen:  ' else '; genLocation: loc; gen: '= ';
 	gen:       '_send('; genSelector: '>>'; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');';
 	genl: '  }'
@@ -991,8 +991,8 @@ CManagedCodeGenerator tagged: rcv rel: operator selector: sel with: arg location
 [
     self
 	gen: '  '; gen: 'if '; checkTags: tagCheck with: rcv with: arg; genl: ' {';
-	gen: '  '; gen: '  '; genLocation: loc; gen: '= (((int)'; genLocation: rcv; gen: ' ';
-	gen:                             operator; gen: ' (int)'; genLocation: arg;
+	gen: '  '; gen: '  '; genLocation: loc; gen: '= (((long)'; genLocation: rcv; gen: ' ';
+	gen:                             operator; gen: ' (long)'; genLocation: arg;
 	gen:              ') ? '; genVariable: 'true'; gen: ' : '; genVariable: 'false'; genl: ');';
 	gen: '  '; gen: '} else '; genLocation: loc;
 	gen: '= _send('; genSelector: sel; gen: ', '; genLocation: rcv; gen: ', '; genLocation: arg; genl: ');'.

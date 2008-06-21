@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 11:29:59 by piumarta on ubuntu
+  Last edited: 2008-06-20 14:36:16 by piumarta on emilia.local
 "
 
 { external }
@@ -45,12 +45,12 @@ _vtable methodAt: aSelector		"install aMethod as the response to sending aSelect
 
 "Support for debugging and cloning."
 
-_object   _debugName { return (oop)"_object";   }  _object   _sizeof { return (oop)sizeof(struct t__object  ); }
-_selector _debugName { return (oop)"_selector"; }  _selector _sizeof { return (oop)sizeof(struct t__selector); }
-_assoc    _debugName { return (oop)"_assoc";    }  _assoc    _sizeof { return (oop)sizeof(struct t__assoc   ); }
-_closure  _debugName { return (oop)"_closure";  }  _closure  _sizeof { return (oop)sizeof(struct t__closure ); }
-_vector   _debugName { return (oop)"_vector";   }  _vector   _sizeof { return (oop)sizeof(struct t__vector  ); }
-_vtable   _debugName { return (oop)"_vtable";   }  _vtable   _sizeof { return (oop)sizeof(struct t__vtable  ); }
+_object   _debugName { return (oop)"_object";   }  _object   _sizeof { return (oop)(long)sizeof(struct t__object  ); }
+_selector _debugName { return (oop)"_selector"; }  _selector _sizeof { return (oop)(long)sizeof(struct t__selector); }
+_assoc    _debugName { return (oop)"_assoc";    }  _assoc    _sizeof { return (oop)(long)sizeof(struct t__assoc   ); }
+_closure  _debugName { return (oop)"_closure";  }  _closure  _sizeof { return (oop)(long)sizeof(struct t__closure ); }
+_vector   _debugName { return (oop)"_vector";   }  _vector   _sizeof { return (oop)(long)sizeof(struct t__vector  ); }
+_vtable   _debugName { return (oop)"_vtable";   }  _vtable   _sizeof { return (oop)(long)sizeof(struct t__vtable  ); }
 
 "Primitive error handling -- #doesNotUnderstand:"
 

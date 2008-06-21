@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-02-13 14:26:35 by piumarta on emilia
+  Last edited: 2008-06-20 15:52:25 by piumarta on emilia
 "
 
 { import: ArrayedCollection }
@@ -40,16 +40,16 @@ WordArray at: anInteger
 [
     | _w |
     { unsigned int w;
-      if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        w= (((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]);
+      if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        w= (((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]);
       else
 #ifdef _sendv
 	return _sendv(s_primitiveFailed, 1, v_self);
 #else
 	return _send(s_primitiveFailed, v_self);
 #endif
-      if (!(w & 0xc0000000)) return (oop)(w << 1 | 1);
-      v__w= (oop)w;
+      if (!(w & 0xc0000000)) return (oop)(long)(w << 1 | 1);
+      v__w= (oop)(long)w;
     }.
     ^LargePositiveInteger value_: _w
 ]
@@ -58,40 +58,40 @@ WordArray at: anInteger put: aWord
 [
     | _w |
     {
-      if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size) && ((int)v_aWord & 1))
+      if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size) && ((long)v_aWord & 1))
         {
-          ((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]= (unsigned int)v_aWord >> 1;
+          ((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]= (unsigned int)(long)v_aWord >> 1;
           return v_aWord;
         }
     }.
     (anInteger isSmallInteger and: [anInteger > 0 and: [anInteger <= size]]) ifFalse: [^self primitiveFailed].
     (aWord isLargePositiveInteger and: [aWord digitLength == 4]) ifFalse: [^self primitiveFailed].
     _w := aWord _integerValue.
-    { ((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]= (unsigned int)v__w; }.
+    { ((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]= (unsigned int)(long)v__w; }.
     ^aWord
 ]
 
 WordArray integerAt: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size)) {
-        int w= (((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]);
-        if ((w ^ (w << 1)) >= 0) return (oop)(w << 1 | 1); } }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size)) {
+        int w= (((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]);
+        if ((w ^ (w << 1)) >= 0) return (oop)(long)(w << 1 | 1); } }.
     ^self primitiveFailed
 ]
 
 WordArray _at: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        return (oop)(((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]); }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        return (oop)(long)(((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]); }.
     ^self primitiveFailed
 ]
 
 WordArray _at: anInteger put_: _word
 [
     {
-      if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
+      if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
         {
-          ((unsigned int *)self->v__words)[((int)v_anInteger >> 1) - 1]= (unsigned int)v__word;
+          ((unsigned int *)self->v__words)[((long)v_anInteger >> 1) - 1]= (unsigned int)(long)v__word;
           return v__word;
         }
     }.
@@ -100,7 +100,7 @@ WordArray _at: anInteger put_: _word
 
 WordArray elementSize
 {
-    return (oop)(sizeof(int) << 1 | 1);
+    return (oop)(long)(sizeof(unsigned int) << 1 | 1);
 }
 
 
@@ -123,9 +123,9 @@ WordArray replaceFrom: first to: last with: words startingAt: offset
 
 WordArray replaceFrom_: _first for_: _count with_: _source startingAt_: _offset
 {
-    memcpy((char *)self->v__words + sizeof(unsigned int) * ((int)v__first - 1),
-	   (char *)v__source + sizeof(unsigned int) * ((int)v__offset - 1),
-	   sizeof(unsigned int) * (int)v__count);
+    memcpy((char *)self->v__words + sizeof(unsigned int) * ((long)v__first - 1),
+	   (char *)v__source + sizeof(unsigned int) * ((long)v__offset - 1),
+	   sizeof(unsigned int) * (long)v__count);
 }
 
 

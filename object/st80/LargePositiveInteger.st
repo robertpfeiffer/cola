@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-27 14:59:46 by piumarta on emilia.local
+  Last edited: 2008-06-20 15:40:08 by piumarta on emilia
 "
 
 { import: Integer }
@@ -51,10 +51,10 @@ LargePositiveInteger value_: _word
     self := self new: 4.
     _bytes := bytes _bytes.
     {
-	((unsigned char *)v__bytes)[0]= ((unsigned int)v__word >>  0) & 0xff;
-	((unsigned char *)v__bytes)[1]= ((unsigned int)v__word >>  8) & 0xff;
-	((unsigned char *)v__bytes)[2]= ((unsigned int)v__word >> 16) & 0xff;
-	((unsigned char *)v__bytes)[3]= ((unsigned int)v__word >> 24) & 0xff;
+	((unsigned char *)v__bytes)[0]= ((unsigned long)v__word >>  0) & 0xff;
+	((unsigned char *)v__bytes)[1]= ((unsigned long)v__word >>  8) & 0xff;
+	((unsigned char *)v__bytes)[2]= ((unsigned long)v__word >> 16) & 0xff;
+	((unsigned char *)v__bytes)[3]= ((unsigned long)v__word >> 24) & 0xff;
     }.
 ]
 
@@ -64,11 +64,10 @@ LargePositiveInteger _integerValue
     bytes size ~~ 4 ifTrue: [^super _integerValue].
     _bytes := bytes _bytes.
     {
-	return (oop)(   (((unsigned char *)v__bytes)[0]      )
-		+	(((unsigned char *)v__bytes)[1] <<  8)
-		+	(((unsigned char *)v__bytes)[2] << 16)
-		+	(((unsigned char *)v__bytes)[3] << 24) );
-
+	return (oop)(long)(   (((unsigned char *)v__bytes)[0]      )
+		+	      (((unsigned char *)v__bytes)[1] <<  8)
+		+	      (((unsigned char *)v__bytes)[2] << 16)
+		+	      (((unsigned char *)v__bytes)[3] << 24) );
     }.
 ]
 

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-02-14 08:26:21 by piumarta on emilia
+  Last edited: 2008-06-20 15:07:39 by piumarta on emilia.local
 "
 
 "This file crowbars a bunch of bogus input/output methods into String."
@@ -26,7 +26,7 @@
 
 String _cString
 {
-  int len= (int)self->v_size >> 1;
+  int len= (long)self->v_size >> 1;
   char *cString= (char *)_libid->balloc(len + 1);
   memcpy(cString, self->v__bytes, len);
   cString[len]= '\0';
@@ -169,7 +169,7 @@ String writeToFileNamed: path ifError: errorBlock
       if (fd >= 0)
         {
 	  int position= 0;
-	  int remaining= (int)self->v_size >> 1;
+	  int remaining= (long)self->v_size >> 1;
           while (remaining)
             {
 	      int count= write(fd, (char *)self->v__bytes + position, remaining);

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-16 16:29:32 by piumarta on emilia.local
+  Last edited: 2008-06-20 14:26:02 by piumarta on emilia.local
 "
 
 { import: Array }
@@ -39,9 +39,9 @@ WeakArray _newPointers: pointersSize
 WeakArray at: anInteger put: anObject
 [
     {
-        if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
+        if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
 	    {
-		void *ptr= (void *)(self->v__pointers) + ((int)v_anInteger >> 1) - 1;
+		void *ptr= (void *)(self->v__pointers) + ((long)v_anInteger >> 1) - 1;
 	        if (*(oop *)ptr)
 	            _libid->gc_unregisterDisappearingLink(ptr);
 	    }
@@ -50,7 +50,7 @@ WeakArray at: anInteger put: anObject
     {
 	if (v_anObject && !((long)v_anObject & 1))
 	    {
-		void *ptr= (void *)(self->v__pointers) + ((int)v_anInteger >> 1) - 1;
+		void *ptr= (void *)(self->v__pointers) + ((long)v_anInteger >> 1) - 1;
 	        _libid->gc_generalRegisterDisappearingLink(ptr, &(v_anObject->_vtable[-1]));
 	    }
     }.

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2006-04-01 11:26:17 by piumarta on emilia.local
+  Last edited: 2008-06-20 14:35:08 by piumarta on emilia.local
 "
 
 { import: ArrayedCollection }
@@ -52,17 +52,17 @@ ByteArray _elements	[ ^_bytes ]
 
 ByteArray byteAt: anInteger
 [
-    { if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size))
-        return (oop)((((int)(((unsigned char *)self->v__bytes)[((int)v_anInteger >> 1) - 1])) << 1) | 1); }.
+    { if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size))
+        return (oop)((((long)(((unsigned char *)self->v__bytes)[((long)v_anInteger >> 1) - 1])) << 1) | 1); }.
     ^self primitiveFailed
 ]
 
 ByteArray byteAt: anInteger put: aByte
 [
     {
-      if (((int)v_anInteger & 1) && ((int)v_anInteger > 1) && ((int)v_anInteger <= (int)self->v_size) && ((int)v_aByte & 1))
+      if (((long)v_anInteger & 1) && ((long)v_anInteger > 1) && ((long)v_anInteger <= (long)self->v_size) && ((long)v_aByte & 1))
         {
-          ((char *)self->v__bytes)[((int)v_anInteger >> 1) - 1]= (int)v_aByte >> 1;
+          ((char *)self->v__bytes)[((long)v_anInteger >> 1) - 1]= (long)v_aByte >> 1;
           return v_aByte;
         }
     }.
@@ -93,7 +93,7 @@ ByteArray replaceFrom: first to: last with: bytes startingAt: offset
 
 ByteArray replaceFrom_: _first for_: _count with_: _source startingAt_: _offset
 {
-    memcpy((char *)self->v__bytes + (int)v__first - 1, (char *)v__source + (int)v__offset - 1, (int)v__count);
+    memcpy((char *)self->v__bytes + (long)v__first - 1, (char *)v__source + (long)v__offset - 1, (long)v__count);
 }
 
 

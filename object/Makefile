@@ -13,13 +13,13 @@ stage3 : stage3/idc
 stage3/idc : stage3/idc1 stage2/idc
 	cp -p idc/idc $@
 
-stage3/idc1 : .config-stamp stage3/st80.so stage2/idc
+stage3/idc1 : .config-stamp stage3/st80.so stage2/idc idc/*
 	$(SHELL) -ec '( cd idc; $(MAKE) IDC="../stage2/idc -B../stage2/ -O" BIN="../stage3/" )'
 
-stage3/st80.so : .config-stamp stage3/libid.o stage2/idc
+stage3/st80.so : .config-stamp stage3/libid.o stage2/idc st80/*
 	$(SHELL) -ec '( cd st80; $(MAKE) IDC="../stage2/idc -B../stage2/ -O" BIN="../stage3/" )'
 
-stage3/libid.o : .config-stamp id/libid.c id/id.h
+stage3/libid.o : .config-stamp id/*
 	-$(SHELL) -ec '[ -d stage3 ] || mkdir stage3'
 	$(SHELL) -ec '( cd id; $(MAKE) BIN="../stage3/" )'
 
@@ -32,13 +32,13 @@ stage3/gc.a : boot/gc.a
 stage2/idc : stage1/idc stage2/idc1
 	cp -p idc/idc $@
 
-stage2/idc1 : .config-stamp stage1/idc stage2/st80.so
+stage2/idc1 : .config-stamp stage1/idc stage2/st80.so idc/*
 	$(SHELL) -ec '( cd idc; $(MAKE) IDC="../stage1/idc -B../stage1/ -O" BIN="../stage2/" )'
 
-stage2/st80.so : .config-stamp stage1/idc stage2/libid.o
+stage2/st80.so : .config-stamp stage1/idc stage2/libid.o st80/*
 	$(SHELL) -ec '( cd st80; $(MAKE) IDC="../stage1/idc -B../stage1/ -O" BIN="../stage2/" )'
 
-stage2/libid.o : .config-stamp id/libid.c id/id.h
+stage2/libid.o : .config-stamp id/*
 	-$(SHELL) -ec '[ -d stage2 ] || mkdir stage2'
 	$(SHELL) -ec '( cd id; $(MAKE) BIN="../stage2/" )'
 
@@ -51,13 +51,13 @@ stage2/gc.a : boot/gc.a
 stage1/idc : stage1/idc1
 	cp -p idc/idc $@
 
-stage1/idc1 : .config-stamp boot/idc stage1/st80.so
+stage1/idc1 : .config-stamp boot/idc stage1/st80.so idc/*
 	$(SHELL) -ec '( cd idc; $(MAKE) IDC="../boot/idc -B../boot/ -O" BIN="../stage1/" )'
 
-stage1/st80.so : .config-stamp boot/idc stage1/libid.o
+stage1/st80.so : .config-stamp boot/idc stage1/libid.o st80/*
 	$(SHELL) -ec '( cd st80; $(MAKE) IDC="../boot/idc -B../boot/ -O" BIN="../stage1/" )'
 
-stage1/libid.o : .config-stamp id/libid.c id/id.h
+stage1/libid.o : .config-stamp id/*
 	-$(SHELL) -ec '[ -d stage1 ] || mkdir stage1'
 	$(SHELL) -ec '( cd id; $(MAKE) BIN="../stage1/" )'
 
@@ -69,7 +69,7 @@ stage1/gc.a : boot/gc.a
 
 boot/idc : boot/idc1
 
-boot/idc1 : boot/Makefile
+boot/idc1 : boot/Makefile boot/src/*
 	-$(SHELL) -ec '( cd boot; $(MAKE) )'
 
 $(CONFIG) : .config-stamp

@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-09-03 11:34:15 by piumarta on ubuntu
+  Last edited: 2008-06-20 14:37:19 by piumarta on emilia.local
 "
 
 { import: ByteArray }
@@ -34,7 +34,7 @@ String _stringValue
 [
     | _string |
     {
-      int len= (int)(self->v_size) >> 1;
+      int len= (long)(self->v_size) >> 1;
       v__string= _libid->balloc(len + 1);
       memcpy(v__string, self->v__bytes, len);
       ((char *)v__string)[len]= '\0';
@@ -47,7 +47,7 @@ String value_: _cString
     self := self _clone.
     {
       int len= strlen((char *)v__cString);
-      self->v_size= (oop)((len << 1) | 1);
+      self->v_size= (oop)(long)((len << 1) | 1);
       self->v__bytes= _libid->balloc(len);
       memcpy(self->v__bytes, v__cString, len);
     }.
@@ -81,7 +81,7 @@ String > aString
 String <= aString	[ ^self = aString or: [self < aString] ]
 String >= aString	[ ^self = aString or: [self > aString] ]
 
-String strncmp_: _s1 _: _s2 _: _length	{ return (oop)(strncmp((char *)v__s1, (char *)v__s2, (int)v__length) << 1 | 1); }
+String strncmp_: _s1 _: _s2 _: _length	{ return (oop)(long)(strncmp((char *)v__s1, (char *)v__s2, (long)v__length) << 1 | 1); }
 
 
 String asByteArray
@@ -101,7 +101,7 @@ ImmutableString value_: _cString
 [
     self := self _clone.
     {
-      self->v_size= (oop)((strlen((char *)v__cString) << 1) | 1);
+      self->v_size= (oop)(long)((strlen((char *)v__cString) << 1) | 1);
       self->v__bytes= v__cString;
     }.
 ]
