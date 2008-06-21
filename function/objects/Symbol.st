@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-15 00:44:31 by piumarta on emilia
+  Last edited: 2008-06-20 18:21:17 by piumarta on emilia
 "
 
 { import: Objects }
@@ -25,16 +25,16 @@ Symbol isSymbol	[ ^true ]
 
 Symbol intern_: _string size_: _stringSize
 {
-    char *buf= (char *)alloca((int)v__stringSize + 1);
-    memcpy((void *)buf, (void *)v__string, (int)v__stringSize);
-    buf[(int)v__stringSize]= '\0';
+    char *buf= (char *)alloca((long)v__stringSize + 1);
+    memcpy((void *)buf, (void *)v__string, (long)v__stringSize);
+    buf[(long)v__stringSize]= '\0';
     _return _libid->intern(buf);
 }
 
 Symbol intern_: _string
 [
     | _stringSize |
-    { v__stringSize= (oop)strlen((char *)v__string); }.
+    { v__stringSize= (oop)(long)strlen((char *)v__string); }.
     ^self intern_: _string size_: _stringSize
 ]
 
