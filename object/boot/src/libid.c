@@ -295,7 +295,7 @@ static oop _vtable__init(oop _thunk, oop state, oop self)
 {
   assert(isKindOf(self, _vtable));
   self->vtable.tally= 0;
-  self->vtable.bindings= new__(_vector, 16, 4);
+  self->vtable.bindings= new__(_vector, sizeof(oop) * 4, 4);
   self->vtable.delegate= 0;
   return self;
 }
@@ -305,7 +305,7 @@ static oop _vtable__delegated(oop _thunk, oop state, oop self)
   oop vt= _vtable___alloc_(0, self->_vtable[-1], self->_vtable[-1], sizeof(_vtable_t));
   assert(isKindOf(self, _vtable));
   vt->vtable.tally= 0;
-  vt->vtable.bindings= new__(_vector, 16, 4);
+  vt->vtable.bindings= new__(_vector, sizeof(oop) * 4, 4);
   vt->vtable.delegate= self;
   return vt;
 }
