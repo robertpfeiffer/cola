@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-14 01:14:13 by piumarta on emilia
+  Last edited: 2008-06-20 18:25:58 by piumarta on emilia
 "
 
 { import: Objects }
@@ -63,7 +63,7 @@ File tab: n					[ n timesRepeat: [self tab] ]
 
 File nextPut: aByte
 [
-    { if ((long)v_aByte & 1) { char c= _I(v_aByte);  _return _O(write((int)self->v__fd, (void *)&c, 1)); } }.
+    { if ((long)v_aByte & 1) { char c= _I(v_aByte);  _return _O(write((long)self->v__fd, (void *)&c, 1)); } }.
     ^self primitiveFailed
 ]
 
@@ -77,26 +77,26 @@ File next: size putAll: aString
     | _bytes _size |
     _bytes := aString _bytes.
     _size  := size _integerValue.
-    { _return _O(write((int)self->v__fd, (void *)v__bytes, (size_t)v__size)); }.
+    { _return _O(write((long)self->v__fd, (void *)v__bytes, (size_t)v__size)); }.
 ]
 
 File print_x: _pointer
 {
     char buf[1024];
-    int size= sprintf(buf, "%x", (int)v__pointer);
-    _return _O(write((int)self->v__fd, (void *)buf, (size_t)size));
+    int size= sprintf(buf, "%lx", (long)v__pointer);
+    _return _O(write((long)self->v__fd, (void *)buf, (size_t)size));
 }
 
 File  read: aCollection				[ ^self read: aCollection size: aCollection size ]
 File  read: aCollection size: size		[ ^self read: aCollection at: 0 size: size ]
 File  read: aCollection at: offset size: size	[ ^SmallInteger value_: (self _read_: aCollection _elements at_: offset _integerValue size_: size _integerValue) ]
-File _read_: _bytes at_: _offset size_: _size	{ _return (oop)(long)read((int)self->v__fd, (char *)v__bytes + (long)v__offset, (size_t)v__size); }
+File _read_: _bytes at_: _offset size_: _size	{ _return (oop)(long)read((long)self->v__fd, (char *)v__bytes + (long)v__offset, (size_t)v__size); }
 
 File  write: aCollection			[ ^self write: aCollection size: aCollection size ]
 File  write: aCollection size: size		[ ^SmallInteger value_: (self _write_: aCollection _elements size_: size _integerValue) ]
-File _write_: _bytes size_: _size		{ _return (oop)(long)write((int)self->v__fd, (void *)v__bytes, (size_t)v__size); }
+File _write_: _bytes size_: _size		{ _return (oop)(long)write((long)self->v__fd, (void *)v__bytes, (size_t)v__size); }
 
-File isInteractive			{ _return (oop)(long)isatty((int)self->v__fd); }
+File isInteractive			{ _return (oop)(long)isatty((long)self->v__fd); }
 
 "
 File waitForInput: msTimeout
