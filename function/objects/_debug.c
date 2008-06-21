@@ -431,6 +431,28 @@ static void signalDebugger(int n)
 
 #if HAVE_READLINE
 
+static char **completionMatches(const char *text, char *(*generator)(const char *, int))
+{
+  int   size= 0;
+  int   capacity= 0;
+  char **matches= 0;
+  char  *match;
+  while ((match= generator(text, size)))
+    {
+      if (size >= (capacity - 2))
+	matches= capacity
+	  ? realloc(matches, sizeof(char *) * (capacity *= 2))
+	  : malloc(sizeof(char *) * (capacity= 16));
+      matches[++size]= match;
+    }
+  if (size)
+    {
+      matches[0]= strdup("");
+      matches[size + 1]= 0;
+    }
+  return matches;
+}
+
 static char *commandGenerator(const char *text, int state)
 {
   static command *cmd= 0;
@@ -512,7 +534,7 @@ static char *argumentGenerator(const char *text, int state)
 
 static char **debugCompletion(const char *text, int start, int end)
 {
-  return rl_completion_matches(text, start ? argumentGenerator : commandGenerator);
+  return completionMatches(text, start ? argumentGenerator : commandGenerator);
 }
 
 #endif /* HAVE_READLINE */
