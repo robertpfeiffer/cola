@@ -67,7 +67,7 @@ $(BIN)%$(OBJEXT_SO) : %.st
 $(BIN)%$(OBJEXT_O) : %.st
 	$(IDC) $(IINC) $(IDFLAGS) -c $< -o $@
 
-$(BIN)%$(OBJEXT) : %.st
+$(BIN)%$(OBJEXT) : %.st $(BIN)/libid.o $(BIN)/gc.a
 	$(IDC) $(IINC) $(IDFLAGS) $< -o $@
 
 $(BIN)idc : ../idc/idc
