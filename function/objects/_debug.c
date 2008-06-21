@@ -437,18 +437,33 @@ static char **completionMatches(const char *text, char *(*generator)(const char 
   int   capacity= 0;
   char **matches= 0;
   char  *match;
+  int    maxLen= 0;
   while ((match= generator(text, size)))
     {
+      int len= strlen(match);
       if (size >= (capacity - 2))
 	matches= capacity
 	  ? realloc(matches, sizeof(char *) * (capacity *= 2))
 	  : malloc(sizeof(char *) * (capacity= 16));
       matches[++size]= match;
+      if (len > maxLen) maxLen= len;
     }
   if (size)
     {
-      matches[0]= strdup("");
+      char **matchp;
+      char  *prefix= strdup(matches[1]);
       matches[size + 1]= 0;
+      for (matchp= matches+2;  prefix[0] && (match= *matchp);  ++matchp)
+	{
+	  int i;
+	  for (i= 0;  prefix[i] && match[i];  ++i)
+	    if (prefix[i] != match[i])
+	      {
+		prefix[i]= '\0';
+		break;
+	      }
+	}
+      matches[0]= prefix;
     }
   return matches;
 }
