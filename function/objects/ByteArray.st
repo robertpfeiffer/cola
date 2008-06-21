@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-02-14 11:06:44 by piumarta on emilia
+  Last edited: 2008-06-20 18:24:45 by piumarta on emilia
 "
 
 { import: Objects }
@@ -45,7 +45,7 @@ ByteArray at: offset
 
 ByteArray _at_: _offset
 {
-    _return (oop)((long)(((unsigned char *)self->v__bytes)[(int)v__offset]));
+    _return (oop)((long)(((unsigned char *)self->v__bytes)[(long)v__offset]));
 }
 
 ByteArray at: offset put: anInteger
@@ -67,7 +67,7 @@ ByteArray at: offset put: anInteger
 
 ByteArray at_: _offset put_: _integer
 {
-    ((char *)self->v__bytes)[(int)v__offset]= (int)v__integer;
+    ((char *)self->v__bytes)[(long)v__offset]= (long)v__integer;
 }
 
 ByteArray replaceFrom: firstIndex to: lastIndex with: aCollection startingAt: startIndex
