@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-12 15:29:22 by piumarta on emilia.local
+  Last edited: 2008-06-20 19:14:40 by piumarta on emilia
 "
 
 { import: Objects }
@@ -29,7 +29,7 @@ OSArgumentVector := []
 OSArguments      := []
 
 OS _argumentCount		{ _return (oop)_libid->param(0); }
-OS _argumentAt_: _index		{ _return (oop)(((char **)_libid->param(1))[(int)v__index]); }
+OS _argumentAt_: _index		{ _return (oop)(((char **)_libid->param(1))[(long)v__index]); }
 
 OS argumentCount		[ ^OSArgumentCount  ifNil: [OSArgumentCount := SmallInteger value_: self _argumentCount] ]
 OS argumentVector		[ ^OSArgumentVector ifNil: [OSArgumentVector := self makeArgumentVector] ]
@@ -62,7 +62,7 @@ OS system		[ ^self stringParam: 6 ]
 OS integerParam: number	[ ^SmallInteger value_: (self _param_: number _integerValue) ]
 OS stringParam: number	[ ^String	value_: (self _param_: number _integerValue) ]
 
-OS _param_: _n		{ _return (oop)_libid->param((int)v__n); }
+OS _param_: _n		{ _return (oop)_libid->param((long)v__n); }
 
 OS getenv: aString
 [
