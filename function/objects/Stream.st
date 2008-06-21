@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-03-07 11:22:15 by piumarta on emilia.local
+  Last edited: 2008-06-20 18:26:42 by piumarta on emilia
 "
 
 { import: Objects }
@@ -279,11 +279,11 @@ ConsoleFileStream refill
 		long len= strlen(buffer);
 		if (len && buffer[len - 1] == '\n')
 		    buffer[--len]= '\0';
-		v_length= (oop)(len << 1 | 1);
+		v_length= (oop)(long)(len << 1 | 1);
 		v__buffer= (oop)buffer;
 	    }
 	else
-	    { _return (oop)(live= 0); }
+	    { _return (oop)(long)(live= 0); }
     }.
     [collection size <= (position + length)] whileTrue: [self grow].
     _bytes := collection _bytes.
