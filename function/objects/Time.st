@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-06-11 18:52:00 by piumarta on emilia.lax04.mtt
+  Last edited: 2008-06-20 19:16:26 by piumarta on emilia
 "
 
 { import: Objects }
@@ -29,7 +29,7 @@ Time millisecondClockValue
 {
     struct timeval tv;
     gettimeofday(&tv, 0);
-    _return (oop)(((tv.tv_sec * 1000 + tv.tv_usec / 1000) &0x3fffffff) << 1 | 1);
+    _return (oop)(long)(((tv.tv_sec * 1000 + tv.tv_usec / 1000) &0x3fffffff) << 1 | 1);
 }
 
 Time millisecondsToRun: aBlock
@@ -46,8 +46,8 @@ Time now
     {
       struct timeval tv;
       gettimeofday(&tv, 0);
-      self->v__seconds=     (oop)(tv.tv_sec        );
-      self->v__nanoseconds= (oop)(tv.tv_usec * 1000);
+      self->v__seconds=     (oop)(long)(tv.tv_sec        );
+      self->v__nanoseconds= (oop)(long)(tv.tv_usec * 1000);
     }
 ]
 
@@ -74,7 +74,7 @@ Time printOn: aStream		[ self printShortOn: aStream ]
 Time printLongOn: aStream	[ aStream nextPutAll: (self formatted: '%a %b %e %H:%M:%S %Z %Y') ]
 Time printShortOn: aStream	[ aStream nextPutAll: (self formatted: '%Y-%m-%d %H:%M:%S') ]
 
-SmallInteger uprint: width	{ fprintf(stdout, "%0*d", (int)v_width >> 1, (unsigned)self >> 1); }
+SmallInteger uprint: width	{ fprintf(stdout, "%0*ld", (int)(long)v_width >> 1, (unsigned long)self >> 1); }
 
 Time print
 [
