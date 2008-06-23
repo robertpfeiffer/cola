@@ -11,7 +11,7 @@ OS		= $(shell ../idc -C os)
 ifeq ($(OS),win32)
 CLIBS		= 
 else
-CLIBS		= -L/usr/local/lib -lreadline
+CLIBS		= 
 endif
 
 all : $(LIBS) ex1 ex2

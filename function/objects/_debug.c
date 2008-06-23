@@ -1,24 +1,6 @@
 #include <signal.h>
 
-#if HAVE_READLINE
-# include <readline/readline.h>
-#else
-  char *readline(char *prompt)
-  {
-    static char line[1024];
-    int n;
-    fputs(prompt, stdout);
-    fflush(stdout);
-    if (!fgets(line, sizeof(line), stdin))
-      return 0;
-    for (n= strlen(line);  n-- > 0;)
-      if ('\n' != line[n] && '\r' != line[n])
-	break;
-      else
-	line[n]= '\0';
-    return line;
-  }
-#endif
+#include "freedline.c"
 
 #ifdef WIN32
 char *strsep(char **stringp, char *delim)
@@ -339,10 +321,8 @@ static void enterDebugger(void)
 {
   for (;;)
     {
-      char *line= readline("debug? ");
-      if (!line)
-	printf("\n");
-      else if (*line)
+      char *line= freedline("debug? ");
+      if (line && *line)
 	{
 	  int   argc;
 	  char *argv[32];
@@ -429,8 +409,7 @@ static void signalDebugger(int n)
   enterDebugger();
 }
 
-#if HAVE_READLINE
-
+#if 0
 static char **completionMatches(const char *text, char *(*generator)(const char *, int))
 {
   int   size= 0;
@@ -467,8 +446,9 @@ static char **completionMatches(const char *text, char *(*generator)(const char 
     }
   return matches;
 }
+#endif
 
-static char *commandGenerator(const char *text, int state)
+static char *commandGenerator(char *text, int state)
 {
   static command *cmd= 0;
   static int len;
@@ -516,7 +496,7 @@ static void addArgument(const char *arg)
   args[argSize++]= arg;
 }
 
-static char *argumentGenerator(const char *text, int state)
+static char *argumentGenerator(char *text, int state)
 {
   static int init= 1;
   static int index= 0;
@@ -547,12 +527,10 @@ static char *argumentGenerator(const char *text, int state)
   return 0;
 }
 
-static char **debugCompletion(const char *text, int start, int end)
+static char **debugCompletion(char *text, int start, int end)
 {
-  return completionMatches(text, start ? argumentGenerator : commandGenerator);
+  return freedlineCompletionMatches(text, start, end, start ? argumentGenerator : commandGenerator);
 }
-
-#endif /* HAVE_READLINE */
 
 static void initDebugger(void)
 {
@@ -562,8 +540,5 @@ static void initDebugger(void)
   signal(SIGINT, signalDebugger);
   setvbuf(stdout, 0, _IONBF, 0);
   setvbuf(stderr, 0, _IONBF, 0);
-#if HAVE_READLINE
-  rl_readline_name= "Pepsi";
-  rl_attempted_completion_function= debugCompletion;
-#endif
+  freedlineCompletionFunction= debugCompletion;
 }

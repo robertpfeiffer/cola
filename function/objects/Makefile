@@ -1,17 +1,10 @@
 IDC		= ./idc $(OFLAGS)
-OFLAGS		= -g
 
-OS		= $(shell $(IDC) -C os)
+OFLAGS		= $(shell ./idc -C OFLAGS)
+OS		= $(shell ./idc -C os)
 
-ifeq ($(OS),win32)
 IDFLAGS		= -k
 LDLIBS		= 
-else
-IDFLAGS		= -k -Wc,-DHAVE_READLINE=1 -J/usr/local/include
-LDLIBS		= -L/usr/local/lib -lreadline
-endif
-
-
 
 OBJEXT          = 
 OBJEXT_O        = .o
@@ -45,7 +38,10 @@ test : objects.a test.st
 Number$(OBJEXT_O) : Number.st
 	$(IDC) -Jmpint $(IDFLAGS) -c $< -o $@
 
-debug.o : _debug.c
+debug.o : _debug.c freedline.c
+
+freedline.o : freedline.c
+	$(CC) -O $(CFLAGS) -c $<
 
 objects.a : $(FILES) mpint/mpint.a
 	ar rc $@.new $(FILES) mpint/*.o
