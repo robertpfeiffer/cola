@@ -15,7 +15,7 @@
  * 
  * THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
  * 
- * Last edited: 2008-06-23 10:10:41 by piumarta on emilia
+ * Last edited: 2008-06-23 11:10:30 by piumarta on emilia
  */
 
 #include "freedline.h"
@@ -618,13 +618,13 @@ char *freedline(char *promptOrNull)
     }
 
   otermios= termios;
-  termios.c_iflag &= ~(IXON | ICANON);
+  termios.c_iflag &= ~(IXON | ICANON | ISIG);
   termios.c_oflag &= ~(OPOST);
   termios.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
   termios.c_cflag &= ~(CSIZE | PARENB);
   termios.c_cflag |= CS8;
 
-  if (tcsetattr(0, TCSADRAIN, &termios))	{ what= "tcsetattr";  goto fail; }
+  if (tcsetattr(0, TCSADRAIN, &termios))		{ what= "tcsetattr";  goto fail; }
 
   oldWindowChanged= signal(SIGWINCH, windowChanged);
 
