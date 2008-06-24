@@ -3,7 +3,7 @@ IDC		= ./idc $(OFLAGS)
 OFLAGS		= $(shell ./idc -C OFLAGS)
 OS		= $(shell ./idc -C os)
 
-IDFLAGS		= -k
+IDFLAGS		= -k -g
 LDLIBS		= 
 
 OBJEXT          = 
