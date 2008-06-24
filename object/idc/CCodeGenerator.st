@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 15:29:17 by piumarta on emilia
+  Last edited: 2008-06-23 16:24:25 by piumarta on emilia
 "
 
 { import: CodeGenerator }
@@ -114,7 +114,7 @@ static struct __libid *_libid= 0;
 # define _enter(info)			(void)info
 # define _line(lno)
 # define _leave()
-# define _backtrace()			"(no debugging information)"
+# define _backtrace()			"(no debugging information)\\n"
 #endif
 #define _return			_leave(); return
 ', self sendText, '
