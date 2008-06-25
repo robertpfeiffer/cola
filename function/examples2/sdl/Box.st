@@ -221,7 +221,7 @@ Box drawInvalidOn: aContext
 
 "----------------------------------------------------------------"
 
-HandExtent := [ 0,0 ]
+HandExtent := [ 1,1 ]
 HandOffset := [ 0,0 ]
 
 

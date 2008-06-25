@@ -1,5 +1,12 @@
+OS		= $(shell ../idc -C os)
+
 SDLINC		= -J/usr/local/include -Jsdlprims
 SDLLIB		= -L/usr/local/lib -lSDLmain -lSDL
+
+ifeq ($(OS),darwin)
+CLIBS		= -Wc,-framework -Wc,Cocoa
+else
+endif
 
 FT2INC		= -J/usr/local/include/freetype2
 FT2LIB		= -L/usr/local/lib -lfreetype
@@ -10,10 +17,9 @@ OFLAGS		= -g
 
 IDFLAGS		= $(OFLAGS) -k -I$(OBJECTS) $(SDLINC) $(FT2INC)
 IDLIBS		= $(OBJECTS)/objects.a
-CLIBS		= $(SDLLIB) $(FT2LIB) -lreadline
 
 LIBS		= Box.o Color.o Geometry.o Surface.o SDLSurface.o Event.o events.o SDL_prims.o \
-		  Text.o Layout.o TextLayout.o Script.o
+		  Text.o Layout.o TextLayout.o TextLayout2.o Script.o
 
 all : $(LIBS) main
 
@@ -21,7 +27,7 @@ run : all
 	./main
 
 % : %.st $(LIBS)
-	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
+	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(SDLLIB) $(FT2LIB) $(CLIBS)
 
 %.o : %.st
 	$(IDC) $(IDFLAGS) -c $< -o $@
