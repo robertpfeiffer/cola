@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-19 22:56:41 by piumarta on emilia
+  Last edited: 2008-06-26 12:48:08 by piumarta on emilia
 "
 
 { import: Object }
@@ -356,10 +356,14 @@ SequenceableCollection flattenOn: aStream
 	ifFalse: [super flattenOn: aStream]
 ]
 
+CharacterClass : ByteArray ()
+
+CharacterClass includes: aCharacter	[ ^aCharacter and: [0 ~~ (self bitAt: aCharacter)] ]
+
 SequenceableCollection asCharacterClass
 [
     | stream class complement c prev |
-    class := ByteArray new: 32 withAll: 0.
+    class := CharacterClass new: 32 withAll: 0.
     (stream := self readStream) atEnd ifTrue: [class].
     (complement := stream peek == $^) ifTrue: [stream next].
     [c := stream next]

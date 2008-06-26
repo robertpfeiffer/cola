@@ -21,9 +21,6 @@ ARCH		= $(shell $(IDC) -C arch)
 
 all : objects.a
 
-test : objects.a test.st
-	$(IDC) $(IDFLAGS) test.st objects.a $(LDLIBS)
-
 .SUFFIXES :
 
 %$(OBJEXT_SO) : %.st
@@ -54,7 +51,7 @@ tidy : .FORCE
 	-rm -f *.o *.d *~ .gdb* *.stackdump $(FILES:.o=.c) *.new
 
 clean : tidy
-	-rm -f $(FILES) objects.a test
+	-rm -f $(FILES) objects.a
 	$(SHELL) -ec 'cd mpint;  $(MAKE) clean' 
 
 distclean spotless : clean
