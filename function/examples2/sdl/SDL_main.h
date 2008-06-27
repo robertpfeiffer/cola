@@ -1,3 +1,3 @@
-#if !defined(WIN32)
+#if defined(MACH)
 # define main SDL_main
 #endif
