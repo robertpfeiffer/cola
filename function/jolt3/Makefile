@@ -13,7 +13,8 @@ all : $(LIBS) main
 
 run : all
 	./main test.g < test.g > test.st
-	$(IDC) $(IDFLAGS) test.st Parser.o $(IDLIBS) -o $@ $(CLIBS)
+	$(IDC) $(IDFLAGS) test.st Parser.o $(IDLIBS) -o test $(CLIBS)
+	time ./test < /dev/null
 	time ./test < test.g
 
 % : %.st $(LIBS)
