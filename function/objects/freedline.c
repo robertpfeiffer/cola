@@ -15,7 +15,7 @@
  * 
  * THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
  * 
- * Last edited: 2008-06-23 11:10:30 by piumarta on emilia
+ * Last edited: 2008-06-27 22:24:21 by piumarta on emilia
  */
 
 #include "freedline.h"
@@ -127,25 +127,6 @@ static void *xrealloc(void *ptr, size_t lbs)
   static void cursorDown(int n)	 { move( 0,  n); }
   static void cursorRight(int n) { move( n,  0); }
   static void cursorLeft(int n)	 { move(-n,  0); }
-
-  char *fgetln(FILE *stream, size_t *len)
-  {
-    static size_t  capacity= 0;
-    static char   *buffer= 0;
-    size_t size= 0;
-    int    c;
-    while (EOF != (c= fgetc(stream)))
-      {
-        if (size == capacity)
-	  buffer= buffer ? xrealloc(buffer, capacity *= 2) : xmalloc(capacity= 64);
-        buffer[size++]= c;
-	if ('\n' == c || '\r' == c)
-	  break;
-      }
-    *len= size;
-    printf("read %d\n", (int)size);
-    return buffer;
-  }
 
 #else
 
@@ -541,6 +522,24 @@ static void init(void)
 
 /* history */
 
+static char *inchwl(FILE *stream, size_t *len)
+{
+  static size_t  capacity= 0;
+  static char   *buffer= 0;
+  size_t size= 0;
+  int    c;
+  while (EOF != (c= fgetc(stream)))
+    {
+      if (size == capacity)
+	buffer= buffer ? xrealloc(buffer, capacity *= 2) : xmalloc(capacity= 64);
+      buffer[size++]= c;
+      if ('\n' == c || '\r' == c)
+	break;
+    }
+  *len= size;
+  return buffer;
+}
+
 void freedlineSaveHistory(char *fileName)
 {
   FILE *file= fopen(fileName, "w");
@@ -570,7 +569,7 @@ void freedlineLoadHistory(char *fileName)
       char   *buf;
       size_t  len;
       init();
-      while ((buf= fgetln(file, &len)) && len)
+      while ((buf= inchwl(file, &len)) && len)
 	{
 	  char *line= xmalloc(len + 1);
 	  memcpy(line, buf, len);
