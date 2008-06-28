@@ -26,7 +26,7 @@ run : all
 	$(IDC) $(IDFLAGS) -s $< -o $@
 
 clean : .FORCE
-	rm -rf *~ *.so *.so.c *.o *.o.c .gdb_history main *.exe *.dSYM
+	rm -rf *~ *.so *.so.c *.o *.o.c .gdb_history main test *.exe *.dSYM
 
 spotless : clean
 	rm -rf .gdb_history NONE
