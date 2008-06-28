@@ -1,0 +1,141 @@
+				  vtable
+				/-------\
+	/-------\		| type -|------>| 
+	| type -|-------------->+-------+
+	+-------+		| data -|------>| name |
+oop ->	| body -|---> data	\-------/	|      |
+	\-------/
+
+----------------------------------------------------------------
+
+(define math (dlopen "libm"))
+(define sin  (dlsym math "sin"))
+
+----------------------------------------------------------------
+
+
+(generate  (load "file.k"))
+(immediate (load "file.k"))
+
+
+(define foo 42)
+(define bar 24)
+
+(define baz '(1 2 3))				(send ', '"foo" '"bar")
+
+(define baz `,['"foo" , '"bar"])		.asciz	"foobar"
+
+
+(dynamic)
+
+(define foo 42)
+(define foo 24)
+(static (define baz 42))
+
+
+
+;; [guilt]
+;; Copyright (c) 2010 Mickey Mouse
+;; [license]
+;; Your Life Reserved
+
+
+(if win32
+  (generate (import "w32math" (sin sine)))
+  (generate (import "libm" sin)))
+
+;; [if win32
+   (generate (import "w32math" (sin sine)))
+;; else
+;; (generate (import "libm" sin)))
+;; ]
+
+
+
+(generate)
+
+(lambda alloc () ...)
+(lambda balloc () ...)
+(lambda palloc () ...)
+(lambda bind () ...)
+
+(entry libid
+  dlopen
+  dlsym
+  dlclose
+  alloc
+  balloc
+  palloc
+  bind)
+
+(lambda getlibid () libid)
+
+
+
+
+(entry printf (lambda (fmt args...) ...))		.globl printf
+						printf:	pushl %ebp ; movl %esp, %ebp ; etc...
+
+(entry data 42)						.globl data
+						data:	.long 42
+
+(entry data "abc")					.globl data
+						data:	.byte 65,66,67,0
+
+(entry data "abc")					.globl data
+						data:	.byte 65,66,67,0
+
+(entry data foo)					.globl data
+						data:	.long foo
+
+(entry lata data)					.globl lata
+						data:	.long data
+
+(entry xyz 'foo)					.globl data
+						data:	.long foo
+
+(entry xyz '"abc")					.globl data
+						data:	.long abc
+						abc:	.asciz "abc"
+
+(entry xyz '(1 2 3))					.globl data
+						data:	.long abc
+						abc:	.asciz "abc"
+
+(entry xyz 1 2 3)					.globl data
+						data:	.long 1,2,3
+
+(dynamic)
+(define lib    (dlopen "lib"        ))
+(define printf (dlsym   lib "printf"))
+
+(static)
+(define lib    (dlopen "lib"        ))
+(define printf (dlsym   lib "printf"))
+
+
+
+(define foo 42)
+
+
+
+(syntax foo (lambda () '42))
+
+
+
+(syntax send (lambda (n c) `(....)))
+
+	1. modify compile env to understand following source code
+	2. compile lambda now; at runtime install lambda in syntax table
+
+(define foo 42)
+
+	1. modify compile env to have foo -> 42
+	2. at runtime reserve & init storage for foo == 42
+
+(syntax (lambda () ... foo ))
+
+
+
+prog
+> (send foo bar)
