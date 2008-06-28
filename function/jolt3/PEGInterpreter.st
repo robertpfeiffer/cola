@@ -102,8 +102,8 @@ PEGInterpreter not	:expr :in :env
 PEGInterpreter sequence :expr :in :env
 [
     | pos |
-    (self eval: expr second on: in in: env) ifFalse: [^nil].
     pos := in position.
+    (self eval: expr second on: in in: env) ifFalse: [^nil].
     expr from: 2 do: [:e | (self eval: e on: in in: env) ifFalse: [^in position: pos]].
 ]
 
@@ -122,16 +122,109 @@ PEGInterpreter parameters	:expr :in :env
 
 PEGInterpreter definition	:expr :in :env	[ self error: 'not implemented: definition' ]
 
-"----------------"
+"----------------------------------------------------------------"
 
-PEGDebugger : PEGInterpreter ()
+PEGDebugger : PEGInterpreter ( depth )
 
-PEGDebugger invoke	:expr :in :env
+PEGDebugger on: aGrammar
 [
-    | ok |
-    ok := super invoke :expr :in :env.
+    self := super on: aGrammar.
+    depth := 0.
+]
+
+PEGDebugger enter: name on: in
+[
+    StdErr space: 2 * depth; nextPutAll: name; cr.
+    depth := depth + 1.
+]
+
+PEGDebugger leave: name on: in with: ok
+[
+    depth := depth - 1.
+    StdErr space: 2 * depth; nextPutAll: name; space; nextPutAll: ' -> '.
     ok
-	ifTrue:  [StdOut print: expr second; nextPutAll: ' -> '; print: result; cr]
-	ifFalse: [StdOut print: expr second; nextPutAll: ' -> FAIL'; cr].
+	ifTrue:  [StdErr print: result.  self echo: result]
+	ifFalse: [StdErr nextPutAll: 'FAIL'].
+    StdErr nextPutAll: ' @ '.
+    self echo: in peek.
+    StdErr cr.
     ^ok
 ]
+
+PEGDebugger echo: c
+[
+    (c and: [c isInteger and: [32 <= c and: [c < 127]]]) ifTrue: [StdErr space; nextPut: c]
+]
+
+"----------------"
+"
+PEGDebugger dot	:expr :in :env
+[
+]
+"
+PEGDebugger literal	:expr :in :env
+[
+    ^self enter: expr first on: in; leave: expr first on: in with: (super literal :expr :in :env)
+]
+"
+PEGDebugger string	:expr :in :env
+[
+]
+
+PEGDebugger class	:expr :in :env
+[
+]
+"
+PEGDebugger invoke	:expr :in :env
+[
+    ^self enter: expr second on: in; leave: expr second on: in with: (super invoke :expr :in :env)
+]
+"
+PEGDebugger zeroOne	:expr :in :env
+[
+]
+
+PEGDebugger zeroMany	:expr :in :env
+[
+]
+
+PEGDebugger oneMany	:expr :in :env
+[
+]
+
+PEGDebugger text	:expr :in :env
+[
+]
+
+PEGDebugger answer	:expr :in :env
+[
+]
+
+PEGDebugger store	:expr :in :env
+[
+]
+
+PEGDebugger and	:expr :in :env
+[
+]
+
+PEGDebugger not	:expr :in :env
+[
+]
+
+PEGDebugger sequence :expr :in :env
+[
+]
+
+PEGDebugger alternatives	:expr :in :env
+[
+]
+
+PEGDebugger parameters	:expr :in :env
+[
+]
+
+PEGDebugger definition	:expr :in :env
+[
+]
+"
