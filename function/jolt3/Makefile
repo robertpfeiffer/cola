@@ -12,12 +12,12 @@ LIBS		= Parser.o PEGParser.o PEGInterpreter.o PEGPepsiGenerator.o
 all : $(LIBS) main
 
 run : all
-	./main test.g < test.g | tee test.st
-	$(MAKE) test
+	./main test.g < test.g > test.st
+	$(IDC) $(IDFLAGS) test.st Parser.o $(IDLIBS) -o $@ $(CLIBS)
 	time ./test < test.g
 
 % : %.st $(LIBS)
-	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(SDLLIB) $(FT2LIB) $(CLIBS)
+	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
 
 %.o : %.st
 	$(IDC) $(IDFLAGS) -c $< -o $@
