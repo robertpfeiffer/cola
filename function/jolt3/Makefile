@@ -1,4 +1,4 @@
-OS		= $(shell ../idc -C os)
+OS		= $(shell ./idc -C os)
 
 OBJECTS		= ../objects
 IDC		= ./idc
@@ -7,15 +7,18 @@ OFLAGS		= -g
 IDFLAGS		= $(OFLAGS) -I$(OBJECTS)
 IDLIBS		= $(OBJECTS)/objects.a
 
-LIBS		= Parser.o PEGParser.o PEGInterpreter.o PEGPepsiGenerator.o
+LIBS		= Token.o Parser.o GrammarParser.o PepsiGrammarGenerator.o
 
-all : $(LIBS) main
+all : g2st
 
-run : all
-	./main test.g < test.g > test.st
-	$(IDC) $(IDFLAGS) test.st Parser.o $(IDLIBS) -o test $(CLIBS)
-	time ./test < /dev/null
-	time ./test < test.g
+T = GrammarParser.g PepsiGrammarGenerator.g
+
+time : g2st .FORCE
+	wc $(T)
+	time ./g2st $(T) $(T) $(T) $(T) $(T) $(T) $(T) $(T) $(T) $(T) > /dev/null
+
+g2st : g2st.st $(LIBS)
+	$(IDC) $(IDFLAGS) g2st.st $(LIBS) $(IDLIBS) -o g2st $(CLIBS)
 
 % : %.st $(LIBS)
 	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
@@ -27,7 +30,7 @@ run : all
 	$(IDC) $(IDFLAGS) -s $< -o $@
 
 clean : .FORCE
-	rm -rf *~ *.so *.so.c *.o *.o.c .gdb_history main test *.exe *.dSYM
+	rm -rf *~ *.so *.so.c *.o *.o.c .gdb_history g2st test *.exe *.dSYM
 
 spotless : clean
 	rm -rf .gdb_history NONE

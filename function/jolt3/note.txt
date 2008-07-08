@@ -1,10 +1,80 @@
-				  vtable
-				/-------\
-	/-------\		| type -|------>| 
-	| type -|-------------->+-------+
-	+-------+		| data -|------>| name |
-oop ->	| body -|---> data	\-------/	|      |
-	\-------/
+what if results came back on the input stream?
+   could effectively:  <foo <bar x y> z>		-> this already works
+or push an entire input stream on there:
+   <compile <optimise <parse>>>
+
+=> invoke :args
+	fn = args next.
+	args
+
+as well as <rule arg1 arg2 arg3>
+allow      <rule stream>
+where stream contains an entire input stream, effectively starting a sub-parse on a new input.
+can use this for multi-stage transformation within the same grammar
+
+
+/-------\	/-------\	/-------\	/-------\
+| next -|------>| next -|------>| next -|------>| next -|------>
++-------+	+-------+	+-------+	+-------+
+| group |	| group-|---\	| group |	| group |
++-------|	+-------|   |	+-------|	+-------|
+| value-|--> f	| value |   |	| value-|--> ;	| value |
+\-------/	\---+---/   |	\-------/	\-------/
+		    |	    |
+		    |	    \----------------------\
+		    |				   |
+		    v				   v
+		/-------\	/-------\	/-------\
+		| next -|------>| next -|------>| next  |
+		+-------+	+-------+	+-------+
+		| value-|--> x	| value-|--> y	| value |--> z
+		+-------|	+-------|	+-------|
+		| group |	| group |	| group |
+		\-------/	\-------/	\-------/
+		    ^				    ^
+		    |				    |
+		    |				    |
+		/---+---\			    |
+input		| next  |			    |
+		+-------+			    |
+		| group-|---------------------------/
+		+-------|
+stream		| value |
+		\-------/
+
+	/-------\
+    /-->| next  |	EMPTY
+    |	+-------+
+    |	| value |
+    |	+-------|
+    |	| group-|--\
+    |	\-------/  |
+    |		   |
+    \--------------/
+
+	/-------\	/-------\
+    	| next -|   /-->| next  |	ONE ELEMENT
+    	+-------+   |	+-------+
+    	| value-|---/	| value |
+    	+-------|   |	+-------|
+    	| group-|---/	| group-|
+    	\-------/  	\-------/
+
+	/-------\	/-------\	/-------\
+	| next -|   /-->| next  |	| next  |	TWO ELEMENTS
+	+-------+   |	+-------+	+-------+
+	| value-|---/	| value |	| value |
+	+-------|	+-------|	+-------|
+	| group-|---\	| group-|	| group-|
+	\-------/   |	\-------/	\-------/
+		    |			    ^
+		    |			    |
+		    \-----------------------/
+
+why group pointer in parent instead of in 1st element of the group?
+- non-group tokens do not have to have a group pointer at all
+- lets 'next' point past the entire list
+- lets dumb languages (C) distinguish between tokens and groups
 
 ----------------------------------------------------------------
 
@@ -12,7 +82,6 @@ oop ->	| body -|---> data	\-------/	|      |
 (define sin  (dlsym math "sin"))
 
 ----------------------------------------------------------------
-
 
 (generate  (load "file.k"))
 (immediate (load "file.k"))

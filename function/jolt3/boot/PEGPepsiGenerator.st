@@ -1,0 +1,248 @@
+{ import: PEGIterator }
+
+CollectPositions : PEGIterator ( depth max )
+
+CollectPositions max	[ ^max ]
+
+CollectPositions for: aGrammar
+[
+    self := self new.
+    max := depth := 0.
+    self preOrderApply: aGrammar.
+]
+
+CollectPositions sequence :node		[ self reservePosition: node ]
+CollectPositions and :node		[ self reservePosition: node ]
+CollectPositions not :node		[ self reservePosition: node ]
+CollectPositions text :node		[ self reservePosition: node ]
+CollectPositions zeroMany :node		[ self reservePosition: node ]
+CollectPositions oneMany :node		[ self reservePosition: node ]
+CollectPositions structure :node	[ self reservePosition: node ]
+
+CollectPositions reservePosition: node
+[
+    max := max max: (depth := depth + 1).
+    super preOrderRest: node.
+    depth := depth - 1
+]
+
+CollectPositions reserve		[ ^'pos', (depth := depth + 1) printString ]
+CollectPositions release		[  depth := depth - 1 ]
+
+"----------------------------------------------------------------"
+
+ParserGenerator : Object ( grammar grammarName output positions )
+
+ParserGenerator on: aGrammar
+[
+    self := self new.
+    grammar := aGrammar.
+    output := StdOut.
+]
+
+ParserGenerator print: anObject		[ output print: anObject. ]
+ParserGenerator emit: aString		[ output nextPutAll: aString. ]
+ParserGenerator cr			[ output cr. ]
+ParserGenerator space			[ output space. ]
+
+ParserGenerator generate		[  self generate: grammar ]
+
+ParserGenerator generate: expr
+[
+    expr ifFalse: [^self error: 'empty expr'].
+    expr isGroup ifFalse: [^self error: 'expr is not group'].
+    self perform: expr first with: expr.
+]
+
+PPG : ParserGenerator ()
+
+PPG grammar :node		"(grammar (declaration name base (vars...)) defns...)"
+[
+    | decl base vars |
+    self emit: '"THIS FILE WAS GENERATED AUTOMATICALLY -- DO NOT EDIT!"'; cr; cr.
+    decl := node second.
+    grammarName := decl second.
+    base := decl third.
+    vars := decl fourth.
+    self emit: '{ import: '; emit: base; emit: ' }'; cr.
+    self emit: grammarName; emit: ' : '; emit: base; emit: ' ('.
+    vars do: [:v | self emit: v] separatedBy: [self space].
+    self emit: ')'; cr.
+    node from: 2 do: [:subNode | self generate: subNode].
+]
+
+PPG definition :node	"(definition name {params} {locals} expr)"
+[
+    | name params locals body |
+    name   := node second.
+    params := node third.
+    locals := node fourth.
+    body   := node fifth.
+    self emit: grammarName; space; emit: name; emit: ' :inputStream ['; cr.
+    positions := CollectPositions for: body.
+    (locals notEmpty or: [positions max > 0])
+	ifTrue:
+	   [self emit: '|'.
+	    locals ifTrue: [locals do: [:n | self space; emit: n]].
+	    1 to: positions max do: [:i | self emit: ' pos'; print: i].
+	    self emit: ' |'; cr].
+    params
+	ifTrue:
+	   [params do: [:n | self emit: n; emit: ' := inputStream next.'; cr]].
+    self emit: '^'.
+    self generate: body.
+    self cr; emit: ']'; cr.
+]
+
+PPG sequence :node	"(sequence exprs...)"
+[
+    | last pos |
+    pos := positions reserve.
+    self emit: '((('; emit: pos; emit: ' := inputStream position)'.
+    node from: 1 do: [:expr | self cr; emit: ' and: ['; generate: expr].
+    node from: 1 do: [:expr | self emit: ']'].
+    self emit: ')'; cr; emit: ' or: [(inputStream position: '; emit: pos; emit: ')])'.
+    positions release.
+]
+
+PPG alternatives :node	"(sequence exprs...)"
+[
+    self emit: '('; generate: node second.
+    node from: 2 do: [:e | self cr; emit: ' or: ['; generate: e].
+    node from: 2 do: [:e | self emit: ']'].
+    self emit: ')'.
+]
+
+PPG and :node		"(and expr)"
+[
+    | pos |
+    pos := positions reserve.
+    self
+	emit: '((('; emit: pos; emit: ' := inputStream position)'; cr; emit: ' and: ['; generate: node second;
+	emit: ']) ifTrue: [(inputStream position: '; emit: pos; emit: '). 1])'.
+    positions release.
+]
+
+PPG not :node		"(not expr)"
+[
+    | pos |
+    pos := positions reserve.
+    self
+	emit: '((('; emit: pos; emit: ' := inputStream position)'; cr; emit: ' and: ['; generate: node second;
+	emit: ']) ifTrue: [(inputStream position: '; emit: pos;
+	emit: ')] ifFalse: [1])'.
+    positions release.
+]
+
+PPG text :node		"(text expr)"
+[
+    | pos |
+    pos := positions reserve.
+    self emit: '((('; emit: pos; emit: ' := inputStream position)'.
+    self cr; emit: ' and: ['; generate: node second; emit: '])'.
+    self emit: ' ifTrue: [result := ('; emit: pos; emit: ' text: inputStream position)])'.
+    positions release.
+]
+
+PPG store :node		"(store name expr)"
+[
+    self emit: '('; generate: node third; cr; emit: ' and: ['; emit: node second; emit: ' := result. 1])'.
+]
+
+PPG zeroOne :node	"(zeroOne expr)"
+[
+    self emit: '(('; generate: node second.
+    self emit: ') ifTrue: [result := TokenGroup with: result] ifFalse: [result := TokenGroup new])'.
+]
+
+PPG zeroMany :node	"(zeroMany expr)"
+[
+    | pos |
+    pos := positions reserve.
+    self emit: '(('; emit: pos; emit: ' := TokenGroup new)'.
+    self cr; emit: ' and: [['; generate: node second; emit: '] whileTrue: [('; emit: pos; emit: ' add: result)].'.
+    self emit: ' (result := '; emit: pos; emit: ')])'.
+    positions release.
+]
+
+PPG oneMany :node	"(oneMany expr)"
+[
+    | pos |
+    pos := positions reserve.
+    self emit: '(('; emit: pos; emit: ' := TokenGroup new)'.
+    self cr; emit: ' and: [(('; generate: node second; emit: ') ifTrue: [('; emit: pos; emit: ' add: result). 1])'.
+    self cr; emit: ' and: [['; generate: node second; emit: '] whileTrue: [('; emit: pos; emit: ' add: result)]. '.
+    self emit: '(result := '; emit: pos; emit: '). 1]])'.
+    pos := positions release.
+]
+
+PPG invoke :node	"(invoke name args...)"
+[
+    | isThunk |
+    (isThunk := node hasSize: 2)
+	ifFalse:
+	   [self emit: '((inputStream pushGroup: (TokenGroup new'.
+	    node from: 2 do: [:arg | self emit: ' add: ('; generate: arg; emit: ')'] separatedBy: [self emit: ';'].
+	    self emit: ')) ifTrue: ['].
+    self emit: '(self '; emit: node second; emit: ' :inputStream)'.
+    isThunk
+	ifFalse:
+	   [self emit: '])'].
+]
+
+PPG argvar :node	"(argvar name)"
+[
+    self emit: node second
+]
+
+PPG arglit :node	"(arglit name)"
+[
+    self print: node second
+]
+
+PPG class :node		"(class charClass)"
+[
+    self emit: '(self class: '; emit: node second printString; emit: ' :inputStream)'
+]
+
+PPG string :node	"(string string)"
+[
+    self emit: '(self string: '; print: node second; emit: ' :inputStream)'.
+]
+
+PPG literal :node	"(literal object)"
+[
+    self emit: '((inputStream peek == '; print: node second; emit: ') ifTrue: [result := inputStream next. 1])'.
+]
+
+PPG structure :node	"(structure expr)"
+[
+    | pos |
+    pos := positions reserve.
+    self
+	emit: '((('; emit: pos; emit: ' := inputStream)'; cr; emit: ' and: [(inputStream := self beginStructure: inputStream)'; cr; emit: ' and: [';
+	generate: node second;
+	emit: ']]) ifTrue: [(result := (inputStream := '; emit: pos; emit: ') next)] ifFalse: [(inputStream := '; emit: pos; emit: '). nil])'.
+    positions release.
+]
+
+PPG action :node	"(action text)"
+[
+    self emit: '(['; emit: node second; emit: '] value)'.
+]
+
+PPG answer :node	"(answer name)"
+[
+    | ans sub |
+    ans := node second.
+    ans isSymbol
+	ifTrue: [^self emit: '((result := '; emit: ans; emit: ')'; cr; emit: ' or: [1])'].
+    (ans isGroup and: [ans first == #action])
+	ifTrue: [^self emit: '((result := '; generate: ans; emit: ')'; cr; emit: ' or: [1])'].
+    self error: 'malformed answer: ', node printString.
+]
+
+PPG dot :node		"(dot)"
+[
+    self emit: '(inputStream notAtEnd and: [result := inputStream next. 1])'.
+]
