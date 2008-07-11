@@ -78,7 +78,7 @@ PPG definition :node	"(definition name {params} {locals} expr)"
     params := node third.
     locals := node fourth.
     body   := node fifth.
-    self emit: grammarName; space; emit: name; emit: ' :inputStream ['; cr.
+    self emit: grammarName; space; emit: name; emit: ' :inputStream\n['; cr.
     positions := CollectPositions for: body.
     (locals notEmpty or: [positions max > 0])
 	ifTrue:
@@ -151,8 +151,7 @@ PPG store :node		"(store name expr)"
 
 PPG zeroOne :node	"(zeroOne expr)"
 [
-    self emit: '(('; generate: node second.
-    self emit: ') ifTrue: [result := TokenGroup with: result] ifFalse: [result := TokenGroup new])'.
+    self emit: '(('; generate: node second; emit: ') ifTrue: [result := TokenGroup with: result] ifFalse: [result := TokenGroup new])'.
 ]
 
 PPG zeroMany :node	"(zeroMany expr)"
@@ -182,7 +181,7 @@ PPG invoke :node	"(invoke name args...)"
     (isThunk := node hasSize: 2)
 	ifFalse:
 	   [self emit: '((inputStream pushGroup: (TokenGroup new'.
-	    node from: 2 do: [:arg | self emit: ' add: ('; generate: arg; emit: ')'] separatedBy: [self emit: ';'].
+	    node from: 2 do: [:arg | self emit: ' add: '; generate: arg] separatedBy: [self emit: ';'].
 	    self emit: ')) ifTrue: ['].
     self emit: '(self '; emit: node second; emit: ' :inputStream)'.
     isThunk
@@ -190,30 +189,12 @@ PPG invoke :node	"(invoke name args...)"
 	   [self emit: '])'].
 ]
 
-PPG argvar :node	"(argvar name)"
-[
-    self emit: node second
-]
-
-PPG arglit :node	"(arglit name)"
-[
-    self print: node second
-]
-
-PPG class :node		"(class charClass)"
-[
-    self emit: '(self class: '; emit: node second printString; emit: ' :inputStream)'
-]
-
-PPG string :node	"(string string)"
-[
-    self emit: '(self string: '; print: node second; emit: ' :inputStream)'.
-]
-
-PPG literal :node	"(literal object)"
-[
-    self emit: '((inputStream peek == '; print: node second; emit: ') ifTrue: [result := inputStream next. 1])'.
-]
+PPG argvar	:node	"(argvar name)"		[ self emit: node second ]
+PPG arglit	:node	"(arglit name)"		[ self print: node second ]
+PPG result	:node	"(result expr)"		[ self emit: '(('; generate: node second; emit: ') ifTrue: [result] ifFalse: [result])' ]
+PPG class	:node	"(class charClass)"	[ self emit: '(self class: '; emit: node second printString; emit: ' :inputStream)' ]
+PPG string	:node	"(string string)"	[ self emit: '(self string: '; print: node second; emit: ' :inputStream)' ]
+PPG literal	:node	"(literal object)"	[ self emit: '((inputStream peek == '; print: node second; emit: ') ifTrue: [result := inputStream next. 1])' ]
 
 PPG structure :node	"(structure expr)"
 [
@@ -226,23 +207,8 @@ PPG structure :node	"(structure expr)"
     positions release.
 ]
 
-PPG action :node	"(action text)"
-[
-    self emit: '(['; emit: node second; emit: '] value)'.
-]
-
-PPG answer :node	"(answer name)"
-[
-    | ans sub |
-    ans := node second.
-    ans isSymbol
-	ifTrue: [^self emit: '((result := '; emit: ans; emit: ')'; cr; emit: ' or: [1])'].
-    (ans isGroup and: [ans first == #action])
-	ifTrue: [^self emit: '((result := '; generate: ans; emit: ')'; cr; emit: ' or: [1])'].
-    self error: 'malformed answer: ', node printString.
-]
-
-PPG dot :node		"(dot)"
-[
-    self emit: '(inputStream notAtEnd and: [result := inputStream next. 1])'.
-]
+PPG action	:node	"(action text)"		[ self emit: '(['; emit: node second; emit: '. 1] value)' ]
+PPG predicate	:node	"(predicate text)"	[ self emit: '(['; emit: node second; emit: '] value)' ]
+PPG value	:node	"(value text)"		[ self emit: '((result := ['; emit: node second; emit: '] value)'; emit: ' or: [1])' ]
+PPG variable	:node	"(variable name)"	[ self emit: '((result := '; emit: node second; emit: ')'; emit: ' or: [1])' ]
+PPG dot		:node	"(dot)"			[ self emit: '(inputStream notAtEnd and: [result := inputStream next. 1])' ]

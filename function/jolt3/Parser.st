@@ -29,3 +29,11 @@ Parser string: aCollection :input
     aCollection do: [:e | e == input peek ifTrue: [input nextToken] ifFalse: [^input position: pos]].
     result := aCollection
 ]
+
+Parser apply :input
+[
+    | selector |
+    (selector := input next) ifFalse: [self error: 'cannot apply nothing at all'].
+    selector isSymbol ifFalse: [self error: 'cannot apply non-selector'].
+    ^self perform: selector with: input
+]

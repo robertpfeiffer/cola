@@ -15,27 +15,38 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-08 00:03:43 by piumarta on emilia
+% Last edited: 2008-07-11 11:44:37 by piumarta on emilia
 
 PepsiGrammarGenerator : GrammarParser ( name depth maxDepth )
 
-start		= header <generate <Grammar>>
+start		= Header <Generate <Grammar>>
 
-header		= { '"THIS FILE WAS GENERATED AUTOMATICALLY -- DO NOT EDIT!"\n\n' put }
+Header		= { '"THIS FILE WAS GENERATED AUTOMATICALLY -- DO NOT EDIT!"\n\n' put }
 
-generate	= #(#grammar generate*)
-		| #(#declaration .:i .:p			{ 123 put. (' import: ', p, ' ') put.  125 putln.
-								  ((name := i asString), ' : ', p, ' (') put }
+Generate	= #(#grammar Generate*)
+		| #(#declaration .:i .:p			{ ('{ import: ', p, ' }') putln.  ((name := i asString), ' : ', p, ' (') put }
 			#( (.:v {v asString put}
 			    &(. {' ' put}) )* ) )		{ (')') putln }
 		| #(#definition					{ maxDepth := depth := 0 }
-			.:i .:p .:l &reserve			{ (name, ' ', i, ' :inputStream [') putln.
+			.:i .:p .:l &reserve			{ (name, ' ', i, ' :inputStream\n[') putln.
 								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | l add: 'pos', n printString]].
 								  l notEmpty ifTrue: ['|' put.  l do: [:n | (' ', n) put].  ' |' putln].
-								  p do: [:n | n asString put.  ' := inputStream next.' putln].
-								  '^' put }
-			generate)				{ ('\n]') putln }
-		| #(#alternatives				{ '(' put }
+								  p do: [:n | n asString put.  ' := inputStream next.' putln]. }
+			Generate)				{ ']' putln }
+% 		| #(#alternatives
+% 			( generate				{' ifTrue: [^inputStream].\n' put}
+% 			)* )					{' ^nil.\n' put }
+%   		| #(#sequence
+%   			save					{ '.' putln }
+%   			generate				{ ' ifFalse: [^nil].' putln }
+%   			( generate				{ ' ifFalse: [^' put }
+%   			  backup				{ '].' putln }
+%   			)*
+%   			release )
+		|						{ '^' put. }
+		  generate					{ '\n' put. }
+
+generate	= #(#alternatives				{ '(' put }
 			&( generate &. {'\n or: [' put})*
 			 ( .        &. {       ']' put})*	{ ')' put }
 		   )
@@ -74,17 +85,17 @@ generate	= #(#grammar generate*)
 			append					{ ']. ' put }
 			egroup)					{ '. 1]])' put }
 		| #(#dot)					{ ('(inputStream notAtEnd and: [result := inputStream next. 1])') put }
-		| #(#answer ( #(#action .:a)			{ ('((result := ([', a, '] value))\n or: [1])') put }
-			    | .:a { a isSymbol }		{ ('((result := ', a, ')\n or: [1])') put }
-			    ) )
-		| #(#action .:a)				{ ('([', a, '] value)') put }
+		| #(#value .:v)					{ ('((result := [', v, '] value) or: [1])') put }
+		| #(#variable .:v)				{ ('((result := ' , v,        ') or: [1])') put }
+		| #(#action .:a)				{ ('([', a, '. 1] value)') put }
+		| #(#predicate .:p)				{ ('([', p, '] value)') put }
 		| #(#invoke .:i !.)				{ ('(self ', i, ' :inputStream)') put }
 		| #(#invoke .:i					{ ('((inputStream pushGroup: (TokenGroup new') put }
-			( &.					{ ' add: (' put }
-			  generate				{ ')' put }
-			  &(. {';' put})? )* )			{ (')) ifTrue: [(self ', i, ' :inputStream)])') put }
+			( &.					{ ' add: ' put }
+			  generate &(. {';' put})? )* )		{ (')) ifTrue: [(self ', i, ' :inputStream)])') put }
 		| #(#argvar .:x)				{ x asString put }
 		| #(#arglit .:x)				{ x printString put }
+		| #(#result {'((' put} generate)		{ ') ifTrue: [result] ifFalse: [result])' put }
 		| #(#literal .:l)				{ ('((inputStream peek == ', l printString, ') ifTrue: [result := inputStream next. 1])') put }
 		| #(#string .:s)				{ ('(self string: ', s printString, ' :inputStream)') put }
 		| #(#class .:c)					{ ('(self class: ', c printString, ' :inputStream)') put }
@@ -104,6 +115,7 @@ reserve		= #( ( #sequence | #and | #not | #text | #zeroMany | #oneMany | #struct
 
 save		= { ('(pos', (depth := depth + 1) printString, ' := inputStream position)') put }
 position	= { ('pos', depth printString) put }
+backup		= { ('(inputStream position: pos', depth printString, ')') put }
 restore		= { ('(inputStream position: pos', depth printString, ')') put.  depth := depth - 1 }
 release		= { depth := depth - 1 }
 

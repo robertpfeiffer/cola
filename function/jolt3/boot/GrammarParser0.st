@@ -204,9 +204,10 @@ GrammarParser application
 
 GrammarParser argument
 [
-    self identifier ifTrue: [^result := (TokenGroup with: #argvar) add: result].
-    self symbol	    ifTrue: [^result := (TokenGroup with: #arglit) add: result].
-    ^self application
+    self identifier	ifTrue: [^result := (TokenGroup with: #argvar) add: result].
+    self symbol		ifTrue: [^result := (TokenGroup with: #arglit) add: result].
+    self application	ifTrue: [^result := (TokenGroup with: #result) add: result].
+    ^nil
 ]
 
 GrammarParser symbol
@@ -223,22 +224,57 @@ GrammarParser answer
     | pos |
     pos := input position.
     self rightArrow	ifFalse: [^nil].
-    self identifier	ifTrue: [^result := (TokenGroup with: #answer) add: result].
-    self action		ifTrue: [^result := (TokenGroup with: #answer) add: result].
+    self variable	ifTrue: [^result].
+    self value		ifTrue: [^result].
     ^input position: pos
+]
+
+GrammarParser variable
+[
+    self identifier	ifFalse: [^nil].
+    result := (TokenGroup with: #variable) add: result.
+]
+
+GrammarParser value
+[
+    self block	ifFalse: [^nil].
+    result := (TokenGroup with: #value) add: result.
 ]
 
 GrammarParser action
 [
+    self block	ifFalse: [^nil].
+    result := (TokenGroup with: #action) add: result.
+]
+
+GrammarParser block
+[
     | pos text |
-    ${ == input peek ifFalse: [^nil].
+    ${ == input peek	ifFalse: [^nil].
     pos := input position.
     input nextToken.
-    [$} == input peek] whileFalse: [input nextToken ifFalse: [^input position: pos]].
+    self blockBody	ifFalse: [^input position: pos].
     text := pos next text: input position.
+    $} == input peek	ifFalse: [^input position: pos].
     input nextToken.
     self spacing.
-    result := (TokenGroup with: #action) add: text.
+    result := text.
+]
+
+GrammarParser blockBody
+[
+    | pos text |
+    pos := input position.
+    [ $} == input peek ifTrue: [^self].
+      ${ == input peek
+	  ifTrue:
+	     [input nextToken.
+	      self blockBody.
+	      ^$} == input peek
+		  ifTrue:  [input nextToken]
+		  ifFalse: [input position: pos]]
+	  ifFalse: [input nextToken] ]
+	whileTrue
 ]
 
 GrammarParser primary

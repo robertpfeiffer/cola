@@ -12,6 +12,7 @@ LIBS0		= $(LIBS) GrammarParser0.o PEGPepsiGenerator.o PEGIterator.o
 LIBS1		= $(LIBS) GrammarParser1.o PEGPepsiGenerator.o PEGIterator.o
 LIBS2		= $(LIBS) GrammarParser2.o PepsiGrammarGenerator2.o
 LIBS3		= $(LIBS) GrammarParser3.o PepsiGrammarGenerator3.o
+LIBS4		= $(LIBS) GrammarParser4.o PepsiGrammarGenerator4.o
 LIBSM		= $(LIBS) GrammarParser.o PepsiGrammarGenerator.o
 
 all : main
@@ -20,9 +21,11 @@ run : all .FORCE
 	./main GrammarParser.g > test.st
 	diff GrammarParser.st test.st
 
-time : all .FORCE
-	time ./main GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g GrammarParser.g > /dev/null
-	wc GrammarParser.g
+T = ../GrammarParser.g ../PepsiGrammarGenerator.g
+
+time : main .FORCE
+	wc $(T)
+	time ./main $(T) $(T) $(T) $(T) $(T) $(T) $(T) $(T) $(T) $(T) > /dev/null
 
 cmp : .FORCE
 	diff -Bbd GrammarParser3.st GrammarParser2.st
@@ -97,3 +100,21 @@ spotless : clean
 	rm -rf .gdb_history NONE
 
 .FORCE :
+
+test4 : main4 .FORCE
+	./main4 test.g > test.st
+	$(IDC) $(IDFLAGS) -c test.st
+	$(IDC) $(IDFLAGS) maint.st test.o $(LIBS4) $(IDLIBS) $(CLIBS) -o maint
+
+main4 : main4.st $(LIBS4)
+	$(IDC) $(IDFLAGS) $< $(LIBS4) $(IDLIBS) $(CLIBS) -o $@
+
+GrammarParser4.o : GrammarParser4.st
+PepsiGrammarGenerator4.o : PepsiGrammarGenerator4.st
+
+GrammarParser4.st : GrammarParser4.g main3
+	./main3 $< > $@
+
+PepsiGrammarGenerator4.st : PepsiGrammarGenerator4.g main3
+	./main3 $< > $@.tmp
+	sed 's/import: GrammarParser/import: GrammarParser4/' < $@.tmp > $@

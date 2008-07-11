@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-08 00:03:02 by piumarta on emilia
+% Last edited: 2008-07-11 11:50:14 by piumarta on emilia
 
 GrammarParser : Parser ()
 
@@ -35,10 +35,12 @@ Parameter	= ':' Identifier
 
 Expression	= Sequence :h (SLASH Sequence)* :t		-> { t isEmpty ifTrue: [h] ifFalse: [(TokenGroup with: #alternatives) add: h; concat: t] }
 Sequence	= Prefix* :p					-> { (p hasSize: 1) ifTrue: [p first] ifFalse: [(TokenGroup with: #sequence) concat: p] }
-Prefix		= AND Assignment :a				-> { (TokenGroup with: #and) add: a }
+Prefix		= AND Predicate :p				-> p
+		| AND Assignment :a				-> { (TokenGroup with: #and) add: a }
 		| NOT Assignment :a				-> { (TokenGroup with: #not) add: a }
 		| Assignment
 		| Store :i					-> { (TokenGroup with: #store) add: i; add: (TokenGroup with: #dot) }
+Predicate	= Block:b					-> { (TokenGroup with: #predicate) add: b }
 Assignment	= Storable :s ( Store :i			-> { (TokenGroup with: #store) add: i; add: s } :s
 			      ) *				-> s
 
@@ -58,14 +60,19 @@ Primary		= Invocation
 		| DOT						-> { TokenGroup with: #dot }
 		| Action
 		| Answer
-Answer		= RIGHTARROW ( Identifier | Action ) :a		-> { (TokenGroup with: #answer) add: a }
-Action		= '{' (!'}' .)* $:a '}' Spacing			-> { (TokenGroup with: #action) add: a }
+Action		= Block:b					-> { (TokenGroup with: #action) add: b }
+Answer		= RIGHTARROW ( Variable | Value ) :a		-> a
+Variable 	= Identifier:i					-> { (TokenGroup with: #variable) add: i }
+Value		= Block:b					-> { (TokenGroup with: #value) add: b }
+Block		= '{' BlockBody $:b '}' Spacing			-> b
+BlockBody	= (!'}' ('{' BlockBody '}' | .))*
 Invocation	= Identifier :i !LEFTARROW			-> { (TokenGroup with: #invoke) add: i }
 		| Application
 Application	= LANGLE Identifier :i Argument* :a RANGLE	-> { (TokenGroup with: #invoke) add: i; concat: a }
-Argument	= Application
+Argument	= Application:a					-> { (TokenGroup with: #result) add: a }
 		| Identifier:x					-> { (TokenGroup with: #argvar) add: x }
-		| Symbol:x					-> { (TokenGroup with: #arglit) add: x }
+		| '#' Identifier:x				-> { (TokenGroup with: #arglit) add: x }
+		| ['] (!['] Char)* :s ['] Spacing		-> { (TokenGroup with: #arglit) add: s asString }
 
 Identifier 	= ( IdentStart IdentCont* )$ :i Spacing		-> { i asSymbol }
 IdentStart 	= [a-zA-Z_]
