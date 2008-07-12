@@ -12,11 +12,12 @@ PepsiGrammarGenerator start :inputStream
 ]
 PepsiGrammarGenerator Header :inputStream
 [
+| pos1 |
 ^([ '"THIS FILE WAS GENERATED AUTOMATICALLY -- DO NOT EDIT!"\n\n' put . 1] value)
 ]
 PepsiGrammarGenerator Generate :inputStream
 [
-| i p v l pos1 pos2 pos3 pos4 pos5 pos6 pos7 pos8 |
+| i p v locals pos1 pos2 pos3 pos4 pos5 pos6 pos7 pos8 pos9 |
 ^((((pos1 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos2 := inputStream position)
@@ -55,20 +56,24 @@ PepsiGrammarGenerator Generate :inputStream
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos3 := inputStream position)
  and: [((inputStream peek == #definition) ifTrue: [result := inputStream next. 1])
- and: [([ maxDepth := depth := 0 . 1] value)
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [i := result. 1])
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [p := result. 1])
- and: [((inputStream notAtEnd and: [result := inputStream next. 1])
- and: [l := result. 1])
+ and: [([ maxDepth := depth := 0 . 1] value)
  and: [(((pos4 := inputStream position)
  and: [(self reserve :inputStream)]) ifTrue: [(inputStream position: pos4). 1])
+ and: [(((result := [ IdentityDictionary new ] value) or: [1])
+ and: [locals := result. 1])
+ and: [(((pos4 := inputStream position)
+ and: [((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])]) ifTrue: [(inputStream position: pos4). 1])
  and: [([ (name, ' ', i, ' :inputStream\n[') putln.
-								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | l add: 'pos', n printString]].
-								  l notEmpty ifTrue: ['|' put.  l do: [:n | (' ', n) put].  ' |' putln].
+								  p do: [:n | locals at: n put: true].
+								  locals := locals keys.
+								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | locals add: 'pos', n printString]].
+								  locals notEmpty ifTrue: ['|' put.  locals do: [:n | (' ', n) put].  ' |' putln].
 								  p do: [:n | n asString put.  ' := inputStream next.' putln]. . 1] value)
- and: [(self Generate :inputStream)]]]]]]]])
+ and: [(self Generate :inputStream)]]]]]]]]])
  or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
  and: [([ ']' putln . 1] value)]])
  or: [(inputStream position: pos1)])
@@ -80,49 +85,71 @@ PepsiGrammarGenerator Generate :inputStream
 ]
 PepsiGrammarGenerator generate :inputStream
 [
-| id e v a p i x l s c pos1 pos2 pos3 pos4 pos5 pos6 pos7 |
+| id e v a p i l s c x pos1 pos2 pos3 pos4 pos5 pos6 pos7 pos8 |
 ^((((pos1 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos2 := inputStream position)
  and: [((inputStream peek == #alternatives) ifTrue: [result := inputStream next. 1])
+ and: [((((pos3 := inputStream position)
+ and: [(((pos4 := inputStream position)
+ and: [(((pos5 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [(((pos6 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [(inputStream position: pos6)] ifFalse: [1])]])
+ or: [(inputStream position: pos5)])]) ifTrue: [(inputStream position: pos4). 1])
+ and: [(self generate :inputStream)]])
+ or: [(inputStream position: pos3)])
+ or: [(((pos3 := inputStream position)
  and: [([ '(' put . 1] value)
- and: [(((pos3 := inputStream position)
+ and: [(((pos4 := inputStream position)
+ and: [((pos5 := TokenGroup new)
+ and: [[(((pos6 := inputStream position)
+ and: [(self generate :inputStream)
+ and: [(((pos7 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [(inputStream position: pos7). 1])
+ and: [(['\n or: [' put. 1] value)]]])
+ or: [(inputStream position: pos6)])] whileTrue: [(pos5 add: result)]. (result := pos5)])]) ifTrue: [(inputStream position: pos4). 1])
  and: [((pos4 := TokenGroup new)
  and: [[(((pos5 := inputStream position)
- and: [(self generate :inputStream)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])
  and: [(((pos6 := inputStream position)
  and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [(inputStream position: pos6). 1])
- and: [(['\n or: [' put. 1] value)]]])
- or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])]) ifTrue: [(inputStream position: pos3). 1])
- and: [((pos3 := TokenGroup new)
- and: [[(((pos4 := inputStream position)
- and: [(inputStream notAtEnd and: [result := inputStream next. 1])
- and: [(((pos5 := inputStream position)
- and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [(inputStream position: pos5). 1])
  and: [([       ']' put. 1] value)]]])
- or: [(inputStream position: pos4)])] whileTrue: [(pos3 add: result)]. (result := pos3)])
- and: [([ ')' put . 1] value)]]]]])
+ or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])
+ and: [([ ')' put . 1] value)]]]])
+ or: [(inputStream position: pos3)])])]])
  or: [(inputStream position: pos2)])]]) ifTrue: [(result := (inputStream := pos1) next)] ifFalse: [(inputStream := pos1). nil])
  or: [(((pos1 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos2 := inputStream position)
  and: [((inputStream peek == #sequence) ifTrue: [result := inputStream next. 1])
+ and: [((((pos3 := inputStream position)
+ and: [(((pos4 := inputStream position)
+ and: [(((pos5 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [(((pos6 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [(inputStream position: pos6)] ifFalse: [1])]])
+ or: [(inputStream position: pos5)])]) ifTrue: [(inputStream position: pos4). 1])
+ and: [(self generate :inputStream)]])
+ or: [(inputStream position: pos3)])
+ or: [(((pos3 := inputStream position)
  and: [([ '((' put . 1] value)
  and: [(self save :inputStream)
- and: [(((pos3 := inputStream position)
- and: [((pos4 := TokenGroup new)
- and: [[(((pos5 := inputStream position)
+ and: [(((pos4 := inputStream position)
+ and: [((pos5 := TokenGroup new)
+ and: [[(((pos6 := inputStream position)
  and: [(['\n and: [' put. 1] value)
  and: [(self generate :inputStream)]])
- or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])]) ifTrue: [(inputStream position: pos3). 1])
- and: [((pos3 := TokenGroup new)
- and: [[(((pos4 := inputStream position)
+ or: [(inputStream position: pos6)])] whileTrue: [(pos5 add: result)]. (result := pos5)])]) ifTrue: [(inputStream position: pos4). 1])
+ and: [((pos4 := TokenGroup new)
+ and: [[(((pos5 := inputStream position)
  and: [([        ']' put. 1] value)
  and: [(inputStream notAtEnd and: [result := inputStream next. 1])]])
- or: [(inputStream position: pos4)])] whileTrue: [(pos3 add: result)]. (result := pos3)])
+ or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])
  and: [([ ')\n or: [' put . 1] value)
  and: [(self restore :inputStream)
- and: [([ '])' put . 1] value)]]]]]]]])
+ and: [([ '])' put . 1] value)]]]]]]])
+ or: [(inputStream position: pos3)])])]])
  or: [(inputStream position: pos2)])]]) ifTrue: [(result := (inputStream := pos1) next)] ifFalse: [(inputStream := pos1). nil])
  or: [(((pos1 := inputStream position)
  and: [(((pos2 := inputStream)
@@ -275,6 +302,34 @@ PepsiGrammarGenerator generate :inputStream
  and: [(((pos2 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #group) ifTrue: [result := inputStream next. 1])
+ and: [([ ('((result := TokenGroup new)') put . 1] value)
+ and: [((pos4 := TokenGroup new)
+ and: [[(((pos5 := inputStream position)
+ and: [(self element :inputStream)
+ and: [(((pos6 := inputStream position)
+ and: [(((pos7 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [([';' put. 1] value)]])
+ or: [(inputStream position: pos7)])]) ifTrue: [(inputStream position: pos6). 1])]])
+ or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])]]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (')') put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #unigroup) ifTrue: [result := inputStream next. 1])
+ and: [([ ('(result := ((TokenGroup new)') put . 1] value)
+ and: [(self element :inputStream)]]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (') first)') put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
  and: [((inputStream peek == #invoke) ifTrue: [result := inputStream next. 1])
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [i := result. 1])
@@ -296,7 +351,7 @@ PepsiGrammarGenerator generate :inputStream
  and: [(((pos6 := inputStream position)
  and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [(inputStream position: pos6). 1])
  and: [([ ' add: ' put . 1] value)
- and: [(self generate :inputStream)
+ and: [(self argument :inputStream)
  and: [(((pos6 := inputStream position)
  and: [(((((pos7 := inputStream position)
  and: [(inputStream notAtEnd and: [result := inputStream next. 1])
@@ -305,36 +360,6 @@ PepsiGrammarGenerator generate :inputStream
  or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])]]]])
  or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
  and: [([ (')) ifTrue: [(self ', i, ' :inputStream)])') put . 1] value)]])
- or: [(inputStream position: pos1)])
- or: [(((pos1 := inputStream position)
- and: [(((pos2 := inputStream)
- and: [(inputStream := self beginStructure: inputStream)
- and: [(((pos3 := inputStream position)
- and: [((inputStream peek == #argvar) ifTrue: [result := inputStream next. 1])
- and: [((inputStream notAtEnd and: [result := inputStream next. 1])
- and: [x := result. 1])]])
- or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
- and: [([ x asString put . 1] value)]])
- or: [(inputStream position: pos1)])
- or: [(((pos1 := inputStream position)
- and: [(((pos2 := inputStream)
- and: [(inputStream := self beginStructure: inputStream)
- and: [(((pos3 := inputStream position)
- and: [((inputStream peek == #arglit) ifTrue: [result := inputStream next. 1])
- and: [((inputStream notAtEnd and: [result := inputStream next. 1])
- and: [x := result. 1])]])
- or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
- and: [([ x printString put . 1] value)]])
- or: [(inputStream position: pos1)])
- or: [(((pos1 := inputStream position)
- and: [(((pos2 := inputStream)
- and: [(inputStream := self beginStructure: inputStream)
- and: [(((pos3 := inputStream position)
- and: [((inputStream peek == #result) ifTrue: [result := inputStream next. 1])
- and: [(['((' put. 1] value)
- and: [(self generate :inputStream)]]])
- or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
- and: [([ ') ifTrue: [result] ifFalse: [result])' put . 1] value)]])
  or: [(inputStream position: pos1)])
  or: [(((pos1 := inputStream position)
  and: [(((pos2 := inputStream)
@@ -386,11 +411,142 @@ PepsiGrammarGenerator generate :inputStream
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [x := result. 1])
  and: [([ self error: 'unknown expression: ', x printString . 1] value)]])
- or: [(inputStream position: pos1)])]]]]]]]]]]]]]]]]]]]]]]])
+ or: [(inputStream position: pos1)])]]]]]]]]]]]]]]]]]]]]]])
+]
+PepsiGrammarGenerator argument :inputStream
+[
+| x pos1 pos2 pos3 |
+^((((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #argvar) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [x := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ x asString put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #arglit) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [x := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ x printString put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #result) ifTrue: [result := inputStream next. 1])
+ and: [(['((' put. 1] value)
+ and: [(self generate :inputStream)]]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ ') ifTrue: [result] ifFalse: [result])' put . 1] value)]])
+ or: [(inputStream position: pos1)])]])
+]
+PepsiGrammarGenerator element :inputStream
+[
+| s x pos1 pos2 pos3 pos4 pos5 pos6 pos7 |
+^((((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #subgroup) ifTrue: [result := inputStream next. 1])
+ and: [([ (' add: (TokenGroup new') put . 1] value)
+ and: [((pos4 := TokenGroup new)
+ and: [[(((pos5 := inputStream position)
+ and: [(self element :inputStream)
+ and: [(((pos6 := inputStream position)
+ and: [(((pos7 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [([';' put. 1] value)]])
+ or: [(inputStream position: pos7)])]) ifTrue: [(inputStream position: pos6). 1])]])
+ or: [(inputStream position: pos5)])] whileTrue: [(pos4 add: result)]. (result := pos4)])]]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (')') put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #symbol) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [s := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (' add: ', s printString) put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #unquote) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [s := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (' add: ', s) put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #unquoteSplicing) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [s := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (' concat: ', s) put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #unquoteString) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [s := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (' add: (', s, ' asString)') put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #unquoteSymbol) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [s := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (' add: (', s, ' asSymbol)') put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [x := result. 1])
+ and: [([ self error: 'malformed group element: ', x printString . 1] value)]])
+ or: [(inputStream position: pos1)])]]]]]])
+]
+PepsiGrammarGenerator collect :inputStream
+[
+| n locals pos1 pos2 pos3 pos4 pos5 |
+locals := inputStream next.
+^((((pos1 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [((((pos2 := inputStream position)
+ and: [((inputStream peek == #store) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [n := result. 1])
+ and: [([ locals at: n put: true . 1] value)
+ and: [((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])]]]])
+ or: [(inputStream position: pos2)])
+ or: [(((pos2 := inputStream position)
+ and: [(inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [((pos3 := TokenGroup new)
+ and: [[((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])] whileTrue: [(pos3 add: result)]. (result := pos3)])]])
+ or: [(inputStream position: pos2)])])]]) ifTrue: [(result := (inputStream := pos1) next)] ifFalse: [(inputStream := pos1). nil])
+ or: [(inputStream notAtEnd and: [result := inputStream next. 1])])
 ]
 PepsiGrammarGenerator reserve :inputStream
 [
-| pos1 pos2 pos3 |
+| pos1 pos2 pos3 pos4 |
 ^((((pos1 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos2 := inputStream position)
@@ -417,45 +573,56 @@ PepsiGrammarGenerator reserve :inputStream
 ]
 PepsiGrammarGenerator save :inputStream
 [
+| pos1 |
 ^([ ('(pos', (depth := depth + 1) printString, ' := inputStream position)') put . 1] value)
 ]
 PepsiGrammarGenerator position :inputStream
 [
+| pos1 |
 ^([ ('pos', depth printString) put . 1] value)
 ]
 PepsiGrammarGenerator backup :inputStream
 [
+| pos1 |
 ^([ ('(inputStream position: pos', depth printString, ')') put . 1] value)
 ]
 PepsiGrammarGenerator restore :inputStream
 [
+| pos1 |
 ^([ ('(inputStream position: pos', depth printString, ')') put.  depth := depth - 1 . 1] value)
 ]
 PepsiGrammarGenerator release :inputStream
 [
+| pos1 |
 ^([ depth := depth - 1 . 1] value)
 ]
 PepsiGrammarGenerator bgroup :inputStream
 [
+| pos1 |
 ^([ ('(pos', (depth := depth + 1) printString, ' := TokenGroup new)') put . 1] value)
 ]
 PepsiGrammarGenerator append :inputStream
 [
+| pos1 |
 ^([ ('(pos', depth printString, ' add: result)') put . 1] value)
 ]
 PepsiGrammarGenerator egroup :inputStream
 [
+| pos1 |
 ^([ ('(result := pos', depth printString, ')') put.  depth := depth - 1 . 1] value)
 ]
 PepsiGrammarGenerator bstream :inputStream
 [
+| pos1 |
 ^([ ('(pos', (depth := depth + 1) printString, ' := inputStream)') put . 1] value)
 ]
 PepsiGrammarGenerator nstream :inputStream
 [
+| pos1 |
 ^([ ('(result := (inputStream := pos', depth printString, ') next)') put . 1] value)
 ]
 PepsiGrammarGenerator estream :inputStream
 [
+| pos1 |
 ^([ ('(inputStream := pos', depth printString, ')') put.  depth := depth - 1 . 1] value)
 ]

@@ -7,7 +7,7 @@
     | input parser grammar |
     OS arguments do: [:arg |
 	input := (File open: arg) tokenStream.
-	parser := GrammarParser on: input.
+	parser := GrammarParser new.
 	((parser start :input) and: [input atEnd]) ifFalse: [parser error: 'syntax error near: ', input printString].
 	grammar := parser result].
     "StdErr prettyPrint: grammar."

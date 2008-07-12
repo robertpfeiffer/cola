@@ -4,9 +4,9 @@ Parser : Object ( result )
 
 Parser result	[ ^result ]
 
-Parser on: aCollection
+Parser parse: aCollection
 [
-    self := self new.
+    ^self start :aCollection tokenStream
 ]
 
 Parser beginStructure: inputStream

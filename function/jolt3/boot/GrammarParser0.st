@@ -54,6 +54,11 @@ GrammarParser close		[ ($) == input peek) ifFalse: [^nil].  input nextToken.  se
 GrammarParser dot		[ ($. == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
 GrammarParser leftAngle		[ ($< == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
 GrammarParser rightAngle	[ ($> == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser backquote		[ ($` == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser comma		[ ($, == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser at		[ ($@ == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser dollar		[ ($$ == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser hash		[ ($# == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
 
 GrammarParser rightArrow
 [
@@ -226,6 +231,7 @@ GrammarParser answer
     self rightArrow	ifFalse: [^nil].
     self variable	ifTrue: [^result].
     self value		ifTrue: [^result].
+    self rewrite	ifTrue: [^result].
     ^input position: pos
 ]
 
@@ -277,6 +283,56 @@ GrammarParser blockBody
 	whileTrue
 ]
 
+GrammarParser rewrite
+[
+    self backquote	ifFalse: [^nil].
+    self group		ifTrue: [^self].
+    self element	ifTrue: [^result := (TokenGroup with: #unigroup) add: result].
+    ^nil
+]
+
+GrammarParser group
+[
+    | pos group |
+    pos := input position.
+    self open						ifFalse: [^nil].
+    group := TokenGroup with: #group.
+    [self element] whileTrue: [group add: result].
+    self close						ifFalse: [^input position: pos].
+    result := group.
+]
+
+GrammarParser element
+[
+    self identifier	ifTrue: [^result := (TokenGroup with: #symbol) add: result].
+    self unquote	ifTrue: [^self].
+    self subgroup	ifTrue: [^self].
+    ^nil
+]
+
+GrammarParser unquote
+[
+    | pos |
+    pos := input position.
+    self comma					ifFalse: [^nil].
+    (self at	 and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteSplicing) add: result].
+    (self dollar and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteString)	add: result].
+    (self hash	 and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteSymbol)	add: result].
+    self identifier				ifTrue: [^result := (TokenGroup with: #unquote)		add: result].
+    ^input position: pos
+]
+
+GrammarParser subgroup
+[
+    | pos group |
+    pos := input position.
+    self open						ifFalse: [^nil].
+    group := TokenGroup with: #subgroup.
+    [self element] whileTrue: [group add: result].
+    self close						ifFalse: [^input position: pos].
+    result := group.
+]
+
 GrammarParser primary
 [
     | pos p |
@@ -313,8 +369,7 @@ GrammarParser storable
 [
     | pos s |
     self suffix		ifFalse: [^nil].
-    $$ == input peek	ifFalse: [^self].
-    input nextToken.
+    self dollar		ifFalse: [^self].
     self spacing.
     result := (TokenGroup with: #text) add: result.
 ]
@@ -360,7 +415,7 @@ GrammarParser sequence
     self prefix			ifFalse: [^nil].
     seq := TokenGroup with: result.
     [self prefix] whileTrue: [seq addLast: result].
-    result := (seq hasSize: 1) ifTrue: [seq first] ifFalse: [seq addFirst: #sequence.  seq].
+    (result := seq) addFirst: #sequence
 ]
 
 GrammarParser expression
@@ -373,7 +428,7 @@ GrammarParser expression
 	whileTrue:
 	   [self sequence	ifFalse: [^input position: pos].
 	    expr add: result].
-    result := (expr hasSize: 1) ifTrue: [expr first] ifFalse: [expr addFirst: #alternatives.  expr].
+    (result := expr) addFirst: #alternatives.
 ]
 
 GrammarParser parameter
@@ -386,7 +441,7 @@ GrammarParser parameter
 
 GrammarParser definition
 [
-    | pos name params locals expr |
+    | pos name params expr |
     pos := input position.
     self identifier		ifFalse: [^input position: pos].
     name := result.
@@ -396,9 +451,7 @@ GrammarParser definition
     self expression		ifFalse: [^input position: pos].
     expr := result.
     self semicolon.
-    locals := CollectLocals for: expr.
-    params do: [:tok | locals at: tok put: true].
-    result := (TokenGroup with: #definition) add: name;	add: params; add: (TokenGroup withAll: locals keys); add: expr
+    result := (TokenGroup with: #definition) add: name;	add: params; add: expr
 ]
 
 GrammarParser declaration

@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-11 11:44:37 by piumarta on emilia
+% Last edited: 2008-07-12 12:24:00 by piumarta on emilia
 
 PepsiGrammarGenerator : GrammarParser ( name depth maxDepth )
 
@@ -27,10 +27,14 @@ Generate	= #(#grammar Generate*)
 		| #(#declaration .:i .:p			{ ('{ import: ', p, ' }') putln.  ((name := i asString), ' : ', p, ' (') put }
 			#( (.:v {v asString put}
 			    &(. {' ' put}) )* ) )		{ (')') putln }
-		| #(#definition					{ maxDepth := depth := 0 }
-			.:i .:p .:l &reserve			{ (name, ' ', i, ' :inputStream\n[') putln.
-								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | l add: 'pos', n printString]].
-								  l notEmpty ifTrue: ['|' put.  l do: [:n | (' ', n) put].  ' |' putln].
+		| #(#definition .:i .:p
+			   { maxDepth := depth := 0 }		&reserve
+			-> { IdentityDictionary new } :locals	&<collect locals>
+								{ (name, ' ', i, ' :inputStream\n[') putln.
+								  p do: [:n | locals at: n put: true].
+								  locals := locals keys.
+								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | locals add: 'pos', n printString]].
+								  locals notEmpty ifTrue: ['|' put.  locals do: [:n | (' ', n) put].  ' |' putln].
 								  p do: [:n | n asString put.  ' := inputStream next.' putln]. }
 			Generate)				{ ']' putln }
 % 		| #(#alternatives
@@ -46,15 +50,19 @@ Generate	= #(#grammar Generate*)
 		|						{ '^' put. }
 		  generate					{ '\n' put. }
 
-generate	= #(#alternatives				{ '(' put }
+generate	= #(#alternatives
+		      ( &(. !.) generate
+		      |						{ '(' put }
 			&( generate &. {'\n or: [' put})*
 			 ( .        &. {       ']' put})*	{ ')' put }
-		   )
-		| #(#sequence					{ '((' put }
+		      ) )
+		| #(#sequence
+		      ( &(. !.) generate
+		      | 					{ '((' put }
 			save	&({'\n and: [' put} generate)*
 				 ({        ']' put} .       )*	{ ')\n or: [' put }
 			restore					{ '])' put }
-		   )
+		      ) )
 		| #(#and					{ '((' put }
 			save					{ '\n and: [' put }
 			generate				{ ']) ifTrue: [' put }
@@ -89,13 +97,14 @@ generate	= #(#alternatives				{ '(' put }
 		| #(#variable .:v)				{ ('((result := ' , v,        ') or: [1])') put }
 		| #(#action .:a)				{ ('([', a, '. 1] value)') put }
 		| #(#predicate .:p)				{ ('([', p, '] value)') put }
+		| #(#group					{ ('((result := TokenGroup new)') put }
+			( element &(. {';' put}) )* )		{ (')') put }
+		| #(#unigroup					{ ('(result := ((TokenGroup new)') put }
+			element )				{ (') first)') put }
 		| #(#invoke .:i !.)				{ ('(self ', i, ' :inputStream)') put }
 		| #(#invoke .:i					{ ('((inputStream pushGroup: (TokenGroup new') put }
 			( &.					{ ' add: ' put }
-			  generate &(. {';' put})? )* )		{ (')) ifTrue: [(self ', i, ' :inputStream)])') put }
-		| #(#argvar .:x)				{ x asString put }
-		| #(#arglit .:x)				{ x printString put }
-		| #(#result {'((' put} generate)		{ ') ifTrue: [result] ifFalse: [result])' put }
+			  argument &(. {';' put})? )* )		{ (')) ifTrue: [(self ', i, ' :inputStream)])') put }
 		| #(#literal .:l)				{ ('((inputStream peek == ', l printString, ') ifTrue: [result := inputStream next. 1])') put }
 		| #(#string .:s)				{ ('(self string: ', s printString, ' :inputStream)') put }
 		| #(#class .:c)					{ ('(self class: ', c printString, ' :inputStream)') put }
@@ -105,6 +114,29 @@ generate	= #(#alternatives				{ '(' put }
 			nstream					{ '] ifFalse: [' put }
 			estream)				{ '. nil])' put }
 		| .:x						{ self error: 'unknown expression: ', x printString }
+
+argument	= #(#argvar .:x)				{ x asString put }
+		| #(#arglit .:x)				{ x printString put }
+		| #(#result {'((' put} generate)		{ ') ifTrue: [result] ifFalse: [result])' put }
+
+element		= #(#subgroup					{ (' add: (TokenGroup new') put }
+			( element &(. {';' put}) )* )		{ (')') put }
+		| #(#symbol .:s)				{ (' add: ', s printString) put }
+		| #(#unquote .:s)				{ (' add: ', s) put }
+		| #(#unquoteSplicing .:s)			{ (' concat: ', s) put }
+		| #(#unquoteString   .:s)			{ (' add: (', s, ' asString)') put }
+		| #(#unquoteSymbol   .:s)			{ (' add: (', s, ' asSymbol)') put }
+		| .:x						{ self error: 'malformed group element: ', x printString }
+		;
+
+% collect all store node variable names within expression tree
+
+collect :locals	= ( #( #store .:n { locals at: n put: true } <collect locals>
+		     | .				     <collect locals>* )
+		  | .
+		  )
+
+% reserve temporaries for saved input positions
 
 reserve		= #( ( #sequence | #and | #not | #text | #zeroMany | #oneMany | #structure )
 		     { maxDepth := maxDepth max: (depth := depth + 1) }

@@ -15,41 +15,38 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-11 11:50:14 by piumarta on emilia
+% Last edited: 2008-07-12 12:16:55 by piumarta on emilia
 
 GrammarParser : Parser ()
 
 start		= Grammar
 
-Grammar		= Spacing Declaration :d Definition+ :g EndOfFile		-> { (TokenGroup with: #grammar) add: d; concat: g }
+Grammar		= Spacing Declaration :d Definition+ :g EndOfFile		-> `(grammar ,d ,@g)
 
-Declaration	= Identifier :n COLON Identifier :b OPEN Identifier* :v CLOSE	-> { (TokenGroup with: #declaration) add: n; add: b; add: v }
-		|								-> { TokenGroup new }
+Declaration	= Identifier :n COLON Identifier :b OPEN Identifier* :v CLOSE	-> `(declaration ,n ,b ,v)
+		|								-> `()
 
-Definition	= Identifier :i Parameter* :p LEFTARROW Expression :e SEMICOLON?
-		    -> { IdentityDictionary new } :locals <collect locals e>
-		    -> { p do: [:n | locals at: n put: true].
-		         (TokenGroup with: #definition) add: i; add: p; add: (TokenGroup withAll: locals keys); add: e.
-		       }
+Definition	= Identifier :i Parameter* :p EQUAL Expression :e SEMICOLON?	-> `(definition ,i ,p ,e)
+
 Parameter	= ':' Identifier
 
-Expression	= Sequence :h (SLASH Sequence)* :t		-> { t isEmpty ifTrue: [h] ifFalse: [(TokenGroup with: #alternatives) add: h; concat: t] }
-Sequence	= Prefix* :p					-> { (p hasSize: 1) ifTrue: [p first] ifFalse: [(TokenGroup with: #sequence) concat: p] }
+Expression	= Sequence :h (SLASH Sequence)* :t		-> `(alternatives ,h ,@t)
+Sequence	= Prefix* :p					-> `(sequence ,@p)
 Prefix		= AND Predicate :p				-> p
-		| AND Assignment :a				-> { (TokenGroup with: #and) add: a }
-		| NOT Assignment :a				-> { (TokenGroup with: #not) add: a }
+		| AND Assignment :a				-> `(and ,a)
+		| NOT Assignment :a				-> `(not ,a)
 		| Assignment
-		| Store :i					-> { (TokenGroup with: #store) add: i; add: (TokenGroup with: #dot) }
-Predicate	= Block:b					-> { (TokenGroup with: #predicate) add: b }
-Assignment	= Storable :s ( Store :i			-> { (TokenGroup with: #store) add: i; add: s } :s
+		| Store :i					-> `(store ,i (dot))
+Predicate	= Block:b					-> `(predicate ,b)
+Assignment	= Storable :s ( Store :i			-> `(store ,i ,s) :s
 			      ) *				-> s
 
-Storable	= Suffix :s ( DOLLAR				-> { (TokenGroup with: #text) add: s } :s
+Storable	= Suffix :s ( DOLLAR				-> `(text ,s) :s
 			    ) ?					-> s
 Store		= COLON Identifier
-Suffix		= Primary :p ( QUESTION				-> { (TokenGroup with: #zeroOne)  add: p } :p
-			     | STAR				-> { (TokenGroup with: #zeroMany) add: p } :p
-			     | PLUS				-> { (TokenGroup with: #oneMany)  add: p } :p
+Suffix		= Primary :p ( QUESTION				-> `(zeroOne  ,p) :p
+			     | STAR				-> `(zeroMany ,p) :p
+			     | PLUS				-> `(oneMany  ,p) :p
 			     ) ?				-> p
 Primary		= Invocation
 		| OPEN Expression :e CLOSE			-> e
@@ -57,24 +54,37 @@ Primary		= Invocation
 		| Class
 		| Structure
 		| Symbol
-		| DOT						-> { TokenGroup with: #dot }
+		| DOT						-> `(dot)
 		| Action
 		| Answer
-Action		= Block:b					-> { (TokenGroup with: #action) add: b }
-Answer		= RIGHTARROW ( Variable | Value ) :a		-> a
-Variable 	= Identifier:i					-> { (TokenGroup with: #variable) add: i }
-Value		= Block:b					-> { (TokenGroup with: #value) add: b }
+Action		= Block:b					-> `(action ,b)
+Answer		= RIGHTARROW ( Variable | Value | Rewrite )
+Variable 	= Identifier:i					-> `(variable ,i)
+Value		= Block:b					-> `(value ,b)
 Block		= '{' BlockBody $:b '}' Spacing			-> b
 BlockBody	= (!'}' ('{' BlockBody '}' | .))*
-Invocation	= Identifier :i !LEFTARROW			-> { (TokenGroup with: #invoke) add: i }
+Rewrite		= BACKQUOTE ( Group
+			    | Element:e				-> `(unigroup ,e)
+			    )
+Group		= OPEN Element*:e CLOSE				-> `(group ,@e)
+Element		= Identifier:i					-> `(symbol ,i)
+		| Unquote
+		| Subgroup
+Unquote		= COMMA ( AT	 Identifier:i			-> `(unquoteSplicing ,i)
+			| DOLLAR Identifier:i			-> `(unquoteString ,i)
+			| '#'	 Identifier:i			-> `(unquoteSymbol ,i)
+			|	 Identifier:i			-> `(unquote ,i)
+			)
+Subgroup	= OPEN Element*:e CLOSE				-> `(subgroup ,@e)
+Invocation	= Identifier :i !EQUAL				-> `(invoke ,i)
 		| Application
-Application	= LANGLE Identifier :i Argument* :a RANGLE	-> { (TokenGroup with: #invoke) add: i; concat: a }
-Argument	= Application:a					-> { (TokenGroup with: #result) add: a }
-		| Identifier:x					-> { (TokenGroup with: #argvar) add: x }
-		| '#' Identifier:x				-> { (TokenGroup with: #arglit) add: x }
-		| ['] (!['] Char)* :s ['] Spacing		-> { (TokenGroup with: #arglit) add: s asString }
+Application	= LANGLE Identifier :i Argument* :a RANGLE	-> `(invoke ,i ,@a)
+Argument	= Application:a					-> `(result ,a)
+		| Identifier:x					-> `(argvar ,x)
+		| '#' Identifier:x				-> `(arglit ,x)
+		| ['] (!['] Char)* :s ['] Spacing		-> `(arglit ,$s)
 
-Identifier 	= ( IdentStart IdentCont* )$ :i Spacing		-> { i asSymbol }
+Identifier 	= ( IdentStart IdentCont* )$ :i Spacing		-> `,#i
 IdentStart 	= [a-zA-Z_]
 IdentCont 	= IdentStart | [0-9]
 Literal 	= ( ['] (!['] Char)* :s ['] Spacing
@@ -96,10 +106,10 @@ Char 		= '\\'	( 'n'					-> { $\n }
 			)
 		| .
 
-Structure	= '#' OPEN Expression:e CLOSE			-> { (TokenGroup with: #structure) add: e }
-Symbol		= '#' Identifier:i				-> { (TokenGroup with: #literal)   add: i }
+Structure	= '#' OPEN Expression:e CLOSE			-> `(structure ,e)
+Symbol		= '#' Identifier:i				-> `(literal   ,i)
 
-LEFTARROW 	= '='  Spacing
+EQUAL	 	= '='  Spacing
 RIGHTARROW 	= '->' Spacing
 SLASH 		= '|'  Spacing
 AND 		= '&'  Spacing
@@ -115,16 +125,12 @@ DOT 		= '.'  Spacing
 SEMICOLON	= ';'  Spacing
 COLON 		= ':'  Spacing
 DOLLAR 		= '$'  Spacing
+BACKQUOTE	= '`'  Spacing
+COMMA		= ','  Spacing
+AT		= '@'  Spacing
 
 Spacing 	= (Space | Comment)*
 Comment 	= '%' (!EndOfLine .)* EndOfLine
 Space 		= ' ' | '\t' | EndOfLine
 EndOfLine 	= '\r\n' | '\n' | '\r'
 EndOfFile 	= !. ;
-
-% collect all store node variable names within expression tree
-
-collect :locals	= ( #( #store .:n { locals at: n put: true } <collect locals>
-		     | .				     <collect locals>* )
-		  | .
-		  )

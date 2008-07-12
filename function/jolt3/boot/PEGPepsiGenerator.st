@@ -71,19 +71,21 @@ PPG grammar :node		"(grammar (declaration name base (vars...)) defns...)"
     node from: 2 do: [:subNode | self generate: subNode].
 ]
 
-PPG definition :node	"(definition name {params} {locals} expr)"
+PPG definition :node	"(definition name {params} expr)"
 [
     | name params locals body |
     name   := node second.
     params := node third.
-    locals := node fourth.
-    body   := node fifth.
+    body   := node fourth.
+    locals := CollectLocals for: body.
+    params do: [:n | locals at: n put: true].
+    locals := locals keys.
     self emit: grammarName; space; emit: name; emit: ' :inputStream\n['; cr.
     positions := CollectPositions for: body.
     (locals notEmpty or: [positions max > 0])
 	ifTrue:
 	   [self emit: '|'.
-	    locals ifTrue: [locals do: [:n | self space; emit: n]].
+	    locals do: [:n | self space; emit: n].
 	    1 to: positions max do: [:i | self emit: ' pos'; print: i].
 	    self emit: ' |'; cr].
     params
@@ -97,6 +99,7 @@ PPG definition :node	"(definition name {params} {locals} expr)"
 PPG sequence :node	"(sequence exprs...)"
 [
     | last pos |
+    (node hasSize: 2) ifTrue: [^self generate: node second].
     pos := positions reserve.
     self emit: '((('; emit: pos; emit: ' := inputStream position)'.
     node from: 1 do: [:expr | self cr; emit: ' and: ['; generate: expr].
@@ -107,6 +110,7 @@ PPG sequence :node	"(sequence exprs...)"
 
 PPG alternatives :node	"(sequence exprs...)"
 [
+    (node hasSize: 2) ifTrue: [^self generate: node second].
     self emit: '('; generate: node second.
     node from: 2 do: [:e | self cr; emit: ' or: ['; generate: e].
     node from: 2 do: [:e | self emit: ']'].
@@ -212,3 +216,30 @@ PPG predicate	:node	"(predicate text)"	[ self emit: '(['; emit: node second; emi
 PPG value	:node	"(value text)"		[ self emit: '((result := ['; emit: node second; emit: '] value)'; emit: ' or: [1])' ]
 PPG variable	:node	"(variable name)"	[ self emit: '((result := '; emit: node second; emit: ')'; emit: ' or: [1])' ]
 PPG dot		:node	"(dot)"			[ self emit: '(inputStream notAtEnd and: [result := inputStream next. 1])' ]
+
+PPG group :node	"(group elts...)"
+[
+    self emit: '((result := TokenGroup new)'.
+    node from: 1 do: [:elt | self generate: elt] separatedBy: [self emit: ';'].
+    self emit: ')'
+]
+
+PPG unigroup :node	"(unigroup elt)"
+[
+    self emit: '(result := ((TokenGroup new)'.
+    node from: 1 do: [:elt | self generate: elt] separatedBy: [self emit: ';'].
+    self emit: ') first)'
+]
+
+PPG subgroup :node	"(subgroup elts...)"
+[
+    self emit: ' add: (TokenGroup new'.
+    node from: 1 do: [:elt | self generate: elt] separatedBy: [self emit: ';'].
+    self emit: ')'
+]
+
+PPG symbol		:node	"(symbol sym)"		[ self emit: ' add: ';    print: node second ]
+PPG unquote		:node	"(unquote sym)"		[ self emit: ' add: ';    emit:  node second ]
+PPG unquoteSplicing	:node	"(unquoteSplicing sym)"	[ self emit: ' concat: '; emit:  node second ]
+PPG unquoteString	:node	"(unquoteString sym)"	[ self emit: ' add: (';	  emit:  node second; emit: ' asString)' ]
+PPG unquoteSymbol	:node	"(unquoteSymbol sym)"	[ self emit: ' add: (';	  emit:  node second; emit: ' asSymbol)' ]

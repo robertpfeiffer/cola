@@ -17,6 +17,13 @@ PEGIterator action		:node []
 PEGIterator predicate		:node []
 PEGIterator value		:node []
 PEGIterator variable		:node []
+PEGIterator result		:node [ ^self preOrderApply: node second ]
+PEGIterator group		:node []
+PEGIterator unigroup		:node []
+PEGIterator symbol		:node []
+PEGIterator unquote		:node []
+PEGIterator unquoteSplicing	:node []
+PEGIterator subgroup		:node []
 PEGIterator store		:node [ ^self preOrderApply: node third  ]
 PEGIterator and			:node [ ^self preOrderApply: node second ]
 PEGIterator not			:node [ ^self preOrderApply: node second ]
@@ -51,6 +58,6 @@ CollectLocals for: aGrammar
 
 CollectLocals store :node
 [
-    locals at: node second put: true.
+    locals at: node second asSymbol put: true.
     super store :node.
 ]
