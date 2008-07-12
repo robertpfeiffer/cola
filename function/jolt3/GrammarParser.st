@@ -226,7 +226,8 @@ GrammarParser Answer :inputStream
  and: [(self RIGHTARROW :inputStream)
  and: [((self Variable :inputStream)
  or: [(self Value :inputStream)
- or: [(self Rewrite :inputStream)]])]])
+ or: [(self Rewrite :inputStream)
+ or: [(self Character :inputStream)]]])]])
  or: [(inputStream position: pos1)])
 ]
 GrammarParser Variable :inputStream
@@ -335,10 +336,16 @@ GrammarParser Unquote :inputStream
  and: [((result := TokenGroup new) add: #unquoteSymbol; add: i)]]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
+ and: [((inputStream peek == 61) ifTrue: [result := inputStream next. 1])
+ and: [((self Identifier :inputStream)
+ and: [i := result. 1])
+ and: [((result := TokenGroup new) add: #unquoteNumber; add: i)]]])
+ or: [(inputStream position: pos2)])
+ or: [(((pos2 := inputStream position)
  and: [((self Identifier :inputStream)
  and: [i := result. 1])
  and: [((result := TokenGroup new) add: #unquote; add: i)]])
- or: [(inputStream position: pos2)])]]])]])
+ or: [(inputStream position: pos2)])]]]])]])
  or: [(inputStream position: pos1)])
 ]
 GrammarParser Subgroup :inputStream
@@ -351,6 +358,17 @@ GrammarParser Subgroup :inputStream
  and: [e := result. 1])
  and: [(self CLOSE :inputStream)
  and: [((result := TokenGroup new) add: #subgroup; concat: e)]]]])
+ or: [(inputStream position: pos1)])
+]
+GrammarParser Character :inputStream
+[
+| c pos1 |
+^(((pos1 := inputStream position)
+ and: [(self BACKSLASH :inputStream)
+ and: [((self Char :inputStream)
+ and: [c := result. 1])
+ and: [(self Spacing :inputStream)
+ and: [((result := TokenGroup new) add: #character; add: c)]]]])
  or: [(inputStream position: pos1)])
 ]
 GrammarParser Invocation :inputStream
@@ -466,8 +484,7 @@ GrammarParser Literal :inputStream
  and: [((inputStream peek == 34) ifTrue: [result := inputStream next. 1])
  and: [(self Spacing :inputStream)]]]])
  or: [(inputStream position: pos2)])])
- and: [((result := [ (s hasSize: 1) ifTrue:  [(TokenGroup with: #literal) add: s asString first]
-										    ifFalse: [(TokenGroup with: #string)  add: s asString] ] value) or: [1])]])
+ and: [((result := TokenGroup new) add: #string; add: (s asString))]])
  or: [(inputStream position: pos1)])
 ]
 GrammarParser Class :inputStream
@@ -485,8 +502,7 @@ GrammarParser Class :inputStream
  and: [c := result. 1])
  and: [((inputStream peek == 93) ifTrue: [result := inputStream next. 1])
  and: [(self Spacing :inputStream)
- and: [((result := [ (c size == 1)  ifTrue:  [(TokenGroup with: #literal) add: c asString first]
-										    ifFalse: [(TokenGroup with: #class)   add: c asString asCharacterClass] ] value) or: [1])]]]]])
+ and: [((result := TokenGroup new) add: #class; add: (c asString))]]]]])
  or: [(inputStream position: pos1)])
 ]
 GrammarParser Range :inputStream
@@ -507,35 +523,35 @@ GrammarParser Char :inputStream
  and: [((inputStream peek == 92) ifTrue: [result := inputStream next. 1])
  and: [((((pos2 := inputStream position)
  and: [((inputStream peek == 110) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $\n ] value) or: [1])]])
+ and: [((result := 10) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 114) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $\r ] value) or: [1])]])
+ and: [((result := 13) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 116) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $\t ] value) or: [1])]])
+ and: [((result := 9) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 39) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $'  ] value) or: [1])]])
+ and: [((result := 39) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 34) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $"  ] value) or: [1])]])
+ and: [((result := 34) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 91) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $[  ] value) or: [1])]])
+ and: [((result := 91) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 93) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $]  ] value) or: [1])]])
+ and: [((result := 93) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((inputStream peek == 92) ifTrue: [result := inputStream next. 1])
- and: [((result := [ $\\ ] value) or: [1])]])
+ and: [((result := 92) or: [1])]])
  or: [(inputStream position: pos2)])
  or: [(((pos2 := inputStream position)
  and: [((((pos3 := inputStream position)
@@ -549,14 +565,9 @@ GrammarParser Char :inputStream
  and: [(((self class: #[0 0 0 0 0 0 255 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] :inputStream)) ifTrue: [result := TokenGroup with: result] ifFalse: [result := TokenGroup new])]])
  or: [(inputStream position: pos4)])])]) ifTrue: [result := (pos3 text: inputStream position)])
  and: [s := result. 1])
- and: [((result := [ s inject: 0 into: [:c :digit | c * 8 + digit - $0] ] value) or: [1])]])
+ and: [(result := ((TokenGroup new) add: (Integer fromString: s)) first)]])
  or: [(inputStream position: pos2)])
- or: [(((pos2 := inputStream position)
- and: [((((pos3 := inputStream position)
- and: [(inputStream notAtEnd and: [result := inputStream next. 1])]) ifTrue: [result := (pos3 text: inputStream position)])
- and: [s := result. 1])
- and: [((result := [ self error: 'unknown escape: ', s ] value) or: [1])]])
- or: [(inputStream position: pos2)])]]]]]]]]])]])
+ or: [((inputStream pushGroup: (TokenGroup new add: 'unknown escape')) ifTrue: [(self error :inputStream)])]]]]]]]]])]])
  or: [(inputStream position: pos1)])
  or: [(inputStream notAtEnd and: [result := inputStream next. 1])])
 ]
@@ -734,6 +745,14 @@ GrammarParser AT :inputStream
  and: [(self Spacing :inputStream)]])
  or: [(inputStream position: pos1)])
 ]
+GrammarParser BACKSLASH :inputStream
+[
+| pos1 |
+^(((pos1 := inputStream position)
+ and: [((inputStream peek == 92) ifTrue: [result := inputStream next. 1])
+ and: [(self Spacing :inputStream)]])
+ or: [(inputStream position: pos1)])
+]
 GrammarParser Spacing :inputStream
 [
 | pos1 pos2 pos3 |
@@ -765,8 +784,7 @@ GrammarParser Space :inputStream
 GrammarParser EndOfLine :inputStream
 [
 | pos1 |
-^((self string: '
-' :inputStream)
+^((self string: '\015\012' :inputStream)
  or: [((inputStream peek == 10) ifTrue: [result := inputStream next. 1])
  or: [((inputStream peek == 13) ifTrue: [result := inputStream next. 1])]])
 ]

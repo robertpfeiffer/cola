@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-12 12:16:55 by piumarta on emilia
+% Last edited: 2008-07-12 16:26:10 by piumarta on emilia
 
 GrammarParser : Parser ()
 
@@ -58,7 +58,8 @@ Primary		= Invocation
 		| Action
 		| Answer
 Action		= Block:b					-> `(action ,b)
-Answer		= RIGHTARROW ( Variable | Value | Rewrite )
+Answer		= RIGHTARROW ( Variable | Value
+			     | Rewrite | Character )
 Variable 	= Identifier:i					-> `(variable ,i)
 Value		= Block:b					-> `(value ,b)
 Block		= '{' BlockBody $:b '}' Spacing			-> b
@@ -73,9 +74,11 @@ Element		= Identifier:i					-> `(symbol ,i)
 Unquote		= COMMA ( AT	 Identifier:i			-> `(unquoteSplicing ,i)
 			| DOLLAR Identifier:i			-> `(unquoteString ,i)
 			| '#'	 Identifier:i			-> `(unquoteSymbol ,i)
+			| '='	 Identifier:i			-> `(unquoteNumber ,i)
 			|	 Identifier:i			-> `(unquote ,i)
 			)
 Subgroup	= OPEN Element*:e CLOSE				-> `(subgroup ,@e)
+Character	= BACKSLASH Char:c Spacing			-> `(character ,c)
 Invocation	= Identifier :i !EQUAL				-> `(invoke ,i)
 		| Application
 Application	= LANGLE Identifier :i Argument* :a RANGLE	-> `(invoke ,i ,@a)
@@ -88,46 +91,45 @@ Identifier 	= ( IdentStart IdentCont* )$ :i Spacing		-> `,#i
 IdentStart 	= [a-zA-Z_]
 IdentCont 	= IdentStart | [0-9]
 Literal 	= ( ['] (!['] Char)* :s ['] Spacing
-		  | ["] (!["] Char)* :s ["] Spacing )		-> { (s hasSize: 1) ifTrue:  [(TokenGroup with: #literal) add: s asString first]
-										    ifFalse: [(TokenGroup with: #string)  add: s asString] }
-Class 		= '[' (!']' Range)* $:c ']' Spacing		-> { (c size == 1)  ifTrue:  [(TokenGroup with: #literal) add: c asString first]
-										    ifFalse: [(TokenGroup with: #class)   add: c asString asCharacterClass] }
+		  | ["] (!["] Char)* :s ["] Spacing )		-> `(string ,$s)
+Class 		= '[' (!']' Range)* $:c ']' Spacing		-> `(class  ,$c)
 Range 		= ( Char '-' Char | Char ) $
-Char 		= '\\'	( 'n'					-> { $\n }
-			| 'r'					-> { $\r }
-			| 't'					-> { $\t }
-			| [']					-> { $'  }
-			| ["]					-> { $"  }
-			| '['					-> { $[  }
-			| ']'					-> { $]  }
-			| '\\'					-> { $\\ }
-			| ( [0-2][0-7][0-7] | [0-7][0-7]? ) $:s	-> { s inject: 0 into: [:c :digit | c * 8 + digit - $0] }
-			| . $:s					-> { self error: 'unknown escape: ', s }
+Char 		= '\\'	( 'n'					-> \\n
+			| 'r'					-> \\r
+			| 't'					-> \\t
+			| [']					-> \'
+			| ["]					-> \"
+			| '['					-> \[
+			| ']'					-> \]
+			| '\\'					-> \\\
+			| ( [0-2][0-7][0-7] | [0-7][0-7]? ) $:s	-> `,=s
+			| <error 'unknown escape'>
 			)
 		| .
 
 Structure	= '#' OPEN Expression:e CLOSE			-> `(structure ,e)
 Symbol		= '#' Identifier:i				-> `(literal   ,i)
 
-EQUAL	 	= '='  Spacing
-RIGHTARROW 	= '->' Spacing
-SLASH 		= '|'  Spacing
-AND 		= '&'  Spacing
-NOT 		= '!'  Spacing
-QUESTION 	= '?'  Spacing
-STAR 		= '*'  Spacing
-PLUS 		= '+'  Spacing
-OPEN 		= '('  Spacing
-CLOSE 		= ')'  Spacing
-LANGLE 		= '<'  Spacing
-RANGLE 		= '>'  Spacing
-DOT 		= '.'  Spacing
-SEMICOLON	= ';'  Spacing
-COLON 		= ':'  Spacing
-DOLLAR 		= '$'  Spacing
-BACKQUOTE	= '`'  Spacing
-COMMA		= ','  Spacing
-AT		= '@'  Spacing
+EQUAL	 	= '='  	Spacing
+RIGHTARROW 	= '->' 	Spacing
+SLASH 		= '|'  	Spacing
+AND 		= '&'  	Spacing
+NOT 		= '!'  	Spacing
+QUESTION 	= '?'  	Spacing
+STAR 		= '*'  	Spacing
+PLUS 		= '+'  	Spacing
+OPEN 		= '('  	Spacing
+CLOSE 		= ')'  	Spacing
+LANGLE 		= '<'  	Spacing
+RANGLE 		= '>'  	Spacing
+DOT 		= '.'  	Spacing
+SEMICOLON	= ';'  	Spacing
+COLON 		= ':'  	Spacing
+DOLLAR 		= '$'  	Spacing
+BACKQUOTE	= '`'  	Spacing
+COMMA		= ','  	Spacing
+AT		= '@'  	Spacing
+BACKSLASH	= '\\'  Spacing
 
 Spacing 	= (Space | Comment)*
 Comment 	= '%' (!EndOfLine .)* EndOfLine

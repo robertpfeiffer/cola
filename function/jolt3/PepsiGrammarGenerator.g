@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-12 12:24:00 by piumarta on emilia
+% Last edited: 2008-07-12 16:26:45 by piumarta on emilia
 
 PepsiGrammarGenerator : GrammarParser ( name depth maxDepth )
 
@@ -94,7 +94,8 @@ generate	= #(#alternatives
 			egroup)					{ '. 1]])' put }
 		| #(#dot)					{ ('(inputStream notAtEnd and: [result := inputStream next. 1])') put }
 		| #(#value .:v)					{ ('((result := [', v, '] value) or: [1])') put }
-		| #(#variable .:v)				{ ('((result := ' , v,        ') or: [1])') put }
+		| #(#variable .:v)				{ ('((result := ' , v,             ') or: [1])') put }
+		| #(#character .:c)				{ ('((result := ' , c printString, ') or: [1])') put }
 		| #(#action .:a)				{ ('([', a, '. 1] value)') put }
 		| #(#predicate .:p)				{ ('([', p, '] value)') put }
 		| #(#group					{ ('((result := TokenGroup new)') put }
@@ -106,8 +107,14 @@ generate	= #(#alternatives
 			( &.					{ ' add: ' put }
 			  argument &(. {';' put})? )* )		{ (')) ifTrue: [(self ', i, ' :inputStream)])') put }
 		| #(#literal .:l)				{ ('((inputStream peek == ', l printString, ') ifTrue: [result := inputStream next. 1])') put }
-		| #(#string .:s)				{ ('(self string: ', s printString, ' :inputStream)') put }
-		| #(#class .:c)					{ ('(self class: ', c printString, ' :inputStream)') put }
+		| #(#string
+			( #(.:s !.)				{ ('((inputStream peek == ', s printString, ') ifTrue: [result := inputStream next. 1])') put }
+			| .:s					{ ('(self string: ', s printStringEscaped, ' :inputStream)') put }
+			) )
+		| #(#class
+			( #(.:s !.)				{ ('((inputStream peek == ', s printString, ') ifTrue: [result := inputStream next. 1])') put }
+			| .:s					{ ('(self class: ', s asCharacterClass printString, ' :inputStream)') put }
+			) )
 		| #(#structure					{ '((' put }
 			bstream					{ '\n and: [(inputStream := self beginStructure: inputStream)\n and: [' put }
 			generate				{ ']]) ifTrue: [' put }
@@ -126,6 +133,7 @@ element		= #(#subgroup					{ (' add: (TokenGroup new') put }
 		| #(#unquoteSplicing .:s)			{ (' concat: ', s) put }
 		| #(#unquoteString   .:s)			{ (' add: (', s, ' asString)') put }
 		| #(#unquoteSymbol   .:s)			{ (' add: (', s, ' asSymbol)') put }
+		| #(#unquoteNumber   .:s)			{ (' add: (Integer fromString: ', s, ')') put }
 		| .:x						{ self error: 'malformed group element: ', x printString }
 		;
 

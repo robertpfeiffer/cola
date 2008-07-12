@@ -41,6 +41,7 @@ ParserGenerator on: aGrammar
 ]
 
 ParserGenerator print: anObject		[ output print: anObject. ]
+ParserGenerator printEscaped: aString	[ aString printEscapedOn: output ]
 ParserGenerator emit: aString		[ output nextPutAll: aString. ]
 ParserGenerator cr			[ output cr. ]
 ParserGenerator space			[ output space. ]
@@ -196,9 +197,25 @@ PPG invoke :node	"(invoke name args...)"
 PPG argvar	:node	"(argvar name)"		[ self emit: node second ]
 PPG arglit	:node	"(arglit name)"		[ self print: node second ]
 PPG result	:node	"(result expr)"		[ self emit: '(('; generate: node second; emit: ') ifTrue: [result] ifFalse: [result])' ]
-PPG class	:node	"(class charClass)"	[ self emit: '(self class: '; emit: node second printString; emit: ' :inputStream)' ]
-PPG string	:node	"(string string)"	[ self emit: '(self string: '; print: node second; emit: ' :inputStream)' ]
 PPG literal	:node	"(literal object)"	[ self emit: '((inputStream peek == '; print: node second; emit: ') ifTrue: [result := inputStream next. 1])' ]
+
+PPG string	:node	"(string string)"
+[
+    | string |
+    string := node second.
+    (string hasSize: 1)
+	ifTrue:  [self emit: '((inputStream peek == '; print: string first; emit: ') ifTrue: [result := inputStream next. 1])']
+	ifFalse: [self emit: '(self string: '; printEscaped: string; emit: ' :inputStream)']
+]
+
+PPG class	:node	"(class string)"
+[
+    | string |
+    string := node second.
+    (string hasSize: 1)
+	ifTrue:  [self emit: '((inputStream peek == '; print: string first; emit: ') ifTrue: [result := inputStream next. 1])']
+	ifFalse: [self emit: '(self class: '; print: string asCharacterClass; emit: ' :inputStream)']
+]
 
 PPG structure :node	"(structure expr)"
 [
@@ -215,6 +232,7 @@ PPG action	:node	"(action text)"		[ self emit: '(['; emit: node second; emit: '.
 PPG predicate	:node	"(predicate text)"	[ self emit: '(['; emit: node second; emit: '] value)' ]
 PPG value	:node	"(value text)"		[ self emit: '((result := ['; emit: node second; emit: '] value)'; emit: ' or: [1])' ]
 PPG variable	:node	"(variable name)"	[ self emit: '((result := '; emit: node second; emit: ')'; emit: ' or: [1])' ]
+PPG character	:node	"(character char)"	[ self emit: '((result := '; print: node second; emit: ')'; emit: ' or: [1])' ]
 PPG dot		:node	"(dot)"			[ self emit: '(inputStream notAtEnd and: [result := inputStream next. 1])' ]
 
 PPG group :node	"(group elts...)"
@@ -243,3 +261,4 @@ PPG unquote		:node	"(unquote sym)"		[ self emit: ' add: ';    emit:  node second
 PPG unquoteSplicing	:node	"(unquoteSplicing sym)"	[ self emit: ' concat: '; emit:  node second ]
 PPG unquoteString	:node	"(unquoteString sym)"	[ self emit: ' add: (';	  emit:  node second; emit: ' asString)' ]
 PPG unquoteSymbol	:node	"(unquoteSymbol sym)"	[ self emit: ' add: (';	  emit:  node second; emit: ' asSymbol)' ]
+PPG unquoteNumber	:node	"(unquoteNumber sym)"	[ self emit: ' add: (Integer fromString: '; emit: node second; emit: ')' ]

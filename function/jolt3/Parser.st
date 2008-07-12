@@ -37,3 +37,8 @@ Parser apply :input
     selector isSymbol ifFalse: [self error: 'cannot apply non-selector'].
     ^self perform: selector with: input
 ]
+
+Parser error :input
+[
+    self error: input next, ' near: ', input printString
+]

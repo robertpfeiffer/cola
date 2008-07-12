@@ -40,25 +40,26 @@ GrammarParser comment
 
 GrammarParser spacing		[ [self space or: [self comment]] whileTrue ]
 
-GrammarParser equal		[ ($= == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser colon		[ ($: == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser semicolon		[ ($; == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser bar		[ ($| == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser and		[ ($& == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser not		[ ($! == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser question		[ ($? == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser star		[ ($* == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser plus		[ ($+ == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser open		[ ($( == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser close		[ ($) == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser dot		[ ($. == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser leftAngle		[ ($< == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser rightAngle	[ ($> == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser backquote		[ ($` == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser comma		[ ($, == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser at		[ ($@ == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser dollar		[ ($$ == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
-GrammarParser hash		[ ($# == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser equal		[ ($=  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser colon		[ ($:  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser semicolon		[ ($;  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser bar		[ ($|  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser and		[ ($&  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser not		[ ($!  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser question		[ ($?  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser star		[ ($*  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser plus		[ ($+  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser open		[ ($(  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser close		[ ($)  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser dot		[ ($.  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser leftAngle		[ ($<  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser rightAngle	[ ($>  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser backquote		[ ($`  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser comma		[ ($,  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser at		[ ($@  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser dollar		[ ($$  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser hash		[ ($#  == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
+GrammarParser backslash		[ ($\\ == input peek) ifFalse: [^nil].  input nextToken.  self spacing ]
 
 GrammarParser rightArrow
 [
@@ -150,9 +151,7 @@ GrammarParser class
     $] == input next ifFalse: [^input position: pos].
     self spacing.
     s := s contents.
-    result := s size == 1
-	ifTrue:  [(TokenGroup with: #literal) add: s first]
-	ifFalse: [(TokenGroup with: #class)   add: s asCharacterClass]
+    result := (TokenGroup with: #class) add: s.
 ]
 
 GrammarParser literal
@@ -163,9 +162,7 @@ GrammarParser literal
 	ifFalse:
 	   [input push: $"; push: $".
 	    self string ifFalse: [^nil]].
-    l := result size == 1
-	ifTrue:  [(TokenGroup with: #literal) add: result first]
-	ifFalse: [(TokenGroup with: #string)  add: result].
+    l := (TokenGroup with: #string) add: result.
     self spacing.
     result := l.
 ]
@@ -212,6 +209,8 @@ GrammarParser argument
     self identifier	ifTrue: [^result := (TokenGroup with: #argvar) add: result].
     self symbol		ifTrue: [^result := (TokenGroup with: #arglit) add: result].
     self application	ifTrue: [^result := (TokenGroup with: #result) add: result].
+    input push: $'; push: $'.
+    self string		ifTrue: [^result := (TokenGroup with: #arglit) add: result].
     ^nil
 ]
 
@@ -232,6 +231,7 @@ GrammarParser answer
     self variable	ifTrue: [^result].
     self value		ifTrue: [^result].
     self rewrite	ifTrue: [^result].
+    self character	ifTrue: [^result].
     ^input position: pos
 ]
 
@@ -318,6 +318,7 @@ GrammarParser unquote
     (self at	 and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteSplicing) add: result].
     (self dollar and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteString)	add: result].
     (self hash	 and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteSymbol)	add: result].
+    (self equal	 and: [self identifier])	ifTrue: [^result := (TokenGroup with: #unquoteNumber)	add: result].
     self identifier				ifTrue: [^result := (TokenGroup with: #unquote)		add: result].
     ^input position: pos
 ]
@@ -331,6 +332,17 @@ GrammarParser subgroup
     [self element] whileTrue: [group add: result].
     self close						ifFalse: [^input position: pos].
     result := group.
+]
+
+GrammarParser character
+[
+    | pos c |
+    pos := input position.
+    self backslash					ifFalse: [^nil].
+    self char						ifFalse: [^input position: pos].
+    c := (TokenGroup with: #character) add: result.
+    self spacing.
+    result := c.
 ]
 
 GrammarParser primary
