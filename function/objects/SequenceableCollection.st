@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-26 12:48:08 by piumarta on emilia
+  Last edited: 2008-07-12 16:22:50 by piumarta on emilia
 "
 
 { import: Object }
@@ -37,6 +37,8 @@ SequenceableCollection fifth		[ ^self at: 4 		  		]
 SequenceableCollection fifth: anObject	[ ^self at: 4 		  put: anObject	]
 SequenceableCollection last		[ ^self at: self size - 1		]
 SequenceableCollection last: anObject	[ ^self at: self size - 1 put: anObject	]
+
+SequenceableCollection hasSize: anInteger	[ ^anInteger == self size ]
 
 SequenceableCollection at: index ifAbsent: errorBlock
 [
