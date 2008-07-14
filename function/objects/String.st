@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-03-06 16:02:13 by piumarta on emilia.local
+  Last edited: 2008-07-12 15:41:30 by piumarta on emilia
 "
 
 { import: Objects }
@@ -97,11 +97,19 @@ String printEscapedOn: aStream delimited: delimiter
 [
     aStream nextPut: delimiter.
     self do: [:c |
-        (c < 32 or: [c > 127]) ifTrue: [aStream nextPut: $\\; print: c base: 8 width: 3]
+        (c < 32 or: [c > 127 or: [c == $\\]]) ifTrue: [aStream nextPut: $\\; print: c base: 8 width: 3]
 	      ifFalse:
 	          [c == delimiter ifTrue: [aStream nextPut: $\\].
 		   aStream nextPut: c]].
     aStream nextPut: delimiter
+]
+
+String printStringEscaped
+[
+    | s |
+    s := WriteStream on: (String new: 32).
+    self printEscapedOn: s.
+    ^s contents.
 ]
 
 String putln
