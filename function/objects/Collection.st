@@ -1,6 +1,6 @@
 " Collection.st -- behaviour common to all collections
 
-  Copyright (c) 2006, 2007 Ian Piumarta
+  Copyright (c) 2006--2008 Ian Piumarta
   All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a
@@ -15,10 +15,13 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-09 12:49:53 by piumarta on emilia
+  Last edited: 2008-06-30 14:08:22 by piumarta on emilia.local
 "
 
 { import: Objects }
+
+Collection isCollection	[ ^self ]
+Object	   isCollection	[ ^nil ]
 
 Collection isEmpty	[ ^self size == 0 ]
 Collection notEmpty	[ ^self isEmpty not ]
