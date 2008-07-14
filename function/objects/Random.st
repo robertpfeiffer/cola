@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-07-10 11:44:38 by piumarta on emilia.lax04.mtt
+  Last edited: 2008-07-14 10:58:12 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -29,8 +29,7 @@ Random new
 
 Random init
 [
-    [seed := 666. "(Time millisecondClockValue bitAnd: 16r3FFFFFFF) bitXor: self hash."
-     seed = 0] whileTrue.
+    seed := (Time millisecondClockValue bitAnd: 16r3FFFFFFF) bitXor: self identityHash.
     a := 16807 asFloat.
     m := 1073741823 asFloat * 2.0.
     q := (m quo: a) asFloat.
