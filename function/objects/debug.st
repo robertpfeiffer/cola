@@ -8,6 +8,11 @@ _object _debug
   exit(0);
 }
 
+_object debug
+{
+  enterDebugger();
+}
+
 {
   initDebugger();
 }
