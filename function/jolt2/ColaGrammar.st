@@ -83,14 +83,16 @@ ColaParsingGrammar	:= [ Grammar new ]
 	at: #comment	put: ( ';' parse , (#eol parse not , PeAny) zeroMore , #eol parse);
 	at: #_		put: ( _ := ( (#space parse | #comment parse) zeroMore ) ).
     g	at: #digit	put: '0-9'			parseClass;
+	at: #bigit	put: '0-1'			parseClass;
 	at: #hex	put: 'A-Fa-f'			parseClass;
 	at: #alpha	put: 'a-zA-Z_'			parseClass;
 	at: #other	put: '-+!#$%&*./:<=>?@\\^|~'	parseClass.
     g	at: #identifier	put: ( ( #alpha parse | #other parse ) , ( #alpha parse | #digit parse | #other parse ) zeroMore ) textResult <- [:p | p result asSymbol].
     g	at: #decimal	put: ( #digit parse oneMore textResult							<- [:p | p result inject: 0 into: [:n :c | n * 10 + c digitValue]] );	
-	at: #heximal	put: ( ( '0x' parse , ( #digit parse | #hex parse ) oneMore ) textResult		<- [:p | p result inject: 0 into: [:n :c | n * 16 + c digitValue]] );
+	at: #heximal	put: ( ( '0x' parse , ( #digit parse | #hex parse ) oneMore textResult )		<- [:p | p result inject: 0 into: [:n :c | n * 16 + c digitValue]] );
+	at: #binimal	put: ( ( '0b' parse , ( #bigit parse              ) oneMore textResult )		<- [:p | p result inject: 0 into: [:n :c | n *  2 + c digitValue]] );
 	at: #posfloat	put: ( #decimal parse -> 0 , '.' parse , ( #digit parse oneMore textResult ) -> 1	<- [:p | (p@1 reverseInject: 0.0 into: [:n :c | n / 10.0 + c digitValue]) / 10.0 + (p@0)] );
-	at: #posnumber	put: ( #decimal parse | #heximal parse | #posfloat parse );
+	at: #posnumber	put: ( #posfloat parse | #heximal parse | #binimal parse | #decimal parse );
 	at: #number	put: ( ( '-' parse          , #posnumber parse						<- [:p | p result negated] )
 			     | ( '+' parse zeroMore , #posnumber parse ) ).
     g	at: #plainChar	put: ( PeAny textResult <- [:p | p last] );
