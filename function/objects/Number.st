@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-07-12 16:25:14 by piumarta on emilia
+  Last edited: 2008-07-19 02:03:27 by piumarta on emilia
 "
 
 { import: Objects }
@@ -909,7 +909,7 @@ Integer fromString: s base: b
     | chars digit sign base value |
     chars := s readStream.
     sign  := 1.
-    base  := b ifNil: [s beginsWith: '0x' ifTrue: [16] ifFalse: [s beginsWith: '0' ifTrue: [8] ifFalse: [10]]].
+    base  := b ifNil: [(s beginsWith: '0x') ifTrue: [16] ifFalse: [(s beginsWith: '0') ifTrue: [8] ifFalse: [10]]].
     value := 0.
     chars peek == $+
 	ifTrue:  [chars next]
