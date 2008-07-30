@@ -1,0 +1,231 @@
+(/ SHRDLU MICRO-WORLD - ROBOT ARM AND LEGOS /)
+(start-world shrdlu)
+
+(/ OBJECTS /)
+(create robot name holding memory)
+(create tables name)
+(create boxes name contains)
+(create block name size height color location)
+(create cube name size height color location)
+(create pyramid name size height color location)
+(create sizes name value)
+(create heights name value)
+
+(/ GROUPINGS /)
+(group lego block cube pyramid)
+(group stackable block cube tables boxes)
+
+(/ INSTANCES /)
+(make sizes big 2)
+(make sizes medium 1)
+(make sizes small 0)
+(make heights tall 1)
+(make heights short 0)
+(make robot ldg none none)
+(make tables table)
+(make boxes box "{ \"BLUE PYRAMID\" }")
+(make pyramid "GREEN PYRAMID" small short green "RED CUBE")
+(make pyramid "RED PYRAMID" medium tall red "GREEN BLOCK")
+(make pyramid "BLUE PYRAMID" big short BLUE box)
+(make cube "RED CUBE" small short red table)
+(make cube "GREEN CUBE" big short green "RED BLOCK")
+(make block "RED BLOCK" big tall red table)
+(make block "GREEN BLOCK" big tall green table)
+(make block "BLUE BLOCK" big tall BLUE table)
+
+(/ QUALIFICATIONS (DYNAMIC PROPERTIES) /)
+(qualify stackable supports select all lego by of location = stackable)
+(qualify lego on-top yes is lego type = pyramid or lego supports = "{ }")
+(qualify lego on-top no is not lego supports = "{ }")
+
+(/ BINARY QUALIFICATIONS (DYNAMIC PROPERTIES BETWEEN TWO OBJECTS) /)
+(rel-qualify lego1 taller lego2 is lego1 height value > lego2 height value) 
+(rel-qualify lego1 shorter lego2 is lego2 taller lego1) 
+(rel-qualify lego1 bigger lego2 is lego1 size value > lego2 size value)
+(rel-qualify lego1 smaller lego2 is lego2 bigger lego1) 
+
+(/ ACTIONS (METHODS) /)
+(action robot drop lego place consequence 
+	lego location = place and
+	robot holding = none and 
+	place contains = place contains + lego is place type = boxes)
+(english action robot drop lego place 
+	 means robot needs to drop lego on the place
+	 consequence robot arm will be free and lego will be on place)
+(rule robot drop is robot holding = lego)
+(english rule robot drop is robot should be holding the lego)
+(rule robot drop is stackable in place groups)
+(english rule robot drop is object surface must be flat)
+(rule robot drop is place type in "{ tables boxes }" or place on-top = yes)
+(english rule robot drop is place should not be under a block)
+(action robot remember object consequence robot memory = object)
+(english action robot remember object
+	 means robot remembers object consequence robot will have object in memory)
+(/ GOALS (RECURSIVE METHODS) /)
+(goal robot pickup object 
+      when not robot holding = object
+      requires lego in object groups and
+      	       object on-top = yes
+      try robot drop (robot holding) table is not robot holding = none      	  
+      consequence robot holding = object and
+      		  object location = robot)
+(english goal robot pickup object
+	 means robot wants to pick object up
+	 when robot is not already holding object
+	 requires object is not under any legos
+	 try robot needs to drop anything it is holding
+	 consequence robot will be holding object)
+(goal robot put lego place 
+      when not lego location = place and
+      	   not place = lego
+      try robot pickup lego and
+      	  robot drop lego place)
+(english goal robot put lego place 
+	 means robot wants to put lego on top of place
+	 when lego is not already on top of place
+	 try robot needs to pick the lego up and
+	     robot needs to drop it on the place)
+(/ NLP DEFINITIONS /)
+(english phrase robot * where * lego means lego location respond by lego is on top of the answer)
+(english phrase robot find what which * qualifier than the * you * holding means robot remember a select all what by of qualifier (robot holding))
+(english phrase robot grasp object means robot pickup object)
+(english phrase robot put lego into * stackable means robot put lego stackable) 
+(english phrase robot what * boxes contain means robot remember boxes contains also boxes contains)
+(english phrase robot what * lego * supported by means lego location respond by by the answer)
+(english phrase robot is lego supported means is not lego location = none)
+(english phrase robot how many what are * stackable means robot remember select all what by of location = stackable also size select all what by of location = stackable respond by answer of them)
+(english phrase robot how many what are not * stackable means robot remember select all what by not of location = stackable also size select all what by not of location = stackable respond by answer of them)
+(english phrase robot find one of someset which is rel-qualifier than lego means robot remember a select someset by of rel-qualifier lego)
+
+(/ START CONVERSATION (QUERIES) /)
+(/ ldg pickup a big size red color block)
+(ldg pickup a green color cube)
+(ldg grasp the pyramid)
+(ldg find block which is taller than the one you are holding also ldg put it into the box)
+(ldg where is it)
+(ldg what does the box contain)
+(ldg what is the pyramid supported by)
+(ldg how many lego are not in the box)
+(ldg find one of them which is bigger than the red color cube)
+(ldg is it supported)
+(ldg what is it supported by)
+(end-file)
+
+       ________
+      |        |
+      | green  |
+      |  cube  |                          __________
+      |________|                         |          |
+       _________                         |          |        /\
+      |         |          /\ green      | blue     |       /  \ red        |                     |
+      |         |	  /__\ pyramid   | block    |      /____\ pyramid   |                     |
+      |	red     |	 ______          |          |   _______________     |       / \           |
+      |	block   |	| red  |         |          |  |     green     |    |      /   \ blue     |
+      |	        |	| cube |         |          |  |     block     |    |     /_____\ pyramid |   
+      |_________|	|______|         |__________|  |_______________|     === box ============= 
+     ---------------------------- table -----------------------------------------------------------
+     
+
+    The dialog that was used as a SHRDLU demo:
+
+        Person: PICK UP A BIG RED BLOCK. 
+        Computer: OK. (does it) 
+        Person: GRASP THE PYRAMID. 
+        Computer: I DON'T UNDERSTAND WHICH PYRAMID YOU MEAN. 
+        Person: FIND A BLOCK WHICH IS TALLER THAN THE ONE YOU ARE HOLDING AND PUT IT INTO THE BOX. 
+        Computer: BY "IT", I ASSUME YOU MEAN THE BLOCK WHICH IS TALLER THAN THE ONE I AM HOLDING. 
+        Computer: OK. (does it) 
+        Person: WHAT DOES THE BOX CONTAIN? 
+        Computer: THE BLUE PYRAMID AND THE BLUE BLOCK. 
+        Person: WHAT IS THE PYRAMID SUPPORTED BY? 
+        Computer: THE BOX. 
+        Person: HOW MANY BLOCKS ARE NOT IN THE BOX? 
+        Computer: FOUR OF THEM. 
+        Person: IS AT LEAST ONE OF THEM NARROWER THAN THE ONE WHICH I TOLD YOU TO PICK UP? 
+        Computer: YES, THE RED CUBE. 
+        Person: IS IT SUPPORTED? 
+        Computer: YES, BY THE TABLE.
+        ........................................................................| (shrdlu.sol) |...
+        Person: CAN THE TABLE PICK UP BLOCKS? 
+        Computer: NO. 
+        Person: CAN A PYRAMID BE SUPPORTED BY A BLOCK? 
+        Computer: YES. 
+        Person: CAN A PYRAMID SUPPORT A PYRAMID? 
+        Computer: I DON'T KNOW. 
+        Person: STACK UP TWO PYRAMIDS. 
+        Computer: I CAN'T. 
+        Person: WILL YOU PLEASE STACK UP BOTH OF THE RED BLOCKS AND EITHER A GREEN CUBE OR A PYRAMID? 
+        Computer: OK. (does it) 
+        Person: WHICH CUBE IS SITTING ON THE TABLE? 
+        Computer: THE LARGE GREEN ONE WHICH SUPPORTS THE RED PYRAMID. 
+        Person: IS THERE A LARGE BLOCK BEHIND A PYRAMID? 
+        Computer: YES, THREE OF THEM: A LARGE RED ONE, A LARGE GREEN CUBE, AND THE BLUE ONE. 
+        Person: PUT A SMALL ONE ONTO THE GREEN CUBE WHICH SUPPORTS A PYRAMID. 
+        Computer: OK. (does it) 
+        Person: PUT THE LITTLEST PYRAMID ON TOP OF IT. 
+        Computer: OK. (does it) 
+        Person: DOES THE SHORTEST THING THE TALLEST PYRAMID'S SUPPORT SUPPORTS SUPPORT ANYTHING GREEN? 
+        Computer: YES, THE GREEN PYRAMID. 
+        Person: WHAT COLOR IS IT? 
+        Computer: BY "IT", I ASSUME YOU MEAN THE SHORTEST THING THE TALLEST PYRAMID'S SUPPORT SUPPORTS. 
+        Computer: RED 
+        Person: HOW MANY THINGS ARE ON TOP OF GREEN CUBES? 
+        Computer: I'M NOT SURE WHAT YOU MEAN BY "ON TOP OF "IN THE PHRASE "ON TOP OF GREEN CUBES " . 
+         DO YOU MEAN:
+
+            1 - DIRECTLY ON THE SURFACE 
+            2 - ANWHERE ON TOP OF ? 
+
+        Person: 2 
+        Computer: THREE OF THEM. 
+        Person: HAD YOU TOUCHED ANY PYRAMID BEFORE YOU PUT THE GREEN ONE ON THE LITTLE CUBE? 
+        Computer: YES, THE GREEN ONE. 
+        Person: WHEN DID YOU PICK IT UP? 
+        Computer: WHILE I WAS STACKING UP THE RED CUBE, A LARGE RED BLOCK AND A LARGE GREEN CUBE. 
+        Person: WHY? 
+        Computer: TO GET RID OF IT. 
+        Person: WHY DID YOU DO THAT? 
+        Computer: TO CLEAN OFF THE RED CUBE. 
+        Person: WHY DID YOU CLEAR OFF THAT CUBE? 
+        Computer: TO PUT IT ON A LARGE GREEN CUBE. 
+        Person: WHY DID YOU DO THAT? 
+        Computer: TO STACK UP THE RED CUBE , A LARGE RED BLOCK AND A LARGE GREEN CUBE. 
+        Person: WHY DID YOU DO THAT? 
+        Computer: BECAUSE YOU ASKED ME TO. 
+        Person: HOW DID YOU DO IT? 
+        Computer: BY PUTTING A LARGE RED BLOCK ON THE TABLE ; THEN LETTING GO OF IT ; THEN PUTTING A LARGE GREEN CUBE ON IT ; THEN LETTING GO OF THAT CUBE ; THEN PUTTING THE RED CUBE ON THAT CUBE; THEN LETTING GO OF THAT CUBE. 
+        Person: HOW MANY OBJECTS DID YOU TOUCH WHILE YOU WERE DOING IT? 
+        Computer: FOUR OF THEM. 
+        Person: WHAT DID THE RED CUBE SUPPORT BEFORE YOU STARTED TO CLEAN IT OFF? 
+        Computer: THE GREEN PYRAMID. 
+        Person: THERE WERE FIVE BLOCKS TO THE LEFT OF THE BOX THEN. 
+        Computer: NO, ONLY FOUR OF THEM: THE RED CUBE, TWO LARGE GREEN CUBES AND A LARGE RED BLOCK. 
+        Person: PUT THE BLUE PYRAMID ON THE BLOCK IN THE BOX. 
+        Computer: OK. (does it) 
+        Person: IS THERE ANYTHING WHICH IS BIGGER THAN EVERY PYRAMID BUT IS NOT AS WIDE AS THE THING THAT SUPPORTS IT? 
+        Computer: YES, THE BLUE BLOCK. 
+        Person: DOES A STEEPLE 
+        Computer interrupting: SORRY, I DON'T KNOW THE WORD "STEEPLE". 
+        Person: A "STEEPLE" IS A STACK WHICH CONTAINS TWO GREEN CUBES AND A PYRAMID. 
+        Computer: I UNDERSTAND. 
+        Person: ARE THERE ANY STEEPLES NOW? 
+        Computer: NO. 
+        Person: BUILD ONE. 
+        Computer: OK. (does it) 
+        Person: CALL THE BIGGEST BLOCK "SUPERBLOCK". 
+        Computer: OK. 
+        Person: HAVE YOU PICKED SUPERBLOCK UP SINCE WE BEGAN? 
+        Computer: YES. 
+        Person: WHY DID YOU DROP IT? 
+        Computer: BY "IT", I ASSUME YOU MEAN THE SUPERBLOCK. 
+         I CAN'T EXPLAIN A NON-EXISTENT EVENT. 
+        Person: IS THERE ANYTHING TO THE RIGHT OF THE RED PYRAMID? 
+        Computer: YES, FOUR THINGS: THE BOX , THE RED CUBE, THE BLUE PYRAMID AND THE BLOCK NAMED SUPERBLOCK 
+        Person: THANK YOU. 
+        Computer: YOU'RE WELCOME! 
+
+
+
+
+
+

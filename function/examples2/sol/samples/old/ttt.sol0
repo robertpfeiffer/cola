@@ -1,0 +1,35 @@
+(start-world tic-tac-toe)
+(create board name players Esquares)
+(create player name play-board symbol squares opponent turn)
+(make board ttt-board "{ player1 player2 }" "{ 1 2 3 4 5 6 7 8 9 }")
+(make player player1 ttt-board x "{ }" player2 yes)
+(make player player2 ttt-board o "{ }" player1 no)
+(action player mark square consequence 
+	       	    	   player play-board Esquares = player play-board Esquares - square and
+	       	    	   player squares = player squares + square and
+		           player turn = no and
+	   		   player opponent turn = yes)
+(rule player mark is player turn = yes)
+(rule player mark is square in player play-board Esquares)
+(rule player mark is not player play-board status = over)
+(qualify player status won is "{ 1 2 3 }" in player squares or
+   	   	        	   "{ 4 5 6 }" in player squares or
+				   "{ 7 8 9 }" in player squares or
+				   "{ 1 4 7 }" in player squares or
+				   "{ 2 5 8 }" in player squares or
+				   "{ 3 6 9 }" in player squares or
+				   "{ 3 5 7 }" in player squares or
+				   "{ 1 5 9 }" in player squares)
+(qualify player status tied is player play-board Esquares = "{ }" and
+	       	      	   	    not (
+					 "{ 1 2 3 }" in player squares or
+   	   	        	   	 "{ 4 5 6 }" in player squares or
+				   	 "{ 7 8 9 }" in player squares or
+				   	 "{ 1 4 7 }" in player squares or
+				   	 "{ 2 5 8 }" in player squares or
+				   	 "{ 3 6 9 }" in player squares or
+				   	 "{ 3 5 7 }" in player squares or
+				   	 "{ 1 5 9 }" in player squares)
+				    )
+(qualify board status over is for any board players do of status = won) 
+(end-file)

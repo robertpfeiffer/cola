@@ -1,0 +1,312 @@
+(start-world dashed-hopes)
+(create place name called xcoord parent-place areas occupants crowdedness)
+(create human name sex location home things states networks beliefs goals plans)
+(create thing name called location owner contents)
+(create emotion name)
+(create state name owner feeling degree)
+(create network-group name types)
+(create network name owner group people)
+(for all "{ happiness hunger boredom sexual-desire anger }" do make emotion of) 
+(for all "{ known-network attractive-network relatives-network }" do make network-group of) 
+(make place bob-home-kitchen kitchen 0 bob-home "{ }" "{ }" norm)
+(make place bob-home home 0 none "{ bob-home-kitchen }" "{ bob }" norm)
+(make place alice-home home 8 none "{ }" "{ }" norm)
+(make place leons-table-1 restaurant-table 10 leons "{ }" "{ alice }" norm)
+(make place leons restaurant 10 none "{ leons-table-1 }" "{ alice }" norm)
+(make place amc movies 11 none "{ }" "{ }" norm)
+(make thing bob-mustang car bob-home bob "{ }")
+(make thing bob-fridge fridge bob-home-kitchen bob "{ food }")
+(make thing alice-tv tv alice-home alice none)
+(make human bob male bob-home bob-home "{ bob-mustang bob-fridge }" "{ \"BOB HAPPINESS\" \"BOB HUNGER\" \"BOB BOREDOM\" \"BOB SEXUAL-DESIRE\" \"BOB ANGER\" }" "{ \"BOB KNOWN-NETWORK\" \"BOB ATTRACTIVE-NETWORK\" \"BOB RELATIVES-NETWORK\" }" "{ }" "{ }" "{ }")
+(make human alice female leons-table-1 alice-home "{ }" "{ \"ALICE HAPPINESS\" \"ALICE HUNGER\" \"ALICE BOREDOM\" \"ALICE SEXUAL-DESIRE\" \"ALICE ANGER\" }" "{ \"ALICE KNOWN-NETWORK\" \"ALICE ATTRACTIVE-NETWORK\" \"ALICE RELATIVES-NETWORK\" }" "{ }" "{ }" "{ }")
+(for all emotion do for all human do make state "human emotion" human emotion norm) 
+(for all network-group do for all human do make network "human network-group" human network-group "{ }")
+(qualify place crowded yes is size place occupants > 1) 
+(qualify place not-crowded yes is place crowded = unknown) 
+(qualify human hunger high is the hunger feeling human states degree = high)
+(qualify human hungry yes is human hunger = high)
+(qualify human hungry no is human hunger = unknown)
+(qualify human bored yes is the boredom feeling human states degree = high)
+(qualify human sexual yes is the sexual-desire feeling human states degree = high)
+(qualify human neighbors select select all human by not of name = human by of location = human location) 
+(rel-qualify place1 close-to place2 is ((place1 xcoord - place2 xcoord) * (place1 xcoord - place2 xcoord)) < 10)
+(action human walk-to dest 
+	consequence human location occupants = 
+		    	  human location occupants - human is not dest in human location areas and
+		    human location parent-place occupants = 
+		    	  human location parent-place occupants - human 
+			  	is not human location parent-place = none and
+ 		    human location = dest and
+	      	    dest occupants = dest occupants + human)
+(english action human walk-to dest 
+	 means human walks to dest
+	 consequence human will no longer be at (human location) and		     
+ 		     human will be at dest and
+		     dest will be occupied by human)
+(rule human walk-to is human location close-to dest)
+(english rule human walk-to is human needs to be near dest)
+(action human drive-to dest 
+	consequence human location occupants = 
+		    	  human location occupants - human 
+			  	is not dest in human location areas and
+		    human location parent-place occupants = 
+		    	  human location parent-place occupants - human 
+			  	is not human location parent-place = none and
+		    human location = dest and
+	      	    dest occupants = dest occupants + human)
+(english action human drive-to dest 
+	means human drives to dest 
+	consequence human will no longer be at (human location) and		     
+ 		    human will be at dest and
+		    dest will be occupied by human)
+(rule human drive-to is car in human things called and not human location close-to dest)
+(english rule human drive-to is human should have a car and human needs to be not near dest)
+(action human add-to-network somebody some-network 
+	consequence the some-network group human networks people = 
+		    	the some-network group human networks people + somebody and
+	   	    the some-network group somebody networks people = 
+		    	the some-network group somebody networks people + human)
+(english action human add-to-network somebody some-network 
+	means human is introduced to somebody
+	consequence human has met somebody and has added somebody to its some-network)
+(rule human add-to-network is not human = somebody and
+      	    		      human location = somebody location)
+(english rule human add-to-network is human cannot add self and
+	      	    		      human needs to be with somebody)
+(goal human be-happy when the happiness feeling human states degree = norm
+       	    	     try human eat is human hungry = yes and
+		     	 human entertain is human bored = yes and
+			 human have-sex an the attractive-network group human networks people
+			       is human sexual = yes) 
+(english goal human be-happy means human wants to be happy
+	      	    	     when human is feeling normal
+      	    	             try human wants to eat if human is hungry and
+		     	     	 human wants to entertain if human is bored and
+			 	 human wants to have sex with somebody if human is sexual)    
+(goal human eat when the hunger feeling human states degree = high 
+   	      	try human eat-home or 
+	            human dine-out)
+(english goal human eat means human wants to eat
+	      	    	when human is hungry
+   	      	        try human wants to eat at home or 
+	            	    human wants to go out to eat)
+(goal human entertain when the boredom feeling human states degree = high
+      	    	      try human goto-movies or
+		      	  human watch-tv)
+(english goal human entertain means human likes to be entertained
+	      	    	       when human is bored
+      	    	               try human needs to go to movies or
+		      	       	   human wants to watch tv at home)
+(goal human have-sex somebody 
+      when the sexual-desire feeling human states degree = high 
+      requires somebody in the attractive-network group human networks people and
+	       human in the attractive-network group somebody networks people 
+      try human bring-home somebody
+      consequence the sexual-desire feeling human states degree = high)
+(english goal human have-sex somebody means human likes to have sex with somebody
+	      	    	              when human is feeling sexual
+       	    	                      requires human needs to think somebody is hot and
+		     	      	               the somebody needs to think human is hot
+   	      	     	     	      try human needs to bring somebody home
+	             	              consequence human still wants to have sex)
+(goal human eat-home when want human eat
+   	      	     requires not the fridge called human things contents = "{ }" and
+		     	      the hunger feeling human states degree = high
+                     try human move the fridge called human things location 
+		     consequence the hunger feeling human states degree = low)
+(english goal human eat-home means human wants to eat at home
+	      	    	     when human wants to eat
+	       		     requires human fridge is empty and
+				      human needs to be hungry   
+			     try human needs to walk to the fridge 
+			     consequence human is no longer hungry)
+(goal human dine-out when want human eat
+      	    	     requires the hunger feeling human states degree = high
+   	      	     try human move a restaurant called place and
+		         human be-seated the restaurant called place
+		     consequence the hunger feeling human states degree = low)
+(english goal human dine-out means human needs to go out to eat
+	      	    	     when human wants to eat
+      	    	             requires human needs to be hungry
+   	      	             try human needs to get to a restaurant and
+		                 waiter seats the human at a table 
+		             consequence human is no longer hungry)
+(goal human watch-tv when want human entertain
+   	      	     requires tv in human things called and
+		     	      the boredom feeling human states degree = high
+                     try human move the tv called human things location 
+		     consequence the boredom feeling human states degree = low)
+(english goal human watch-tv means human watches tv at home
+	      	    	     when human wants to entertain
+   	      	             requires human needs to have a tv at home and
+		     	              human is bored
+                             try human needs to move to tv room 
+		     	     consequence human is no longer bored)
+(goal human goto-movies when want human entertain
+      	    	        requires the boredom feeling human states degree = high 
+   	      	        try human move a movies called place and
+    		       	    human move human home
+		        consequence the boredom feeling human states degree = low)
+(english goal human goto-movies means human needs to go to movies
+				when human wants to entertain
+      	    	                requires human is bored
+   	      	                try human needs to go to movies
+    		       	            human needs to go back home
+		                consequence human is no longer bored)
+(goal human move dest when want human eat or
+      	    	      	   want human entertain or
+      	    	      	   want human have-sex an the attractive-network group human networks people
+   	    	      try human walk-to dest or 
+   	      	          human drive-to dest)
+(english goal human move dest means human needs to go to dest
+	      	    	      when human wants to eat or
+			      	   human wants to entertain or
+      	    	      	           human wants to have sex
+   	    	              try human needs to walk to dest or 
+   	      	              	  human needs to drive to dest)
+(goal human be-seated some-place when want human dine-out
+      	    	      	         try human get-a-table some-place or
+			      	     human share-a-table some-place)
+(english goal human be-seated some-place means human needs to be seated by the waitress at some-place
+					 when human wants to go out to eat
+      	    	      	                 try human gets an empty table at some-place or
+			      	     	     humans has to share a table at some-place)
+(goal human get-a-table some-place when want human be-seated any
+      		  	     	   requires human location = some-place and
+			  	   	    not some-place crowdedness = high
+			     	   try human move an empty status some-place areas)
+(english goal human get-a-table some-place means human finds a free table at some-place
+	      	    			   when human wants to be seated at some-place
+      		  	     	           requires human needs to be at some-place and
+			  	   	            some-place needs to be not crowded
+			     	           try human needs to walk to a free table)
+(goal human share-a-table some-place when want human be-seated any
+      		  	             requires human location = some-place
+			             try human move a human location areas)
+(english goal human share-a-table some-place means human has to share a table at some-place 
+	      	    		  	     when human wants to be seated
+      		  	                     requires human needs to be at some-place
+			             	     try human needs to share the table with somebody)
+(goal human bring-home somebody when human want have-sex an the attractive-network group human networks people
+      	    	  	    	 requires somebody location = human location
+				 try human ask-come-home somebody and
+				     human move human home
+				 consequence somebody location = human home)
+(english goal human bring-home somebody means human wants to bring somebody home
+	      	    	       		 when human wants to have sex
+      	    	  	    	         requires somebody is with human
+				         try human needs to ask somebody to come to (human home) and
+					     human needs to go home
+				         consequence somebody will be at (human home))
+(action human ask-come-home somebody)
+(english action human ask-come-home somebody means human needs to ask somebody to come home with him or her)
+(rule human ask-come-home is somebody location = human location)
+(english phrase what * human act means the act action human plans obj respond by answer)
+(english phrase where * human act means the act action human plans location respond by at answer)
+(english phrase who * human act with means human neighbors respond by answer)
+(english phrase human * famished means info the hunger feeling human states degree = high respond by answer)
+(english phrase human * bored means info the boredom feeling human states degree = high respond by answer)
+(english phrase human something * empty means info the something called human things contents = "{ }" respond by answer)
+(english phrase * human got * car means human drive-to the move action human plans location)
+(english phrase place * crowded means info place crowdedness = high respond by answer)
+(english phrase * human * share * table means human share-a-table human location)
+(english phrase human * introduced * means human add-to-network a human neighbors known-network)
+(english phrase human thought somebody * attractive * means human add-to-network somebody attractive-network)
+(english phrase why * human invite somebody * place means explain why human want ask-come-home somebody)
+(english phrase * where is * human means human location respond by human is at answer)
+(english phrase * what would * human drive to * place for means explain why want human drive-to place respond by answer)
+(/ start "dash hopes" story... /)
+(/ bob things)
+(/ bob things called)
+(/ a fridge called bob things)
+(/ the fridge called bob things contents)
+(/ a restaurant called place)
+(/ the restaurant called place occupants)
+(/ is bob home close-to leons)
+(/ explain why is not bob home close-to leons)
+(/ bob location)
+(/ so tell me where is that darn bob)
+(/ and where is alice)
+(/ explain how can alice drive-to bob home)
+(/ explain how can alice walk-to bob home)
+(/ bob drive-to leons)
+(/ bob walk-to bob home)
+(/ bob drive-to bob home)
+(explain how can bob eat)
+(explain how can alice entertain)
+(bob was famished)
+(alice is bored)
+(bob activate-goals)
+(alice activate-goals)
+(explain how can bob eat)
+(explain how can alice entertain)
+(explain why want bob move bob-home-kitchen)
+(explain why want alice walk-to amc)
+(info the sexual-desire feeling bob states degree = high)
+(bob hungry)
+(bob fridge was empty)
+(leons was crowded)
+(explain how can bob eat)
+(explain why want bob drive-to leons)
+(what would that bob drive to that lousy leons for)
+(bob hungry)
+(bob eat)
+(bob hungry)
+(where is bob)
+(alice immediately introduced herself)
+(bob thought alice was very attractive and they it it off)
+(The attractive-network group bob networks people)
+(bob neighbors)
+(alice neighbors)
+(explain why want bob bring-home alice)
+(explain how can bob be-happy)
+(where is alice)
+(bob be-happy)
+(now where is that girl alice)
+(end-file)
+
+
+
+
+(/ work in progress...)
+(so bob got his car)
+(so the hostess asked bob to share a table)
+(alice immediately introduced herself)
+(bob thought alice was very attractive and they hit it off)
+(when the waitress brought the menus alice ordered the salad)
+(make plan alice-plan-0 alice eat salad leons norm)
+(info alice plans = alice plans + alice-plan-0)
+(and bob the stake)
+(make plan bob-plan-1 bob eat steak leons norm)
+(info bob plans = bob plans + bob-plan-1)
+(explain why cant bob have-sex alice)
+(explain why want bob ask-come-home alice)
+(explain why cant bob eat-home)
+(explain why cant bob move leons)
+(bob drive-to leons)
+(explain why cant bob get-a-table leons)
+(bob eat)
+(where did bob eat)
+(what did bob eat)
+(who did alice eat with)
+(/ He asked her to come back to his place afterwards)
+(make plan bob-plan-1 bob have-sex alice bob-home norm)
+(info bob plans = bob plans + bob-plan-1)
+(/ and she agreed)
+(make plan alice-plan-1 alice have-sex bob bob-home norm)
+(info alice plans = alice plans + alice-plan-1)
+(/ bob was very hopeful)
+(info the have-sex action bob plans likelihood = high)
+(/ bob said McCain should be president because government health care in England is bad)
+(make belief bob-belief-0 bob mccain president "government health care in England is bad")
+(info bob beliefs = bob beliefs + bob-belief-0)
+(/ alice got angry)
+(info the anger feeling alice states = high)
+(/ She said he was too senile to be president)
+(make belief alice-belief-0 alice mccain not-president "mccain was too senile")
+(info alice beliefs = alice beliefs + alice-belief-0)
+(/ bob felt bad)
+(info the happiness feeling bob states = low)
+(/ bob's hopes were dashed)
+(info the have-sex action bob plans likelihood = low)
+(end-file)

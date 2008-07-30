@@ -1,0 +1,20 @@
+(start-world mathematics)
+(create calculator name answer)
+(make calculator calc none)
+(action calculator set value consequence calculator answer = value)
+(english action calculator set value means we need to set the answer to value
+	 		       	     consequence we set the answer to value)
+(goal calculator factorial n
+      try calculator set 1 is n = 0 and
+     	  calculator factorial (n - 1) is not n = 0
+      consequence calculator answer =  calculator answer * n is not n = 0)
+(english goal calculator factorial n
+	 means we want to calcualte the factorial of n
+	 try set the answer to 1 if n is zero and
+	     need to calculate the factorial of (n - 1) if n is not zero
+	 consequence we set the answer to accumalted result of (calculator answer) times n only if variable-n is not 0)
+(calc ag factorial 3)
+(calc answer)
+(calc factorial 3)
+(calc answer)
+(end-file)

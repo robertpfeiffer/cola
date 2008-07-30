@@ -1,0 +1,318 @@
+{sol-program}
+
+start-world chess.
+create player name play-board color king opponent turn.
+create board name squares.
+create square name col row contains.
+create col-obj name number.
+create row-obj name.
+create piece name color kind location.
+make col-obj A- 1.
+make col-obj B- 2.
+make col-obj C- 3.
+make col-obj D- 4.
+make col-obj E- 5.
+make col-obj F- 6.
+make col-obj G- 7.
+make col-obj H- 8.
+for all "{ 1 2 3 4 5 6 7 8 }" do make row-obj of.
+for all col-obj do for all "{ 3 4 5 6 }" do make square "col-obj of" col-obj of none.
+for all col-obj do make square "col-obj 2" col-obj 2 "white pawn col-obj".
+for all col-obj do make square "col-obj 7" col-obj 7 "black pawn col-obj".
+for all "{ A- H- }" do make square "of 1" of 1 "white rook of".
+for all "{ B- G- }" do make square "of 1" of 1 "white knight of".
+for all "{ C- F- }" do make square "of 1" of 1 "white bishop of".
+make square "D- 1" D- 1 "WHITE QUEEN".
+make square "E- 1" E- 1 "WHITE KING".
+for all "{ A- H- }" do make square "of 8" of 8 "black rook of".
+for all "{ B- G- }" do make square "of 8" of 8 "black knight of".
+for all "{ C- F- }" do make square "of 8" of 8 "black bishop of".
+make square "D- 8" D- 8 "BLACK QUEEN".
+make square "E- 8" E- 8 "BLACK KING".
+make board chess-board all square.
+make player player1 chess-board white "WHITE KING" player2 yes.
+make player player2 chess-board black "BLACK KING" player1 no.
+for all col-obj do make piece "white pawn col-obj" white pawn "col-obj 2" in.
+for all "{ A- H- }" do make piece "white rook of" white rook "of 1" in.
+for all "{ B- G- }" do make piece "white knight of" white knight "of 1" in.
+for all "{ C- F- }" do make piece "white bishop of" white bishop "of 1" in.
+make piece "WHITE QUEEN" white queen "D- 1" in.
+make piece "WHITE KING" white king "E- 1" in.
+for all col-obj do make piece "black pawn col-obj" black pawn "col-obj 7" in.
+for all "{ A- H- }" do make piece "black rook of" black rook "of 8" in.
+for all "{ B- G- }" do make piece "black knight of" black knight "of 8" in.
+for all "{ C- F- }" do make piece "black bishop of" black bishop "of 8" in.
+make piece "BLACK QUEEN" black queen "D- 8" in.
+make piece "BLACK KING" black king "E- 8" in.
+rel-qualify from-square straight-open to-square is 
+	     (to-square col = from-square col and 
+	      to-square row > from-square row and
+	      for every select select select all square by of col = from-square col by of row > from-square row by of row < to-square row do of contains = none) or
+	     (to-square col = from-square col and 
+	      to-square row < from-square row and
+	      for every select select select all square by of col = from-square col by of row < from-square row by of row > to-square row do of contains = none) or
+	     (to-square row = from-square row and 
+	      to-square col number > from-square col number and
+	      for every select select select all square by of row = from-square row by of col number > from-square col number by of col number < to-square col number do of contains = none) or
+	     (to-square row = from-square row and 
+	      to-square col number < from-square col number and
+	      for every select select select all square by of row = from-square row by of col number < from-square col number by of col number > to-square col number do of contains = none))
+rel-qualify from-square diagonal-open to-square is 
+	    (to-square row < from-square row and
+	     to-square row - from-square row = to-square col number - from-square col number and
+	     for every select select select all square 
+	     	 by of row - from-square row = of col number - from-square col number 
+		 by of row < from-square row 
+		 by of row > to-square row do of contains = none) or
+            (to-square row < from-square row and
+	     to-square row - from-square row = from-square col number - to-square col number and
+	     for every select select select all square 
+	     	 by of row - from-square row = from-square col number - of col number 
+		 by of row < from-square row 
+		 by of row > to-square row do of contains = none) or
+            (to-square row > from-square row and
+ 	     to-square row - from-square row = to-square col number - from-square col number and
+	     for every select select select all square 
+	     	 by of row - from-square row = of col number - from-square col number 
+		 by of row > from-square row 
+		 by of row < to-square row do of contains = none) or
+            (to-square row > from-square row and 
+	     to-square row - from-square row = from-square col number - to-square col number and
+	     for every select select select all square 
+	     	 by of row - from-square row = from-square col number - of col number 
+		 by of row > from-square row 
+		 by of row < to-square row do of contains = none).
+rel-qualify from-square pawn-take to-square is not to-square contains = none and
+	     		 	   	        (to-square col number = from-square col number + 1 or
+						 to-square col number = from-square col number - 1) and
+	     		 	   	     	((from-square contains color = white and
+						  to-square row = from-square row + 1) or 
+						 (from-square contains color = black and
+						  to-square row = from-square row - 1)).
+rel-qualify from-square pawn-move to-square is (to-square contains = none and
+					         ((from-square contains color = white and
+	     		 	   	     	  from-square col = to-square col and
+	     		 	   	     	  (from-square row = to-square row - 1 or
+						   (from-square row = 2 and 
+						    to-square row = 4 and 
+						    from-square straight-open to-square))) or
+						 (from-square contains color = black and
+	     		 	   	     	  from-square col = to-square col and
+	     		 	   	     	  (from-square row = to-square row + 1 or
+						   (from-square row = 7 and 
+						    to-square row = 5 and
+						    from-square straight-open to-square))))) or
+						from-square pawn-take to-square)
+rel-qualify from-square rook-move to-square is (from-square row = to-square row or
+	     		 	   	     	 from-square col = to-square col) and
+						from-square straight-open to-square) 
+(rel-qualify from-square knight-move to-square is ((to-square row = from-square row + 2 or
+	     		 	     	       	    to-square row = from-square row - 2) and
+						   (to-square col number = from-square col number + 1 or
+	     		 	     	       	    to-square col number = from-square col number - 1)) or
+						  ((to-square row = from-square row + 1 or
+	     		 	     	       	    to-square row = from-square row - 1) and
+						   (to-square col number = from-square col number + 2 or
+	     		 	     	       	    to-square col number = from-square col number - 2)).
+rel-qualify from-square bishop-move to-square is 
+	     		 	      (from-square diagonal-open to-square) and
+	     		 	      (for any "{ 1 2 3 4 5 6 7 }" do 
+	     		 	       ((to-square row = from-square row + of and
+			                 to-square col number = from-square col number + of) or
+	     		      	        (to-square row = from-square row - of and
+			                 to-square col number = from-square col number - of) or
+	     		      	        (to-square row = from-square row + of and
+			                 to-square col number = from-square col number - of) or
+	     		 	        (to-square row = from-square row - of and
+			                 to-square col number = from-square col number + of))))
+rel-qualify from-square queen-move to-square is from-square rook-move to-square or
+	     		 	    	      	 from-square bishop-move to-square.
+(rel-qualify from-square king-rook-move to-square is
+	     		 		       (from-square contains = "WHITE KING" or
+	     		 		        from-square contains = "BLACK KING") and 
+					       from-square straight-open to-square and
+ 	     		 		       ((from-square contains color = white and 
+	     		 	                 from-square = "E- 1" and 
+				  	         (to-square = "G- 1" or
+				  	          to-square = "C- 1")) or 
+						(from-square contains color = black and 
+	     		 	                 from-square = "E- 8" and 
+				  	         (to-square = "G- 8" or
+				  	          to-square = "C- 8"))).
+rel-qualify from-square white-king-rook-short-move to-square is
+	     		 	 	        not from-square contains = none and
+	     		 			from-square contains = "WHITE KING" and
+	     		 			from-square contains color = white and 
+	     		 	                from-square = "E- 1" and 
+				  	        to-square = "G- 1" and
+	     		 			from-square straight-open to-square)
+rel-qualify from-square white-king-rook-long-move to-square is
+	     		 	 	        not from-square contains = none and
+	     		 			from-square contains = "WHITE KING" and
+	     		 			from-square contains color = white and 
+	     		 	                from-square = "E- 1" and 
+				  	        to-square = "C- 1" and
+	     		 			from-square straight-open to-square.
+rel-qualify from-square black-king-rook-short-move to-square is
+	     		 	 	        not from-square contains = none and
+	     		 			from-square contains = "BLACK KING" and
+	     		 			from-square contains color = black and 
+	     		 	                from-square = "E- 8" and 
+				  	        to-square = "G- 8" and
+	     		 			from-square straight-open to-square.
+rel-qualify from-square black-king-rook-long-move to-square is
+	     		 	 	        not from-square contains = none and
+	     		 			from-square contains = "BLACK KING" and
+	     		 			from-square contains color = black and 
+	     		 	                from-square = "E- 8" and 
+				  	        to-square = "C- 8" and
+	     		 			from-square straight-open to-square.
+rel-qualify from-square king-move to-square is ((to-square row = from-square row or
+	     		 	   	     	  to-square row = from-square row + 1 or
+	     		 	   	     	  to-square row = from-square row - 1) and
+						 (to-square col = from-square col or
+						  to-square col number = from-square col number + 1 or
+  						  to-square col number = from-square col number - 1)) or 
+						(from-square king-rook-move to-square).  
+rel-qualify from-square valid-move to-square is not from-square contains = none and
+	     		 	    	      	 (to-square contains = none or 
+	     		 	    	      	  not from-square contains color = to-square contains color) and						 
+	     		 	    	      	 ((from-square contains kind = pawn and
+	     		 	    	      	   from-square pawn-move to-square) or
+						  (from-square contains kind = rook and
+	     		 	    	           from-square rook-move to-square) or
+						  (from-square contains kind = knight and
+	     		 	    	      	   from-square knight-move to-square) or
+						  (from-square contains kind = bishop and
+	     		 	    	      	   from-square bishop-move to-square) or
+						  (from-square contains kind = queen and
+	     		 	    	      	   from-square queen-move to-square) or
+						  (from-square contains kind = king and
+	     		 	    	      	   from-square king-move to-square)).  
+qualify piece attacked yes is
+         size select select select all piece by not of color = piece color 
+	      	     	    	       	     by not of location = out 
+					     by of location valid-move piece location >= 1.
+qualify piece not-attacked yes is piece attacked = unknown.
+qualify player checked yes is player ksing attacked = yes.
+qualify player check-mated yes is 
+	 	size select select all piece 
+		            by not of location = out 
+		            by for any square do of location fully-valid-move square = 0.
+qualify player pieces select select all piece by of color = player color by not of location = out.
+qualify player moves select player pieces by for any square do of location fully-valid-move square.
+qualify piece moves select all square by piece location fully-valid-move of.
+action player move from-square to-square consequence
+	       	    	    "WHITE ROOK H-" location = "F- 1" is from-square white-king-rook-short-move to-square and
+	       	    	    "F- 1" contains = "WHITE ROOK H-" is from-square white-king-rook-short-move to-square	and
+	       	    	    "H- 1" contains = none is from-square white-king-rook-short-move to-square and
+	       	    	    "WHITE ROOK A-" location = "D- 1" is from-square white-king-rook-long-move to-square and
+	       	    	    "D- 1" contains = "WHITE ROOK A-" is from-square white-king-rook-long-move to-square and	
+	       	    	    "A- 1" contains = none is from-square white-king-rook-long-move to-square and
+	       	    	    "BLACK ROOK H-" location = "F- 8" is from-square black-king-rook-short-move to-square and
+	       	    	    "F- 8" contains = "BLACK ROOK H-" is from-square black-king-rook-short-move to-square	and
+	       	    	    "H- 8" contains = none is from-square black-king-rook-short-move to-square and
+	       	    	    "BLACK ROOK A-" location = "D- 8" is from-square black-king-rook-long-move to-square and
+	       	    	    "D- 8" contains = "BLACK ROOK A-" is from-square black-king-rook-long-move to-square and
+	       	    	    "A- 8" contains = none is from-square black-king-rook-long-move to-square and
+			    to-square contains location = out is not to-square contains = none and
+ 		            from-square contains location = to-square and 
+		      	    to-square contains = from-square contains and
+			    from-square contains = none and
+			    player turn = no and
+		            player opponent turn = yes.
+rule player move is upon player move-piece from-square to-square do player king not-attacked = yes. 
+rule player move is from-square valid-move to-square.
+rule player move is from-square contains color = player color.
+rule player move is from-square type = square.
+rule player move is to-square type = square.
+rule player move is player turn = yes.
+rel-qualify from-square fully-valid-move to-square is
+	     to-square type = square and
+	     from-square type = square and
+	     from-square valid-move to-square and
+	     ((from-square contains color = white and 	     
+	       upon player1 move-piece from-square to-square do player1 king not-attacked = yes) or
+	       (from-square contains color = black and 	     
+	        upon player2 move-piece from-square to-square do player2 king not-attacked = yes)).
+action player move-piece from-square to-square consequence
+	       		  to-square contains location = out is not to-square contains = none and
+ 		          from-square contains location = to-square and 
+		      	  to-square contains = from-square contains and
+			  from-square contains = none.
+(/ comments...)
+/ select all square by "WHITE KING" location valid-move of)
+(/ select select select all piece by of color = white by not of location = out by for any square do of location fully-valid-move square)
+(/ is for any piece do (piece color = white and for any square do piece location valid-move square))
+(/ "WHITE PAWN E-" moves)
+(/ player1 moves)
+(end-file)
+(PLAYER1 MOVE "E- 2" "E- 4")
+(PLAYER2 MOVE "E- 7" "E- 6")
+(PLAYER1 MOVE "E- 4" "E- 5")
+(PLAYER2 MOVE "D- 7" "D- 6")
+(PLAYER1 MOVE "D- 2" "D- 4")
+(PLAYER2 MOVE "D- 6" "E- 5")
+(PLAYER1 MOVE "D- 4" "E- 5")
+(PLAYER2 MOVE "D- 8" "D- 1")
+(PLAYER1 MOVE "E- 1" "D- 1")
+(PLAYER2 MOVE "F- 8" "C- 5")
+(PLAYER1 MOVE "C- 1" "E- 3")
+(PLAYER2 MOVE "C- 5" "E- 3")
+(PLAYER1 MOVE "F- 2" "E- 3")
+(PLAYER2 MOVE "G- 8" "H- 6")
+(PLAYER1 MOVE "H- 2" "H- 3") 
+(PLAYER2 MOVE "H- 6" "F- 5")
+(PLAYER1 MOVE "E- 3" "E- 4")
+(PLAYER2 MOVE "F- 5" "G- 3") 
+(PLAYER1 MOVE "H- 1" "H- 2") 
+(PLAYER2 MOVE "G- 3" "F- 1") 
+(PLAYER1 MOVE "H- 2" "H- 1") 
+(PLAYER2 MOVE "F- 1" "G- 3") 
+(PLAYER1 MOVE "H- 1" "H- 2") 
+(PLAYER2 MOVE "G- 3" "E- 4") 
+(PLAYER1 MOVE "G- 2" "G- 4")
+(PLAYER2 MOVE "E- 8" "G- 8")
+(PLAYER1 MOVE "G- 1" "F- 3")
+(PLAYER2 MOVE "F- 7" "F- 6") 
+(PLAYER1 MOVE "H- 3" "H- 4") 
+(PLAYER2 MOVE "B- 8" "C- 6") 
+(PLAYER1 MOVE "E- 5" "F- 6") 
+(PLAYER2 MOVE "E- 6" "E- 5") 
+(PLAYER1 MOVE "G- 4" "G- 5") 
+(PLAYER2 MOVE "C- 8" "G- 4") 
+(PLAYER1 MOVE "H- 2" "F- 2") 
+(PLAYER2 MOVE "E- 4" "F- 2") 
+(PLAYER1 MOVE "D- 1" "E- 2")
+(PLAYER2 MOVE "F- 2" "H- 1")
+(PLAYER1 MOVE "B- 1" "C- 3")
+(PLAYER2 MOVE "C- 6" "D- 4")
+(PLAYER1 MOVE "E- 2" "E- 3")
+(Player2 MOVE "D- 4" "C- 2")
+(PLAYER1 MOVE "E- 3" "E- 4")
+(PLAYER2 MOVE "H- 1" "F- 2")
+(PLAYER1 MOVE "E- 4" "E- 5")
+(PLAYER2 MOVE "G- 7" "F- 6")
+(PLAYER1 MOVE "E- 5" "F- 4")
+(PLAYER2 MOVE "F- 6" "G- 5")
+(PLAYER1 MOVE "E- 5" "F- 4")
+(PLAYER2 MOVE "F- 6" "G- 5")
+(PLAYER1 MOVE "F- 4" "G- 3")
+(PLAYER2 MOVE "F- 8" "F- 3")
+(PLAYER1 MOVE "G- 3" "G- 2")
+(PLAYER2 MOVE "C- 2" "E- 3")
+(PLAYER1 MOVE "G- 2" "G- 1")
+(PLAYER2 MOVE "F- 2" "H- 3")
+(PLAYER1 MOVE "G- 1" "H- 2")
+(PLAYER2 MOVE "F- 3" "F- 2")
+(PLAYER1 MOVE "H- 2" "G- 3")
+(PLAYER2 MOVE "F- 2" "G- 2")
+
+(/ mate)
+(/ PLAYER1 STATUS)
+
+
+
+
+
+

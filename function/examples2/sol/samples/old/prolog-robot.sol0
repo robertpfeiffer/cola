@@ -1,0 +1,187 @@
+(start-world prolog-robot)
+(create human name employee location holding happy alive)
+(create robot name boss location holding memory alive)
+(create alien name location alive)
+(create place name entrance occupants)
+(create entrance name building key-of locked closed)
+(create key name of-door location)
+(create thing name location) 
+(group liftable thing key)
+(group injurable human robot alien)
+(group body human robot alien thing key)
+(make human bob ldg rocket none no yes)
+(make robot ldg bob rocket none none yes)
+(make alien bdg cave yes)
+(make place rocket airlock "{ bob ldg }")
+(make place building door "{ fuel }")
+(make place cave hole "{ gold the-key bdg }")
+(make entrance airlock rocket none no yes)
+(make entrance door building the-key yes yes)
+(make entrance hole cave none no no)
+(make key the-key door cave)
+(make thing gold cave)
+(make thing fuel building)
+(rel-qualify somebody endangers somebody-else is somebody type = alien and
+	     	      			      	 somebody alive = yes and
+	     	      			         injurable in somebody-else groups and
+	                                         somebody location = somebody-else location)
+(qualify human endangered yes is for any alien do alien endangers human)
+(qualify human endangered no is not for any alien do alien endangers human)
+(qualify robot endangered yes is for any alien do alien endangers robot)
+(qualify robot endangered no is not for any alien do alien endangers robot)
+(qualify human endangered-by select all alien by of endangers human)
+(qualify robot endangered-by select all alien by of endangers robot)
+(goal robot fetch object when is yes
+      	    	         try robot find object and
+		             robot pickup object and
+		             robot moveto robot boss location and
+		             robot drop object
+			 consequence robot boss happy = yes)
+(english goal robot fetch object means robot is told to fetch the object	      
+	      	    	  	 when always
+	      	    	  	 try robot finds where the object is and
+				     robot picks up the object and
+				     robot moves to where the boss is and
+				     robot puts the object down
+				 consequence (robot boss) will be happy)
+(goal robot get object when want robot fetch any and not robot holding = object
+      	    	       try robot remember robot location and
+ 		           robot find object and
+		           robot pickup object and
+		           robot moveto robot memory and
+			   robot unremember)
+(english goal robot get object 
+	 means robot wants to get object
+	 when robot needs to fetch someting and robot is not holding the object
+	 try robot memorizes its current location and
+	     robot finds where the object is and
+	     robot picks the object up and
+	     robot moves to the (robot memory) and
+	     robot clears its memory)		 
+(goal robot pickup object when want robot fetch any and not robot holding = object
+			  requires liftable in object groups and
+			  	   robot location = object location
+      	    	   	  try robot drop robot holding is not robot holding = none
+			  consequence robot holding = object)
+(english goal robot pickup object 
+	 means robot needs to pick the object up
+	 when robot needs to fetch and robot is not holding the object
+	 requires the object is liftable and 
+	 	  robot is in same place as the object
+	 try robot puts what its holding down if it is holding something
+	 consequence robot will be holding the object)
+(action robot remember something consequence robot memory = something)
+(english action robot remember something means robot needs to remember something consequence robot will have something memorized)
+(rule robot remember is robot memory = none)
+(english rule robot remember is robot memory should be clear)
+(action robot unremember consequence robot memory = none)
+(english action robot unremember means robot needs to clear memory consequence robot will have a clear memory)
+(action robot drop object
+	consequence robot location occupants = robot location occupants + robot holding and
+	robot holding = none)
+(english action robot drop object 
+	 means robot needs to drop the object
+	 consequence the object is going to be in (robot location) and
+	 	     the robot would be holding nothing)
+(rule robot drop is robot holding = object)
+(english rule robot drop is robot should be holding object)
+(goal robot moveto destination when want robot fetch any and not robot location = destination
+      	    	   	       try robot leave and
+			       	   robot enter destination)
+(english goal robot moveto destination 
+	 means robot needs to move to the destination
+	 when robot needs to fetch and robot is not already at destination
+	 try robot leaves (robot location) and
+	     robot enters the destination)
+(goal robot leave 
+      when want robot fetch any and not robot location = outside
+      try robot open robot location entrance
+      consequence robot location occupants = robot location occupants - robot and
+      		  robot location occupants = robot location occupants - robot holding is not robot holding = none and
+      		  robot location = outside and
+	          robot holding location = outside is not robot holding = none)
+(english goal robot leave
+	 means robot needs to leave its current location
+	 when robot needs to fetch and robot is not outside
+	 try robot opens the exit door of (robot location) and
+	 consequence the (robot location) is no longer occupied by robot or anything robot is holding and
+		     robot will be outside)
+(goal robot enter destination
+      when want robot fetch any and not robot location = destination
+      requires destination type = place and
+      	       robot location = outside
+      try robot open destination entrance 
+      consequence robot location = destination and
+      		  robot holding location = destination is not robot holding = none and
+		  destination occupants = destination occupants + robot and
+		  destination occupants = destination occupants + robot holding is not robot holding = none)
+(english goal robot enter destination
+	 means robot needs to enter the destination
+	 when robot needs to fetch and robot is not already at the destination
+	 requires destination should be a place and
+	 	  robot should be outside
+	 try robot opens the entrance door of destination and
+	 consequence robot will be at the destination and	 	     
+	 	     the destination is now occupied by robot and anything robot is holding)
+(goal robot open a-door
+      when (want robot enter a-door building or want robot leave) and a-door closed = yes
+      requires robot location = outside or robot location entrance = a-door
+      try robot get a-door key-of is a-door locked = yes
+      consequence a-door closed = no)
+(english goal robot open a-door
+	 means robot needs to open the a-door
+	 when robot needs to enter a place or leave its place and the door happens to be closed
+	 requires robot is outside or the door is a-door
+	 try robot finds the key belonging to the a-door if a-door is locked
+	 consequence a-door will be opened)
+(goal robot find object
+      when want robot fetch any
+      try for any place do robot moveto place and robot lookfor object)
+(english goal robot find object
+	 means robot needs to find where the object is
+	 when robot needs to fetch object
+	 try go to all known places and look for object)
+(action robot lookfor object)
+(english action robot lookfor object means robot needs to look for object)
+(rule robot lookfor is object location = robot location)
+(english rule robot lookfor is object needs to be where robot is)
+(goal robot protect somebody
+      when somebody endangered = yes
+      requires somebody = robot boss or somebody = robot
+      try for all somebody endangered-by do robot shoot of)
+(english goal robot protect somebody
+	 means robot needs to protect somebody
+         when somebody is in danger
+      	 requires somebody needs to be the boss of robot or robot itself
+      	 try shoot anybody who is threatening somebody)
+(goal robot shoot somebody 
+      when want robot protect any
+      requires not somebody type = human      	       
+      try robot find somebody
+      consequence somebody alive = no) 
+(english goal robot shoot somebody 
+	means robot needs to shoot somebody
+      	when robot needs to protect its boss or itself
+      	requires somebody should not be a human
+      	try robot needs to find where somebody is
+      	consequence somebody will be dead)
+(action alien moveto destination consequence
+	alien location occupants = alien location occupants - alien and
+        alien location = destination and
+	alien location occupants = alien location occupants + alien)
+(english action alien moveto destination 
+	 means alien flies to the destination
+	 consequence alien will no longer will be at (alien location) and
+	 	     alien will be at destination and
+		     destination will be occupied by alien)
+(english phrase * where * is * body means body location respond by body is at the answer)
+(ldg ag fetch fuel)
+(ldg ag leave)
+(ldg ag protect bob)
+(ldg goals)
+(explain how can ldg leave)
+(explain why want ldg find the-key)
+(explain how can ldg fetch fuel)
+(bdg moveto rocket)
+(explain how can ldg protect bob)
+(end-file)

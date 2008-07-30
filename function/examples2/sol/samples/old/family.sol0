@@ -1,0 +1,64 @@
+(start-world family-tree)
+(create human name sex age father mother)
+(qualify human sisters select select select select all human by not of = human by of sex = girl by of mother = human mother by of father = human father)
+(qualify human brothers select select select select all human by not of = human by of sex = boy by of mother = human mother by of father = human father)
+(qualify human siblings select select select all human by not of = human by of mother = human mother by of father = human father)
+(qualify human uncles select all human by of in human mother brothers or of in human father brothers)
+(qualify human aunts select all human by of in human mother sisters or of in human father sisters)
+(qualify human cousins select all human by of father in human uncles or of mother in human aunts)
+(rel-qualify human1 older human2 is human1 age > human2 age)
+(rel-qualify human1 younger human2 is not human1 older human2)
+(rel-qualify human1 mother human2 is human2 mother = human1)
+(rel-qualify human1 father human2 is human2 father = human1)
+(rel-qualify human1 brother human2 is not human1 = human2 and
+	     	    	    	      human1 mother = human2 mother and
+	       	   	   	      human1 sex = boy)
+(rel-qualify human1 sister human2 is not human1 = human2 and 
+	     	    	   	     human1 mother = human2 mother and
+	     	   	   	     human1 sex = girl)
+(rel-qualify human1 daughter human2 is (human1 father = human2 or 
+	     	    	     	        human1 mother = human2) and
+				       human1 sex = girl)
+(rel-qualify human1 son human2 is (human1 father = human2 or 
+	     	    	           human1 mother = human2) and
+                                  human1 sex = boy)
+(rel-qualify human1 grandpa human2 is human2 father father = human1 or
+	        	   	      human2 mother father = human1) 
+(rel-qualify human1 grandma human2 is human2 father mother = human1 or
+	     	   	   	      human2 mother mother = human1)
+(rel-qualify human1 granddaughter human2 is (human2 grandpa human1 or
+	     	    		  	     human2 grandma human1) and
+					    human1 sex = girl)
+(rel-qualify human1 grandson human2 is (human2 grandpa human1 or
+	     	    		        human2 grandma human1) and
+			 	       humfan1 sex = boy)
+(rel-qualify human1 aunt human2 is human1 sister human2 mother or
+	     	    	  	   human1 sister human2 father)
+(rel-qualify human1 uncle human2 is human1 brother human2 mother or
+	     	    	  	    human1 brother human2 father)
+(rel-qualify human1 nephew human2 is (human2 uncle human1 or human2 aunt human1) and
+	     	    	  	     human1 sex = boy)
+(rel-qualify human1 niece human2 is (human2 uncle human1 or human2 aunt human1) and
+	     	    	  	     human1 sex = girl)
+(rel-qualify human1 cousin human2 is human1 father uncle human2 or
+	     	    	   	     human1 mother aunt human2)
+(make human sherly girl 11 kc ruth)
+(make human shayan boy 8 kc ruth) 
+(make human mary girl 16 david may)
+(make human hesam boy 27 david may)
+(make human may girl 51 kevin michelle)
+(make human david boy 51 art kevince)
+(make human mike boy 38 kevin michelle)
+(make human pete boy 14 mike kate)
+(make human mark boy 10 mike kate)
+(make human jessica girl 56 kevin michelle)
+(make human matt boy 21 kevin jessica)
+(make human rob boy 29 kevin jessica)
+(make human alex boy 31 kevin jessica)
+(make human jose boy 3 rob barbara)
+(make human arya boy 3 alex sarah)  
+(end-file)
+
+
+
+

@@ -1,0 +1,81 @@
+(start-world maze)
+(create board name squares)
+(create square name col row contains is-goal)
+(create col-obj name number)
+(create row-obj name)
+(create robot name play-board position)
+(qualify square next-up the select select all square by of col = square col by of row = square row + 1)
+(qualify square next-down the select select all square by of col = square col by of row = square row - 1)
+(qualify square next-right the select select all square by of row = square row by of col number = square col number + 1)
+(qualify square next-left a select select all square by of row = square row by of col number = square col number - 1)
+(make col-obj A- 1)
+(make col-obj B- 2)
+(make col-obj C- 3)
+(for all "{ 1 2 3 4 }" do make row-obj of)
+(make square "A-1" A- 1 none no)
+(make square "A-2" A- 2 none no)
+(make square "A-3" A- 3 none no)
+(make square "A-4" A- 4 ldg no)
+(make square "B-1" B- 1 block no)
+(make square "B-2" B- 2 block no)
+(make square "B-3" B- 3 none no)
+(make square "B-4" B- 4 block no)
+(make square "C-1" C- 1 none no)
+(make square "C-2" C- 2 none no)
+(make square "C-3" C- 3 none no)
+(make square "C-4" C- 4 none yes)
+(make board maze-board all square)
+(make robot ldg maze-board "A-4")
+(action robot move direction 
+	consequence robot position contains = block and
+	      	    robot position = robot position next-down is direction = down and
+		    robot position = robot position next-right is direction = right and
+		    robot position = robot position next-up is direction = up and
+		    robot position = robot position next-left is direction = left and
+	            robot position contains = robot)
+(rule robot move is direction in "{ down right up left }")
+(rule robot move is not direction = down or
+      	    	     (not robot position next-down = unknown and
+      	    	      robot position next-down contains = none))
+(rule robot move is not direction = right or
+      	    	     (not robot position next-right = unknown and
+      	    	      robot position next-right contains = none))
+(rule robot move is not direction = up or
+      	    	     (not robot position next-up = unknown and
+      	    	      robot position next-up contains = none))
+(rule robot move is not direction = left or
+      	    	     (not robot position next-left = unknown and
+      	    	      robot position next-left contains = none))
+(goal robot step 
+      when want robot goto any
+      try robot move down or
+      	  robot move up or
+	  robot move left or
+	  robot move right)
+(goal robot goto location 
+      when not robot position = location
+      try robot step and
+	  robot goto location)
+(goal robot find-goal
+      when is yes
+      try robot goto the yes is-goal square)
+(ldg ag find-goal)
+(set-opt no-nlp yes)
+(explain how can ldg find-goal)
+(end-file)
+
+
+ Maze:
+-------------
+| R | X | G | 4
+-------------
+|   |   |   | 3
+-------------
+|   | X |   | 2
+-------------
+|   | X |   | 1  
+-------------
+  A   B   C
+  1   2   3
+
+
