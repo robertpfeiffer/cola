@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 18:21:17 by piumarta on emilia
+  Last edited: 2008-08-01 11:51:56 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -61,6 +61,7 @@ Symbol at: offset	[ (offset between: 0 and: self size - 1) ifTrue: [^SmallIntege
 
 Symbol _at_: _offset	{ _return (oop)(long)(((char *)self->v__elements)[(long)v__offset]); }
 
+Symbol hash		[ ^self identityHash ]
 Symbol = other		[ ^self == other ]
 
 Object isKeyword	[ ^nil ]
