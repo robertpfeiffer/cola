@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-08-01 12:50:46 by piumarta on emilia
+  Last edited: 2008-08-01 12:56:13 by piumarta on emilia
 "
 
 { import: Object }
@@ -367,7 +367,7 @@ CharacterClass : ByteArray ()
 
 CharacterClass includes: aCharacter	[ ^aCharacter and: [0 ~~ (self bitAt: aCharacter)] ]
 
-String asCharacterClass
+SequenceableCollection asCharacterClass
 [
     | stream class complement c prev |
     class := CharacterClass new: 32 withAll: 0.
