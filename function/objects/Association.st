@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-28 14:36:50 by piumarta on emilia
+  Last edited: 2008-08-01 10:22:35 by piumarta on emilia
 "
 
 { import: Objects }
@@ -45,6 +45,11 @@ Association setValue: aValue
 Association identityHash
 [
     ^key identityHash
+]
+
+Association hash
+[
+    ^key hash
 ]
 
 Association printOn: aStream
