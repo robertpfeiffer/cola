@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-03-05 13:05:17 by piumarta on emilia.local
+  Last edited: 2008-08-01 10:16:50 by piumarta on emilia
 "
 
 { import: Objects }
@@ -46,7 +46,7 @@ IdSetDebug := [ 0 ]
 IdentitySet add: anObject
 [
     | listOffset list |
-    listOffset := anObject identityHash \\ lists size.
+    listOffset := (self hashOf: anObject) \\ lists size.
     list := lists at: listOffset.
     list isNil
 	ifTrue:
@@ -75,7 +75,7 @@ IdentitySet remove: anObject	[ ^self remove: anObject ifAbsent: [self errorNotFo
 IdentitySet remove: anObject ifAbsent: errorBlock
 [
     | listOffset list size |
-    listOffset := anObject identityHash \\ lists size.
+    listOffset := (self hashOf: anObject) \\ lists size.
     list := lists at: listOffset.
     list isNil ifTrue: [^errorBlock value].
     0 to: (listOffset := list size - 1) do: [:offset |
@@ -105,7 +105,7 @@ IdentitySet grow: list at: listOffset
 IdentitySet findElement: anObject
 [
     | listOffset list |
-    listOffset := anObject identityHash \\ lists size.
+    listOffset := (self hashOf: anObject) \\ lists size.
     list := lists at: listOffset.
     list isNil ifTrue: [^nil].
     0 to: list size - 1 do: [:offset |
@@ -116,11 +116,8 @@ IdentitySet findElement: anObject
     ^nil
 ]
 
-IdentitySet compare: anEntry with: anObject
-[
-    ^anEntry == anObject
-]
-
+IdentitySet hashOf: anObject			[ ^anObject identityHash ]
+IdentitySet compare: anEntry with: anObject	[ ^anEntry == anObject ]
 
 IdentitySet widen
 [

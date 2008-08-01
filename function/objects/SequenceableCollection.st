@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-07-12 16:22:50 by piumarta on emilia
+  Last edited: 2008-08-01 11:24:51 by piumarta on emilia
 "
 
 { import: Object }
@@ -143,6 +143,11 @@ SequenceableCollection atAll: keyCollection put: value
 SequenceableCollection addAllLast: aCollection
 [
     aCollection do: [:elt | self addLast: elt]
+]
+
+SequenceableCollection hash
+[
+    ^self inject: 0 into: [:hash :element | (hash bitAnd: 0x00ffffff) * 31 + (element hash bitAnd: 0x00ffffff)].
 ]
 
 SequenceableCollection = aCollection
@@ -356,26 +361,4 @@ SequenceableCollection flattenOn: aStream
     aStream collection _vtable == self _vtable
 	ifTrue:  [self do: [:elt | elt flattenOn: aStream]]
 	ifFalse: [super flattenOn: aStream]
-]
-
-CharacterClass : ByteArray ()
-
-CharacterClass includes: aCharacter	[ ^aCharacter and: [0 ~~ (self bitAt: aCharacter)] ]
-
-SequenceableCollection asCharacterClass
-[
-    | stream class complement c prev |
-    class := CharacterClass new: 32 withAll: 0.
-    (stream := self readStream) atEnd ifTrue: [class].
-    (complement := stream peek == $^) ifTrue: [stream next].
-    [c := stream next]
-	whileTrue:
-	   [(c == $- and: [prev and: [stream atEnd not]])
-		ifTrue:
-		   [prev to: stream next do: [:n | class setBit: n].
-		    prev := nil]
-		ifFalse:
-		   [class setBit: (prev := c)]].
-    complement ifTrue: [class invertBits].
-    ^class
 ]

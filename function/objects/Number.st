@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-07-19 02:03:27 by piumarta on emilia
+  Last edited: 2008-08-01 11:20:36 by piumarta on emilia
 "
 
 { import: Objects }
@@ -67,6 +67,8 @@ Object  isInteger	[ ^false ]
 Integer	isInteger	[ ^true ]
 
 Integer asInteger	[]
+
+Integer hash		[ ^self ]
 
 "----------------------------------------------------------------"
 
@@ -296,6 +298,22 @@ SmallInteger copy	[ ]
 Float        asFloat	[ ]
 SmallInteger asFloat	[ ^Float new setIntegerValue_: self _integerValue ]
 Integer      asFloat	[ ^self asFloatScaled: 1.0 ]
+
+Float	hash
+{
+    double d;
+    unsigned long hash;
+    memcpy(&d, self, sizeof(d));
+    if (d == 0)
+	hash= 0;
+    else
+      {
+	int e;
+	d= frexp(d, &e);
+	hash= (long)((2.0 * fabs(d) - 1.0) * 0x01ffffff) ^ (unsigned long)(e * e);
+      }
+    _return (oop)(hash << 1 | 1);
+}
 
 Integer asFloatScaled: scale
 [
