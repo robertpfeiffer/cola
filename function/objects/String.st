@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-07-12 15:41:30 by piumarta on emilia
+  Last edited: 2008-07-20 22:53:48 by piumarta on emilia
 "
 
 { import: Objects }
@@ -129,4 +129,26 @@ String dirname
 	ifTrue:
 	   [self at: size - 1 put: 0.
 	    size := size - 1].
+]
+
+CharacterClass : ByteArray ()
+
+CharacterClass includes: aCharacter	[ ^aCharacter and: [0 ~~ (self bitAt: aCharacter)] ]
+
+String asCharacterClass
+[
+    | stream class complement c prev |
+    class := CharacterClass new: 32 withAll: 0.
+    (stream := self readStream) atEnd ifTrue: [class].
+    (complement := stream peek == $^) ifTrue: [stream next].
+    [c := stream next]
+	whileTrue:
+	   [(c == $- and: [prev and: [stream atEnd not]])
+		ifTrue:
+		   [prev to: stream next do: [:n | class setBit: n].
+		    prev := nil]
+		ifFalse:
+		   [class setBit: (prev := c)]].
+    complement ifTrue: [class invertBits].
+    ^class
 ]
