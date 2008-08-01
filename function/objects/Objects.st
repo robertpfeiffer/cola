@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-09 12:53:19 by piumarta on emilia
+  Last edited: 2008-08-01 11:24:18 by piumarta on emilia
 "
 
 { import: _object }
@@ -42,9 +42,12 @@ Object : _object ()					[ Object := _object ]	"alias"
           String : ByteArray ()
       OrderedCollection : SequenceableCollection ( firstIndex lastIndex array )
     IdentitySet : Collection ( tally lists )
+      Set : IdentitySet ()
       IdentityDictionary : IdentitySet ()
+        Dictionary : IdentityDictionary ()
         FastIdentityDictionary : IdentityDictionary ()
   SlotDictionary : Object ( _size _tally _keys _values default )
+    MemoDictionary : SlotDictionary ()
   StaticBlockClosure : Object ( _function _arity )
     BlockClosure : StaticBlockClosure ( outer state _nlr )
   ProfiledMethod : Object ( _method count next )

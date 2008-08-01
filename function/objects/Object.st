@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-05-21 09:11:59 by piumarta on emilia.local
+  Last edited: 2008-08-01 11:25:46 by piumarta on emilia
 "
 
 { import: Objects }
@@ -175,8 +175,10 @@ Object errorKeyNotFound: aKey
 { import: Array }
 { import: ByteArray }
 { import: IdentitySet }
+{ import: Set }
 { import: Association }
 { import: IdentityDictionary }
+{ import: Dictionary }
 { import: SlotDictionary }
 { import: MemoDictionary }
 { import: OrderedCollection }
@@ -302,3 +304,65 @@ _vtable copyEmpty: aVT
 	delegate: aVT delegate;
 	copy: #(_sizeof _debugName _slots) from: aVT
 ]
+
+"----------------------------------------------------------------"
+
+String putEscaped	[ self do: [:c | c putEscaped] ]
+
+SmallInteger putEscaped
+[
+    self == $\\			ifTrue: [^'\\\\' put].
+    self == $'			ifTrue: [^'\\''' put].
+    (self between: 32 and: 126)	ifTrue: [^self put].
+    $\\ put.
+    (self // 64 \\ 8 + $0) put.
+    (self //  8 \\ 8 + $0) put.
+    (self       \\ 8 + $0) put.
+]
+
+String escaped
+[
+    | out |
+    out := WriteStream on: (self new: self size * 2).
+    self do: [:c |
+	(c < 32 or: [c == 127])
+	    ifTrue:  [out nextPut: $\\; print: c base: 8 width: 3]
+	    ifFalse: [out nextPut: c]].
+    ^out contents
+]
+
+StringEscapes := [ IdentityDictionary new
+	at: $a  put: $\a; "bel"
+	at: $b  put: $\b; "bs"
+	at: $e  put: $\e; "esc"
+	at: $f  put: $\f; "ff"
+	at: $n  put: $\n; "nl"
+	at: $r  put: $\r; "cr"
+	at: $t  put: $\t; "ht"
+	at: $v  put: $\v; "vt"
+	yourself
+]
+
+String unescaped
+[
+    | in out c d |
+    in := self readStream.
+    out := WriteStream on: (self new: self size).
+    [in atEnd]
+	whileFalse:
+	   [(c := in next) == $\\
+		ifTrue:
+		   [((c := in next) between: $0 and: $7)
+			ifTrue:
+			    [d := c digitValue.
+			     ((c := in peek) between: $0 and: $7) ifTrue: [in next.  d := d * 8 + c digitValue].
+			     ((c := in peek) between: $0 and: $7) ifTrue: [in next.  d := d * 8 + c digitValue].
+			     out nextPut: d]
+			ifFalse:
+			    [(d := StringEscapes at: c ifAbsent: [])
+				 ifTrue:  [out nextPut: d]
+				 ifFalse: [out nextPut: c]]]
+		ifFalse: [out nextPut: c]].
+    ^out contents
+]
+
