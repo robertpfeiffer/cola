@@ -1,11 +1,14 @@
 OS		= $(shell ../idc -C os)
 
 SDLINC		= -J/usr/local/include -Jsdlprims
-SDLLIB		= -L/usr/local/lib -lSDLmain -lSDL
+SDLLIB		= -L/usr/local/lib -lSDL
 
 ifeq ($(OS),darwin)
-CLIBS		= -Wc,-framework -Wc,Cocoa
+  CLIBS		= -lSDLmain -Wc,-framework -Wc,Cocoa
 else
+  ifeq ($(OS),win32)
+    CLIBS	= -mingw32 -lSDLmain
+  endif
 endif
 
 FT2INC		= -J/usr/local/include/freetype2
@@ -27,7 +30,7 @@ run : all
 	./main
 
 % : %.st $(LIBS)
-	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(SDLLIB) $(FT2LIB) $(CLIBS)
+	$(IDC) $(IDFLAGS) $< $(LIBS) $(IDLIBS) -o $@ $(CLIBS) $(SDLLIB) $(FT2LIB)
 
 %.o : %.st
 	$(IDC) $(IDFLAGS) -c $< -o $@

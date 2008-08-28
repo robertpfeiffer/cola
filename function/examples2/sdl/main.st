@@ -3,6 +3,7 @@
 { import: TextLayout }
 { import: Box }
 { import: SDLSurface }
+{ include "SDL_main.h" }
 
 { import: debug }
 
@@ -193,5 +194,3 @@ Window textProperties
 			    label: 'quit'             action: [:anEvent | OS exit: 0]).
     [window draw; dispatchEvent: window nextEvent] repeat.
 ]
-
-{ include "SDL_main.h" }
