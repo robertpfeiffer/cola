@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-12 16:26:45 by piumarta on emilia
+% Last edited: 2008-08-09 10:19:14 by piumarta on emilia
 
 PepsiGrammarGenerator : GrammarParser ( name depth maxDepth )
 
@@ -26,29 +26,26 @@ Header		= { '"THIS FILE WAS GENERATED AUTOMATICALLY -- DO NOT EDIT!"\n\n' put }
 Generate	= #(#grammar Generate*)
 		| #(#declaration .:i .:p			{ ('{ import: ', p, ' }') putln.  ((name := i asString), ' : ', p, ' (') put }
 			#( (.:v {v asString put}
-			    &(. {' ' put}) )* ) )		{ (')') putln }
+			    &(. {' ' put}) )* ) )		{ (')') putln.  optionTrace ifTrue: ['TraceIndent := [0]' putln] }
 		| #(#definition .:i .:p
 			   { maxDepth := depth := 0 }		&reserve
 			-> { IdentityDictionary new } :locals	&<collect locals>
 								{ (name, ' ', i, ' :inputStream\n[') putln.
 								  p do: [:n | locals at: n put: true].
+								  locals at: #_ok_ put: true.
+								  optionMemo ifTrue: [locals at: #_memo_ put: true].
 								  locals := locals keys.
 								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | locals add: 'pos', n printString]].
 								  locals notEmpty ifTrue: ['|' put.  locals do: [:n | (' ', n) put].  ' |' putln].
-								  p do: [:n | n asString put.  ' := inputStream next.' putln]. }
-			Generate)				{ ']' putln }
-% 		| #(#alternatives
-% 			( generate				{' ifTrue: [^inputStream].\n' put}
-% 			)* )					{' ^nil.\n' put }
-%   		| #(#sequence
-%   			save					{ '.' putln }
-%   			generate				{ ' ifFalse: [^nil].' putln }
-%   			( generate				{ ' ifFalse: [^' put }
-%   			  backup				{ '].' putln }
-%   			)*
-%   			release )
-		|						{ '^' put. }
-		  generate					{ '\n' put. }
+								  p do: [:n | n asString put.  ' := inputStream next.' putln].
+								  optionTrace ifTrue: [('StdErr space: (TraceIndent := TraceIndent + 2); println: ''', i, '''.') putln].
+								  optionMemo ifTrue: [('(_memo_ := self memoized: #',i,' :inputStream) ifTrue: [^_memo_ success ifTrue: [inputStream position: _memo_ next.  result := _memo_ result.  self]].\n_memo_ := inputStream position.') putln].
+								  '_ok_ := ' put. }
+		  generate)					{ '.\n' put.
+								  optionTrace ifTrue:
+								     [('StdErr space: TraceIndent; print: ''',i,'''; nextPutAll: (_ok_ ifTrue: ['' ok''] ifFalse: ['' FAIL'']); cr.\nTraceIndent := TraceIndent - 2.\n') put].
+								  optionMemo ifTrue: [('self memoize: #',i,' at: _memo_ success: _ok_ result: result :inputStream.') putln].
+								  '^_ok_\n]' putln. }
 
 generate	= #(#alternatives
 		      ( &(. !.) generate
@@ -56,6 +53,7 @@ generate	= #(#alternatives
 			&( generate &. {'\n or: [' put})*
 			 ( .        &. {       ']' put})*	{ ')' put }
 		      ) )
+		| #(#sequence !.)				{ 'true' put }
 		| #(#sequence
 		      ( &(. !.) generate
 		      | 					{ '((' put }
@@ -102,6 +100,11 @@ generate	= #(#alternatives
 			( element &(. {';' put}) )* )		{ (')') put }
 		| #(#unigroup					{ ('(result := ((TokenGroup new)') put }
 			element )				{ (') first)') put }
+		| #(#format					{ '((result := TokenGroup new)' put }
+			generate*)				{ ' yourself)' put }
+		| #(#formatChar .:c)				{ ' add: '    put.  c print.         ';' put }
+		| #(#formatVariable .:i)			{ ' addAll: ' put.  i asString put.  ';' put }
+		| #(#formatString .:i)				{ ' addAll: ' put.  i asString put.  ' asString;' put }
 		| #(#invoke .:i !.)				{ ('(self ', i, ' :inputStream)') put }
 		| #(#invoke .:i					{ ('((inputStream pushGroup: (TokenGroup new') put }
 			( &.					{ ' add: ' put }
@@ -113,7 +116,7 @@ generate	= #(#alternatives
 			) )
 		| #(#class
 			( #(.:s !.)				{ ('((inputStream peek == ', s printString, ') ifTrue: [result := inputStream next. 1])') put }
-			| .:s					{ ('(self class: ', s asCharacterClass printString, ' :inputStream)') put }
+			| .:s					{ ('(self class: ', s unescaped asCharacterClass printString, ' :inputStream)') put }
 			) )
 		| #(#structure					{ '((' put }
 			bstream					{ '\n and: [(inputStream := self beginStructure: inputStream)\n and: [' put }
@@ -124,6 +127,7 @@ generate	= #(#alternatives
 
 argument	= #(#argvar .:x)				{ x asString put }
 		| #(#arglit .:x)				{ x printString put }
+		| #(#argsym .:x)				{ x printString put }
 		| #(#result {'((' put} generate)		{ ') ifTrue: [result] ifFalse: [result])' put }
 
 element		= #(#subgroup					{ (' add: (TokenGroup new') put }

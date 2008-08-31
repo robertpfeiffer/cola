@@ -207,7 +207,7 @@ GrammarParser application
 GrammarParser argument
 [
     self identifier	ifTrue: [^result := (TokenGroup with: #argvar) add: result].
-    self symbol		ifTrue: [^result := (TokenGroup with: #arglit) add: result].
+    self symbol		ifTrue: [^result := (TokenGroup with: #argsym) add: result].
     self application	ifTrue: [^result := (TokenGroup with: #result) add: result].
     input push: $'; push: $'.
     self string		ifTrue: [^result := (TokenGroup with: #arglit) add: result].

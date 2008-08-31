@@ -8,12 +8,12 @@ IDFLAGS		= $(OFLAGS) -I$(OBJECTS) -I..
 IDLIBS		= $(OBJECTS)/objects.a
 
 LIBS		= Token.o Parser.o PrettyPrint.o
-LIBS0		= $(LIBS) GrammarParser0.o PEGPepsiGenerator.o PEGIterator.o
-LIBS1		= $(LIBS) GrammarParser1.o PEGPepsiGenerator.o PEGIterator.o
-LIBS2		= $(LIBS) GrammarParser2.o PepsiGrammarGenerator2.o
-LIBS3		= $(LIBS) GrammarParser3.o PepsiGrammarGenerator3.o
-LIBS4		= $(LIBS) GrammarParser4.o PepsiGrammarGenerator4.o
-LIBSM		= $(LIBS) GrammarParser.o PepsiGrammarGenerator.o
+LIBS0		= $(LIBS)               GrammarParser0.o PEGPepsiGenerator.o PEGIterator.o
+LIBS1		= $(LIBS) COLAParser1.o GrammarParser1.o PEGPepsiGenerator.o PEGIterator.o
+LIBS2		= $(LIBS) COLAParser2.o GrammarParser2.o PepsiGrammarGenerator2.o
+LIBS3		= $(LIBS) COLAParser3.o GrammarParser3.o PepsiGrammarGenerator3.o
+LIBS4		= $(LIBS) COLAParser4.o GrammarParser4.o PepsiGrammarGenerator4.o
+LIBSM		= $(LIBS) COLAParser.o  GrammarParser.o  PepsiGrammarGenerator.o
 
 all : main
 
@@ -38,8 +38,12 @@ cmp2 : .FORCE
 main : main.st $(LIBSM)
 	$(IDC) $(IDFLAGS) main.st $(LIBSM) $(IDLIBS) -o main $(CLIBS)
 
+COLAParser.o : COLAParser.st
 GrammarParser.o : GrammarParser.st
 PepsiGrammarGenerator.o : PepsiGrammarGenerator.st
+
+COLAParser.st : ../COLAParser.g main3
+	./main3 $< > $@
 
 GrammarParser.st : ../GrammarParser.g main3
 	./main3 $< > $@
@@ -50,11 +54,16 @@ PepsiGrammarGenerator.st : ../PepsiGrammarGenerator.g main3
 main3 : main3.st $(LIBS3)
 	$(IDC) $(IDFLAGS) $< $(LIBS3) $(IDLIBS) $(CLIBS) -o $@
 
+COLAParser3.o : COLAParser3.st
 GrammarParser3.o : GrammarParser3.st
 PepsiGrammarGenerator3.o : PepsiGrammarGenerator3.st
 
-GrammarParser3.st : ../GrammarParser.g main2
+COLAParser3.st : ../COLAParser.g main2
 	./main2 $< > $@
+
+GrammarParser3.st : ../GrammarParser.g main2
+	./main2 $< > $@.tmp
+	sed 's/import: COLAParser/import: COLAParser3/' < $@.tmp > $@
 
 PepsiGrammarGenerator3.st : ../PepsiGrammarGenerator.g main2
 	./main2 $< > $@.tmp
@@ -63,11 +72,16 @@ PepsiGrammarGenerator3.st : ../PepsiGrammarGenerator.g main2
 main2 : main2.st $(LIBS2)
 	$(IDC) $(IDFLAGS) $< $(LIBS2) $(IDLIBS) $(CLIBS) -o $@
 
+COLAParser2.o : COLAParser2.st
 GrammarParser2.o : GrammarParser2.st
 PepsiGrammarGenerator2.o : PepsiGrammarGenerator2.st
 
-GrammarParser2.st : ../GrammarParser.g main1
+COLAParser2.st : ../COLAParser.g main1
 	./main1 $< > $@
+
+GrammarParser2.st : ../GrammarParser.g main1
+	./main1 $< > $@.tmp
+	sed 's/import: COLAParser/import: COLAParser2/' < $@.tmp > $@
 
 PepsiGrammarGenerator2.st : ../PepsiGrammarGenerator.g main1
 	./main1 $< > $@.tmp
@@ -76,8 +90,12 @@ PepsiGrammarGenerator2.st : ../PepsiGrammarGenerator.g main1
 main1 : main1.st $(LIBS1)
 	$(IDC) $(IDFLAGS) $< $(LIBS1) $(IDLIBS) $(CLIBS) -o $@
 
-GrammarParser1.st : ../GrammarParser.g main0
+COLAParser1.st : ../COLAParser.g main0
 	./main0 $< > $@
+
+GrammarParser1.st : ../GrammarParser.g main0
+	./main0 $< > $@.tmp
+	sed 's/import: COLAParser/import: COLAParser1/' < $@.tmp > $@
 
 main0 : main0.st $(LIBS0)
 	$(IDC) $(IDFLAGS) $< $(LIBS0) $(IDLIBS) $(CLIBS) -o $@
@@ -91,9 +109,9 @@ main0 : main0.st $(LIBS0)
 clean : .FORCE
 	rm -rf *~ *.so *.so.c *.o *.o.c .gdb_history main test *.exe *.dSYM *.tmp
 	rm -rf main0 main0.exe
-	rm -rf main1 main1.exe GrammarParser1.st PepsiGrammarGenerator1.st
-	rm -rf main2 main2.exe GrammarParser2.st PepsiGrammarGenerator2.st
-	rm -rf main3 main3.exe GrammarParser3.st PepsiGrammarGenerator3.st
+	rm -rf main1 main1.exe GrammarParser1.st PepsiGrammarGenerator1.st COLAParser1.st
+	rm -rf main2 main2.exe GrammarParser2.st PepsiGrammarGenerator2.st COLAParser2.st
+	rm -rf main3 main3.exe GrammarParser3.st PepsiGrammarGenerator3.st COLAParser3.st
 	rm -rf main  main
 
 spotless : clean

@@ -1,10 +1,34 @@
 { import: Objects }
 
-Token : Object ( value next )
+Tokens := [ nil ]
+
+Token : Object ( value next properties nextToken )
+
+Token new
+[
+    self := super new.
+    nextToken := Tokens.
+    Tokens := self.
+]
+
+Token printAllStats
+[
+    [Tokens] whileTrue: [Tokens := Tokens printStats]
+]
+
+Token printStats
+[
+    properties ifTrue: [properties size println].
+    ^nextToken
+]
 
 Token value		[ ^value ]
 Token next		[ ^next ]
 Token next: aToken	[ ^next := aToken ]
+
+Token propertyAt: aKey			[ ^properties ifTrue: [properties at: aKey ifAbsent: []] ]
+Token propertyAt: aKey put: aValue	[ ^self properties at: aKey put: aValue ]
+Token properties			[  properties ifFalse: [properties := SlotDictionary new].  ^properties ]
 
 Token withValue: x
 [
@@ -76,6 +100,14 @@ TokenStream next
     ^token ifTrue: [token value]
 ]
 
+TokenStream matchString: aCollection
+[
+    | pos |
+    (input and: [input value == aCollection first]) ifFalse: [^nil].
+    pos := input.
+    aCollection do: [:c | c == self next ifFalse: [^self position: pos]].
+]
+
 TokenStream printOn: aStream
 [
     | tok |
@@ -106,6 +138,7 @@ TokenInputStream nextToken
     token := input.
     input next ifFalse: [stream atEnd ifFalse: [input next: (next := Token withValue: stream next)]].
     input := input next.
+    "StdErr tab; tab; nextPutAll: '>>> '; println: token."
     ^token
 ]
 
@@ -116,6 +149,7 @@ TokenInputStream next
     token := input.
     input next ifFalse: [stream atEnd ifFalse: [input next: (next := Token withValue: stream next)]].
     input := input next.
+    "StdErr tab; tab; nextPutAll: '>>> '; println: token."
     ^token value
 ]
 

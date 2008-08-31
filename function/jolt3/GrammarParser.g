@@ -1,4 +1,4 @@
-% GrammarParser -- Parser for COLA grammars								-*- fundamental -*-
+% GrammarParser -- Parser for COLA grammars		-*- fundamental -*-
 % 
 % Copyright (c) 2008 Ian Piumarta
 % All rights reserved.
@@ -15,13 +15,19 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-12 16:26:10 by piumarta on emilia
+% Last edited: 2008-07-26 10:10:22 by piumarta on emilia
 
-GrammarParser : Parser ()
+GrammarParser : COLAParser ( optionMemo optionDebug optionTrace )
+
+CommentCharacter 	= '%'
 
 start		= Grammar
 
-Grammar		= Spacing Declaration :d Definition+ :g EndOfFile		-> `(grammar ,d ,@g)
+Grammar		= Spacing Option* Declaration :d Definition+ :g EndOfFile	{ optionDebug ifTrue: [d println.  g println] } -> `(grammar ,d ,@g)
+
+Option		= '+memo'  Spacing { optionMemo  := true }	| '-memo'  Spacing	{ optionMemo  := false }
+		| '+debug' Spacing { optionDebug := true }	| '-debug' Spacing	{ optionDebug := false }
+		| '+trace' Spacing { optionTrace := true }	| '-trace' Spacing	{ optionTrace := false }
 
 Declaration	= Identifier :n COLON Identifier :b OPEN Identifier* :v CLOSE	-> `(declaration ,n ,b ,v)
 		|								-> `()
@@ -30,7 +36,7 @@ Definition	= Identifier :i Parameter* :p EQUAL Expression :e SEMICOLON?	-> `(def
 
 Parameter	= ':' Identifier
 
-Expression	= Sequence :h (SLASH Sequence)* :t		-> `(alternatives ,h ,@t)
+Expression	= Sequence :h (BAR Sequence)* :t		-> `(alternatives ,h ,@t)
 Sequence	= Prefix* :p					-> `(sequence ,@p)
 Prefix		= AND Predicate :p				-> p
 		| AND Assignment :a				-> `(and ,a)
@@ -59,12 +65,13 @@ Primary		= Invocation
 		| Answer
 Action		= Block:b					-> `(action ,b)
 Answer		= RIGHTARROW ( Variable | Value
-			     | Rewrite | Character )
+			     | Rewrite | LiteralChar )
 Variable 	= Identifier:i					-> `(variable ,i)
 Value		= Block:b					-> `(value ,b)
 Block		= '{' BlockBody $:b '}' Spacing			-> b
 BlockBody	= (!'}' ('{' BlockBody '}' | .))*
 Rewrite		= BACKQUOTE ( Group
+			    | Format
 			    | Element:e				-> `(unigroup ,e)
 			    )
 Group		= OPEN Element*:e CLOSE				-> `(group ,@e)
@@ -78,61 +85,22 @@ Unquote		= COMMA ( AT	 Identifier:i			-> `(unquoteSplicing ,i)
 			|	 Identifier:i			-> `(unquote ,i)
 			)
 Subgroup	= OPEN Element*:e CLOSE				-> `(subgroup ,@e)
-Character	= BACKSLASH Char:c Spacing			-> `(character ,c)
+Format		= ['] (!['] FormatChar)* :s ['] Spacing		-> `(format ,@s)
+FormatChar	= BACKSLASH OPEN Identifier:i CLOSE		-> `(formatVariable ,i)
+		| BACKSLASH DOLLAR OPEN Identifier:i CLOSE	-> `(formatString ,i)
+		| Char:c					-> `(formatChar ,c)
+LiteralChar	= BACKSLASH Character:c Spacing			-> `(character ,c)
 Invocation	= Identifier :i !EQUAL				-> `(invoke ,i)
 		| Application
 Application	= LANGLE Identifier :i Argument* :a RANGLE	-> `(invoke ,i ,@a)
 Argument	= Application:a					-> `(result ,a)
 		| Identifier:x					-> `(argvar ,x)
-		| '#' Identifier:x				-> `(arglit ,x)
-		| ['] (!['] Char)* :s ['] Spacing		-> `(arglit ,$s)
+		| '#' Identifier:x				-> `(argsym ,x)
+		| SingleString:s				-> `(arglit ,s)
 
-Identifier 	= ( IdentStart IdentCont* )$ :i Spacing		-> `,#i
-IdentStart 	= [a-zA-Z_]
-IdentCont 	= IdentStart | [0-9]
-Literal 	= ( ['] (!['] Char)* :s ['] Spacing
-		  | ["] (!["] Char)* :s ["] Spacing )		-> `(string ,$s)
+Literal 	= ( SingleString | DoubleString ) :s		-> `(string ,s)
 Class 		= '[' (!']' Range)* $:c ']' Spacing		-> `(class  ,$c)
-Range 		= ( Char '-' Char | Char ) $
-Char 		= '\\'	( 'n'					-> \\n
-			| 'r'					-> \\r
-			| 't'					-> \\t
-			| [']					-> \'
-			| ["]					-> \"
-			| '['					-> \[
-			| ']'					-> \]
-			| '\\'					-> \\\
-			| ( [0-2][0-7][0-7] | [0-7][0-7]? ) $:s	-> `,=s
-			| <error 'unknown escape'>
-			)
-		| .
+Range 		= ( Character '-' Character | Character )
 
 Structure	= '#' OPEN Expression:e CLOSE			-> `(structure ,e)
 Symbol		= '#' Identifier:i				-> `(literal   ,i)
-
-EQUAL	 	= '='  	Spacing
-RIGHTARROW 	= '->' 	Spacing
-SLASH 		= '|'  	Spacing
-AND 		= '&'  	Spacing
-NOT 		= '!'  	Spacing
-QUESTION 	= '?'  	Spacing
-STAR 		= '*'  	Spacing
-PLUS 		= '+'  	Spacing
-OPEN 		= '('  	Spacing
-CLOSE 		= ')'  	Spacing
-LANGLE 		= '<'  	Spacing
-RANGLE 		= '>'  	Spacing
-DOT 		= '.'  	Spacing
-SEMICOLON	= ';'  	Spacing
-COLON 		= ':'  	Spacing
-DOLLAR 		= '$'  	Spacing
-BACKQUOTE	= '`'  	Spacing
-COMMA		= ','  	Spacing
-AT		= '@'  	Spacing
-BACKSLASH	= '\\'  Spacing
-
-Spacing 	= (Space | Comment)*
-Comment 	= '%' (!EndOfLine .)* EndOfLine
-Space 		= ' ' | '\t' | EndOfLine
-EndOfLine 	= '\r\n' | '\n' | '\r'
-EndOfFile 	= !. ;

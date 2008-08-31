@@ -196,6 +196,7 @@ PPG invoke :node	"(invoke name args...)"
 
 PPG argvar	:node	"(argvar name)"		[ self emit: node second ]
 PPG arglit	:node	"(arglit name)"		[ self print: node second ]
+PPG argsym	:node	"(argsym sym)"		[ self print: node second ]
 PPG result	:node	"(result expr)"		[ self emit: '(('; generate: node second; emit: ') ifTrue: [result] ifFalse: [result])' ]
 PPG literal	:node	"(literal object)"	[ self emit: '((inputStream peek == '; print: node second; emit: ') ifTrue: [result := inputStream next. 1])' ]
 
