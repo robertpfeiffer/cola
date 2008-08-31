@@ -110,6 +110,15 @@ i386 () {
     SYSARCH="i386"
 }
 
+x86_32 () {
+    OFLAGS=${OFLAGS:-"-O"}
+    O3FLAGS=${O3FLAGS:-"-O3 -march=prescott -fomit-frame-pointer -falign-functions=16 -funroll-loops"}
+    PGFLAGS=${PGFLAGS:-"-O3 -march=prescott -falign-functions=16 -funroll-loops"}
+    SYSARCH="i386"
+    MFLAGS="-m32"
+    TARGET=${SYSARCH}${TARGET#x86_32}
+}
+
 x86_64 () {
     OFLAGS=${OFLAGS:-"-O"}
     O3FLAGS=${O3FLAGS:-"-O3 -fomit-frame-pointer -falign-functions=16 -funroll-loops"}
@@ -153,7 +162,6 @@ pic () {
 }
 
 PIC () {
-    CCFLAGS="$CCFLAGS -fPIC"
     CCFLAGS_O="$CCFLAGS_O -fPIC"
     CCFLAGS_SO="$CCFLAGS_SO -fPIC"
 }
@@ -209,6 +217,7 @@ case $TARGET in
     *cygwin)			i386;	cygwin			;;
     *mingw32)			i386;	mingw32			;;
     x86_64-*-linux*)		x86_64;	linux;	PIC		;;
+    x86_32-*-linux*)		x86_32;	linux;	pic		;;
     *)
 	echo "Target '$TARGET' is not recognised."
 	echo

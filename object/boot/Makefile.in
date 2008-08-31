@@ -88,6 +88,7 @@ FILES		= include/gc \
 		  idc \
 		  gc.a
 
+TARGET		= @TARGET@
 PREFIX		= @PREFIX@
 CC		= @CC@
 CFLAGS		= @CFLAGS@ @MFLAGS@ -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS)
@@ -111,24 +112,24 @@ SYSOS		= @SYSOS@
 
 all : $(FILES)
 
-libid.o : src/libid.c include/gc
+libid.o : src/libid.c include/gc gc.a
 	$(CC) -Iinclude -DPREFIX='"$(PREFIX)"' $(CFLAGS) $(O3FLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
-libid_g.o : src/libid.c include/gc
+libid_g.o : src/libid.c include/gc gc.a
 	$(CC) -Iinclude -DPREFIX='"$(PREFIX)"' $(CFLAGS) $(GFLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
-idc : ../idc/idc
+idc : ../idc/idc gc.a
 	cp -p $< .
 
 .SUFFIXES :
 
-st80$(OBJEXT_SO) : src/st80$(OBJEXT_SO).c $(ST80_FILES) include/gc
+st80$(OBJEXT_SO) : src/st80$(OBJEXT_SO).c $(ST80_FILES) include/gc gc.a
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_SO) $(LDFLAGS_SO) $< $(ST80_FILES) $(LDLIBS_SO) -o $@
 
-idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES) include/gc
+idst$(OBJEXT_SO) : src/idst$(OBJEXT_SO).c $(IDST_FILES) include/gc gc.a
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_SO) $(LDFLAGS_SO) $< $(IDST_FILES) $(LDLIBS_SO) -o $@
 
-%$(OBJEXT_O) : src/%$(OBJEXT_O).c include/gc
+%$(OBJEXT_O) : src/%$(OBJEXT_O).c include/gc gc.a
 	$(CC) -Iinclude $(CFLAGS) $(OFLAGS) $(CCFLAGS_O) $(LDFLAGS_O) $< $(LDLIBS_O) -o $@
 
 %$(OBJEXT) : src/%.c gc.a libid.o libid_g.o include/gc
@@ -145,7 +146,7 @@ gc.a : ../$(GCDIR)/.libs/libgc.a
 ifeq ($(SYSOS),win32)
 	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) -f Makefile.win32 ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
 else
-	-$(SHELL) -ec 'cd ../$(GCDIR)/; test -f config.log || ABI_FLAG="$(MFLAGS)" ./configure --enable-threads=posix --enable-large-config; $(MAKE) ABI_FLAG="$(MFLAGS)"'
+	-$(SHELL) -ec 'cd ../$(GCDIR)/; test -f config.log || CFLAGS="$(MFLAGS)" ./configure --target="$(TARGET)" --enable-threads=posix --enable-large-config --disable-shared; $(MAKE)'
 endif
 
 install : all .FORCE
