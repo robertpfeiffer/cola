@@ -11,7 +11,7 @@ else
   endif
 endif
 
-FT2INC		= -J/usr/local/include/freetype2
+FT2INC		= -J/usr/local/include/freetype2 -J/usr/include/freetype2
 FT2LIB		= -L/usr/local/lib -lfreetype
 
 OBJECTS		= ../../objects
