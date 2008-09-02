@@ -134,6 +134,10 @@ arch_386 () {
     MFLAGS="-arch i486"
 }
 
+gc7 () {
+    GCDIR="gc-7.0"
+}
+
 darwin () {
     CC=${CC:-"cc"}
     PREFIX=${PREFIX:-"/usr/local/lib/idc/$TARGET/"}
@@ -162,6 +166,7 @@ pic () {
 }
 
 PIC () {
+    CCFLAGS="$CCFLAGS -fPIC"
     CCFLAGS_O="$CCFLAGS_O -fPIC"
     CCFLAGS_SO="$CCFLAGS_SO -fPIC"
 }
@@ -211,6 +216,7 @@ case $TARGET in
     powerpc-*-linux-gnu)	ppc;	linux			;;
     arm*-*-linux-gnu)		arm;	linux			;;
     ia64-*-linux-gnu)		ia64;	linux			;;
+    i[3456789]86-*-darwin9*)	i386;	darwin; arch_386; gc7	;;
     i[3456789]86-*-darwin*)	i386;	darwin;	arch_386	;;
     i[3456789]86-*-linux*)	i386;	linux;	pic		;;
     i[3456789]86-*-freebsd*)	i386;	bsd			;;
