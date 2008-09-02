@@ -1,6 +1,5 @@
 { import: Object }
 
-{ include <signal.h> }
 { include "sigalrm.h" }
 
 ProfiledMethod : Object ( _method count next )
@@ -118,7 +117,7 @@ ProfiledMethod _name	{ _return((oop)((struct __methodinfo *)self->v__method)->na
 StaticBlockClosure statisticalProfile
 [
     | methods |
-    self perform: #profilerTick every: 0.01.
+    self perform: #profilerTick every: 0.001.
     self value.
     self perform: nil every: 0.
     methods := ProfiledMethods.
@@ -150,6 +149,7 @@ Object perform: aSymbol every: nSeconds
 	sigalrmSelector= v_aSymbol;
 	if (v_aSymbol)
 	  {
+	    enableStatisticalProfile();
 	    signal(SIGALRM, sigalrm);
 	    setitimer(ITIMER_REAL, &interval, 0);
 	  }
@@ -157,6 +157,7 @@ Object perform: aSymbol every: nSeconds
 	  {
 	    signal(SIGALRM, SIG_IGN);
 	    setitimer(ITIMER_REAL, 0, 0);
+	    disableStatisticalProfile();
 	  }
 #     endif
     }
