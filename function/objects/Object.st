@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-08-01 11:25:46 by piumarta on emilia
+  Last edited: 2008-09-02 14:51:16 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -205,6 +205,24 @@ SmallInteger put	[ StdOut nextPut: self ]
 SmallInteger putln	[ StdOut nextPut: self; cr ]
 String put		[ StdOut nextPutAll: self ]
 String putln		[ StdOut nextPutAll: self; cr ]
+
+PerformSelectors := [
+    #(	perform:with0arguments:	perform:with1arguments:	perform:with2arguments:	perform:with3arguments:
+	perform:with4arguments:	perform:with5arguments:	perform:with6arguments:	perform:with7arguments:
+	perform:with8arguments: )
+]
+
+Object perform: s withArguments: a	[ ^self perform: (PerformSelectors at: a size) with: s with: a ]
+
+Object perform: s with0arguments: a	[ ^self perform: s ]
+Object perform: s with1arguments: a	[ ^self perform: s with: (a at: 0) ]
+Object perform: s with2arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) ]
+Object perform: s with3arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) with: (a at: 2) ]
+Object perform: s with4arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) with: (a at: 2) with: (a at: 3) ]
+Object perform: s with5arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) with: (a at: 2) with: (a at: 3) with: (a at: 4) ]
+Object perform: s with6arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) with: (a at: 2) with: (a at: 3) with: (a at: 4) with: (a at: 5) ]
+Object perform: s with7arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) with: (a at: 2) with: (a at: 3) with: (a at: 4) with: (a at: 5) with: (a at: 6) ]
+Object perform: s with8arguments: a	[ ^self perform: s with: (a at: 0) with: (a at: 1) with: (a at: 2) with: (a at: 3) with: (a at: 4) with: (a at: 5) with: (a at: 6) with: (a at: 7) ]
 
 { import: ProfiledMethod }
 
