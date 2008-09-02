@@ -1,6 +1,6 @@
 ;;; net-if.k -- network pseudo interface
 
-(send '_import: Object "NetworkPseudoInterfaceWin" "__id__init__NetworkPseudoInterfaceWin")
+(send '_import: Object "NetworkPseudoInterface" "__id__init__NetworkPseudoInterface")
 
 (define NetworkPseudoInterface (import "NetworkPseudoInterface"))
 
