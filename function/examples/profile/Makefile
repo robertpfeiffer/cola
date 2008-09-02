@@ -1,4 +1,4 @@
-PROGRAM = profile
+PROGRAM = profile profile2
 o	= .o
 LDOBJS  = 
 LDLIBS  = ../../objects/objects.a
