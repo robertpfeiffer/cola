@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 18:23:00 by piumarta on emilia
+  Last edited: 2008-09-02 09:54:30 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -115,4 +115,21 @@ BlockClosure function_: _implementationAddress arity_: _argumentCount
     outer     := outerBlock.
     state     := variableArray.
     _nlr      := _dynamicEnvironment.
+]
+
+"----------------------------------------------------------------"
+
+{ include "_profile.c" }
+
+StaticBlockClosure printExecutionProfile
+[
+    | result |
+    { enableExecutionProfile(); }.
+    result := self value.
+    {
+	disableExecutionProfile();
+	printExecutionProfile();
+	clearExecutionProfile();
+    }.
+    ^result
 ]
