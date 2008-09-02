@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-08-24 17:04:48 by piumarta on emilia
+  Last edited: 2008-06-26 17:12:19 by piumarta on emilia
 "
 
 { import: ParseNode }
@@ -152,6 +152,7 @@ SendNode macroEncoders
 	at: 'or:'		put: #encodeOr_:		;
 	at: 'ifTrue:ifFalse:'	put: #encodeIfTrue_ifFalse_:	;
 	at: 'ifFalse:ifTrue:'	put: #encodeIfFalse_ifTrue_:	;
+	at: 'value'		put: #encodeValue:		;
 	at: 'whileTrue'		put: #encodeWhileTrue:		;
 	at: 'whileFalse'	put: #encodeWhileFalse:		;
 	at: 'whileTrue:'	put: #encodeWhileTrue_:		;
@@ -318,6 +319,20 @@ SendNode genIfFalse_ifTrue_: gen
     arguments second generateOpen: gen.
     gen defineLabel: continue.
     gen popLabels: 2.
+]
+
+SendNode encodeValue: encoder
+[
+    (receiver isOpenCodable and: [arguments isEmpty]) ifFalse: [^nil].
+    location := receiver encodeOpen: encoder; location.
+    ^#genValue:.
+]
+
+SendNode genValue: gen
+[
+    | loop |
+    gen comment: 'value'.
+    receiver generateOpen: gen.
 ]
 
 SendNode encodeWhileTrue: encoder
