@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-08-01 11:20:36 by piumarta on emilia
+  Last edited: 2008-08-09 12:34:41 by piumarta on emilia
 "
 
 { import: Objects }
@@ -769,7 +769,7 @@ LargeInteger normalize
 
 LargeInteger <  aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) <  0] ifFalse: [aNumber adaptToInteger: self andSend: #< ] ]
 LargeInteger <= aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) <= 0] ifFalse: [aNumber adaptToInteger: self andSend: #<=] ]
-LargeInteger  = aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) == 0] ifFalse: [aNumber adaptToInteger: self andSend: # =] ]
+LargeInteger  = aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) == 0] ifFalse: [aNumber adaptToInteger: self andSend: #= ] ]
 LargeInteger ~= aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) ~~ 0] ifFalse: [aNumber adaptToInteger: self andSend: #~=] ]
 LargeInteger >= aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) >= 0] ifFalse: [aNumber adaptToInteger: self andSend: #>=] ]
 LargeInteger >  aNumber	[ ^aNumber isInteger ifTrue: [(self mpCmp: aNumber asLargeInteger) >  0] ifFalse: [aNumber adaptToInteger: self andSend: #> ] ]
@@ -862,7 +862,7 @@ Integer \\ 	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger \\ 	  aNum
 Integer <  	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger <  	  aNumber] ifFalse: [aNumber adaptToInteger: self andSend: #<      ] ]
 Integer <= 	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger <= 	  aNumber] ifFalse: [aNumber adaptToInteger: self andSend: #<=     ] ]
 
-Integer  = 	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger  = 	  aNumber] ifFalse: [aNumber isNumber ifTrue: [aNumber adaptToInteger: self andSend: # =] ifFalse: [super  = aNumber]] ]
+Integer  = 	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger  = 	  aNumber] ifFalse: [aNumber isNumber ifTrue: [aNumber adaptToInteger: self andSend: #= ] ifFalse: [super  = aNumber]] ]
 Integer ~= 	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger ~= 	  aNumber] ifFalse: [aNumber isNumber ifTrue: [aNumber adaptToInteger: self andSend: #~=] ifFalse: [super ~= aNumber]] ]
 
 Integer >= 	aNumber	[ ^aNumber isInteger ifTrue: [self asLargeInteger >= 	  aNumber] ifFalse: [aNumber adaptToInteger: self andSend: #>=     ] ]
