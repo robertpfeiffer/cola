@@ -7,7 +7,7 @@ ifeq ($(OS),darwin)
   CLIBS		= -lSDLmain -Wc,-framework -Wc,Cocoa
 else
   ifeq ($(OS),win32)
-    CLIBS	= -mingw32 -lSDLmain
+    CLIBS	= -lmingw32 -lSDLmain
   endif
 endif
 
