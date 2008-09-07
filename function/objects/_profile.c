@@ -188,9 +188,8 @@ static void  profileLeave(void *cookie)
       sampleTime= currentTime;
     }
 
-  if (currentTime != entries[position].time)
+  if (currentTime > entries[position].time)
     {
-      assert(currentTime > entries[position].time);
       if (entries[position].profile && (1 == entries[position].profile->active))
 	entries[position].profile->totalTime += currentTime - entries[position].time;
       if (entries[position].edge && (1 == entries[position].edge->active))
@@ -225,7 +224,7 @@ static void enableExecutionProfile(void)
   {
     LARGE_INTEGER frequency;
     QueryPerformanceFrequency(&frequency);
-    profileQuantum= frequency.QuadPart / 1000000 * profilePeriod;
+    profileQuantum= frequency.QuadPart / (1000000 / profilePeriod);
     QueryPerformanceCounter(&lastCounter);
   }
 #else
