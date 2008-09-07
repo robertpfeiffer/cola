@@ -80,9 +80,9 @@ void		  *_libid_infoList(void);
   ((_imp_t)(_libid_bindv(&_s)))(&_s, _s.receiver, _s.receiver, ##ARG);	\
 })
 
-static long   _argc= 0;
-static char **_argv= 0;
-static char **_envp= 0;
+static int    id_argc= 0;
+static char **id_argv= 0;
+static char **id_envp= 0;
 
 static oop s_methodAt_put_with_= 0;
 static oop s__intern_= 0;
@@ -911,9 +911,9 @@ void *_libid_param(int index)
   switch (index)
     {
     case -1:	return (void *)(long)errno;
-    case  0:	return (void *)_argc;
-    case  1:	return (void *)_argv;
-    case  2:	return (void *)_envp;
+    case  0:	return (void *)id_argc;
+    case  1:	return (void *)id_argv;
+    case  2:	return (void *)id_envp;
 #  if USE_GC
     case  3:	return (void *)(long)(GC_gcollect(), 0);
     case  4:	return (void *)GC_get_free_bytes();
@@ -1052,9 +1052,9 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
 
   if (argcp)
     {
-      _argc= *argcp;
-      _argv= *argvp;
-      _envp= *envpp;
+      id_argc= *argcp;
+      id_argv= *argvp;
+      id_envp= *envpp;
     }
 
   _vtable_vtable= new(_vtable);
