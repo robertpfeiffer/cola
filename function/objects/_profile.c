@@ -56,13 +56,20 @@ static int numEntries= 0;
 static long  profilePeriod= 1000;
 static float msRatio= 1.0;
 
+#if defined(WIN32)
+static LARGE_INTEGER lastCounter;
+static long long profileQuantum;
+#endif
+
 static long currentTime= 0;
 static long sampleTime= 0;
 
 static long numProfiles= 0;
 static long numEdges= 0;
 
+#if !defined(WIN32)
 static void sigalrm(int signo)	{ ++currentTime; }
+#endif
 
 static void profileAddCallee(struct profile *profile, struct edge *edge)
 {
@@ -85,6 +92,21 @@ static void profileListAdd(struct profileList *list, struct profile *profile)
   list->size++;
 }
 
+#if defined(WIN32)
+static void updateTime(void)
+{
+  LARGE_INTEGER thisCounter;
+  long long delta;
+  QueryPerformanceCounter(&thisCounter);
+  delta= thisCounter.QuadPart - lastCounter.QuadPart;
+  if (delta >= profileQuantum)
+    {
+      ++currentTime;
+      lastCounter= thisCounter;
+    }
+}
+#endif
+
 static void *profileEnter(struct __methodinfo *method)
 {
   void	*cookie=   enter(method);
@@ -93,6 +115,10 @@ static void *profileEnter(struct __methodinfo *method)
   struct profile *callerProfile= caller ? caller->meta : 0;
   struct profile *calleeProfile;
   struct edge *edge= 0;
+
+#if defined(WIN32)
+  updateTime();
+#endif
 
   if (sampleTime != currentTime)
     {
@@ -150,6 +176,10 @@ static void  profileLeave(void *cookie)
 {
   int position= (long)cookie;
 
+#if defined(WIN32)
+  updateTime();
+#endif
+
   if (currentTime != sampleTime)
     {
       assert(currentTime > sampleTime);
@@ -182,7 +212,6 @@ static void setExecutionProfilePeriod(long uSecs)
 
 static void enableExecutionProfile(void)
 {
-  struct itimerval interval= { { 0, profilePeriod }, { 0, profilePeriod } };
   struct __methodinfo *method= _libid->methodAt(0);
   if (!method->meta)
     {
@@ -193,10 +222,18 @@ static void enableExecutionProfile(void)
       ++numProfiles;
     }
 #if defined(WIN32)
-  (void)sigalrm;
+  {
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
+    profileQuantum= frequency.QuadPart / 1000000 * profilePeriod;
+    QueryPerformanceCounter(&lastCounter);
+  }
 #else
-  signal(SIGALRM, sigalrm);
-  setitimer(ITIMER_REAL, &interval, 0);
+  {
+    struct itimerval interval= { { 0, profilePeriod }, { 0, profilePeriod } };
+    signal(SIGALRM, sigalrm);
+    setitimer(ITIMER_REAL, &interval, 0);
+  }
 #endif
   if (enter != profileEnter)
     {
@@ -208,9 +245,7 @@ static void enableExecutionProfile(void)
 
 static void disableExecutionProfile(void)
 {
-#if defined(WIN32)
-  (void)sigalrm;
-#else
+#if !defined(WIN32)
   signal(SIGALRM, SIG_IGN);
   setitimer(ITIMER_REAL, 0, 0);
 #endif
