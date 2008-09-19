@@ -34,7 +34,6 @@ NetworkPseudoInterface tunnel: dev from: src to: dst
 	      struct ifaliasreq ifra;
 	      memset(&ifra, 0, sizeof(ifra));
 	      strcpy(ifra.ifra_name, (char *)v__dev + 5);	/* xxx ASSUMES /dev/ PREFIX xxx */
-	      if (ioctl(sock, SIOCDIFADDR, &ifra) < 0) perror("SIOCDIFADDR");
 	      memcpy(&ifra.ifra_addr,	   src->ai_addr, src->ai_addrlen);
 	      memcpy(&ifra.ifra_broadaddr, dst->ai_addr, dst->ai_addrlen);
 	      if (ioctl(sock, SIOCAIFADDR, &ifra) < 0) perror("SIOCAIFADDR");
