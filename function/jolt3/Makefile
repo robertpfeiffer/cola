@@ -28,7 +28,7 @@ main : $(LIBS) FunctionParser.o main.st
 FunctionParser.st : FunctionParser.g
 	./g2st $< > $@
 
-test : pepsi
+timep : pepsi
 	for i in $(OBJECTS)/*.st; do \time ./pepsi $$i; done # ; cat $(OBJECTS)/*.st | wc -l
 
 pepsi : pepsi.st $(LIBS) ObjectParser.o
@@ -37,6 +37,15 @@ pepsi : pepsi.st $(LIBS) ObjectParser.o
 ObjectParser.o : ObjectParser.st
 
 ObjectParser.st : ObjectParser.g g2st
+	./g2st $< > $@
+
+
+test : test.st $(LIBS) TestParser.o
+	$(IDC) $(IDFLAGS) test.st TestParser.o $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
+
+TestParser.o : TestParser.st
+
+TestParser.st : TestParser.g g2st
 	./g2st $< > $@
 
 

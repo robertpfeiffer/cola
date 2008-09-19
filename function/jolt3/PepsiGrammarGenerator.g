@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-09-17 21:38:35 by piumarta on emilia.local
+% Last edited: 2008-09-19 08:41:25 by piumarta on emilia.local
 
 PepsiGrammarGenerator : GrammarParser ( name attribute attributes depth maxDepth )
 
@@ -48,7 +48,7 @@ Generate	= #(#grammar Generate*)
 								  locals := locals keys.
 								  maxDepth > 0 ifTrue: [1 to: maxDepth do: [:n | locals add: 'pos', n printString]].
 								  locals notEmpty ifTrue: ['|' put.  locals do: [:n | (' ', n) put].  ' |' putln].
-								  p do: [:n | n asString put.  ' := inputStream next.' putln].
+								  "p do: [:n | n asString put.  ' := inputStream next.' putln]."
 								  optionTrace ifTrue: [('StdErr space: (TraceIndent := TraceIndent + 2); println: ''', i, '''.') putln].
 								  optionMemo ifTrue: [('(_memo_ := self memoized: #',i,' :inputStream) ifTrue: [^_memo_ success ifTrue: [inputStream position: _memo_ next.  result := _memo_ result.  self]].\n_memo_ := inputStream position.') putln].
 								  '_ok_ := ' put. }
