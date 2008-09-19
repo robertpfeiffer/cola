@@ -15,9 +15,9 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-08-09 10:19:14 by piumarta on emilia
+% Last edited: 2008-09-17 21:38:35 by piumarta on emilia.local
 
-PepsiGrammarGenerator : GrammarParser ( name depth maxDepth )
+PepsiGrammarGenerator : GrammarParser ( name attribute attributes depth maxDepth )
 
 start		= Header <Generate <Grammar>>
 
@@ -30,7 +30,18 @@ Generate	= #(#grammar Generate*)
 		| #(#definition .:i .:p
 			   { maxDepth := depth := 0 }		&reserve
 			-> { IdentityDictionary new } :locals	&<collect locals>
-								{ (name, ' ', i, ' :inputStream\n[') putln.
+								{ (attribute := p notEmpty) ifTrue:
+								     [((attribute := name, '_', i), ' : Object (') put.
+								      attributes := p.
+								      p do: [:n | ' ' put.  n asString put].
+								      ' )' putln.
+								      (attribute, ' new') put.
+								      p do: [:n | (' :_', n) put].
+								      ' [self := super new' put.
+								      p do: [:n | ('. ', n, ' := _', n) put].
+								      ']' putln.
+								      p do: [:n | (attribute, ' ', n, ' [^', n, ']') putln]].
+								  (name, ' ', i, ' :inputStream\n[') putln.
 								  p do: [:n | locals at: n put: true].
 								  locals at: #_ok_ put: true.
 								  optionMemo ifTrue: [locals at: #_memo_ put: true].
@@ -42,6 +53,11 @@ Generate	= #(#grammar Generate*)
 								  optionMemo ifTrue: [('(_memo_ := self memoized: #',i,' :inputStream) ifTrue: [^_memo_ success ifTrue: [inputStream position: _memo_ next.  result := _memo_ result.  self]].\n_memo_ := inputStream position.') putln].
 								  '_ok_ := ' put. }
 		  generate)					{ '.\n' put.
+		  						  attribute ifTrue:
+								     ['_ok_ ifTrue: [' put.
+								      ('result := ', attribute, ' new') put.
+								      attributes do: [:n | (' :', n) put].
+								      '].' putln].
 								  optionTrace ifTrue:
 								     [('StdErr space: TraceIndent; print: ''',i,'''; nextPutAll: (_ok_ ifTrue: ['' ok''] ifFalse: ['' FAIL'']); cr.\nTraceIndent := TraceIndent - 2.\n') put].
 								  optionMemo ifTrue: [('self memoize: #',i,' at: _memo_ success: _ok_ result: result :inputStream.') putln].
@@ -143,7 +159,8 @@ element		= #(#subgroup					{ (' add: (TokenGroup new') put }
 
 % collect all store node variable names within expression tree
 
-collect :locals	= ( #( #store .:n { locals at: n put: true } <collect locals>
+collect		= .:locals
+		  ( #( #store .:n { locals at: n put: true } <collect locals>
 		     | .				     <collect locals>* )
 		  | .
 		  )

@@ -235,6 +235,15 @@ TokenGroup printOn: aStream
 TokenGroup isEmpty	[ ^value isNil ]
 TokenGroup notEmpty	[ ^value ]
 
+TokenGroup size
+[
+    | size tok |
+    size := 0.
+    tok := value.
+    [tok] whileTrue: [size := size + 1.  tok := tok next].
+    ^size
+]
+
 TokenGroup hasSize: n
 [
     | tok end |

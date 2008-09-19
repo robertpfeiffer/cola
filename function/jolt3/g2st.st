@@ -1,4 +1,5 @@
 { import: Object }
+{ import: GrammarParser }
 { import: PepsiGrammarGenerator }
 
 [

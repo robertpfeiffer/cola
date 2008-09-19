@@ -7,9 +7,10 @@ OFLAGS		= -g
 IDFLAGS		= $(OFLAGS) -I$(OBJECTS)
 IDLIBS		= $(OBJECTS)/objects.a
 
-LIBS		= Token.o Parser.o COLAParser.o GrammarParser.o PepsiGrammarGenerator.o
+LIBS		= Token.o Parser.o COLAParser.o GrammarParser.o PepsiGrammarGenerator.o \
+		  Expression.o
 
-all : g2st
+all : g2st main
 
 boot : .FORCE
 	$(MAKE) -j 3 -C boot
@@ -20,6 +21,12 @@ reboot : boot .FORCE
 	cp -p boot/PepsiGrammarGenerator.st .
 	$(MAKE) all
 
+
+main : $(LIBS) FunctionParser.o main.st
+	$(IDC) $(IDFLAGS) main.st FunctionParser.o $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
+
+FunctionParser.st : FunctionParser.g
+	./g2st $< > $@
 
 test : pepsi
 	for i in $(OBJECTS)/*.st; do \time ./pepsi $$i; done # ; cat $(OBJECTS)/*.st | wc -l

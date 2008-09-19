@@ -1,7 +1,7 @@
 "THIS FILE WAS GENERATED AUTOMATICALLY -- DO NOT EDIT!"
 
 { import: GrammarParser }
-PepsiGrammarGenerator : GrammarParser (name depth maxDepth)
+PepsiGrammarGenerator : GrammarParser (name attribute attributes depth maxDepth)
 PepsiGrammarGenerator start :inputStream
 [
 | _ok_ pos1 |
@@ -69,7 +69,18 @@ _ok_ := ((((pos1 := inputStream)
  and: [locals := result. 1])
  and: [(((pos4 := inputStream position)
  and: [((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])]) ifTrue: [(inputStream position: pos4). 1])
- and: [([ (name, ' ', i, ' :inputStream\n[') putln.
+ and: [([ (attribute := p notEmpty) ifTrue:
+								     [((attribute := name, '_', i), ' : Object (') put.
+								      attributes := p.
+								      p do: [:n | ' ' put.  n asString put].
+								      ' )' putln.
+								      (attribute, ' new') put.
+								      p do: [:n | (' :_', n) put].
+								      ' [self := super new' put.
+								      p do: [:n | ('. ', n, ' := _', n) put].
+								      ']' putln.
+								      p do: [:n | (attribute, ' ', n, ' [^', n, ']') putln]].
+								  (name, ' ', i, ' :inputStream\n[') putln.
 								  p do: [:n | locals at: n put: true].
 								  locals at: #_ok_ put: true.
 								  optionMemo ifTrue: [locals at: #_memo_ put: true].
@@ -83,6 +94,11 @@ _ok_ := ((((pos1 := inputStream)
  and: [(self generate :inputStream)]]]]]]]]])
  or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
  and: [([ '.\n' put.
+		  						  attribute ifTrue:
+								     ['_ok_ ifTrue: [' put.
+								      ('result := ', attribute, ' new') put.
+								      attributes do: [:n | (' :', n) put].
+								      '].' putln].
 								  optionTrace ifTrue:
 								     [('StdErr space: TraceIndent; print: ''',i,'''; nextPutAll: (_ok_ ifTrue: ['' ok''] ifFalse: ['' FAIL'']); cr.\nTraceIndent := TraceIndent - 2.\n') put].
 								  optionMemo ifTrue: [('self memoize: #',i,' at: _memo_ success: _ok_ result: result :inputStream.') putln].
@@ -639,23 +655,26 @@ _ok_ := ((((pos1 := inputStream position)
 ]
 PepsiGrammarGenerator collect :inputStream
 [
-| n locals _ok_ pos1 pos2 pos3 pos4 pos5 |
-locals := inputStream next.
-_ok_ := ((((pos1 := inputStream)
+| locals n _ok_ pos1 pos2 pos3 pos4 pos5 |
+_ok_ := (((pos1 := inputStream position)
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [locals := result. 1])
+ and: [((((pos2 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
- and: [((((pos2 := inputStream position)
+ and: [((((pos3 := inputStream position)
  and: [((inputStream peek == #store) ifTrue: [result := inputStream next. 1])
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [n := result. 1])
  and: [([ locals at: n put: true . 1] value)
  and: [((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])]]]])
- or: [(inputStream position: pos2)])
- or: [(((pos2 := inputStream position)
+ or: [(inputStream position: pos3)])
+ or: [(((pos3 := inputStream position)
  and: [(inputStream notAtEnd and: [result := inputStream next. 1])
- and: [((pos3 := TokenGroup new)
- and: [[((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])] whileTrue: [(pos3 add: result)]. (result := pos3)])]])
- or: [(inputStream position: pos2)])])]]) ifTrue: [(result := (inputStream := pos1) next)] ifFalse: [(inputStream := pos1). nil])
- or: [(inputStream notAtEnd and: [result := inputStream next. 1])]).
+ and: [((pos4 := TokenGroup new)
+ and: [[((inputStream pushGroup: (TokenGroup new add: locals)) ifTrue: [(self collect :inputStream)])] whileTrue: [(pos4 add: result)]. (result := pos4)])]])
+ or: [(inputStream position: pos3)])])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ or: [(inputStream notAtEnd and: [result := inputStream next. 1])])]])
+ or: [(inputStream position: pos1)]).
 ^_ok_
 ]
 PepsiGrammarGenerator reserve :inputStream
