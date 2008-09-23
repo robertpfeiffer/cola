@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-09-19 08:41:25 by piumarta on emilia.local
+% Last edited: 2008-09-23 14:37:20 by piumarta on emilia.local
 
 PepsiGrammarGenerator : GrammarParser ( name attribute attributes depth maxDepth )
 
@@ -149,6 +149,7 @@ argument	= #(#argvar .:x)				{ x asString put }
 element		= #(#subgroup					{ (' add: (TokenGroup new') put }
 			( element &(. {';' put}) )* )		{ (')') put }
 		| #(#symbol .:s)				{ (' add: ', s printString) put }
+		| #(#literalString   .:s)			{ (' add: ', s printString) put }
 		| #(#unquote .:s)				{ (' add: ', s) put }
 		| #(#unquoteSplicing .:s)			{ (' concat: ', s) put }
 		| #(#unquoteString   .:s)			{ (' add: (', s, ' asString)') put }

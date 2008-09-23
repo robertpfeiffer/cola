@@ -204,6 +204,11 @@ TokenGroup addAll: aCollection
     aCollection do: [:e | self add: e]
 ]
 
+TokenGroup addAll: aCollection from: start
+[
+    aCollection from: start do: [:e | self add: e]
+]
+
 TokenGroup add: anObject	[  self addLastToken: (Token withValue: anObject) ]
 TokenGroup addLast: anObject	[ ^self addLastToken: (Token withValue: anObject) ]
 TokenGroup addFirst: anObject	[ ^self addFirstToken: (Token withValue: anObject) ]
@@ -255,11 +260,11 @@ TokenGroup hasSize: n
     ^tok == end and: [n == 0]
 ]
 
-TokenGroup first	[ ^value value ]
-TokenGroup second	[ ^value next value ]
-TokenGroup third	[ ^value next next value ]
-TokenGroup fourth	[ ^value next next next value ]
-TokenGroup fifth	[ ^value next next next next value ]
+TokenGroup first		[ ^value value ]
+TokenGroup second		[ ^value next value ]
+TokenGroup third		[ ^value next next value ]
+TokenGroup fourth		[ ^value next next next value ]
+TokenGroup fifth		[ ^value next next next next value ]
 
 TokenGroup asString	[ ^value ifTrue: [value text: group next] ifFalse: [String new: 0] ]
 

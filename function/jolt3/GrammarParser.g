@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-07-26 10:10:22 by piumarta on emilia
+% Last edited: 2008-09-23 14:43:40 by piumarta on emilia.local
 
 GrammarParser : COLAParser ( optionMemo optionDebug optionTrace )
 
@@ -78,6 +78,7 @@ Group		= OPEN Element*:e CLOSE				-> `(group ,@e)
 Element		= Identifier:i					-> `(symbol ,i)
 		| Unquote
 		| Subgroup
+		| ( SingleString | DoubleString ) :s		-> `(literalString ,s)
 Unquote		= COMMA ( AT	 Identifier:i			-> `(unquoteSplicing ,i)
 			| DOLLAR Identifier:i			-> `(unquoteString ,i)
 			| '#'	 Identifier:i			-> `(unquoteSymbol ,i)

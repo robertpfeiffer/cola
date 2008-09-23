@@ -600,6 +600,16 @@ _ok_ := ((((pos1 := inputStream position)
  and: [(((pos2 := inputStream)
  and: [(inputStream := self beginStructure: inputStream)
  and: [(((pos3 := inputStream position)
+ and: [((inputStream peek == #literalString) ifTrue: [result := inputStream next. 1])
+ and: [((inputStream notAtEnd and: [result := inputStream next. 1])
+ and: [s := result. 1])]])
+ or: [(inputStream position: pos3)])]]) ifTrue: [(result := (inputStream := pos2) next)] ifFalse: [(inputStream := pos2). nil])
+ and: [([ (' add: ', s printString) put . 1] value)]])
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [(((pos2 := inputStream)
+ and: [(inputStream := self beginStructure: inputStream)
+ and: [(((pos3 := inputStream position)
  and: [((inputStream peek == #unquote) ifTrue: [result := inputStream next. 1])
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [s := result. 1])]])
@@ -650,7 +660,7 @@ _ok_ := ((((pos1 := inputStream position)
  and: [((inputStream notAtEnd and: [result := inputStream next. 1])
  and: [x := result. 1])
  and: [([ self error: 'malformed group element: ', x printString . 1] value)]])
- or: [(inputStream position: pos1)])]]]]]]]).
+ or: [(inputStream position: pos1)])]]]]]]]]).
 ^_ok_
 ]
 PepsiGrammarGenerator collect :inputStream

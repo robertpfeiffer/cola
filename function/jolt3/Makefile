@@ -40,13 +40,16 @@ ObjectParser.st : ObjectParser.g g2st
 	./g2st $< > $@
 
 
-test : test.st $(LIBS) TestParser.o
-	$(IDC) $(IDFLAGS) test.st TestParser.o $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
+test : test.st $(LIBS) IRParser.o IA32Generator.o
+	$(IDC) $(IDFLAGS) test.st IRParser.o IA32Generator.o  $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
 
-TestParser.o : TestParser.st
+%.o : %.g
+	./g2st $< > $(@:.o=.st)
+	$(IDC) $(IDFLAGS) -c $(@:.o=.st) -o $@
 
-TestParser.st : TestParser.g g2st
-	./g2st $< > $@
+
+ia32 : ia32.st $(LIBS) IA32Parser.o
+	$(IDC) $(IDFLAGS) ia32.st IA32Parser.o $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
 
 
 ecma : ecma.st $(LIBS) ECMA262_3.o profile.c

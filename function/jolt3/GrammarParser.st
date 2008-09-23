@@ -370,14 +370,20 @@ _ok_ := (((pos1 := inputStream position)
 ]
 GrammarParser Element :inputStream
 [
-| i _ok_ pos1 |
+| i s _ok_ pos1 pos2 |
 _ok_ := ((((pos1 := inputStream position)
  and: [((self Identifier :inputStream)
  and: [i := result. 1])
  and: [((result := TokenGroup new) add: #symbol; add: i)]])
  or: [(inputStream position: pos1)])
  or: [(self Unquote :inputStream)
- or: [(self Subgroup :inputStream)]]).
+ or: [(self Subgroup :inputStream)
+ or: [(((pos1 := inputStream position)
+ and: [(((self SingleString :inputStream)
+ or: [(self DoubleString :inputStream)])
+ and: [s := result. 1])
+ and: [((result := TokenGroup new) add: #literalString; add: s)]])
+ or: [(inputStream position: pos1)])]]]).
 ^_ok_
 ]
 GrammarParser Unquote :inputStream
