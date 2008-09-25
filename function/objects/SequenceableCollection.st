@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-08-01 12:56:13 by piumarta on emilia
+  Last edited: 2008-09-20 10:19:06 by piumarta on emilia
 "
 
 { import: Object }
@@ -384,3 +384,9 @@ SequenceableCollection asCharacterClass
     complement ifTrue: [class invertBits].
     ^class
 ]
+
+SequenceableCollection uppercased
+[
+    ^self collect: [:c | c uppercased]
+]
+

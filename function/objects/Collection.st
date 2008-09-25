@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-30 14:08:22 by piumarta on emilia.local
+  Last edited: 2008-09-20 10:16:54 by piumarta on emilia
 "
 
 { import: Objects }
@@ -31,8 +31,9 @@ Collection emptyCheck
     self isEmpty ifTrue: [self error: 'this collection is empty']
 ]
 
-Collection addAll: aCollection		[ aCollection do: [:elt | self add: elt] ]
-Collection removeAll: aCollection	[ aCollection do: [:elt | self remove: elt] ]
+Collection addAll: aCollection			[ aCollection do: [:elt | self add: elt] ]
+Collection addAll: aCollection from: start	[ aCollection from: start do: [:elt | self add: elt] ]
+Collection removeAll: aCollection		[ aCollection do: [:elt | self remove: elt] ]
 
 Collection minimum: valueBlock
 [

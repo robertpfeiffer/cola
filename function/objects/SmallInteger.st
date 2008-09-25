@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-12-04 05:04:32 by piumarta on emilia
+  Last edited: 2008-09-20 10:20:24 by piumarta on emilia
 "
 
 { import: Objects.st }
@@ -52,6 +52,13 @@ SmallInteger digitValue
     (self between: $a and: $z) ifTrue: [^self - $a + 10].
     (self between: $0 and: $9) ifTrue: [^self - $0     ].
     ^nil
+]
+
+SmallInteger uppercased
+[
+    ^(self between: $a and: $z)
+	ifTrue:  [self - 32]
+	ifFalse: [self]
 ]
 
 SmallInteger to: limit do: unaryBlock
