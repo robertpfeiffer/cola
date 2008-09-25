@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-09-25 15:32:48 by piumarta on emilia
+  Last edited: 2008-09-25 15:35:02 by piumarta on emilia
 "
 
 { import: Objects }
@@ -131,7 +131,4 @@ String dirname
 	    size := size - 1].
 ]
 
-String import
-[
-    _object _import: self _stringValue : ('__id__init__', self) _stringValue
-]
+String import	[ _object _import: self _stringValue : ('__id__init__', self) _stringValue ]

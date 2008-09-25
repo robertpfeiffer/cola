@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 18:24:09 by piumarta on emilia
+  Last edited: 2008-09-25 15:35:19 by piumarta on emilia
 "
 
 { import: Objects }
@@ -82,3 +82,5 @@ Array printOn: aStream
     aStream nextPut: $#.
     self printContentsOn: aStream.
 ]
+
+Array import	[ self do: [:s | s import] ]
