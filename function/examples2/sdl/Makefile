@@ -21,8 +21,9 @@ OFLAGS		= -g
 IDFLAGS		= $(OFLAGS) -k -I$(OBJECTS) $(SDLINC) $(FT2INC)
 IDLIBS		= $(OBJECTS)/objects.a
 
-LIBS		= Box.o Color.o Geometry.o Surface.o SDLSurface.o Event.o events.o SDL_prims.o \
-		  Text.o Layout.o TextLayout.o TextLayout2.o Script.o
+LIBS		= Box.o Color.o Geometry.o Surface.o Event.o events.o \
+		  Text.o Layout.o TextLayout.o TextLayout2.o Script.o \
+		  SDLSurface.o SDL_prims.o FT2Text.o
 
 all : $(LIBS) main
 

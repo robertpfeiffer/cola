@@ -3,6 +3,8 @@
 { import: TextLayout }
 { import: Box }
 { import: SDLSurface }
+{ import: FT2Text }
+
 { include "SDL_main.h" }
 
 { import: debug }
