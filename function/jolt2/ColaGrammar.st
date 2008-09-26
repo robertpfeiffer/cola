@@ -57,7 +57,7 @@ ColaParsingGrammar	:= [ Grammar new ]
 			     | #store parse
 			     | ( #dot parse <- [PeAny] )
 			     | ( #lparen parse , #expression parse , #rparen parse ) ).
-    g	at: #prefix	put: ( ( #pling parse , #match parse <- [:p | p result not] )
+    g	at: #prefix	put: ( ( #pling parse , #prefix parse <- [:p | p result not] )
 			     |                  #match parse                 ).
     g	at: #repeat	put: ( #prefix parse , ( ( #query  parse <- [:p | p result zeroOne    ] )
 					       | ( #star   parse <- [:p | p result zeroMore   ] )
