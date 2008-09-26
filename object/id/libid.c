@@ -22,6 +22,7 @@
   dlhandle_t  dlopen(const char *path, int mode);
   void	     *dlsym(dlhandle_t handle, const char *symbol);
   int	      dlclose(dlhandle_t handle);
+# define      dlerror() "unknown error"
 #else
 # include <dlfcn.h>
   typedef void *dlhandle_t;
@@ -478,11 +479,13 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
       snprintf(path, MAXPATHLEN, "%s.so", fileName);
       lib= dlopen(path, ID_RTLD_FLAGS);
       dprintf("3  dlopen %s -> %p\n", path, lib);
+      if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
       if (!lib)
 	{
 	  snprintf(path, MAXPATHLEN, "./%s.so", fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
 	  dprintf("4  dlopen %s -> %p\n", path, lib);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	}
       if (!lib)
 	{
@@ -490,6 +493,7 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	  if (!(prefix= getenv("IDC_LIBDIR"))) prefix= PREFIX;
 	  snprintf(path, MAXPATHLEN, "%s%s.so", prefix, fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	  dprintf("5  dlopen %s -> %p\n", path, lib);
 	}
 #      if defined(WIN32)
@@ -499,12 +503,14 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	  for (p= path;  *p;  ++p)
 	    if ('/' == *p) *p= '\\';
 	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	  dprintf("7  dlopen %s -> %p\n", path, lib);
 	}
       if (!lib)
 	{
 	  snprintf(path, MAXPATHLEN, ".\\%s.so", fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	  dprintf("6  dlopen %s -> %p\n", path, lib);
 	}
 #      endif
