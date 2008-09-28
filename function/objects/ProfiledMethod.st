@@ -162,3 +162,4 @@ Object perform: aSymbol every: nSeconds
 #     endif
     }
 ]
+

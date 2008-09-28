@@ -68,7 +68,8 @@ static long numProfiles= 0;
 static long numEdges= 0;
 
 #if !defined(WIN32)
-static void sigalrm(int signo)	{ ++currentTime; }
+# include <signal.h>
+  static void sigalrm(int signo)	{ ++currentTime; }
 #endif
 
 static void profileAddCallee(struct profile *profile, struct edge *edge)

@@ -1,3 +1,7 @@
+#if !defined(WIN32)
+# include <signal.h>
+#endif
+
 static oop sigalrmReceiver= 0;
 static oop sigalrmSelector= 0;
 static int statisticalSampler= 0;
