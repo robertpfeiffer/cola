@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-09-02 14:51:16 by piumarta on emilia.local
+  Last edited: 2008-09-27 00:23:10 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -186,6 +186,7 @@ Object errorKeyNotFound: aKey
 { import: Stream }
 { import: Link }
 { import: LinkedList }
+{ import: Magnitude }
 { import: Number }
 { import: OS }
 { import: Function }

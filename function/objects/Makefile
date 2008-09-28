@@ -15,7 +15,7 @@ FILES		= _object.o Objects.o Object.o \
 		  Collection.o SequenceableCollection.o ArrayedCollection.o Array.o ByteArray.o \
 		  IdentitySet.o Set.o Association.o Dictionary.o IdentityDictionary.o SlotDictionary.o MemoDictionary.o OrderedCollection.o \
 		  File.o Stream.o Link.o LinkedList.o \
-		  Number.o OS.o Date.o Function.o Random.o Time.o debug.o deprecated.o
+		  Magnitude.o Number.o OS.o Date.o Function.o Random.o Time.o debug.o deprecated.o
 
 ARCH		= $(shell $(IDC) -C arch)
 
