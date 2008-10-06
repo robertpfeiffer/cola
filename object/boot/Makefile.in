@@ -146,7 +146,7 @@ gc.a : ../$(GCDIR)/.libs/libgc.a
 ifeq ($(SYSOS),win32)
 	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) -f Makefile.win32 ABI_FLAG="$(MFLAGS) -DLARGE_CONFIG"'
 else
-	-$(SHELL) -ec 'cd ../$(GCDIR)/; test -f config.log || CFLAGS="$(MFLAGS)" ./configure --target="$(TARGET)" --enable-threads=posix --enable-large-config --disable-shared; $(MAKE)'
+	-$(SHELL) -ec 'cd ../$(GCDIR)/; echo $$PATH; test -f Makefile || CFLAGS="$(MFLAGS)" ./configure --enable-large-config --disable-shared; $(MAKE)'
 endif
 
 install : all .FORCE
@@ -166,6 +166,8 @@ clean : tidy
 	-rm -rf $(FILES) idc1$(OBJEXT) gc.a *$(OBJEXT_O) *$(OBJEXT_SO)
 
 distclean spotless : clean
+	-$(SHELL) -ec 'cd ../$(GCDIR)/; $(MAKE) distclean'
+	-$(SHELL) -ec 'cd ../$(GCDIR)/libatomic_ops; $(MAKE) distclean'
 	-rm -f Makefile
 
 .FORCE :

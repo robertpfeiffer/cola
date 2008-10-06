@@ -80,7 +80,7 @@ done
 
 TARGET="${TARGET:-`sh ./boot/config.guess`}"
 
-GCDIR=${GCDIR:-"gc6.7"}
+GCDIR=${GCDIR:-"gc-7.0"}
 
 ppc () {
     OFLAGS=${OFLAGS:-"-O"}
