@@ -26,7 +26,7 @@ stage3/libid.o : .config-stamp id/*
 stage3/gc.a : boot/gc.a
 	-$(SHELL) -ec '[ -d stage3 ] || mkdir stage3 ; mkdir stage3/include ; mkdir stage3/include/gc ; mkdir stage3/include/id '
 	cp -p $< $@
-	-ranlinb -t $@
+	-ranlib -t $@
 
 
 stage2/idc : stage1/idc stage2/idc1
@@ -45,7 +45,7 @@ stage2/libid.o : .config-stamp id/*
 stage2/gc.a : boot/gc.a
 	-$(SHELL) -ec '[ -d stage2 ] || mkdir stage2 ; mkdir stage2/include ; mkdir stage2/include/gc ; mkdir stage2/include/id '
 	cp -p $< $@
-	-ranlinb -t $@
+	-ranlib -t $@
 
 
 stage1/idc : stage1/idc1
@@ -64,7 +64,7 @@ stage1/libid.o : .config-stamp id/*
 stage1/gc.a : boot/gc.a
 	-$(SHELL) -ec '[ -d stage1 ] || mkdir stage1 ; mkdir stage1/include ; mkdir stage1/include/gc ; mkdir stage1/include/id '
 	cp -p $< $@
-	-ranlinb -t $@
+	-ranlib -t $@
 
 
 boot/idc : boot/idc1
