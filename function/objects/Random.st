@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-07-14 10:58:12 by piumarta on emilia.local
+  Last edited: 2008-10-08 10:04:35 piumarta
 "
 
 { import: Objects }
@@ -29,11 +29,15 @@ Random new
 
 Random init
 [
+  { #ifndef EMBEDDED }.
     seed := (Time millisecondClockValue bitAnd: 16r3FFFFFFF) bitXor: self identityHash.
     a := 16807 asFloat.
     m := 1073741823 asFloat * 2.0.
     q := (m quo: a) asFloat.
     r := (m \\ a) asFloat.
+  { #else
+    (void)_2;
+    #endif }.
 ]
 
 Random next

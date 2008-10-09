@@ -65,6 +65,8 @@ EOF
     exit 0
 }
 
+IDST=${PWD%/object}
+
 FILES=""
 
 while [ $# -gt 0 ]; do
@@ -208,6 +210,8 @@ linux () {
     LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
     OBJEXT_SO=${OBJEXT_SO:-".so"}
     SYSOS="linux"
+    CCFLAGS_K=${CCFLAGS_K:-"-g -Wall -Wreturn-type -Werror -Wno-unused-value -nostdinc -I$IDST/system/include -DEMBEDDED=1 -D_GNU_SOURCE=1 -m32 -fno-strict-aliasing -fno-builtin -fno-stack-limit -fno-stack-protector"}
+    LDFLAGS_K=${LDFLAGS_K:-"-nostdlib -Wl,-melf_i386 -Bstatic -N -Wl,-Ttext -Wl,0x100000 -Wl,--eh-frame-hdr -Wl,--hash-style=both"}
 }
 
 case $TARGET in
@@ -242,6 +246,7 @@ esac
 echo "$TARGET:"
 echo "  TARGET     = $TARGET"
 echo "  PREFIX     = $PREFIX"
+echo "  IDST       = $IDST"
 echo "  CC         = $CC"
 echo "  CFLAGS     = $CFLAGS"
 echo "  MFLAGS     = $MFLAGS"
@@ -260,6 +265,8 @@ echo "  CCFLAGS_SO = $CCFLAGS_SO"
 echo "  LDFLAGS_SO = $LDFLAGS_SO"
 echo "  LDLIBS_SO  = $LDLIBS_SO"
 echo "  OBJEXT_SO  = $OBJEXT_SO"
+echo "  CCFLAGS_K  = $CCFLAGS_K"
+echo "  LDFLAGS_K  = $LDFLAGS_K"
 echo "  GCDIR      = $GCDIR"
 echo "  SYSARCH    = $SYSARCH"
 echo "  SYSOS      = $SYSOS"
@@ -270,6 +277,7 @@ for file in $FILES; do
     sed "
 s:@TARGET@:$TARGET:g;
 s:@PREFIX@:$PREFIX:g;
+s:@IDST@:$IDST:g;
 s:@CC@:$CC:g;
 s:@CFLAGS@:$CFLAGS:g;
 s:@MFLAGS@:$MFLAGS:g;
@@ -279,9 +287,11 @@ s:@PGFLAGS@:$PGFLAGS:g;
 s:@CCFLAGS@:$CCFLAGS:g;
 s:@CCFLAGS_O@:$CCFLAGS_O:g;
 s:@CCFLAGS_SO@:$CCFLAGS_SO:g;
+s:@CCFLAGS_K@:$CCFLAGS_K:g;
 s:@LDFLAGS@:$LDFLAGS:g;
 s:@LDFLAGS_O@:$LDFLAGS_O:g;
 s:@LDFLAGS_SO@:$LDFLAGS_SO:g;
+s:@LDFLAGS_K@:$LDFLAGS_K:g;
 s:@LDLIBS@:$LDLIBS:g;
 s:@LDLIBS_O@:$LDLIBS_O:g;
 s:@LDLIBS_SO@:$LDLIBS_SO:g;

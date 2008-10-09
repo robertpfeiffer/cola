@@ -14,6 +14,9 @@ ldobjs=""
 idtype="program"
 idmain="false"
 cckill="true"
+dlsyms="false"
+static="false"
+gc_a="gc.a"
 _p=""
 
 fatal () {
@@ -57,25 +60,27 @@ usage() {
 usage: $program [-option ...] filename
   -B prefix - prepend prefix to compiler files
   -C arch   - print configured architecture
-  -C os     - print configured operating system
-  -c        - generate an object file
-  -g        - generate debugging information
-  -h        - print help (this message) then exit
-  -H        - print copyright information then exit
+  -C os	    - print configured operating system
+  -c	    - generate an object file
+  -g	    - generate debugging information
+  -h	    - print help (this message) then exit
+  -H	    - print copyright information then exit
   -I dir    - search dir for id include/input/import files
   -J dir    - search dir for C header files
-  -k        - keep intermediate compiler files
-  -n        - do not execute compilation commands (useful with '-v')
+  -k	    - keep intermediate compiler files
+  -n	    - do not execute compilation commands (useful with '-v')
   -o file   - place output in file
-  -O        - optimise
-  -Op       - optimise, maximising performance at all costs
-  -p        - profile
-  -s        - generate a shared library
-  -v        - print compilation commands (useful with '-n')
-  -w        - generate a Windows executable (no console)
+  -O	    - optimise
+  -Op	    - optimise, maximising performance at all costs
+  -p	    - profile
+  -s	    - generate a shared library
+  -v	    - print compilation commands (useful with '-n')
+  -w	    - generate a Windows executable (no console)
   -Wi,opt   - pass opt to the Id compiler
   -Wc,opt   - pass opt to the C compiler
   -Wl,opt   - pass opt to the linker
+  -XO	    - standalone (objects are statically linked)
+  -XS	    - standalone (symbols resolved internally)
 without '-c' or '-s' the default is to generate an executable
 without '-o' the output is called 'filename[.[s]o]'
 EOF
@@ -83,6 +88,7 @@ EOF
 }
 
 rm -f .id.ldobjs
+rm -f .id.dlsyms
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -92,7 +98,7 @@ while [ $# -gt 0 ]; do
 	-C)	checkarg $@; config="$2"; shift;;
 	-c)	idtype="object";;
 	-f*)	ccopts="$ccopts $1";;
-	-g*)	ccopts="$ccopts -g -DID_DEBUG=1";  idopts="$idopts -g";  _p="_g";;
+	-g*)	ccopts="$ccopts -g -DID_DEBUG=1";  idopts="$idopts -g";	 _p="_g";;
 	-I?*)	idopts="$idopts -I${1#-I}";;
 	-I)	checkarg $@; idopts="$idopts -I$2"; shift;;
 	-J?*)	ccopts="$ccopts -I${1#-J}";;
@@ -115,15 +121,15 @@ while [ $# -gt 0 ]; do
 	-Wi,*)	idopts="$idopts ${1#-Wi,}";;
 	-Wc,*)	ccopts="$ccopts ${1#-Wc,}";;
 	-Wl,*)	ccopts="$ccopts $1";;
+	-XO)	static="true";;
+	-XS)	dlsyms="true";;
 	--*)	usage;;
 	-\?*)	usage;;
 	-h*)	usage;;
 	-H*)	copyright;;
 	-*)	fatal "option '$1' not recognised";;
-	*.o)	ldobjs="$ldobjs $1";;
-	*.a)	ldobjs="$ldobjs $1"
-		echo $1 >> .id.ldobjs
-		;;
+	*.o)	ldobjs="$ldobjs $1"; echo "$1" >> .id.ldobjs;;
+	*.a)	ldobjs="$ldobjs $1"; echo "$1" >> .id.ldobjs;;
 	*.dll)	ldobjs="$ldobjs $1";;
 	*)	[ -z "$infile" ] || fatal "multiple input files";
 		infile="$1";;
@@ -134,6 +140,7 @@ done
 case "$config" in
     "arch")		echo "@SYSARCH@";	exit;;
     "os")		echo "@SYSOS@";		exit;;
+    "IDST")		echo "@IDST@";		exit;;
     "TARGET")		echo "@TARGET@";	exit;;
     "PREFIX")		echo "@PREFIX@";	exit;;
     "CC")		echo "@CC@";		exit;;
@@ -144,9 +151,11 @@ case "$config" in
     "CCFLAGS")		echo "@CCFLAGS@";	exit;;
     "CCFLAGS_O")	echo "@CCFLAGS_O@";	exit;;
     "CCFLAGS_SO")	echo "@CCFLAGS_SO@";	exit;;
+    "CCFLAGS_K")	echo "@CCFLAGS_K@";	exit;;
     "LDFLAGS")		echo "@LDFLAGS@";	exit;;
     "LDFLAGS_O")	echo "@LDFLAGS_O@";	exit;;
     "LDFLAGS_SO")	echo "@LDFLAGS_SO@";	exit;;
+    "LDFLAGS_K")	echo "@LDFLAGS_K@";	exit;;
     "LDLIBS")		echo "@LDLIBS@";	exit;;
     "LDLIBS_O")		echo "@LDLIBS_O@";	exit;;
     "LDLIBS_SO")	echo "@LDLIBS_SO@";	exit;;
@@ -162,25 +171,39 @@ esac
 case $idtype in
     program)
 	idflags="-m"
-	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS@"
-	ldflags="@LDFLAGS@"
-	idlibs="libid$_p.o gc.a"
-	ldlibs="@LDLIBS@ -lm"
+	if $static; then
+	    ccflags="@CCFLAGS_K@"
+	    ccopts="$ccopts -DEMBEDDED=1 -I$IDST/system/include"
+	    ldflags="@LDFLAGS_K@"
+	    idlibs="libid_k.o"
+	    ldlibs=""
+	else
+	    ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS@"
+	    ldflags="@LDFLAGS@"
+	    idlibs="libid$_p.o $gc_a"
+	    ldlibs="@LDLIBS@"
+	fi
 	soext="@OBJEXT@"
 	;;
     win32)
 	idflags="-w"
 	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS@"
 	ldflags="@LDFLAGS@"
-	idlibs="libid$_p.o gc.a"
-	ldlibs="@LDLIBS@ -lm"
+	idlibs="libid$_p.o $gc_a"
+	ldlibs="@LDLIBS@"
 	soext="@OBJEXT@"
 	;;
     object)
 	idflags="-c"
-	ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS_O@"
-	ldflags="@LDFLAGS_O@"
-	ldlibs="@LDLIBS_O@"
+	if $static; then
+	    ccflags="@CCFLAGS_O@ @CCFLAGS_K@"
+	    ldflags="@LDFLAGS_O@"
+	    ldlibs="@LDLIBS_O@"
+	else
+	    ccflags="@CFLAGS@ @MFLAGS@ @CCFLAGS_O@"
+	    ldflags="@LDFLAGS_O@"
+	    ldlibs="@LDLIBS_O@"
+	fi
 	soext="@OBJEXT_O@"
 	;;
     shared)
@@ -197,12 +220,41 @@ case $idtype in
 	;;
 esac
 
+for lib in $idlibs; do
+  plibs="${plibs} ${prefix}${lib}"
+done
+idlibs="$plibs"
+ccflags="$ccflags -I${prefix}"
+
 if test -s .id.ldobjs; then
     while read file; do
 	ldobjs="$ldobjs `nm $file | fgrep __id__init__ | awk '{print \"-u\", $3}'`"
     done < .id.ldobjs
 fi
+
+if $dlsyms; then
+  echo $idlibs | tr ' ' '\012' >> .id.ldobjs
+  while read file; do
+    nm $file 2>/dev/null | grep -w [TD] >> .id.dlsyms
+  done < .id.ldobjs
+  awk -f - .id.dlsyms > .id.dlsym.s <<-'EOF'
+	BEGIN	{ print ".data" }
+		{ printf "_dl_%d: .asciz \"%s\"\n", NR, $3 }
+	EOF
+  awk -f - .id.dlsyms >> .id.dlsym.s <<-'EOF'
+	BEGIN	{ print ".globl dlsym_tab"; print "dlsym_tab:" }
+		{ printf ".long _dl_%d, %s\n", NR, $3 }
+	END	{ print ".long 0,0" }
+	EOF
+  as -o .id.dlsym.o .id.dlsym.s
+  dlsyms=".id.dlsym.o"
+else
+  dlsyms=""
+fi
+
 rm -f .id.ldobjs
+rm -f .id.dlsyms
+rm -f .id.dlsym.s
 
 $idmain && idflags="-m"
 
@@ -222,11 +274,11 @@ fi
 
 trap "$run $cckill $ccfile; exit 1" 2 3 5 6 10 13 15
 
-for lib in $idlibs; do
-  plibs="${plibs} ${prefix}${lib}"
-done
-idlibs="$plibs"
-ccflags="$ccflags -I${prefix}"
+#for lib in $idlibs; do
+#  plibs="${plibs} ${prefix}${lib}"
+#done
+#idlibs="$plibs"
+#ccflags="$ccflags -I${prefix}"
 
 [ -z "$prefix" ] || {
   libfix=${prefix}
@@ -240,9 +292,9 @@ ccflags="$ccflags -I${prefix}"
 if [ ! -z "$infile" ]; then
   $verbose
   $run ${prefix}idc1 -I$prefix $idopts $idflags $infile -o $ccfile &&
-  $run $cc -I$prefix/include $ccflags $ccopts $ccfile -o $outfile $ldflags $ldobjs $idlibs $ldlibs &&
+  $run $cc -I$prefix/include $ccflags $ccopts $ccfile -o $outfile $ldflags $dlsyms $ldobjs $idlibs $ldlibs &&
   $run $cckill $ccfile
 else
   $verbose
-  $run $cc -I$prefix/include $ccflags $ccopts -o $outfile $ldflags $ldobjs $idlibs $ldlibs
+  $run $cc -I$prefix/include $ccflags $ccopts -o $outfile $ldflags $dlsyms $ldobjs $idlibs $ldlibs
 fi

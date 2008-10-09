@@ -20,14 +20,14 @@ win32 : .FORCE
 
 tidy : .FORCE
 	rm -f *~
-	-$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) tidy ); done'
+	-$(SHELL) -ec 'for dir in $(SUBDIRS) system; do ( cd $$dir; $(MAKE) tidy ); done'
 
 clean : .FORCE
 	rm -f *~
-	-$(SHELL) -ec 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) clean ); done'
+	-$(SHELL) -ec 'for dir in $(SUBDIRS) system; do ( cd $$dir; $(MAKE) clean ); done'
 
 distclean spotless : .FORCE
 	-rm -f *~
-	-$(SHELL) -c 'for dir in $(SUBDIRS); do ( cd $$dir; $(MAKE) distclean ); done'
+	-$(SHELL) -c 'for dir in $(SUBDIRS) system; do ( cd $$dir; $(MAKE) distclean ); done'
 
 .FORCE :

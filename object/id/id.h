@@ -1,6 +1,59 @@
 #ifndef __ID_H
 #define __ID_H
 
+#if defined(EMBEDDED)
+# define NO_GC	1
+# define NO_OS	1
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <setjmp.h>
+#include <string.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/param.h>
+#include <assert.h>
+
+#if !defined(NO_GC)
+# define GC_DLL 1
+# include <gc/gc.h>
+#endif
+
+#if defined(WIN32)
+# include <malloc.h>
+# include <windows.h>
+  typedef HINSTANCE dlhandle_t;
+# if 0 /*----------------------------------------------------------------*/
+# define RTLD_DEFAULT	0
+# define RTLD_LAZY	0
+# define RTLD_GLOBAL	0
+# define RTLD_NOW	0
+  dlhandle_t  dlopen(const char *path, int mode);
+  void       *dlsym(dlhandle_t handle, const char *symbol);
+  int	      dlclose(dlhandle_t handle);
+# define      dlerror() "unknown error"
+# endif /*----------------------------------------------------------------*/
+#else
+# include <dlfcn.h>
+  typedef void *dlhandle_t;
+#endif
+#ifndef O_BINARY
+# define O_BINARY 0
+#endif
+
+typedef struct t__object *oop;
+
+struct __send;
+typedef oop (*_imp_t)(struct __send *_send, ...);
+
+
 struct __closure
 {
   _imp_t	method;

@@ -69,8 +69,9 @@ stage1/gc.a : boot/gc.a
 
 boot/idc : boot/idc1
 
-boot/idc1 : boot/Makefile boot/src/*
+boot/gc.a boot/idc1 : boot/Makefile boot/src/*
 	-$(SHELL) -ec '( cd boot; $(MAKE) )'
+
 
 $(CONFIG) : .config-stamp
 

@@ -372,6 +372,7 @@ static void signalDebugger(int n)
   switch (n)
     {
     case SIGINT:	who= "interrupt";			break;
+#ifndef EMBEDDED
     case SIGILL:	who= "illegal instruction";		break;
     case SIGABRT:	who= "abort";				break;
     case SIGFPE:	who= "floating-point exception";	break;
@@ -403,7 +404,8 @@ static void signalDebugger(int n)
   /*case SIGINFO:	who= "status request";			break;*/
     case SIGUSR1:	who= "user-defined 1";			break;
     case SIGUSR2:	who= "user-defined 2";			break;
-#endif
+#endif /* WIN32 */
+#endif /* EMBEDDED */
     }
   printf("\n\nsignal: %s\n", who);
   enterDebugger();

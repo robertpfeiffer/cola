@@ -1,10 +1,13 @@
+IDST   = @IDST@
 CFLAGS = @CFLAGS@ @MFLAGS@ -g @O3FLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS) -fno-strict-aliasing
 PFLAGS = @CFLAGS@ @MFLAGS@ -g @PGFLAGS@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS) -fno-strict-aliasing
 GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" $(EFLAGS) -fno-strict-aliasing
 PREFIX = @PREFIX@
 GCDIR  = @GCDIR@
 
-all : $(BIN)./include $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o
+CCFLAGS_K = @CCFLAGS_K@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" -I$(IDST)/system/include
+
+all : $(BIN)./include $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o $(BIN)libid_k.o
 
 $(BIN)./include : 
 	-$(SHELL) -ec 'mkdir $(BIN)./include; \
@@ -20,6 +23,10 @@ $(BIN)libid_p.o : libid.c $(BIN)./include
 $(BIN)libid_g.o : libid.c $(BIN)./include
 	$(CC) $(GFLAGS) -g -DPREFIX='"@PREFIX@"' $< -c -o $@
 
+$(BIN)libid_k.o : libid.c $(BIN)./include
+	$(CC) $(CCFLAGS_K) -DPREFIX='"@PREFIX@"' $< -c -o $@
+
+
 install : $(PREFIX)libid.o $(PREFIX)libid_p.o $(PREFIX)libid_g.o
 
 $(PREFIX)libid.o : $(BIN)libid.o
@@ -34,11 +41,16 @@ $(PREFIX)libid_g.o : $(BIN)libid_g.o
 	-mkdir -p $(PREFIX)
 	-cp -p $< $@
 
+$(PREFIX)libid_k.o : $(BIN)libid_k.o
+	-mkdir -p $(PREFIX)
+	-cp -p $< $@
+
+
 tidy : .FORCE
 	rm -f *~
 
 clean : tidy
-	rm -f $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o
+	rm -f $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o $(BIN)libid_k.o
 
 distclean spotless : clean
 	rm -f Makefile
