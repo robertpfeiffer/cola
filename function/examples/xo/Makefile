@@ -1,47 +1,44 @@
-TFTPBOOT = 10.0.1.2:/private/tftpboot/boot.elf
-PROGRAM  =  hw
+include Makefile.conf
 
-IDC = ../idc
+IDC	= ../idc
+IDST	= $(shell $(IDC) -C IDST)
 
-LIBO    = lib.o wrappers.o malloc.o strings.o printf.o debug.o main.o intprop.o regprop.o strprop.o mem.o callofw.o start.o missing.o
-LIB     = lib.a
-SYSTEM  = ../../../system
-LIBSYS  = $(SYSTEM)/libossage.a
-OBJECT  = ../../objects
-LIBOBJ  = $(OBJECT)/objects_k.a
 
-all : $(PROGRAM)
+all : $(BOOTLIBS)
 
-run : all
-	./$(PROGRAM)
 
-boot : $(PROGRAM)
-	scp -1 -p $(PROGRAM) $(TFTPBOOT)
+libofw.a : libofw/libofw.a
+	$(SHELL) -ec '( ln -s $< $@ )'
 
-hw : $(LIB) $(LIBSYS) $(LIBOBJ) missing.o hw.st
-	../idc -XO -XS hw.st missing.o $(LIBOBJ) $(LIBSYS) $(LIB) -lgcc
+libofw/libofw.a :
+	$(SHELL) -ec '( cd libofw; make )'
 
-$(LIB) : $(LIBO)
-	ar rc $@ $(LIBO)
 
-%.o : lib/%.c
-	gcc -g -m32 -fno-builtin -fno-stack-limit -fno-stack-protector -o $@ -c $<
+libossage.a : $(IDST)/system/libossage.a
+	$(SHELL) -ec '( ln -s $< $@ )'
 
-%.o : lib/%.s
-	gcc -g -m32 -fno-builtin -fno-stack-limit -fno-stack-protector -o $@ -c $<
+$(IDST)/system/libossage.a :
+	$(SHELL) -ec '( cd $(IDST)/system; make )'
 
-$(LIBSYS) :
-	$(MAKE) -C $(SYSTEM) 
 
-$(LIBOBJ) :
-	$(MAKE) -C $(OBJECT) objects_k.a
+libobjects.a : $(IDST)/function/objects/objects_k.a
+	$(SHELL) -ec '( ln -s $< $@ )'
+
+$(IDST)/function/objects/objects_k.a :
+	$(SHELL) -ec '( cd $(IDST)/function/objects; $(MAKE) objects_k.a )'
+
 
 tidy: .FORCE
+	-$(MAKE) -C libofw tidy
 	rm -f *~
 
 clean : tidy .FORCE
-	rm -rf $(PROGRAM) *.exe *.o *.a *.dSYM
+	rm -rf *.exe *.o *.a *.dSYM
+	rm -f $(BOOTLIBS)
+	-$(MAKE) -C libofw clean
 
 spotless : clean .FORCE
+	-$(MAKE) -C libofw spotless
+
 
 .FORCE :
