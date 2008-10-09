@@ -5,7 +5,7 @@
 { import: SDLSurface }
 { import: FT2Text }
 
-{ include "SDL_main.h" }
+{ include <SDL/SDL.h> }
 
 { import: debug }
 
