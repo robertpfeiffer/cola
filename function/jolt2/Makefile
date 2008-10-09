@@ -45,7 +45,7 @@ main$(OBJEXT) : main.st $(LIBS)
 	$(IDC) $(OFLAGS) $(IDFLAGS) main.st $(LDLIBS) -o $@
 
 jolt.a : $(FILES) ../objects/objects.a
-	ar rc $@.new $(FILES) ../objects/*.o
+	ar rcs $@.new $(FILES) ../objects/*.o
 	mv $@.new $@
 
 ../objects/objects.a : .FORCE
