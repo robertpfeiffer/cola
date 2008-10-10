@@ -92,6 +92,7 @@ ofw_setup()
     *argstr++ = '\0';
   }
   parse_homedir(argv[0]);
+  printf("booting...\n");
   main(i, argv);
 }
 
