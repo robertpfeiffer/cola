@@ -27,7 +27,7 @@ all : canvas.a hello # geystar fontsel world
 .SUFFIXES :
 
 canvas.a : $(OBJS)
-	ar rc $@.new $(OBJS)
+	ar rcs $@.new $(OBJS)
 	mv $@.new $@
 
 run : all
