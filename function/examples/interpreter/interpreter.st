@@ -47,7 +47,7 @@ Object interpretedMethod ...
 [
     | _send nArgs args _args |
     _send := _closure.
-    { v__closure= (oop)(((struct __send *)v__send)->closure);  v_nArgs= ((struct __send *)v__send)->nArgs << 1 | 1; }.
+    { v__closure= (oop)(((struct __send *)v__send)->closure);  v_nArgs= (oop)(((struct __send *)v__send)->nArgs << 1 | 1); }.
     nArgs > 0 ifTrue: [
 	args := Array new: nArgs.
 	_args := args _elements.
