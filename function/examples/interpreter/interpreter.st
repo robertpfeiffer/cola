@@ -126,7 +126,7 @@ Object newSubtypeNamed: nameSymbol withSlotNames: slotNameArray
 
 " Run the code within a Context.  Each instruction is dispatched as a
   message to the Context in a loop that terminates at the first
-  instruction that answers nil, the answers the topmost item on the
+  instruction that answers nil, then answers the topmost item on the
   Context's stack. "
 
 Context run
