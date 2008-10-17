@@ -248,5 +248,7 @@ Context brf	"idem false"
 	self push 2 send2 - send1 nfibs
 	push 1 send2 + send2 + return).
 
-    (Time millisecondsToRun: [22 nfibs println]) println.	"about 100,000 sends/second on my Q9450"
+    (Time millisecondsToRun: [23 nfibs println]) println.
+    "about 100,000 sends/second on my Q9450, compiled -O -g"
+    "about 300,000 sends/second compiled -Op"
 ]
