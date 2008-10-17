@@ -114,7 +114,7 @@ Object newSubtypeNamed: nameSymbol withSlotNames: slotNameArray
     type := self _delegated.
     "install the methods required by the runtime system"
     type _genericConstantAt: #_debugName put: nameSymbol _stringValue.
-    type _genericConstantAt: #_sizeof    put: self sizeof + (self sizeofOop * slotNameArray size).
+    type _genericConstantAt: #_sizeof    put: (self sizeof + (self sizeofOop * slotNameArray size)) _integerValue.
     "install accessors for each of the slots in the new type"
     slotNameArray doWithIndex: [:slotName :index |
 	type _genericGetterAt: slotName       put: self instVarCount + index.
