@@ -119,7 +119,7 @@ Object newSubtypeNamed: nameSymbol withSlotNames: slotNameArray
     slotNameArray doWithIndex: [:slotName :index |
 	type _genericGetterAt: slotName       put: self instVarCount + index.
 	type _genericSetterAt: slotName , ':' put: self instVarCount + index].
-    ^type.	"may it serve you well"
+    ^type new.	"may it serve you well"
 ]
 
 "----------------------------------------------------------------"
@@ -141,11 +141,12 @@ Context run
   arithmetic and/or special selectors that are inlined by the Id
   compiler.  Each such insn would save one computed message send. "
 
-Context self	[ self at: (sp := sp + 1) put: receiver ]
-Context arg	[ self at: (sp := sp + 1) put: (arguments at: (code at: (pc := pc + 1)) - 1) ]
-Context arg1	[ self at: (sp := sp + 1) put: (arguments at: 0) ]
-Context push	[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) ]
-Context pop	[ sp := sp - 1 ]
+Context self		[ self at: (sp := sp + 1) put: receiver ]
+Context arg		[ self at: (sp := sp + 1) put: (arguments at: (code at: (pc := pc + 1)) - 1) ]
+Context arg1		[ self at: (sp := sp + 1) put: (arguments at: 0) ]
+Context push		[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) ]
+Context pushGlobal	[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) asPrototype ]
+Context pop		[ sp := sp - 1 ]
 
 Context dup
 [
@@ -240,6 +241,10 @@ Context brf	"idem false"
     aPoint r println.
     aPoint scaleBy: 2.
     aPoint r println.
+
+    Point _interpretedMethodAt: #testInterp3 put: #(pushGlobal 'ReadStream' return).
+
+    Point testInterp3 println.
 
     Integer _interpretedMethodAt: #nfibs put: #(
 	self push 2 send2 < brf 3
