@@ -6,9 +6,10 @@ all : $(PROGRAM) .FORCE
 IDC		= ../idc -O
 IDFLAGS		= -g -k -I../../objects -I../../jolt-burg
 IDLIBS		= ../../objects/objects.a ../../jolt-burg/jolt.a ../../jolt-burg/readline.o -lreadline
+LIBS		= interpret.o
 
-% : %.st
-	$(IDC) $(IDFLAGS) $< $(IDLIBS) -o $@
+% : %.st $(LIBS)
+	$(IDC) $(IDFLAGS) $< $(IDLIBS) $(LIBS) -o $@
 
 %.o : %.st
 	$(IDC) $(IDFLAGS) -c $< -o $@
@@ -17,7 +18,7 @@ IDLIBS		= ../../objects/objects.a ../../jolt-burg/jolt.a ../../jolt-burg/readlin
 	$(IDC) $(IDFLAGS) -s $< -o $@
 
 clean : .FORCE
-	rm -rf *~ *.so *.so.c $(PROGRAM) $(PROGRAM).o $(PROGRAM).c $(PROGRAM).o.c *.dSYM
+	rm -rf *~ *.so *.so.c $(PROGRAM) $(PROGRAM).o $(LIBS) $(PROGRAM).c $(PROGRAM).o.c *.dSYM
 
 spotless : clean
 	rm -rf .gdb_history NONE
