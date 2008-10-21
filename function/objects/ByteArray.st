@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 18:24:45 by piumarta on emilia
+  Last edited: 2008-10-21 14:23:36 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -114,6 +114,16 @@ ByteArray asPrototype
     strncpy(buf, (char *)self->v__bytes, size);
     buf[size]= '\0';
     _return(_libid->import(buf));
+}
+
+ByteArray bePrototype: anObject
+{
+    int size= (long)self->v_size >> 1;
+    char buf[1024];
+    if (size >= sizeof(buf)) size= sizeof(buf) - 1;
+    strncpy(buf, (char *)self->v__bytes, size);
+    buf[size]= '\0';
+    _return(_libid->export(buf, v_anObject));
 }
 
 ByteArray printOn: aStream
