@@ -242,7 +242,7 @@ Context brf	"idem false"
     aPoint scaleBy: 2.
     aPoint r println.
 
-    Point _interpretedMethodAt: #testInterp3 put: #(pushGlobal 'ReadStream' return).
+    Point _interpretedMethodAt: #testInterp3 put: #(pushGlobal ReadStream return).
 
     Point testInterp3 println.
 
