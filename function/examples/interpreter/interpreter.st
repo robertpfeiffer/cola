@@ -145,7 +145,7 @@ Context self		[ self at: (sp := sp + 1) put: receiver ]
 Context arg		[ self at: (sp := sp + 1) put: (arguments at: (code at: (pc := pc + 1)) - 1) ]
 Context arg1		[ self at: (sp := sp + 1) put: (arguments at: 0) ]
 Context push		[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) ]
-Context pushGlobal	[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) asPrototype ]
+Context pushGlobal	[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) asString asPrototype ]
 Context pop		[ sp := sp - 1 ]
 
 Context dup
