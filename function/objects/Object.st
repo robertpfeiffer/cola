@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-09-27 00:23:10 by piumarta on emilia.local
+  Last edited: 2008-10-22 11:28:20 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -230,7 +230,7 @@ Object perform: s with8arguments: a	[ ^self perform: s with: (a at: 0) with: (a 
 Object slotNameAt: index
 [
     | _name |
-    ^(_name := self _slotNameAt_: index _integerValue) ifTrue: [String value_: _name]
+    ^(_name := self _slotNameAt_: index _integerValue) ifTrue: [Symbol intern_: _name]
 ]
 
 Object _slotNameAt_: _index
@@ -280,6 +280,18 @@ Object slots
 	   [slots at: name put: ((self slotOffsetAt: index) -> (self slotSizeAt: index)).
 	    index := index + 1].
     ^slots
+]
+
+Object allSlotNames
+[
+    | index slots name |
+    index := 0.
+    slots := OrderedCollection new.
+    [name := self slotNameAt: index]
+	whileTrue:
+	   [slots add: name.
+	    index := index + 1].
+    ^slots asArray
 ]
 
 Object _oopAt: index

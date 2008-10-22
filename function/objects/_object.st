@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-18 20:35:45 by piumarta on emilia
+  Last edited: 2008-10-22 11:28:43 by piumarta on emilia.local
 "
 
 { external }
@@ -95,6 +95,12 @@ _vector new_: _newSize
 }
 
 "Introspection"
+
+_object _slots
+{
+    static struct __slotinfo info[]= { { 0, 0, 0 } };
+    return (oop)&info[0];
+}
 
 _object _methodAt: aSelector
 [
