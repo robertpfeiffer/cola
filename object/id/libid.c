@@ -1136,6 +1136,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.import		= _libid_import;
   _libid.export		= _libid_export;
   _libid.param		= _libid_param;
+  _libid.isExported	= _libid_isExported;
 
   _libid.bind		= _libid_bind;
   _libid.bind2		= _libid_bind2;
