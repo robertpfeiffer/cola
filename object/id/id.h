@@ -134,7 +134,7 @@ struct __libid
   oop		 (*import)(const char *key);
   oop		 (*export)(const char *key, oop value);
   void		*(*param)(int index);
-  int		 (*isExported)(const char *key, oop value);
+  int		 (*isExported)(const char *key);
 
   void		  *unused28;
   void		  *unused29;
