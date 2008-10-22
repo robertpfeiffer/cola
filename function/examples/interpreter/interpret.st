@@ -113,13 +113,32 @@ Object newSubtypeNamed: nameSymbol withSlotNames: slotNameArray
     "create an empty type delegating to the receiver's type"
     type := self _delegated.
     "install the methods required by the runtime system"
-    type _genericConstantAt: #_debugName put: nameSymbol _stringValue.
-    type _genericConstantAt: #_sizeof    put: (self sizeof + (self sizeofOop * slotNameArray size)) _integerValue.
+    type _genericConstantAt: #_debugName   put: nameSymbol _stringValue.
+    type _genericConstantAt: #_sizeof      put: (self sizeof + (self sizeofOop * slotNameArray size)) _integerValue.
+    type _genericConstantAt: #allSlotNames put: self allSlotNames , slotNameArray.
     "install accessors for each of the slots in the new type"
     slotNameArray doWithIndex: [:slotName :index |
 	type _genericGetterAt: slotName       put: self instVarCount + index.
 	type _genericSetterAt: slotName , ':' put: self instVarCount + index].
-    ^type new.	"may it serve you well"
+    ^type new
+]
+    
+Object withNewSlotNamed: slotName
+[
+    | clone |
+    clone := (self newSubtypeNamed: self debugName asSymbol , #+ , slotName
+		   withSlotNames:   (Array with: slotName)) new.
+    self sizeof println.
+    clone sizeof println.
+    self shallowCopyInto: clone.
+    ^clone
+]
+
+Object shallowCopyInto: anObject
+[
+    | _size |
+    _size := self _sizeof.
+    {printf("%p %p %ld\n", v_anObject, self, (long)v__size); memcpy(v_anObject, self, (long)v__size); }.
 ]
 
 "----------------------------------------------------------------"

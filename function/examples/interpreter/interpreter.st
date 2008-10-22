@@ -4,7 +4,7 @@
 " Demonstrations... "
 
 [
-    | Point aPoint |
+    | Point aPoint MyArray |
 
     Object _interpretedMethodAt: #testInterp0 put: #(push 'Hello, interpreted world!' send1 putln return).
 
@@ -36,10 +36,22 @@
     aPoint r println.
 
     #Fooble bePrototype: #(foo ble).
-
     Point _interpretedMethodAt: #testInterp3 put: #(pushGlobal Fooble return).
-
     Point testInterp3 println.
+
+    MyArray := Array newSubtypeNamed: #MyArray withSlotNames: #( mySlot ).
+    MyArray debugName println.
+    Array   allSlotNames println.
+    MyArray allSlotNames println.
+    MyArray sizeof println.
+    MyArray mySlot: 12345.
+    MyArray mySlot println.
+    MyArray := MyArray withNewSlotNamed: #anotherSlot.
+    MyArray debugName println.
+    MyArray allSlotNames println.
+    MyArray sizeof println.
+    MyArray mySlot println.
+    MyArray anotherSlot println.
 
     Integer _interpretedMethodAt: #nfibs put: #(
 	self push 2 send2 < brf 3
