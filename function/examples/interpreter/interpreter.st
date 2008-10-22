@@ -53,6 +53,9 @@
     MyArray mySlot println.
     MyArray anotherSlot println.
 
+    'OrderedCollection' isPrototype println.
+    'DBJrPage99' isPrototype println.
+
     Integer _interpretedMethodAt: #nfibs put: #(
 	self push 2 send2 < brf 3
 	push 1 return

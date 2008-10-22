@@ -807,6 +807,13 @@ oop _libid_proto2(oop base, size_t size)
   return _sendv(s__delegated_, 2, (base ? base : _object), size);
 }
 
+int _libid_isExported(const char *key)
+{
+  oop name= _selector___intern_(0, _selector, _selector, key);
+  oop assoc= _vtable__findKeyOrNil_(0, _object_Table, _object_Table, name);
+  return !!assoc;
+}
+
 oop _libid_import(const char *key)
 {
   oop name= _selector___intern_(0, _selector, _selector, key);
