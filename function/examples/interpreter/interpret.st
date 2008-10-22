@@ -138,7 +138,7 @@ Object shallowCopyInto: anObject
 [
     | _size |
     _size := self _sizeof.
-    {printf("%p %p %ld\n", v_anObject, self, (long)v__size); memcpy(v_anObject, self, (long)v__size); }.
+    { memcpy(v_anObject, self, (long)v__size); }.
 ]
 
 "----------------------------------------------------------------"
