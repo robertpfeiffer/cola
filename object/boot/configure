@@ -197,6 +197,7 @@ mingw32 () {
     LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
     OBJEXT_SO=${OBJEXT_SO:-".so"}
     SYSOS="win32"
+    GCDIR="gc6.7"
 }
 
 linux () {
@@ -210,6 +211,7 @@ linux () {
     LDFLAGS_SO=${LDFLAGS_SO:-"-shared"}
     OBJEXT_SO=${OBJEXT_SO:-".so"}
     SYSOS="linux"
+    LIBID_K_O="libid_k.o"
     CCFLAGS_K=${CCFLAGS_K:-"-g -Wall -Wreturn-type -Werror -Wno-unused-value -nostdinc -I$IDST/system/include -DEMBEDDED=1 -D_GNU_SOURCE=1 -m32 -fno-strict-aliasing -fno-builtin -fno-stack-limit -fno-stack-protector"}
     LDFLAGS_K=${LDFLAGS_K:-"-nostdlib -Wl,-melf_i386 -Bstatic -N -Wl,-Ttext -Wl,0x100000 -Wl,--eh-frame-hdr -Wl,--hash-style=both"}
 }
@@ -265,6 +267,7 @@ echo "  CCFLAGS_SO = $CCFLAGS_SO"
 echo "  LDFLAGS_SO = $LDFLAGS_SO"
 echo "  LDLIBS_SO  = $LDLIBS_SO"
 echo "  OBJEXT_SO  = $OBJEXT_SO"
+echo "  LIBID_K_O  = $LIBID_K_O"
 echo "  CCFLAGS_K  = $CCFLAGS_K"
 echo "  LDFLAGS_K  = $LDFLAGS_K"
 echo "  GCDIR      = $GCDIR"
@@ -287,6 +290,7 @@ s:@PGFLAGS@:$PGFLAGS:g;
 s:@CCFLAGS@:$CCFLAGS:g;
 s:@CCFLAGS_O@:$CCFLAGS_O:g;
 s:@CCFLAGS_SO@:$CCFLAGS_SO:g;
+s:@LIBID_K_O@:$LIBID_K_O:g;
 s:@CCFLAGS_K@:$CCFLAGS_K:g;
 s:@LDFLAGS@:$LDFLAGS:g;
 s:@LDFLAGS_O@:$LDFLAGS_O:g;

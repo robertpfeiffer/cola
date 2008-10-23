@@ -22,7 +22,9 @@
 #include <assert.h>
 
 #if !defined(NO_GC)
-# define GC_DLL 1
+# if !defined(IN_LIBID)
+#   define GC_DLL 1
+# endif
 # include <gc/gc.h>
 #endif
 
@@ -30,7 +32,7 @@
 # include <malloc.h>
 # include <windows.h>
   typedef HINSTANCE dlhandle_t;
-# if 0 /*----------------------------------------------------------------*/
+# if 1 /*----------------------------------------------------------------*/
 # define RTLD_DEFAULT	0
 # define RTLD_LAZY	0
 # define RTLD_GLOBAL	0

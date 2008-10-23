@@ -1,7 +1,7 @@
 /* cum mortuis in lingua mortua */
 
+#define IN_LIBID 1
 #include <id/id.h>
-
 #include <signal.h>
 
 #define GLOBAL_MCACHE	1024

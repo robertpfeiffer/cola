@@ -5,9 +5,10 @@ GFLAGS = @CFLAGS@ @MFLAGS@ -g           -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@S
 PREFIX = @PREFIX@
 GCDIR  = @GCDIR@
 
+LIBID_K_O = @LIBID_K_O@
 CCFLAGS_K = @CCFLAGS_K@ -I$(BIN)/include -DNDEBUG -DSYSARCH=\"@SYSARCH@\" -DSYSOS=\"@SYSOS@\" -I$(IDST)/system/include
 
-all : $(BIN)./include $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o $(BIN)libid_k.o
+all : $(BIN)./include $(BIN)libid.o $(BIN)libid_p.o $(BIN)libid_g.o $(BIN)$(LIBID_K_O)
 
 $(BIN)./include : 
 	-$(SHELL) -ec 'mkdir $(BIN)./include; \
