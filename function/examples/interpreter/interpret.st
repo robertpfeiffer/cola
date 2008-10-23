@@ -150,7 +150,8 @@ Object shallowCopyInto: anObject
 
 Context run
 [
-    [self perform: (code at: (pc := pc + 1))] whileTrue.	"run until an insn wants to return"
+    ["pc print. $\t put. (code at: pc + 1) println."
+     self perform: (code at: (pc := pc + 1))] whileTrue.	"run until an insn wants to return"
     sp := sp - 1.
     ^self at: sp + 1.
 ]
@@ -202,6 +203,18 @@ Context send2
     sp := sp - 2.
     r := self at: sp + 1.
     a := self at: sp + 2.
+    r := r perform: s with: a.
+    self at: (sp := sp + 1) put: r.
+]
+
+Context send3
+[
+    | s r a |
+    s := code at: (pc := pc + 1).
+    sp := sp - 3.
+    r := self at: sp + 1.
+    a := self at: sp + 2.
+    a := self at: sp + 3.
     r := r perform: s with: a.
     self at: (sp := sp + 1) put: r.
 ]
