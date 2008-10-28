@@ -69,7 +69,7 @@ time : g2st .FORCE
 g2st : g2st.st $(LIBS)
 	$(IDC) $(IDFLAGS) g2st.st $(LIBS) $(IDLIBS) -o $@ $(CLIBS)
 
-LIBSC		= Token.o Parser.o COLAParser.o GrammarParser.o CGrammarGenerator.o
+LIBSC		= Token.o Parser.o COLAParser.o GrammarParser.o CppGrammarGenerator.o
 
 g2c : g2c.st $(LIBSC)
 	$(IDC) $(IDFLAGS) $< $(LIBSC) $(IDLIBS) -o $@ $(CLIBS)

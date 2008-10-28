@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-09-23 14:43:40 by piumarta on emilia.local
+% Last edited: 2008-10-04 13:56:30 by piumarta on emilia.local
 
 GrammarParser : COLAParser ( optionMemo optionDebug optionTrace )
 
@@ -69,7 +69,7 @@ Answer		= RIGHTARROW ( Variable | Value
 Variable 	= Identifier:i					-> `(variable ,i)
 Value		= Block:b					-> `(value ,b)
 Block		= '{' BlockBody $:b '}' Spacing			-> b
-BlockBody	= (!'}' ('{' BlockBody '}' | .))*
+BlockBody	= (!'}' ('{' BlockBody '}' | '\\{' | '\\}' | .))*
 Rewrite		= BACKQUOTE ( Group
 			    | Format
 			    | Element:e				-> `(unigroup ,e)

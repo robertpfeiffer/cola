@@ -336,7 +336,9 @@ _ok_ := ((pos1 := TokenGroup new)
  and: [(self BlockBody :inputStream)
  and: [((inputStream peek == 125) ifTrue: [result := inputStream next. 1])]]])
  or: [(inputStream position: pos3)])
- or: [(inputStream notAtEnd and: [result := inputStream next. 1])])]])
+ or: [(self string: '\134{' :inputStream)
+ or: [(self string: '\134}' :inputStream)
+ or: [(inputStream notAtEnd and: [result := inputStream next. 1])]]])]])
  or: [(inputStream position: pos2)])] whileTrue: [(pos1 add: result)]. (result := pos1)]).
 ^_ok_
 ]
