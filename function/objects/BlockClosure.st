@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-09-02 09:54:30 by piumarta on emilia.local
+  Last edited: 2008-10-30 16:59:28 by piumarta on emilia
 "
 
 { import: Objects }
@@ -130,6 +130,7 @@ StaticBlockClosure printExecutionProfile
 	disableExecutionProfile();
 	printExecutionProfile();
 	clearExecutionProfile();
+	(void)setExecutionProfilePeriod;
     }.
     ^result
 ]
