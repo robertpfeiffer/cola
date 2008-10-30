@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-10 07:54:25 by piumarta on emilia
+  Last edited: 2008-10-29 16:24:43 by piumarta on ubuntu.piumarta.com
 "
 
 { import: Objects }
@@ -152,6 +152,14 @@ LinkedList reverseDo: unaryBlock
 	whileTrue:
 	   [unaryBlock value: link.
 	    link := link prevLink]
+]
+
+LinkedList collect: unaryBlock
+[
+    | list |
+    list := self new.
+    self do: [:elt | list add: (unaryBlock value: elt)].
+    ^list
 ]
 
 LinkedList detect: unaryBlock

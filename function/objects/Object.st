@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-10-22 11:28:20 by piumarta on emilia.local
+  Last edited: 2008-10-29 16:19:50 by piumarta on ubuntu.piumarta.com
 "
 
 { import: Objects }
@@ -96,6 +96,12 @@ UndefinedObject ifTrue: aBlock		[ ^nil ]
 
 Object ifFalse: aBlock			[ ^nil ]
 UndefinedObject ifFalse: aBlock		[ ^aBlock value ]
+
+Object ifTrue: aBlock ifFalse: bBlock		[ ^aBlock value ]
+UndefinedObject ifTrue: aBlock ifFalse: bBlock	[ ^bBlock value ]
+
+Object ifFalse: aBlock ifTrue: bBlock		[ ^bBlock value ]
+UndefinedObject ifFalse: aBlock ifTrue: bBlock	[ ^aBlock value ]
 
 Object abort		{ abort(); }
 Object exit		{ exit(0); }

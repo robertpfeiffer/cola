@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-08-09 12:34:41 by piumarta on emilia
+  Last edited: 2008-10-28 21:58:39 by piumarta on ubuntu.piumarta.com
 "
 
 { import: Objects }
@@ -277,6 +277,13 @@ Float setIntegerValue_: _integer
 {
     double d= (double)(long)v__integer;
     memcpy(self, &d, sizeof(d));
+}
+
+Float _integerValue
+{
+    double d;
+    memcpy(&d, self, sizeof(d));
+    _return ((oop)(long)d);
 }
 
 Float fromString: s
