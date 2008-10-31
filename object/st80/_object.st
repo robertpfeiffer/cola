@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 14:36:16 by piumarta on emilia.local
+  Last edited: 2008-10-31 10:24:20 by piumarta on emilia
 "
 
 { external }
@@ -62,6 +62,7 @@ _object doesNotUnderstand: aSelector
 _object _typeName: _cName doesNotUnderstand: _cSelector
 {
   fprintf(stderr, "%s does not understand '%s'\n", (char *)v__cName, (char *)v__cSelector);
+  fputs(_backtrace(), stderr);
   abort();
 }
 
