@@ -66,4 +66,12 @@
     (Time millisecondsToRun: [23 nfibs println]) println.
     "about 100,000 sends/second on my Q9450, compiled -O -g"
     "about 300,000 sends/second compiled -Op"
+
+    #(hello 'from' 1 block)
+	do: (InterpretedBlockClosure
+		 arity: 1
+		 outer: nil	"choosing correct values for these arguments"
+		 state: nil	"may require a certain amount of care"
+		 self:  nil
+		 code:  #(arg1 send1 println return)).
 ]

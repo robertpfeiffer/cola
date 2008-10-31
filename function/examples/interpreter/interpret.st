@@ -68,6 +68,43 @@ InterpretedMethod := [ Object _methodAt: #interpretedMethod ]
 _vtable interpretedMethodAt: selectorSymbol put: codeArray	[ self methodAt: selectorSymbol put: InterpretedMethod with: codeArray ]
 Object _interpretedMethodAt: selectorSymbol put: codeArray	[ self _vtable interpretedMethodAt: selectorSymbol put: codeArray ]
 
+InterpretedBlockClosure : BlockClosure ( receiver code )
+
+InterpretedBlockClosure receiver	[ ^receiver ]
+InterpretedBlockClosure code		[ ^code ]
+
+" Similarly for interpreted blocks. "
+
+Object interpretedBlock ...
+[
+    | block nArgs args _args |
+    block := stateful_self.
+    nArgs := block arity.
+    nArgs > 0 ifTrue: [
+	args := Array new: nArgs.
+	args at: 0 put: self.
+	_args := args _elements.
+	{
+	    int i, n= (long)v_nArgs >> 1;
+	    for (i= 1;  i < n;  ++i) ((oop *)v__args)[i]= va_arg(ap, oop);
+        }.
+    ].
+    ^(Context withCode: block code receiver: block receiver arguments: args) run.
+]
+
+InterpretedBlock := [ Object _methodAt: #interpretedBlock ]
+
+InterpretedBlockClosure arity: nArgs outer: outerBlock state: stateArray self: me code: codeArray
+[
+    self := self new.
+    _function := InterpretedBlock.
+    _arity    := nArgs _integerValue.
+    outer     := outerBlock.
+    state     := stateArray.
+    receiver  := me.
+    code      := codeArray.
+]
+
 " Some primitives for creating new types and accessing their slots. "
 
 Object genericGetter

@@ -1,12 +1,16 @@
 PROGRAM = interpreter
 
-all : $(PROGRAM) .FORCE
+.SUFFIXES :
+
+all : $(PROGRAM)
 	./$(PROGRAM)
 
 IDC		= ../idc -O
 IDFLAGS		= -g -k -I../../objects -I../../jolt-burg
 IDLIBS		= ../../objects/objects.a ../../jolt-burg/jolt.a ../../jolt-burg/readline.o -lreadline
 LIBS		= interpret.o
+
+$(PROGRAM) : $(PROGRAM).st
 
 % : %.st $(LIBS)
 	$(IDC) $(IDFLAGS) $< $(IDLIBS) $(LIBS) -o $@
