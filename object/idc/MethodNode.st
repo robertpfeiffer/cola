@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-18 12:08:17 by piumarta on emilia.local
+  Last edited: 2008-10-31 10:21:07 by piumarta on emilia
 "
 
 { import: BlockNode }
@@ -139,7 +139,7 @@ MethodNode genInitialisation: gen
 MethodNode println: indent
 [
     self printIndent: indent.
-    ('Method ', type, ' ', selector) print.
+    ('Method ', type printString, ' ', selector) print.
     variadic ifTrue: [' ...' print].
     ' [' println.
     super println: indent + 1.
