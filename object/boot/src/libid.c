@@ -1,39 +1,14 @@
-#include <stdio.h>					/* cum mortuis in lingua mortua */
-#include <stdlib.h>
-#include <stdarg.h>
-#include <signal.h>
-#include <setjmp.h>
-#include <string.h>
-#include <ctype.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <sys/param.h>
-#include <assert.h>
-#if defined(WIN32)
-# include <windows.h>
-  typedef HINSTANCE dlhandle_t;
-# define RTLD_DEFAULT	0
-# define RTLD_LAZY	0
-# define RTLD_GLOBAL	0
-# define RTLD_NOW	0
-  dlhandle_t  dlopen(const char *path, int mode);
-  void	     *dlsym(dlhandle_t handle, const char *symbol);
-  int	      dlclose(dlhandle_t handle);
-#else
-# include <dlfcn.h>
-  typedef void *dlhandle_t;
-#endif
+/* cum mortuis in lingua mortua */
 
-#include "gc/gc.h"
+#define IN_LIBID 1
+#include <id/id.h>
+#include <signal.h>
 
 #define GLOBAL_MCACHE	1024
 #define USE_GC		1
 #define DEBUG_ALL	0
 
-#if EMULATION
+#if defined(NO_GC)
 # undef	 USE_GC
 # define USE_GC		0
 #endif
@@ -44,13 +19,7 @@
 # define dprintf(fmt, args...)
 #endif
 
-typedef struct t__object *oop;
-
 struct __send;
-
-typedef oop (*_imp_t)(struct __send *_send, ...);
-
-#include <id/id.h>
 
 struct __libid	  *_libid_init    (int *argcp, char ***argvp, char ***envp);
 oop  		   _libid_intern  (const char *string);
@@ -478,11 +447,13 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
       snprintf(path, MAXPATHLEN, "%s.so", fileName);
       lib= dlopen(path, ID_RTLD_FLAGS);
       dprintf("3  dlopen %s -> %p\n", path, lib);
+      if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
       if (!lib)
 	{
 	  snprintf(path, MAXPATHLEN, "./%s.so", fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
 	  dprintf("4  dlopen %s -> %p\n", path, lib);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	}
       if (!lib)
 	{
@@ -490,6 +461,7 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	  if (!(prefix= getenv("IDC_LIBDIR"))) prefix= PREFIX;
 	  snprintf(path, MAXPATHLEN, "%s%s.so", prefix, fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	  dprintf("5  dlopen %s -> %p\n", path, lib);
 	}
 #      if defined(WIN32)
@@ -499,12 +471,14 @@ static oop _object___import_(oop _thunk, oop state, oop self, char *fileName, ch
 	  for (p= path;  *p;  ++p)
 	    if ('/' == *p) *p= '\\';
 	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	  dprintf("7  dlopen %s -> %p\n", path, lib);
 	}
       if (!lib)
 	{
 	  snprintf(path, MAXPATHLEN, ".\\%s.so", fileName);
 	  lib= dlopen(path, ID_RTLD_FLAGS);
+	  if (!lib && !access(path, R_OK|X_OK)) fprintf(stderr, "%s: %s\n", path, dlerror());
 	  dprintf("6  dlopen %s -> %p\n", path, lib);
 	}
 #      endif
@@ -686,7 +660,7 @@ struct __closure *_libid_bind(oop selector, oop receiver)
 # if USE_GC
   entry= GC_malloc(sizeof(struct __entry));
 # else
-  entry= malloc(sizeof(struct __entry));	/* lossage */
+  entry= (struct __entry *)malloc(sizeof(struct __entry));	/* lossage */
 # endif
   entry->selector= selector;
   entry->vtable=   vtable;
@@ -724,7 +698,7 @@ struct __lookup _libid_bind2(oop selector, oop receiver)
 #	if USE_GC
 	entry= GC_malloc(sizeof(struct __entry));
 #	else
-	entry= malloc(sizeof(struct __entry));	/* lossage */
+	entry= (struct __entry *)malloc(sizeof(struct __entry));	/* lossage */
 #	endif
 	entry->selector= selector;
 	entry->vtable=   vtable;
@@ -757,7 +731,7 @@ _imp_t _libid_bindv(struct __send *send)
 #endif
   oop assoc= 0;
   oop vtable= receiver ? (((long)receiver & 1) ? _libid_tag_vtable : receiver->_vtable[-1]) : _libid_nil_vtable;
-  dprintf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, receiver);
+  //printf("_libid_bind(%p<%s>, %p\n", selector, selector->selector.elements, receiver);
   if (!vtable) fatal("panic: cannot send '%s' to %s: no vtable", selector->selector.elements, nameOf(receiver));
 
 #if GLOBAL_MCACHE
@@ -796,7 +770,7 @@ _imp_t _libid_bindv(struct __send *send)
 # if USE_GC
   entry= GC_malloc(sizeof(struct __entry));
 # else
-  entry= malloc(sizeof(struct __entry));	/* lossage */
+  entry= (struct __entry *)malloc(sizeof(struct __entry));	/* lossage */
 # endif
   entry->selector= selector;
   entry->vtable=   vtable;
@@ -831,6 +805,13 @@ oop _libid_proto(oop base)
 oop _libid_proto2(oop base, size_t size)
 {
   return _sendv(s__delegated_, 2, (base ? base : _object), size);
+}
+
+int _libid_isExported(const char *key)
+{
+  oop name= _selector___intern_(0, _selector, _selector, key);
+  oop assoc= _vtable__findKeyOrNil_(0, _object_Table, _object_Table, name);
+  return !!assoc;
 }
 
 oop _libid_import(const char *key)
@@ -878,7 +859,7 @@ oop *_libid_palloc(size_t size)
 #if USE_GC
   return GC_malloc(size);
 #else
-  return calloc(1, size);
+  return (oop *)calloc(1, size);
 #endif
 }
 
@@ -965,12 +946,12 @@ void *_libid_enter(struct __methodinfo *info)
       if (positions)
 	{
 	  maxPosition *= 2;
-	  positions= realloc(positions, sizeof(struct position) * maxPosition);
+	  positions= (struct position *)realloc(positions, sizeof(struct position) * maxPosition);
 	}
       else
 	{
 	  maxPosition= 128;
-	  positions= malloc(sizeof(struct position) * maxPosition);
+	  positions= (struct position *)malloc(sizeof(struct position) * maxPosition);
 	}
     }
   p= positions + position;
@@ -1155,6 +1136,7 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
   _libid.import		= _libid_import;
   _libid.export		= _libid_export;
   _libid.param		= _libid_param;
+  _libid.isExported	= _libid_isExported;
 
   _libid.bind		= _libid_bind;
   _libid.bind2		= _libid_bind2;
@@ -1275,4 +1257,4 @@ int dlclose(dlhandle_t handle)
   return 0;
 }
 
-#endif
+#endif /* WIN32 dlopen emulation */
