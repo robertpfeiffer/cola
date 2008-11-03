@@ -3,6 +3,8 @@
 
 " Demonstrations... "
 
+Object testNativeNLR: arg	[ ^(arg do: [:x | x even ifTrue: [^x]]) ]
+
 [
     | Point aPoint MyArray block |
 
@@ -70,23 +72,26 @@
     #(hello 'from' 1 block)
 	do: (InterpretedBlockClosure
 		 arity: 1
-		 outer: nil	"choosing correct values for these arguments"
-		 state: nil	"may require a certain amount of care"
+		 outer: nil	"choosing correct values for"
+		 state: nil	"these arguments may require"
+		 _nlr:  nil	"a certain amount of care"
 		 self:  nil
-		 code:  #(arg1 send1 println return)
-		 nlr:   nil).
+		 code:  #(arg1 send1 println return)).
 
     Object _interpretedMethodAt: #testNLR:nArgs: put: #( arg1 arg2 sblock send1 value pop push 42 return ).
     (Object testNLR: #( push 666   return ) nArgs: 0) println.
     (Object testNLR: #( push 666 nlReturn ) nArgs: 0) println.
 
-    Object _interpretedMethodAt: #testNLR2: put: #( arg1 send1 value pop push 42 return ).
-    Object _interpretedMethodAt: #testNLR0  put: #( self block 0 ( push 666   return ) send2 testNLR2: return ).
-    Object _interpretedMethodAt: #testNLR1  put: #( self block 0 ( push 666 nlReturn ) send2 testNLR2: return ).
+    Object _interpretedMethodAt: #testNLR:  put: #( arg1 send1 value pop push 42 return ).
+    Object _interpretedMethodAt: #testNLR0  put: #( self block 0 ( push 666   return ) send2 testNLR: return ).
+    Object _interpretedMethodAt: #testNLR1  put: #( self block 0 ( push 666 nlReturn ) send2 testNLR: return ).
     Object testNLR0 println.
     Object testNLR1 println.
-"
-    (Object testNLR: (InterpretedBlockClosure arity: 0 outer: nil state: nil self: nil code: #( push 666   return ))) println.
-    (Object testNLR: (InterpretedBlockClosure arity: 0 outer: nil state: nil self: nil code: #( push 666 nlReturn ))) println.
-"
+
+    Number _interpretedMethodAt: #even		      put: #( self push 2 send2 \\ push 0 send2 = return ).
+    Object _interpretedMethodAt: #testInterpretedNLR: put: #( arg1 block 1 ( arg1 send1 even brf 2 arg1 nlReturn push nil return ) send2 do: return ).
+    (Object testNativeNLR:      #(1 3 5 7 9)) println.
+    (Object testInterpretedNLR: #(1 3 5 7 9)) println.
+    (Object testNativeNLR:      #(1 3 4 7 9)) println.
+    (Object testInterpretedNLR: #(1 3 4 7 9)) println.
 ]
