@@ -25,6 +25,7 @@ Context : Array (
     code	"Array of instructions and their inline arguments"
     receiver	"Object that received the message that caused this Context to be activated"
     arguments	"Array of the arguments passed to this method, or nil if came from a unary send"
+    nlr		"Block that returns from the innermost method context's run loop"
 )
 
 Context withCode: codeArray receiver: anObject arguments: argumentArray
@@ -68,10 +69,11 @@ InterpretedMethod := [ Object _methodAt: #interpretedMethod ]
 _vtable interpretedMethodAt: selectorSymbol put: codeArray	[ self methodAt: selectorSymbol put: InterpretedMethod with: codeArray ]
 Object _interpretedMethodAt: selectorSymbol put: codeArray	[ self _vtable interpretedMethodAt: selectorSymbol put: codeArray ]
 
-InterpretedBlockClosure : BlockClosure ( receiver code )
+InterpretedBlockClosure : BlockClosure ( receiver code nlr )
 
 InterpretedBlockClosure receiver	[ ^receiver ]
 InterpretedBlockClosure code		[ ^code ]
+InterpretedBlockClosure nlr		[ ^nlr ]
 
 " Similarly for interpreted blocks. "
 
@@ -89,12 +91,12 @@ Object interpretedBlock ...
 	    for (i= 1;  i < n;  ++i) ((oop *)v__args)[i]= va_arg(ap, oop);
         }.
     ].
-    ^(Context withCode: block code receiver: block receiver arguments: args) run.
+    ^(Context withCode: block code receiver: block receiver arguments: args) run: block nlr.
 ]
 
 InterpretedBlock := [ Object _methodAt: #interpretedBlock ]
 
-InterpretedBlockClosure arity: nArgs outer: outerBlock state: stateArray self: me code: codeArray
+InterpretedBlockClosure arity: nArgs outer: outerBlock state: stateArray self: me code: codeArray nlr: nlrBlock
 [
     self := self new.
     _function := InterpretedBlock.
@@ -103,6 +105,30 @@ InterpretedBlockClosure arity: nArgs outer: outerBlock state: stateArray self: m
     state     := stateArray.
     receiver  := me.
     code      := codeArray.
+    nlr       := nlrBlock.
+]
+
+Context block	"create closure from inline arguments"
+[
+    | nArgs body |
+    nArgs := code at: (pc := pc + 1).
+    body  := code at: (pc := pc + 1).
+    self at: (sp := sp + 1) put: (InterpretedBlockClosure arity: nArgs outer: self state: nil self: receiver code: body nlr: nlr).
+]
+
+Context sblock	"create closure from stack arguments"
+[
+    | nArgs body |
+    sp := sp - 1.
+    nArgs := self at: sp + 1.
+    body  := self at: sp.
+    self at: sp put: (InterpretedBlockClosure arity: nArgs outer: self state: nil self: receiver code: body nlr: nlr).
+]
+
+Context nlReturn
+[
+    sp := sp - 1.
+    nlr value: (self at: sp + 1).
 ]
 
 " Some primitives for creating new types and accessing their slots. "
@@ -187,6 +213,12 @@ Object shallowCopyInto: anObject
 
 Context run
 [
+    ^self run: [:answer | ^answer].
+]
+
+Context run: nlrBlock
+[
+    nlr := nlrBlock.
     ["pc print. $\t put. (code at: pc + 1) println."
      self perform: (code at: (pc := pc + 1))] whileTrue.	"run until an insn wants to return"
     sp := sp - 1.
@@ -201,6 +233,7 @@ Context run
 Context self		[ self at: (sp := sp + 1) put: receiver ]
 Context arg		[ self at: (sp := sp + 1) put: (arguments at: (code at: (pc := pc + 1)) - 1) ]
 Context arg1		[ self at: (sp := sp + 1) put: (arguments at: 0) ]
+Context arg2		[ self at: (sp := sp + 1) put: (arguments at: 1) ]
 Context push		[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) ]
 Context pushGlobal	[ self at: (sp := sp + 1) put: (code at: (pc := pc + 1)) asString asPrototype ]
 Context pop		[ sp := sp - 1 ]

@@ -4,7 +4,7 @@
 " Demonstrations... "
 
 [
-    | Point aPoint MyArray |
+    | Point aPoint MyArray block |
 
     Object _interpretedMethodAt: #testInterp0 put: #(push 'Hello, interpreted world!' send1 putln return).
 
@@ -63,7 +63,7 @@
 	self push 2 send2 - send1 nfibs
 	push 1 send2 + send2 + return).
 
-    (Time millisecondsToRun: [23 nfibs println]) println.
+"    (Time millisecondsToRun: [23 nfibs println]) println."
     "about 100,000 sends/second on my Q9450, compiled -O -g"
     "about 300,000 sends/second compiled -Op"
 
@@ -73,5 +73,20 @@
 		 outer: nil	"choosing correct values for these arguments"
 		 state: nil	"may require a certain amount of care"
 		 self:  nil
-		 code:  #(arg1 send1 println return)).
+		 code:  #(arg1 send1 println return)
+		 nlr:   nil).
+
+    Object _interpretedMethodAt: #testNLR:nArgs: put: #( arg1 arg2 sblock send1 value pop push 42 return ).
+    (Object testNLR: #( push 666   return ) nArgs: 0) println.
+    (Object testNLR: #( push 666 nlReturn ) nArgs: 0) println.
+
+    Object _interpretedMethodAt: #testNLR2: put: #( arg1 send1 value pop push 42 return ).
+    Object _interpretedMethodAt: #testNLR0  put: #( self block 0 ( push 666   return ) send2 testNLR2: return ).
+    Object _interpretedMethodAt: #testNLR1  put: #( self block 0 ( push 666 nlReturn ) send2 testNLR2: return ).
+    Object testNLR0 println.
+    Object testNLR1 println.
+"
+    (Object testNLR: (InterpretedBlockClosure arity: 0 outer: nil state: nil self: nil code: #( push 666   return ))) println.
+    (Object testNLR: (InterpretedBlockClosure arity: 0 outer: nil state: nil self: nil code: #( push 666 nlReturn ))) println.
+"
 ]
