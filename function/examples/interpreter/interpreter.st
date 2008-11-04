@@ -94,4 +94,12 @@ Object testNativeNLR: arg	[ ^(arg do: [:x | x even ifTrue: [^x]]) ]
     (Object testInterpretedNLR: #(1 3 5 7 9)) println.
     (Object testNativeNLR:      #(1 3 4 7 9)) println.
     (Object testInterpretedNLR: #(1 3 4 7 9)) println.
+
+    aPoint _interpretedMethodAt: #unique put: #( push 'I am NOT unique' send1 putln return ).
+    Point new unique.
+    aPoint := Point new.
+    aPoint _vtable: aPoint _vtable delegated.
+    aPoint _interpretedMethodAt: #unique put: #( push 'I am unique!' send1 putln return ).
+    aPoint unique.
+    Point new unique.
 ]
