@@ -20,6 +20,7 @@ FILES		= _object.o Objects.o Object.o \
 		  IdentitySet.o Set.o Association.o Dictionary.o IdentityDictionary.o SlotDictionary.o MemoDictionary.o OrderedCollection.o \
 		  File.o Stream.o Link.o LinkedList.o \
 		  Magnitude.o Number.o OS.o Date.o Function.o Random.o Time.o debug.o deprecated.o \
+		  WorldModel.o MiniSat.o \
 		  $(MPFILES_O)
 
 MPFLAGS_K	= -Impint $(shell $(IDC) -C MFLAGS) $(shell $(IDC) -C O3FLAGS) $(CCFLAGS_K) $(shell $(IDC) -C CCFLAGS_K)
