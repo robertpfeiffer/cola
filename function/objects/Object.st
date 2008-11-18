@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-11-18 11:39:36 by piumarta on emilia.local
+  Last edited: 2008-11-18 12:18:54 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -59,6 +59,8 @@ Object identityHash		{ _return (oop)((long)self >> 3 | 1); }
 
 Object = other			[ ^self == other ]
 Object ~= other			[ ^(self = other) not ]
+Object == other			[ ^self == other ]
+Object ~~ other			[ ^self ~~ other ]
 
 Object _palloc: size		{ _return (oop)_libid->palloc(sizeof(oop) * _I(v_size)); }
 Object _balloc: size		{ _return (oop)_libid->balloc(              _I(v_size)); }
