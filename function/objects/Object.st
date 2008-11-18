@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-10-29 16:19:50 by piumarta on ubuntu.piumarta.com
+  Last edited: 2008-11-18 11:39:36 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -41,6 +41,15 @@ ByteArray size_: _size value_: _value
 ]
 
 Object new			[ | _vt | { v__vt= (oop)self->_vtable[-1]; }.  ^_vt _alloc: self _sizeof ]
+
+Object shallowCopy
+[
+    | copy _size |
+    copy := self new.
+    _size := self _sizeof.
+    { memcpy(v_copy, v_self, (long)v__size); }.
+    ^copy
+]
 
 " Object "
 
