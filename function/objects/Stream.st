@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 18:26:42 by piumarta on emilia
+  Last edited: 2008-11-25 14:32:12 by piumarta on emilia.vpri.org
 "
 
 { import: Objects }
@@ -76,7 +76,7 @@ ReadStream flush
 	    position  := 0]
 ]
 
-ReadStream grow		[ self grow: collection size ]
+ReadStream grow		[ self grow: (collection size max: 2)]
 
 ReadStream grow: count
 [
