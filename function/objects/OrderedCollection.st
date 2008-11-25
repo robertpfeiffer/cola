@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-11-15 15:29:54 by piumarta on emilia.local
+  Last edited: 2008-11-25 14:42:24 by piumarta on emilia.vpri.org
 "
 
 { import: Objects }
@@ -61,10 +61,11 @@ OrderedCollection addLast: anObject
 OrderedCollection makeRoomAtFirst
 [
     | delta newArray |
-    delta := array size.
+    (delta := array size) == 0 ifTrue: [array := array new: (delta := 2)].
     (self size == 0 and: [delta > 0]) ifTrue: [^self resetToEnd].
     (self size * 2 < delta) ifTrue: [^self shiftToEnd].
-    newArray := (array new: self size + delta) replaceFrom: firstIndex + delta to: lastIndex + delta - 1 with: array startingAt: firstIndex.
+    newArray := (array new: (self size + delta max: 2))
+	replaceFrom: firstIndex + delta to: lastIndex + delta - 1 with: array startingAt: firstIndex.
     array := newArray.
     firstIndex := firstIndex + delta.
     lastIndex := lastIndex + delta.
@@ -74,7 +75,7 @@ OrderedCollection makeRoomAtLast
 [
     (self size == 0 and: [array size > 0]) ifTrue: [^self resetToBeginning].
     (self size * 2 < array size) ifTrue: [^self shiftToBeginning].
-    array := (array new: self size + array size)
+    array := (array new: (self size + array size max: 2))
 	replaceFrom: firstIndex to: lastIndex - 1 with: array startingAt: firstIndex;
 	yourself.
 ]
