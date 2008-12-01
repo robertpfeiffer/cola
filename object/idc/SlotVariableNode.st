@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2007-02-21 20:17:36 by piumarta on emilia.lax02.mtt
+  Last edited: 2008-12-01 15:16:54 by piumarta on ubuntu.piumarta.com
 "
 
 "I represent a named field in an object, usually the receiver within a method
@@ -76,10 +76,10 @@ SlotVariableNode generateStore: gen location: location
 
 SlotVariableNode generate: gen freeIn: innerLevel location: location
 [
-    ^gen loadFreeSlot: name type: type name scope: scope tag outer: innerLevel - scope level offset: receiver offset location: location
+    ^gen loadFreeSlot: name type: type name scope: scope tag outer: innerLevel - scope level offset: receiver tied offset location: location
 ]
 
 SlotVariableNode generateStore: gen freeIn: innerLevel location: location
 [
-    ^gen storeFreeSlot: name type: type name scope: scope tag outer: innerLevel - scope level offset: receiver offset location: location
+    ^gen storeFreeSlot: name type: type name scope: scope tag outer: innerLevel - scope level offset: receiver tied offset location: location
 ]

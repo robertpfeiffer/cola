@@ -14,7 +14,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-10-31 10:21:07 by piumarta on emilia
+  Last edited: 2008-12-01 15:15:01 by piumarta on ubuntu.piumarta.com
 "
 
 { import: BlockNode }
@@ -69,7 +69,7 @@ MethodNode encode: encoder
     temporaries := temporaries collect: [:tmp | encoder declareTemporary: tmp position: position].
     "variadic ifTrue: [temporaries addLast: (encoder declareVararg: 'nextArgument' position: position)]."
     arguments second tied: arguments first.	"<--------"
-    type slots do: [:slot | encoder declareSlot: slot position: position type: type receiver: arguments first].	"<--------"
+    type slots do: [:slot | encoder declareSlot: slot position: position type: type receiver: arguments second].	"<--------"
     "implicit ^self"
     (statements isEmpty or: [statements last isReturnNode not])
 	ifTrue: [statements add: (ReturnNode withValue: (VariableNode withName: 'self' position: position) position: position)].
@@ -139,7 +139,7 @@ MethodNode genInitialisation: gen
 MethodNode println: indent
 [
     self printIndent: indent.
-    ('Method ', type printString, ' ', selector) print.
+    ('Method ', type, ' ', selector) print.
     variadic ifTrue: [' ...' print].
     ' [' println.
     super println: indent + 1.
