@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-09-20 10:19:06 by piumarta on emilia
+  Last edited: 2008-12-09 17:36:08 by piumarta on emilia.vpri.org
 "
 
 { import: Object }
@@ -276,6 +276,12 @@ SequenceableCollection with: aCollection doWithIndex: elementsIndexBlock
 [
     self size == aCollection size ifFalse: [self error: 'collection sizes differ'].
     0 to: self size - 1 do: [:offset | elementsIndexBlock value: (self at: offset) value: (aCollection at: offset) value: offset].
+]
+
+SequenceableCollection from: first to: last with: aCollection doWithIndex: elementsIndexBlock
+[
+    self size == aCollection size ifFalse: [self error: 'collection sizes differ'].
+    first to: last do: [:offset | elementsIndexBlock value: (self at: offset) value: (aCollection at: offset) value: offset].
 ]
 
 SequenceableCollection with: aCollection replace: elementsBlock
