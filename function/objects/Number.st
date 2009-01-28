@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-10-28 21:58:39 by piumarta on ubuntu.piumarta.com
+  Last edited: 2008-12-09 19:26:03 by piumarta on emilia.vpri.org
 "
 
 { import: Objects }
@@ -965,3 +965,7 @@ Integer to: limit doWithIndex: binaryBlock
     i := -1.
     self to: limit do: [:j | binaryBlock value: j value: (i := i + 1)]
 ]
+
+Integer isNan		[ ^false ]
+Number  isZero		[ ^self = 0 ]
+Integer isInfinity	[ ^false ]
