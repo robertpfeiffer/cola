@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-11-18 12:18:54 by piumarta on emilia.local
+  Last edited: 2009-01-28 09:41:30 by piumarta on emilia
 "
 
 { import: Objects }
@@ -80,9 +80,20 @@ Object isNil			[ ^false ]
 UndefinedObject notNil		[ ^false ]
 Object notNil			[ ^true ]
 
+UndefinedObject | nilOrObject   [ ^nilOrObject ]
+Object		| nilOrObject   [ ^true ]
+
+UndefinedObject & nilOrObject   [ ^true ]
+Object		& nilOrObject   [ ^nilOrObject ]
+
+UndefinedObject == other	[ ^self == other "inlined" ]
+Object		== other	[ ^self == other "inlined" ]
+
 _vtable isKindOf:   family	[ ^self == family or: [delegate ~~ nil and: [delegate isKindOf: family]] ]
 Object  isKindOf:   family	[ ^self _vtable isKindOf: family _vtable ]
 Object  isMemberOf: family	[ ^self _vtable == family _vtable ]
+
+Object respondsTo: aSelector	[ ^self _vtable lookup: aSelector ]
 
 Object debugName			[ ^String value_: self _debugName ]
 Object printOn: aStream			[ ^aStream nextPutAll: self debugName ]
@@ -101,6 +112,9 @@ UndefinedObject ifNil: nilBlock		[ ^nilBlock value ]
 
 Object ifNotNil: notNilBlock		[ ^notNilBlock value ]
 UndefinedObject ifNotNil: notNilBlock	[ ^nil ]
+
+Object		ifNil: nilBlock    ifNotNil: notNilBlock [ ^notNilBlock value ]
+UndefinedObject ifNil: notNilBlock ifNotNil: nilBlock	 [ ^nilBlock value ]
 
 Object ifTrue: aBlock			[ ^aBlock value ]
 UndefinedObject ifTrue: aBlock		[ ^nil ]
