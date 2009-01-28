@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-11-25 14:42:24 by piumarta on emilia.vpri.org
+  Last edited: 2009-01-28 09:55:35 by piumarta on emilia
 "
 
 { import: Objects }
@@ -191,4 +191,9 @@ OrderedCollection do: unaryBlock
 	whileTrue:
 	   [unaryBlock value: (array at: index).
 	    index := index + 1]
+]
+
+OrderedCollection asOrderedCollection
+[
+    ^self
 ]

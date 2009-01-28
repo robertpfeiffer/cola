@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-10-29 16:24:43 by piumarta on ubuntu.piumarta.com
+  Last edited: 2009-01-28 09:53:01 by piumarta on emilia
 "
 
 { import: Objects }
@@ -162,6 +162,14 @@ LinkedList collect: unaryBlock
     ^list
 ]
 
+LinkedList select: unaryBlock
+[
+    | list |
+    list := self new.
+    self do: [:elt | (unaryBlock value: elt) ifTrue: [list add: elt]].
+    ^list
+]
+
 LinkedList detect: unaryBlock
 [
     | link |
@@ -207,3 +215,14 @@ Link upTo: bLink inject: answer into: binaryBlock
 
 LinkedList isEmpty	[ ^firstLink isNil ]
 LinkedList notEmpty	[ ^firstLink ]
+
+LinkedList at: index
+[
+    | link |
+    index >= 0
+	ifTrue:
+	   [link := firstLink.
+	    [link and: [(index := index - 1) > 0]] whileTrue: [link := link nextLink].
+	    ^link].
+    ^super at: index
+]
