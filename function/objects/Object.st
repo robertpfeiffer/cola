@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-01-28 09:41:30 by piumarta on emilia
+  Last edited: 2009-01-28 13:40:32 by piumarta on emilia
 "
 
 { import: Objects }
@@ -85,9 +85,6 @@ Object		| nilOrObject   [ ^true ]
 
 UndefinedObject & nilOrObject   [ ^true ]
 Object		& nilOrObject   [ ^nilOrObject ]
-
-UndefinedObject == other	[ ^self == other "inlined" ]
-Object		== other	[ ^self == other "inlined" ]
 
 _vtable isKindOf:   family	[ ^self == family or: [delegate ~~ nil and: [delegate isKindOf: family]] ]
 Object  isKindOf:   family	[ ^self _vtable isKindOf: family _vtable ]
