@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-12-09 17:36:08 by piumarta on emilia.vpri.org
+  Last edited: 2009-01-28 09:54:49 by piumarta on emilia
 "
 
 { import: Object }
@@ -174,6 +174,14 @@ SequenceableCollection collect: elementBlock as: resultType
     result := resultType new: self size.
     self doWithIndex: [:e :i | result at: i put: (elementBlock value: e)].
     ^result
+]
+
+SequenceableCollection select: selBlock
+[
+    | stream |
+    stream := WriteStream on: (self new: self size).
+    self do: [:element | (selBlock value: element) ifTrue: [stream nextPut: element]].
+    ^stream contents
 ]
 
 SequenceableCollection from: firstIndex collect: elementBlock
@@ -396,3 +404,10 @@ SequenceableCollection uppercased
     ^self collect: [:c | c uppercased]
 ]
 
+SequenceableCollection asOrderedCollection
+[
+    | oc |
+    oc := OrderedCollection new.
+    self do: [:elt | oc addLast: elt].
+    ^oc
+]
