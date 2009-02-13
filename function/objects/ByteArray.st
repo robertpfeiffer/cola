@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-10-22 14:56:41 by piumarta on emilia.local
+  Last edited: 2009-02-13 14:53:09 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -68,6 +68,29 @@ ByteArray at: offset put: anInteger
 ByteArray at_: _offset put_: _integer
 {
     ((char *)self->v__bytes)[(long)v__offset]= (long)v__integer;
+}
+
+ByteArray s16at: offset put: anInteger
+[
+    {
+	int size= (long)self->v_size >> 1;
+	int offset= (long)v_offset >> 1;
+	int anInteger= (long)v_anInteger >> 1;
+	if (((long)v_offset & (long)v_anInteger & 1) && 0 <= offset && offset * 2 + 1 < size && -32768 <= anInteger && anInteger < 32768)
+	{
+	    ((short *)self->v__bytes)[offset]= anInteger;
+	    return v_anInteger;
+	}
+    }.
+    (0 <= offset and: [offset * 2 + 1 < size and: [-32768 <= anInteger and: [anInteger < 32768]]])
+	ifTrue:  [self s16at_: offset _integerValue put_: anInteger _integerValue]
+	ifFalse: [self errorOutOfBounds: offset].
+    ^anInteger.
+]
+
+ByteArray s16at_: _offset put_: _integer
+{
+    ((short *)self->v__bytes)[(long)v__offset]= (long)v__integer;
 }
 
 ByteArray replaceFrom: firstIndex to: lastIndex with: aCollection startingAt: startIndex
