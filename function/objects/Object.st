@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-01-28 13:40:32 by piumarta on emilia
+  Last edited: 2009-02-18 04:07:53 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -110,8 +110,8 @@ UndefinedObject ifNil: nilBlock		[ ^nilBlock value ]
 Object ifNotNil: notNilBlock		[ ^notNilBlock value ]
 UndefinedObject ifNotNil: notNilBlock	[ ^nil ]
 
-Object		ifNil: nilBlock    ifNotNil: notNilBlock [ ^notNilBlock value ]
-UndefinedObject ifNil: notNilBlock ifNotNil: nilBlock	 [ ^nilBlock value ]
+Object		ifNil: nilBlock ifNotNil: notNilBlock	[ ^notNilBlock value ]
+UndefinedObject ifNil: nilBlock ifNotNil: notNilBlock	[ ^nilBlock value ]
 
 Object ifTrue: aBlock			[ ^aBlock value ]
 UndefinedObject ifTrue: aBlock		[ ^nil ]
