@@ -14,10 +14,10 @@ else
 CLIBS		= 
 endif
 
-CFLAGS		= -g -Wall -I../../../object
+CFLAGS		= -g -Wall -I../../../object/stage2/include
 
 callin : $(LIBS) callin.o
-	gcc -o $@ $(LIBS) callin.o -lgc ../../../object/stage2/libid_g.o $(OBJECTS)/*.o
+	gcc -o $@ $(LIBS) callin.o ../../../object/stage2/libid_g.o ../../../object/stage2/gc.a $(OBJECTS)/*.o
 
 
 run : callin
