@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-02-18 04:07:53 by piumarta on emilia.local
+  Last edited: 2009-02-25 11:49:18 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -229,6 +229,7 @@ Object errorKeyNotFound: aKey
 [ StdErr := File	withFd: 2 name: '<stderr>' ]
 
 Object print		[ StdOut print: self ]
+Object printsp		[ StdOut print: self; space ]
 Object println		[ StdOut print: self; cr ]
 SmallInteger put	[ StdOut nextPut: self ]
 SmallInteger putln	[ StdOut nextPut: self; cr ]
