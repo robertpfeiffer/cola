@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-08-09 07:29:17 by piumarta on emilia
+% Last edited: 2009-03-02 17:20:18 by piumarta on emilia.local
 
 COLAParser : Parser ()
 
@@ -60,6 +60,11 @@ Identifier	 	= IdentifierName :i Spacing				-> i
 IdentifierName	 	= ( IdentifierCharacter IdentifierRest* )$ :i		-> `,#i
 IdentifierCharacter 	= [a-zA-Z_]
 IdentifierRest	 	= IdentifierCharacter | [0-9]
+
+% DecimalIntegers are sequences of DecimalDigits
+
+DecimalDigit	 	= [0-9]
+DecimalInteger	 	= DecimalDigit+ $:n					-> `,=n
 
 % Common punctuation characters and sequences.
 

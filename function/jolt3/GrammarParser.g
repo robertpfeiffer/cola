@@ -15,7 +15,7 @@
 % 
 % THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 % 
-% Last edited: 2008-10-04 13:56:30 by piumarta on emilia.local
+% Last edited: 2009-03-02 18:00:26 by piumarta on emilia.local
 
 GrammarParser : COLAParser ( optionMemo optionDebug optionTrace )
 
@@ -98,6 +98,7 @@ Argument	= Application:a					-> `(result ,a)
 		| Identifier:x					-> `(argvar ,x)
 		| '#' Identifier:x				-> `(argsym ,x)
 		| SingleString:s				-> `(arglit ,s)
+		| DecimalInteger:n				-> `(arglit ,n)
 
 Literal 	= ( SingleString | DoubleString ) :s		-> `(string ,s)
 Class 		= '[' (!']' Range)* $:c ']' Spacing		-> `(class  ,$c)

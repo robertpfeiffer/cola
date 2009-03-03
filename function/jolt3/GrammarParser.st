@@ -525,7 +525,7 @@ _ok_ := (((pos1 := inputStream position)
 ]
 GrammarParser Argument :inputStream
 [
-| a x s _ok_ pos1 |
+| a x s n _ok_ pos1 |
 _ok_ := ((((pos1 := inputStream position)
  and: [((self Application :inputStream)
  and: [a := result. 1])
@@ -546,7 +546,12 @@ _ok_ := ((((pos1 := inputStream position)
  and: [((self SingleString :inputStream)
  and: [s := result. 1])
  and: [((result := TokenGroup new) add: #arglit; add: s)]])
- or: [(inputStream position: pos1)])]]]).
+ or: [(inputStream position: pos1)])
+ or: [(((pos1 := inputStream position)
+ and: [((self DecimalInteger :inputStream)
+ and: [n := result. 1])
+ and: [((result := TokenGroup new) add: #arglit; add: n)]])
+ or: [(inputStream position: pos1)])]]]]).
 ^_ok_
 ]
 GrammarParser Literal :inputStream

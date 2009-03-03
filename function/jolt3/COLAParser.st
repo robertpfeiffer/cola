@@ -205,6 +205,25 @@ _ok_ := ((self IdentifierCharacter :inputStream)
  or: [(self class: #[0 0 0 0 0 0 255 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] :inputStream)]).
 ^_ok_
 ]
+COLAParser DecimalDigit :inputStream
+[
+| _ok_ pos1 |
+_ok_ := (self class: #[0 0 0 0 0 0 255 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0] :inputStream).
+^_ok_
+]
+COLAParser DecimalInteger :inputStream
+[
+| n _ok_ pos1 pos2 pos3 |
+_ok_ := (((pos1 := inputStream position)
+ and: [((((pos2 := inputStream position)
+ and: [((pos3 := TokenGroup new)
+ and: [(((self DecimalDigit :inputStream)) ifTrue: [(pos3 add: result). 1])
+ and: [[(self DecimalDigit :inputStream)] whileTrue: [(pos3 add: result)]. (result := pos3). 1]])]) ifTrue: [result := (pos2 text: inputStream position)])
+ and: [n := result. 1])
+ and: [(result := ((TokenGroup new) add: (Integer fromString: n)) first)]])
+ or: [(inputStream position: pos1)]).
+^_ok_
+]
 COLAParser EQUAL :inputStream
 [
 | _ok_ pos1 |
