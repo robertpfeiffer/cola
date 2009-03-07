@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-02-13 14:53:09 by piumarta on emilia.local
+  Last edited: 2009-03-05 19:06:07 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -50,6 +50,7 @@ ByteArray _at_: _offset
 
 ByteArray at: offset put: anInteger
 [
+    | ok |
     {
 	int offset= (long)v_offset >> 1;
 	int anInteger= (long)v_anInteger >> 1;
@@ -59,9 +60,9 @@ ByteArray at: offset put: anInteger
 	    return v_anInteger;
 	}
     }.
-    (0 <= offset and: [offset < size and: [0 <= anInteger and: [anInteger < 256]]])
+    ((ok := 0 <= offset and: [offset < size]) and: [0 <= anInteger and: [anInteger < 256]])
 	ifTrue:  [self at_: offset _integerValue put_: anInteger _integerValue]
-	ifFalse: [self errorOutOfBounds: offset].
+	ifFalse: [ok ifTrue: [self errorImproperStore: anInteger] ifFalse: [self errorOutOfBounds: offset]].
     ^anInteger.
 ]
 
