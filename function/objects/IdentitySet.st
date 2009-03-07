@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-08-01 10:16:50 by piumarta on emilia
+  Last edited: 2009-03-05 13:14:47 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -41,8 +41,6 @@ IdentitySet new: width
 
 IdentitySet size	[ ^tally ]
 
-IdSetDebug := [ 0 ]
-
 IdentitySet add: anObject
 [
     | listOffset list |
@@ -62,11 +60,9 @@ IdentitySet add: anObject
 		^list at: offset put: anObject].
 	(self compare: elt with: anObject)
 	    ifTrue: [^elt]].
-    (IdSetDebug := IdSetDebug + 1) = 20 ifTrue: [self error: 'recursion'].
     self
 	grow: list at: listOffset;
 	add: anObject.
-    IdSetDebug := IdSetDebug - 1.
     ^anObject
 ]
 
@@ -86,6 +82,7 @@ IdentitySet remove: anObject ifAbsent: errorBlock
 	    ifTrue:
 	       [offset to: listOffset - 1 do: [:index | list at: index put: (list at: index + 1)].
 		list at: listOffset put: nil.
+		tally := tally - 1.
 		^anObject]].
     ^errorBlock value
 ]
