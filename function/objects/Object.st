@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-02-25 11:49:18 by piumarta on emilia.local
+  Last edited: 2009-03-05 19:06:50 by piumarta on emilia.local
 "
 
 { import: Objects }
@@ -177,6 +177,17 @@ Object errorOutOfBounds: anIndex
     StdErr backtrace.
     StdErr cr;
 	print: anIndex; nextPutAll: ' is out of bounds in ';
+	nextPutAll: self debugName; nextPut: $(; print: self size; nextPut: $);
+	cr.
+    { exit(1); }.
+]
+
+Object errorImproperStore: aValue
+[
+    StdErr cr.
+    StdErr backtrace.
+    StdErr cr;
+	print: aValue; nextPutAll: ' cannot be stored in ';
 	nextPutAll: self debugName; nextPut: $(; print: self size; nextPut: $);
 	cr.
     { exit(1); }.
