@@ -1063,57 +1063,15 @@ TextEditor loadBMP: text as: name
     dot container layoutChanged.
 ]
 
-PostScriptStream : WriteStream ( currentFont savedStates )
+"----------------"
 
-PostScriptStream on: aCollection
-[
-    self := super on: aCollection.
-    self nextPutAll: '/BOD { 36 756 translate 0 0 moveto } def\n'.
-    self nextPutAll: '/EOD { 4 string cvs dup stringwidth pop initgraphics 2 div neg 306 add 36 moveto show showpage } def\n'.
-    self nextPutAll: '/EOP { EOD BOD } def\n'.
-    self nextPutAll: '/readstring { currentfile exch readhexstring pop } bind def\n'.
-    savedStates := OrderedCollection new.
-]
-
-PostScriptStream saveState
-[
-    self nextPutAll: 'save'; cr.
-    savedStates addLast: currentFont.
-]
-
-PostScriptStream restoreState
-[
-    self nextPutAll: 'restore'; cr.
-    currentFont := savedStates removeLast.
-]
-
-PostScriptStream origin: aPoint
-[
-    self print: aPoint x; space; print: aPoint y negated; space; nextPutAll: 'translate 0 0 moveto'; cr
-]
-
-PostScriptStream ensureFont: aFont
-[
-    currentFont == aFont ifTrue: [^self].
-    self nextPut: $/; nextPutAll: aFont name.
-    aFont isPlain	ifTrue: [self nextPutAll: '-Roman'].
-    aFont isBold	ifTrue: [self nextPutAll: '-Bold'].
-    aFont isItalic	ifTrue: [self nextPutAll: '-Italic'].
-    self nextPutAll: ' findfont '; print: aFont pointSize; nextPutAll: ' scalefont setfont'; cr.
-    currentFont := aFont.
-]
-
-PostScriptStream eject
-[
-    self nextPutAll: 'showpage'; cr.
-]
+{ import: PostScriptStream }
 
 TextEditor print: text as: name
 [
     | stream |
     stream := PostScriptStream on: (String new: 1024).
     text do: [:box | box printTextOn: stream].
-    stream eject.
     name := name asString.
     (name endsWith: '.ps') ifFalse: [name := name , '.ps'].
     (File create: name) write: stream contents; close.
@@ -1123,17 +1081,17 @@ SBox printTextOn: aStream
 [
     | p y |
     y := 0.
-    p := 0.
-    aStream nextPutAll: 'BOD\n'.
+    aStream beginDocument; beginPage: (p := 1).
     self do: [:box |
 	box layOutIn: self.
 	y := y + (box printTextLineOn: aStream).
 	(box nextLink and: [y + box nextLink totalHeight > 684])
 	    ifTrue:
-	       [aStream print: (p := p + 1); nextPutAll: ' EOP\n'.
+	       [aStream endPage: p.
 		StdOut nextPutAll: 'PAGE '; print: p; cr.
+		aStream beginPage: (p := p + 1).
 		y := 0]].
-    aStream print: (p := p + 1); nextPutAll: ' EOD\n'.
+    aStream endPage: p; endDocument.
     StdOut nextPutAll: 'PAGE '; print: p; cr.
 ]
 
@@ -1151,60 +1109,19 @@ Box printTextLineOn: aStream
 Box printTextElementOn: aStream
 [
     (prevLink not or: [prevLink isGlue or: [prevLink isTab or: [prevLink isGraphic]]])
-	ifTrue: [aStream print: origin x; space; print: 0; nextPutAll: ' moveto '].
+	ifTrue: [aStream moveToX: origin x].
     width > 0 ifTrue: [surface printTextElementOn: aStream].
 ]
+
+Surface printTextElementOn: aStream	[ aStream nextPutSurface: self ]
 
 Glyph printTextElementOn: aStream
 [
     (unicode between: 32 and: 126) ifFalse: [^nil].
-    aStream ensureFont: font.
-    (unicode == $( or: [unicode == $) or: [unicode == $\\]])
-	ifTrue:  [aStream nextPutAll: '(\\'; nextPut: unicode; nextPutAll: ') show'; cr]
-	ifFalse: [aStream nextPutAll: '('; nextPut: unicode; nextPutAll: ') show'; cr].
+    aStream ensureFont: font; nextPutUnicode: unicode.
 ]
 
-Surface oldPrintTextElementOn: aStream
-[
-    | w h |
-    w := self width.
-    h := self height.
-    aStream
-	nextPutAll: 'save ';
-	print: w; space; print: h; nextPutAll: ' scale ';
-	print: w; space; print: h; nextPutAll: ' 8 [ ';
-	print: w; nextPutAll: ' 0 0 '; print: h negated; nextPutAll: ' 0 '; print: h; nextPutAll: ']'; cr;
-	nextPutAll: '{<'; cr.
-    0 to: h - 1 do: [:y |
-	0 to: w - 1 do: [:x | aStream nextPutPixel: (self at: x at: y)].
-	aStream cr].
-    aStream
-	nextPutAll: '>}'; cr;
-	nextPutAll: 'false 3 colorimage restore'; cr.
-]
-
-Surface printTextElementOn: aStream
-[
-    | w h |
-    w := self width.
-    h := self height.
-    aStream
-	nextPutAll: 'save\n';
-	nextPutAll: '/rpicstr '; print: w; nextPutAll: ' string def\n';
-	nextPutAll: '/gpicstr '; print: w; nextPutAll: ' string def\n';
-	nextPutAll: '/bpicstr '; print: w; nextPutAll: ' string def\n';
-	print: w; space; print: h; nextPutAll: ' scale ';
-	print: w; space; print: h; nextPutAll: ' 8 [ ';
-	print: w; nextPutAll: ' 0 0 '; print: h negated; nextPutAll: ' 0 '; print: h; nextPutAll: ']'; cr;
-	nextPutAll: '{ rpicstr readstring } { gpicstr readstring } { bpicstr readstring } true 3 colorimage\n'.
-    0 to: h - 1 do: [:y |
-	0 to: w - 1 do: [:x | aStream nextPutHex8: (self redAt:   x at: y)].  aStream cr.
-	0 to: w - 1 do: [:x | aStream nextPutHex8: (self greenAt: x at: y)].  aStream cr.
-	0 to: w - 1 do: [:x | aStream nextPutHex8: (self blueAt:  x at: y)].  aStream cr].
-    aStream nextPutAll: 'restore\n'.
-]
-
-PostScriptStream nextPutHex8: anInteger	[ anInteger printOn: self base: 16 width: 2 padded: $0 ]
+"----------------"
 
 Box asString
 [
