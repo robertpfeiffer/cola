@@ -6,8 +6,15 @@ ifeq ($(shell uname),Darwin)
   CFLAGS := -I/usr/local/include/SDL
   IDLIBS := -Wc,-framework -Wc,SDL -Wc,-framework -Wc,SDL_ttf -lSDLmain -Wc,-framework -Wc,Cocoa ../../objects/objects.a
 else
-  IDLIBS := -lSDL_ttf -lSDL ../../objects/objects.a
+  ifeq ($(findstring MINGW, $(shell uname)),MINGW)
+    IDC_FLAGS := -J /usr/local/include
+    IDLIBS := -L/usr/local/lib -lmingw32 -lSDL -lSDLmain SDL_ttf.dll ../../objects/objects.a -w
+ else
+    IDLIBS := -lSDL_ttf -lSDL ../../objects/objects.a
+  endif
 endif
+
+
 
 FT2LIBS := -lSDL_ttf -lfreetype
 
