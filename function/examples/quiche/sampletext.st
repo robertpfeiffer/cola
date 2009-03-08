@@ -102,4 +102,5 @@ Control P = move to previous line
 • only PostScript printing (in Times font) is supported (HTML should be supported too)
 • there is no way to preview the pagination (or page numbers) that appear when printing
 • there is no support for indexing, section numbering, hanging indentation, etc.
+• no embedded PostScript fonts (only unicode characters in the standard PS fonts will print)
 ']
