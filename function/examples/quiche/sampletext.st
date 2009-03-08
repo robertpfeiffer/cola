@@ -92,7 +92,6 @@ Control P = move to previous line
 • paragraphs that end with a space have layout issues
 • shift + any movement key should extend the selection
 • tab should tabulate in columns instead of inserting an unbreakable quad
-• unicode characters outside the Latin-1 range do not print
 • new text is always inserted in the default font (Times-Roman 14)
 • there is no way to insert text from a file into the current document (only replace)
 • there is no way to clear the current document

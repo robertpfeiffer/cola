@@ -1,3 +1,23 @@
+" main.st -- Quick User Interface Clumsily Hacked for Editing
+
+  Copyright (c) 2009 Ian Piumarta
+  All rights reserved.
+
+  Permission is hereby granted, free of charge, to any person obtaining a
+  copy of this software and associated documentation files (the 'Software'),
+  to deal in the Software without restriction, including without limitation
+  the rights to use, copy, modify, merge, publish, distribute, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, provided that the above copyright notice(s) and this
+  permission notice appear in all copies of the Software and that both the
+  above copyright notice(s) and this permission notice appear in supporting
+  documentation.
+
+  THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
+
+  Last edited: 2009-03-07 20:16:50 by piumarta on emilia
+"
+
 { import: Object }
 { import: Surface }
 { import: Colour }
@@ -1117,7 +1137,6 @@ Surface printTextElementOn: aStream	[ aStream nextPutSurface: self ]
 
 Glyph printTextElementOn: aStream
 [
-    (unicode between: 32 and: 126) ifFalse: [^nil].
     aStream ensureFont: font; nextPutUnicode: unicode.
 ]
 
@@ -1325,6 +1344,7 @@ Box hLine	[ self addLast: (Box new height: 1; backgroundColour: ColourWhite) ]
 		      addLast: ((name := 'file name' asText) beEditable: frame));
 	addLast: (Box new vBox width: 1; moveTo: 4, 26;
 		      addLast: (' load '   asText beButton: [editor := editor load: text as: name]);
+		      smallSep;
 		      addLast: (' save '   asText beButton: [editor save: text as: name]);
 		      smallSep;
 		      addLast: (' image '  asText beButton: [editor loadBMP: text as: name]);
