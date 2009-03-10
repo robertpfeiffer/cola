@@ -15,7 +15,7 @@
  * 
  * THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
  * 
- * Last edited: 2008-06-13 10:35:40 by piumarta on emilia
+ * Last edited: 2009-03-09 21:36:47 by piumarta on emilia
  */
 
 #include <stdio.h>
@@ -30,8 +30,12 @@
 #define abs(N)		(((N) < 0) ? -(N) : (N))
 #define sgn(N)		(((N) < 0) ? -1 : ((N) > 0 ? 1 : 0))
 #define swap(T, A, B)	do { T tmp= A;  A= B;  B= tmp; } while (0)
-#define min(A, B)	(((A) < (B) ? (A) : (B)))
-#define max(A, B)	(((A) > (B) ? (A) : (B)))
+#if !defined(min)
+# define min(A, B)	(((A) < (B) ? (A) : (B)))
+#endif
+#if !defined(max)
+# define max(A, B)	(((A) > (B) ? (A) : (B)))
+#endif
 #define clamp(A, X, B)	min(max(A, X), B)
 
 #define CLIPX0(S)	((S)->clip_rect.x)
