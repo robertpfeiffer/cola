@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-07 20:20:53 by piumarta on emilia
+  Last edited: 2009-03-10 07:44:34 by piumarta on emilia
 "
 
 { import: Surface }
@@ -83,6 +83,7 @@ Glyph height	[ ^font ascent ]
 Glyph depth	[ ^font descent ]
 Glyph lineSkip	[ ^font lineSkip ]
 Glyph style	[ ^font style ]
+Glyph pointSize	[ ^font pointSize ]
 
 Glyph newWithFont: aFont index: glyphIndex
 [
@@ -116,6 +117,7 @@ Glyph newWithFont: aFont index: glyphIndex
 ]
 
 Glyph withSize: aSize		[ ^(font face withSize: aSize) glyphAt: unicode ]
+Glyph withFamily: aFamily	[ ^(((Family withName: aFamily) withStyle: self style) withSize: self pointSize) glyphAt: unicode ]
 Glyph withFace: aFace		[ ^(aFace withSize: font pointSize) glyphAt: unicode ]
 Glyph withFont: aFont		[ ^aFont glyphAt: unicode ]
 Glyph withStyle: styleMask	[ ^self withFont: (font withStyle: styleMask) ]
@@ -259,6 +261,23 @@ Font isPlain		[ ^face isPlain ]
 Font isBold		[ ^face isBold ]
 Font isItalic		[ ^face isItalic ]
 
+TrueTypeFontMap := [
+    IdentityDictionary new
+	at: #'Times'		put: 'Times';
+	at: #'Times-B'		put: 'Times-Bold';
+	at: #'Times-S'		put: 'Times-Italic';
+	at: #'Times-BS'		put: 'Times-BoldItalic';
+	at: #'Helvetica'	put: 'Helvetica';
+	at: #'Helvetica-B'	put: 'Helvetica-Bold';
+	at: #'Helvetica-S'	put: 'Helvetica-Oblique';
+	at: #'Helvetica-BS'	put: 'Helvetica-BoldOblique';
+  	at: #'Courier'		put: 'Courier';
+	at: #'Courier-B'	put: 'Courier-Bold';
+	at: #'Courier-S'	put: 'Courier-Oblique';
+	at: #'Courier-BS'	put: 'Courier-BoldOblique';
+	yourself
+]
+
 Font newWithFace: typeFace size: size
 [
     | name style _name _size _style |
@@ -268,9 +287,14 @@ Font newWithFace: typeFace size: size
     name   := face family name.
     style  := face style.	"underline | slanted | bold"
     style == 0 ifFalse: [name := name , '-'].
-    (style bitAnd: 1) ~~ 0 ifTrue: [name := name , 'Bold'].
-    (style bitAnd: 2) ~~ 0 ifTrue: [name := name , 'Italic'].
-    (style bitAnd: 4) ~~ 0 ifTrue: [name := name , 'Underlined'].
+    (style bitAnd: 1) ~~ 0 ifTrue: [name := name , 'B'].
+    (style bitAnd: 2) ~~ 0 ifTrue: [name := name , 'S'].
+    (style bitAnd: 4) ~~ 0 ifTrue: [name := name , 'U'].
+    name := TrueTypeFontMap
+	at: name asSymbol
+	ifAbsent:
+	   [StdErr nextPutAll: 'substituting Times for missing font ', name.
+	    'Times'].
     _name  := name _stringValue.
     _size  := size _integerValue.
     _style := 0 "face style" _integerValue.

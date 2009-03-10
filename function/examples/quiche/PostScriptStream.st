@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-07 20:18:49 by piumarta on emilia
+  Last edited: 2009-03-10 07:53:44 by piumarta on emilia
 "
 
 { import: Stream }
@@ -372,6 +372,23 @@ UnicodeToPostScriptSymbolMap := [
     ) inject: IdentityDictionary new into: [:map :unipss | map at: unipss first put: unipss second; yourself]
 ]
 
+PostScriptFontMap := [
+    IdentityDictionary new
+	at: #'Times-R'		put: 'Times-Roman';
+	at: #'Times-B'		put: 'Times-Bold';
+	at: #'Times-S'		put: 'Times-Italic';
+	at: #'Times-BS'		put: 'Times-BoldItalic';
+	at: #'Helvetica-R'	put: 'Helvetica';
+	at: #'Helvetica-B'	put: 'Helvetica-Bold';
+	at: #'Helvetica-S'	put: 'Helvetica-Oblique';
+	at: #'Helvetica-BS'	put: 'Helvetica-BoldOblique';
+	at: #'Courier-R'	put: 'Courier';
+	at: #'Courier-B'	put: 'Courier-Bold';
+	at: #'Courier-S'	put: 'Courier-Oblique';
+	at: #'Courier-BS'	put: 'Courier-BoldOblique';
+	yourself
+]
+
 PostScriptStream : WriteStream ( currentFont )
 
 PostScriptStream beginDocument
@@ -400,11 +417,18 @@ PostScriptStream origin: aPoint
 
 PostScriptStream ensureFont: aFont
 [
+    | name |
     currentFont == aFont ifTrue: [^self].
-    self print: aFont pointSize; nextPutAll: ' /'; nextPutAll: aFont name.
-    aFont isPlain	ifTrue: [self nextPutAll: '-Roman'].
-    aFont isBold	ifTrue: [self nextPutAll: '-Bold'].
-    aFont isItalic	ifTrue: [self nextPutAll: '-Italic'].
+    name := aFont name asString , '-'.
+    aFont isPlain	ifTrue: [name := name , 'R'].
+    aFont isBold	ifTrue: [name := name , 'B'].
+    aFont isItalic	ifTrue: [name := name , 'S'].
+    name := PostScriptFontMap
+	at: name asSymbol
+	ifAbsent:
+	   [StdErr nextPutAll: 'substituting Times-Roman for unknown font ', name.
+	    'Times-Roman'].
+    self print: aFont pointSize; nextPutAll: ' /'; nextPutAll: name.
     self nextPutAll: ' f\n'.
     currentFont := aFont.
 ]
@@ -429,13 +453,14 @@ PostScriptStream nextPutUnicode: unicode
 
 PostScriptStream nextPutCharacter: code	[ self nextPutAll: '(\\'; print: code base: 8 width: 3 padded: $0; nextPutAll: ')s\n' ]
 
-PostScriptStream nextPutSurface: aSurface
+PostScriptStream nextPutSurface: aSurface at: origin
 [
     | w h |
     w := aSurface width.
     h := aSurface height.
     self
 	nextPutAll: 'save\n';
+	print: origin x; space; print: origin y; space; nextPutAll: ' t\n';
 	nextPutAll: '/rpicstr '; print: w; nextPutAll: ' string def\n';
 	nextPutAll: '/gpicstr '; print: w; nextPutAll: ' string def\n';
 	nextPutAll: '/bpicstr '; print: w; nextPutAll: ' string def\n';
