@@ -26,6 +26,8 @@ BoxList removeFront		[ ^super removeFirst ]
 
 BoxList detectFrontToBack: unaryBlock	[ ^super detect: unaryBlock ]
 
+BoxList contentsFrontToBack	[ ^self asOrderedCollection ]
+
 "----------------------------------------------------------------"
 
 Box : Link ( myList position extent properties contents )
@@ -55,6 +57,8 @@ Box extent: aPoint
 
 Box width	[ ^extent x ]
 Box height	[ ^extent y ]
+
+Box globalPosition	[ ^myList ifTrue: [position + myList globalPosition] ifFalse: [position] ]
 
 Box layoutContents
 [
@@ -127,6 +131,8 @@ Box properties	[ ^properties ifTrue: [properties] ifFalse: [properties := Identi
 Box propertyAt: aSymbol put: aValue		[  self properties at: aSymbol put: aValue ]
 Box propertyAt: aSymbol				[ ^properties ifTrue: [properties at: aSymbol ifAbsent: []] ]
 Box propertyAt: aSymbol ifAbsent: valueBlock	[ ^properties ifTrue: [properties at: aSymbol ifAbsent: valueBlock] ]
+
+Box resetProperties	[ properties := nil ]
 
 Box background	[ ^self propertyAt: #background ]	Box background: aColor	 [ ^self propertyAt: #background put: aColor  ]
 Box border	[ ^self propertyAt: #border     ]	Box border:     aColor	 [ ^self propertyAt: #border     put: aColor  ]
