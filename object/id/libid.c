@@ -7,6 +7,7 @@
 #define GLOBAL_MCACHE	1024
 #define USE_GC		1
 #define DEBUG_ALL	0
+#define GC_EXTRA_BYTES	0
 
 #if defined(NO_GC)
 # undef	 USE_GC
@@ -14,7 +15,7 @@
 #endif
 
 #if DEBUG_ALL
-# define dprintf(fmt, args...)  fprintf(stdout, fmt, ##args)
+# define dprintf(fmt, args...)  fprintf(stderr, fmt, ##args)
 #else
 # define dprintf(fmt, args...)
 #endif
@@ -318,7 +319,10 @@ static oop _vtable__lookup_(oop _thunk, oop state, oop self, oop selector)
   dprintf("_vtable__lookup_(%p, %p, %p, %p<%s>)\n", _thunk, self, state, selector, selector->selector.elements);
   assoc= _vtable__findKeyOrNil_(0, self, self, selector);
   assert(isKindOf(self, _vtable));
-  if (assoc) return assoc;
+  if (assoc) {
+    dprintf("_vtable__lookup_ <%s> => %p { %p %p }\n", selector->selector.elements, assoc, assoc->assoc.key, assoc->assoc.value);
+    return assoc;
+  }
   if (self->vtable.delegate)
     {
       if (self == self->vtable.delegate) fatal("delegation loop\n");
@@ -356,6 +360,7 @@ static oop _vtable__methodAt_put_with_(oop _thunk, oop state, oop self, oop sele
 static oop _vtable__flush(oop _thunk, oop state, oop self)
 {
 #if GLOBAL_MCACHE
+  dprintf("_vtable__flush\n");
   memset(_libid_mcache, 0, sizeof(_libid_mcache));
 #endif
   return self;
@@ -785,12 +790,20 @@ void _libid_flush(oop selector)
 {
 #if GLOBAL_MCACHE
   unsigned int probe;
+  dprintf("_libid_flush(%s)\n", selector->selector.elements);
   if (selector)
     {
       for (probe= 0;  probe < GLOBAL_MCACHE;  ++probe)
-	if (_libid_mcache[probe] && _libid_mcache[probe]->selector == selector)
-	  _libid_mcache[probe]->selector=
-	    _libid_mcache[probe]->vtable= 0;
+	if (_libid_mcache[probe] && _libid_mcache[probe]->selector == selector) {
+	  dprintf("_libid_flush(%s) ### { %p %p %p }\n",
+		  selector->selector.elements,
+		  _libid_mcache[probe]->vtable,
+		  _libid_mcache[probe]->selector,
+		  _libid_mcache[probe]->closure);
+	  _libid_mcache[probe]->closure= 0;
+	  _libid_mcache[probe]->selector= 0;
+	  _libid_mcache[probe]->vtable= 0;
+	}
     }
   else
     memset(_libid_mcache, 0, sizeof(_libid_mcache));
@@ -804,7 +817,11 @@ oop _libid_proto(oop base)
 
 oop _libid_proto2(oop base, size_t size)
 {
-  return _sendv(s__delegated_, 2, (base ? base : _object), size);
+  oop proto;
+  dprintf("_libid_proto2(%p %ld)\n", base, size);
+  proto= _sendv(s__delegated_, 2, (base ? base : _object), size);
+  dprintf("_libid_proto2(%p %ld) => %p\n", base, size, proto);
+  return proto;
 }
 
 int _libid_isExported(const char *key)
@@ -857,7 +874,7 @@ oop *_libid_palloc(size_t size)
 {
   dprintf("LIBID_PALLOC %ld\n", (long)size);
 #if USE_GC
-  return GC_malloc(size);
+  return GC_malloc(size + GC_EXTRA_BYTES);
 #else
   return (oop *)calloc(1, size);
 #endif
@@ -867,7 +884,7 @@ void *_libid_balloc(size_t size)
 {
   dprintf("LIBID_BALLOC %4ld\n", (long)size);
 #if USE_GC
-  return GC_malloc_atomic(size);
+  return GC_malloc_atomic(size + GC_EXTRA_BYTES);
 #else
   return calloc(1, size);
 #endif
