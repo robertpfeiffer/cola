@@ -15,23 +15,24 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-11-25 14:32:12 by piumarta on emilia.vpri.org
+  Last edited: 2009-03-07 20:02:27 by piumarta on emilia
 "
 
 { import: Objects }
 
 SinkStream : Object ()
 
-SinkStream cr				[]
-SinkStream tab				[]
-SinkStream space			[]
-SinkStream print: o			[]
-SinkStream println: o			[]
-SinkStream print: o base: b		[]
-SinkStream print: o base: b width: w	[]
-SinkStream print_x: o			[]
-SinkStream nextPut: o			[]
-SinkStream nextPutAll: o		[]
+SinkStream cr					[]
+SinkStream tab					[]
+SinkStream space				[]
+SinkStream print: o				[]
+SinkStream println: o				[]
+SinkStream print: o base: b			[]
+SinkStream print: o base: b width: w		[]
+SinkStream print: o base: b width: w padded: p	[]
+SinkStream print_x: o				[]
+SinkStream nextPut: o				[]
+SinkStream nextPutAll: o			[]
 
 "----------------------------------------------------------------"
 
@@ -189,14 +190,15 @@ WriteStream next: count putAll: seqCollection
     ^seqCollection
 ]
 
-WriteStream cr				[ self nextPut: $\n ]
-WriteStream tab				[ self nextPut: $\t ]
-WriteStream space			[ self nextPut: $   ]
-WriteStream print: o			[ o printOn: self ]
-WriteStream println: o			[ self print: o; cr ]
-WriteStream print: o base: b		[ o printOn: self base: b ]
-WriteStream print: o base: b width: w	[ o printOn: self base: b width: w ]
-WriteStream print_x: o			[ self print: (Integer value_: o) base: 16 ]
+WriteStream cr					[ self nextPut: $\n ]
+WriteStream tab					[ self nextPut: $\t ]
+WriteStream space				[ self nextPut: $   ]
+WriteStream print: o				[ o printOn: self ]
+WriteStream println: o				[ self print: o; cr ]
+WriteStream print: o base: b			[ o printOn: self base: b ]
+WriteStream print: o base: b width: w		[ o printOn: self base: b width: w ]
+WriteStream print: o base: b width: w padded: p	[ o printOn: self base: b width: w padded: p ]
+WriteStream print_x: o				[ self print: (Integer value_: o) base: 16 ]
 
 WriteStream grow: count
 [
