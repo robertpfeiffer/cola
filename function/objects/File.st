@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2008-06-20 18:25:58 by piumarta on emilia
+  Last edited: 2009-03-07 20:06:47 by piumarta on emilia
 "
 
 { import: Objects }
@@ -50,16 +50,17 @@ File withFd_: _theFd name: nameString
 
 File name					[ ^name ]
 
-File print: anObject				[ anObject printOn: self ]
-File println: anObject				[ self print: anObject; cr ]
-File print: aNumber base: base			[ aNumber printOn: self base: base ]
-File print: aNumber base: base width: width	[ aNumber printOn: self base: base width: width ]
-File cr						[ self nextPut: $\n ]
-File cr: n					[ n timesRepeat: [self cr] ]
-File space					[ self nextPut: $   ]
-File space: n					[ n timesRepeat: [self space] ]
-File tab					[ self nextPut: $\t ]
-File tab: n					[ n timesRepeat: [self tab] ]
+File print: anObject					[ anObject printOn: self ]
+File println: anObject					[ self print: anObject; cr ]
+File print: aNumber base: base				[ aNumber printOn: self base: base ]
+File print: aNumber base: base width: width		[ aNumber printOn: self base: base width: width ]
+File print: aNumber base: base width: width padded: p	[ aNumber printOn: self base: base width: width padded: p ]
+File cr							[ self nextPut: $\n ]
+File cr: n						[ n timesRepeat: [self cr] ]
+File space						[ self nextPut: $   ]
+File space: n						[ n timesRepeat: [self space] ]
+File tab						[ self nextPut: $\t ]
+File tab: n						[ n timesRepeat: [self tab] ]
 
 File nextPut: aByte
 [
