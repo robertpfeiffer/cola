@@ -46,7 +46,7 @@ Box handleEvent: anEvent
     | evh |
     (evh := self propertyAt: anEvent name ifAbsent: [self eventHandler])
 	ifTrue: [(evh performEvent: anEvent for: self) ifTrue: [^self]].
-    ^myList handleEvent: anEvent
+    ^myList ifTrue: [myList handleEvent: anEvent]
 ]
 
 BoxList handleEvent: anEvent	[ ^myBox handleEvent: anEvent ]
@@ -155,6 +155,8 @@ MenuHandler withMenu: aBox
     self := super new.
     menu := aBox.
 ]
+
+MenuHandler menu	[ ^menu ]
 
 MenuHandler label: labelString action: actionBlock
 [
