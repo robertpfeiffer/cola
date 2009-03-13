@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-10 07:44:34 by piumarta on emilia
+  Last edited: 2009-03-13 11:08:44 by piumarta on emilia
 "
 
 { import: Surface }
@@ -309,7 +309,7 @@ Font newWithFace: typeFace size: size
     self->v_ascent= (oop)(TTF_FontAscent(font) << 1 | 1);
     self->v_descent= (oop)(-TTF_FontDescent(font) << 1 | 1);
     self->v_lineSkip= (oop)(TTF_FontLineSkip(font) << 1 | 1);
-    self->v_isFixedWidth= (oop)(TTF_FontFaceIsFixedWidth(font) ? self : 0);
+    self->v_isFixedWidth= (oop)(TTF_FontFaceIsFixedWidth(font) ? v_Object : 0);
   }.
     glyphs := IdentityDictionary new.
 ]
