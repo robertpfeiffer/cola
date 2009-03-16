@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-13 11:08:44 by piumarta on emilia
+  Last edited: 2009-03-16 16:32:40 by piumarta on emilia
 "
 
 { import: Surface }
@@ -314,8 +314,10 @@ Font newWithFace: typeFace size: size
     glyphs := IdentityDictionary new.
 ]
 
-Font withFace: aFace	[ ^aFace @ pointSize ]
-Font withStyle: aStyle	[ ^self withFace: (face withStyle: aStyle) ]
+Font withFamily: aFamily	[ ^((Family withName: aFamily) withStyle: self style) withSize: self pointSize ]
+Font withFace: aFace		[ ^aFace @ pointSize ]
+Font withStyle: aStyle		[ ^self withFace: (face withStyle: aStyle) ]
+Font withSize: aSize		[ ^face @ aSize ]
 
 Font   normal		[ ^self withFace: face normal ]
 Font   bold		[ ^self withFace: face bold ]		Font   medium	[ ^self withFace: face medium ]

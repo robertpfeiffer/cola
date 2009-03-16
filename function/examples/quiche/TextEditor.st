@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 13:59:16 by piumarta on emilia
+  Last edited: 2009-03-16 16:56:39 by piumarta on emilia
 "
 
 { import: Box }
@@ -222,6 +222,7 @@ TextEditor xUnderlined	[ self applyStyle: Family underlineStyleMask ]
 
 TextEditor applyFamily: familyName
 [
+    DefaultFont := DefaultFont withFamily: familyName.
     self selectionDo: [:box |
 	box isGlyph
 	    ifTrue:
@@ -231,6 +232,7 @@ TextEditor applyFamily: familyName
 
 TextEditor applyStyle: styleMask
 [
+    DefaultFont := DefaultFont withStyle: (DefaultFont style bitXor: styleMask).
     self selectionDo: [:box |
 	box isGlyph
 	    ifTrue:
@@ -240,6 +242,7 @@ TextEditor applyStyle: styleMask
 
 TextEditor applySize: size
 [
+    DefaultFont := DefaultFont withSize: size.
     self selectionDo: [:box |
 	box isGlyph
 	    ifTrue:
@@ -425,13 +428,14 @@ TextEditor print: text as: name
 
 SBox printTextOn: aStream
 [
-    | p y |
+    | p y h |
     y := 0.
-    aStream beginDocument; beginPage: (p := 1).
+    h := height - 108.
+    aStream beginDocument: width , height; beginPage: (p := 1).
     self do: [:box |
 	box layOutIn: self.
 	y := y + (box printTextLineOn: aStream).
-	(box nextLink and: [y + box nextLink totalHeight > 684])
+	(box nextLink and: [y + box nextLink totalHeight > h])
 	    ifTrue:
 	       [aStream endPage: p.
 		StdOut nextPutAll: 'PAGE '; print: p; cr.
