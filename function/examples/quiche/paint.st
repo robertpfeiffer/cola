@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 10:50:05 by piumarta on emilia
+  Last edited: 2009-03-16 11:36:08 by piumarta on emilia
 "
 
 { import: Object }
@@ -49,6 +49,7 @@ Box withOrigin: aPoint width: wd height: ht depth: dp
 
 Box new				[ ^self withOrigin: PointZero width: 0 height: 0 depth: 0 ]
 
+Box withExtent: aPoint		[ ^self withOrigin: PointZero width: aPoint x height: aPoint y depth: 0 ]
 Box withBounds: aRectangle	[ ^self withOrigin: aRectangle origin width: aRectangle width height: aRectangle height depth: 0 ]
 
 Box withSurface: aSurface
@@ -495,8 +496,9 @@ SBox isVisible: aBox	[ self firstVisible to: self lastVisible do: [:box | box ==
 
 Box drawOn: aSurface at: aPoint
 [
-    | bg bd bw extent |
+    | doa bg bd bw extent |
     aPoint := aPoint + origin.
+    (doa := self propertiesAt: #drawOn:at:) ifTrue: [^doa value: aSurface value: aPoint].
     bg := changed ifTrue: [ColourYellow] ifFalse: [self backgroundColour].
     bd := self borderColour.
     bw := self borderWidth.
@@ -1540,23 +1542,26 @@ Surface toFile: fileName
 ]
 
 "----------------------------------------------------------------"
+
 "The global paint configuration"
 
-PaintTool : Object (nibSize colour)
+PaintTool : Object ( nibSize nibColour nib )
 
 PaintTool new
 [
     self := super new.
     nibSize := 3.
-    colour := ColourBlack.
+    nibColour := ColourBlack.
 ]
 
-PaintTool colour: aColour [ colour := aColour ]
-PaintTool colour          [^ colour]
-PaintTool nibSize: aNumber [ nibSize := aNumber ]
-PaintTool nibSize          [^ nibSize]
+PaintTool nibColour: aColour	[  nibColour := aColour.  self destroyNib ]
+PaintTool nibColour		[^ nibColour]
+PaintTool nibSize: aNumber	[  nibSize := aNumber.	  self destroyNib ]
+PaintTool nibSize		[^ nibSize]
 
-PaintTool nib [ ^Box makeNib: (PaintTool nibSize) colour: colour ]
+PaintTool destroyNib		[  nib ifTrue: [nib surface destroy].  nib := nil ]
+
+PaintTool nib			[ ^nib ifNil: [nib := Box makeNib: nibSize colour: nibColour] ]
 
 [ PaintTool := PaintTool new ]
 
@@ -1599,7 +1604,7 @@ Box makeNib: size colour: aColour
     | sf |
     sf := Surface withExtent: 20, 20.
     sf fillCircle: 10, 10 radius: size withColour: aColour.
-    ^sf asBox.
+    ^sf asBox
 ]
 
 DoqReadStream g
@@ -1681,14 +1686,14 @@ TextEditor buildNewImageDialog: aBlock
 
 "----------------------------------------------------------------"
 
-PaletteHandler : EventHandler (isDown)
+PaletteHandler : EventHandler ( isDown )
 
 PaletteHandler buttonDownEvent :event :box :point [ isDown := true ]
 
 PaletteHandler motionEvent :event :box :point
 [
     isDown ifFalse: [^ self].
-    PaintTool colour: (Box paletteColorAt: point inExtent: box width, box height).
+    PaintTool nibColour: (Box paletteColorAt: point inExtent: box width, box height).
 ]
 
 PaletteHandler buttonUpEvent :event :box :point
@@ -1709,7 +1714,7 @@ Box bePalette
 "----------------------------------------------------------------"
 
 [
-    | window w h frame face text name editor |
+    | window w h frame face text name editor currentNib currentColour |
 
     (OS argumentAt: 1) = '-landscape'
 	ifTrue:  [h := 612.  w := 792]
@@ -1760,13 +1765,18 @@ Box bePalette
 		      addLast: (' info '   asText beButton: [editor printInfo]);
 		      bigSep;
 		      bigSep;
+		      addLast: ((Box withExtent: 20,20)
+				    propertiesAt: #drawOn:at:
+				    put: [:sfc :pt | PaintTool nib layOutIn: RectangleZero; drawOn: sfc at: pt]; yourself);
+		      smallSep;
+		      addLast: (Box paletteForExtent: 44, 100);
+		      smallSep;
 		      addLast: ((Box makeNib: 1) beButton: [PaintTool nibSize: 1]);
+		      addLast: ((Box makeNib: 2) beButton: [PaintTool nibSize: 2]);
 		      addLast: ((Box makeNib: 3) beButton: [PaintTool nibSize: 3]);
 		      addLast: ((Box makeNib: 5) beButton: [PaintTool nibSize: 5]);
 		      addLast: ((Box makeNib: 7) beButton: [PaintTool nibSize: 7]);
 		      addLast: ((Box makeNib: 9) beButton: [PaintTool nibSize: 9]);
-		      smallSep;
-		      addLast: (Box paletteForExtent: 44, 100);
 		      smallSep;
 		      addLast: (' new '  asText beButton: [editor insertNewImage: text window: window]);
 		      bigSep;
