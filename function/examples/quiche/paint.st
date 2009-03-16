@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 11:36:08 by piumarta on emilia
+  Last edited: 2009-03-16 11:50:26 by piumarta on emilia
 "
 
 { import: Object }
@@ -713,27 +713,29 @@ IdentityDictionary from: start to: stop put: aValue
 ]
 
 TextActions := [ IdentityDictionary new
-		     at:  $A - 64		put: #xBOL;
-		     at:  $B - 64		put: #xLeft;
-		     at:  $D - 64		put: #xDelete;
-		     at:  $E - 64		put: #xEOL;
-		     at:  $F - 64		put: #xRight;
-		     at:  $H - 64		put: #xBackspace;
-		     at:  $I - 64		put: #xTab;
-		     at:  $J - 64		put: #xNewline;
-		     at:  $M - 64		put: #xNewline;
-		     at:  $N - 64		put: #xDown;
-		     at:  $P - 64		put: #xUp;
-		     at:  $S - 64		put: #xSlanted;
-		     at:  $U - 64		put: #xUnderlined;
-		     at:      127		put: #xBackspace;
-		     at:   0xF700		put: #xUp;
-		     at:   0xF701		put: #xDown;
-		     at:   0xF702		put: #xLeft;
-		     at:   0xF703		put: #xRight;
-		     at:   0xF72c		put: #xPageUp;
-		     at:   0xF72d		put: #xPageDown;
-		     yourself ]
+    at: $A - 64 put: #xBOL;
+    at: $B - 64 put: #xLeft;
+    at: $D - 64 put: #xDelete;
+    at: $E - 64 put: #xEOL;
+    at: $F - 64 put: #xRight;
+    at: $H - 64 put: #xBackspace;
+    at: $I - 64 put: #xTab;
+    at: $J - 64 put: #xNewline;
+    at: $M - 64 put: #xNewline;
+    at: $N - 64 put: #xDown;
+    at: $P - 64 put: #xUp;
+    at: $S - 64 put: #xSlanted;
+    at: $U - 64 put: #xUnderlined;
+    at:     127 put: #xBackspace;
+    "    Mac OS                             Win32   "
+    at:  0xF700 put: #xUp;		at:  -273 put: #xUp;
+    at:  0xF701 put: #xDown;		at:  -274 put: #xDown;
+    at:  0xF702 put: #xLeft;		at:  -276 put: #xLeft;
+    at:  0xF703 put: #xRight;		at:  -275 put: #xRight;
+    at:  0xF72c put: #xPageUp;		at:  -280 put: #xPageUp;
+    at:  0xF72d put: #xPageDown;	at:  -281 put: #xPageDown;
+    yourself
+]
 
 TextEditor : EventHandler ( dot mark )
 
@@ -932,7 +934,7 @@ TextEditor applySize: size
 		box container layoutChanged]]
 ]
 
-TextEditor xIgnore	:event	[ (event code printStringBase: 16) putln ]
+TextEditor xIgnore	:event	[ (event code println printStringBase: 16) putln ]
 TextEditor xInsert	:event	[ self deleteSelection.  dot container add: (DefaultFont glyphAt: event code) asBox before: dot ]
 TextEditor xTab		:event	[ self deleteSelection.  dot container add: ((DefaultFont glyphAt: 160) asBox width: (DefaultFont glyphAt: 32) width * 8) before: dot ]
 TextEditor xNewline	:event	[ self deleteSelection.  dot container add: (DefaultFont glyphAt: 10) asBox before: dot ]

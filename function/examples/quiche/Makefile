@@ -35,5 +35,10 @@ paint : paint.st $(LIBS) $(SOLIBS) sampletext.st
 run: main
 	./main
 
+zip : default
+	( cd .. ; zip -r quiche-win32.zip \
+			quiche/main.exe quiche/paint.exe quiche/*.dll quiche/caret16.bmp quiche/fonts \
+			quiche/file\ name.doq quiche/file\ name.bmp )
+
 clean:
 	rm -rf *~ *.o *.so $(EXAMPLES) *.dSYM
