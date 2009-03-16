@@ -1,4 +1,4 @@
-EXAMPLES := main
+EXAMPLES := main paint
 
 IDC := ../idc -g
 
@@ -21,6 +21,9 @@ LIBS	:= Surface.o Geometry.o Colour.o Font.o MacroState.o UTF8Stream.o PostScrip
 default: $(EXAMPLES)
 
 main : main.st $(LIBS) $(SOLIBS) sampletext.st
+	$(IDC) $(IDC_FLAGS) $(LIBS) $(IDLIBS) $< -o $@
+
+paint : paint.st $(LIBS) $(SOLIBS) sampletext.st
 	$(IDC) $(IDC_FLAGS) $(LIBS) $(IDLIBS) $< -o $@
 
 %.o : %.st
