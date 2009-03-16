@@ -16,7 +16,7 @@ endif
 
 FT2LIBS := -lSDL_ttf -lfreetype
 
-LIBS	:= Surface.o Geometry.o Colour.o Font.o MacroState.o UTF8Stream.o PostScriptStream.o # Layout.o Box.o
+LIBS	:= Surface.o Geometry.o Colour.o Font.o MacroState.o UTF8Stream.o PostScriptStream.o Box.o TextEditor.o
 
 default: $(EXAMPLES)
 
