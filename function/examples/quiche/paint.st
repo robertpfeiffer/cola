@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 14:02:38 by piumarta on emilia
+  Last edited: 2009-03-16 18:57:30 by piumarta on emilia
 "
 
 { import: TextEditor }
@@ -395,12 +395,26 @@ Box bePalette
 "----------------------------------------------------------------"
 
 [
-    | window w h frame face text name editor currentNib currentColour |
+    | argv fileName content window w h frame face text name editor |
 
-    (OS argumentAt: 1) = '-landscape'
-	ifTrue:  [h := 612.  w := 792]
-	ifFalse: [w := 612.  h := 792].
-
+    w := 612.
+    h := 792.
+    fileName := 'file name'.
+    argv := OS arguments.
+    [argv isEmpty]
+	whileFalse:
+	   [| arg |
+	    arg := argv removeFirst.
+	    arg = '-landscape'
+		ifTrue:  [| t | t := h.  h := w.  w := t]
+		ifFalse:
+		   [| file |
+		    (file := File open: arg ifAbsent: [File open: arg , '.doq'])
+			ifTrue:
+			   [content := file contents.
+			    fileName := arg.
+			    file close]]].
+    content ifFalse: [content := SampleText].
     face := #Times roman @ 14.
     window := Window withExtent: (w + 56) , (h - 6).
     window addFirst: ((Box withBounds: (52,26 extent: (w) , (h - 36)))
@@ -408,11 +422,11 @@ Box bePalette
 			  addFirst: ((text := Box withBounds: (36,36 extent: (w - 72) , (h - 108)))
 					 backgroundColour: ColourWhite;
 					 borderWidth: 10;
-					 addLast: (SampleText asParagraph: text))).
+					 addLast: (content asParagraph: text))).
     editor := text propertiesAt: #editor.
     window
 	addLast: ((frame := Box new) width: (w + 48); height: 16; depth: 2; backgroundColour: ColourWhite; moveTo: 4, 4;
-		      addLast: ((name := 'file name' asText) beEditable: frame));
+		      addLast: ((name := fileName asText) beEditable: frame));
 	addLast: (Box new vBox width: 1; moveTo: 4, 26;
 		      addLast: (' load '   asText beButton: [editor := editor load: text as: name]);
 		      smallSep;
@@ -429,6 +443,7 @@ Box bePalette
 		      addLast: (' bold '   asText beButton: [editor xBold]);
 		      addLast: (' italic ' asText beButton: [editor xSlanted]);
 		      smallSep;
+"
 		      addLast: ('   8pt '  asText beButton: [editor applySize:  8]);
 		      addLast: ('   9pt '  asText beButton: [editor applySize:  9]);
 		      addLast: (' 10pt '   asText beButton: [editor applySize: 10]);
@@ -438,6 +453,7 @@ Box bePalette
 		      addLast: (' 16pt '   asText beButton: [editor applySize: 16]);
 		      addLast: (' 18pt '   asText beButton: [editor applySize: 18]);
 		      addLast: (' 20pt '   asText beButton: [editor applySize: 20]);
+"
 		      addLast: (' 24pt '   asText beButton: [editor applySize: 24]);
 		      addLast: (' 28pt '   asText beButton: [editor applySize: 28]);
 		      addLast: (' 34pt '   asText beButton: [editor applySize: 34]);

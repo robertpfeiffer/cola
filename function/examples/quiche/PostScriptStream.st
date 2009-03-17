@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 16:57:32 by piumarta on emilia
+  Last edited: 2009-03-16 20:28:29 by piumarta on emilia
 "
 
 { import: Stream }
@@ -403,7 +403,7 @@ PostScriptStream beginDocument: extent
 	nextPutAll: '/BOP { 36 '; print: h - 36; nextPutAll: ' translate 0 0 moveto } bind def\n';
 	nextPutAll: '/EOP { 4 string cvs dup stringwidth pop initgraphics 2 div neg ';
 			print: w // 2;
-			nextPutAll: ' add 36 moveto show showpage } bind def\n';
+			nextPutAll: ' add 18 moveto show showpage } bind def\n';
 	nextPutAll: '/readstring { currentfile exch readhexstring pop } bind def\n';
 	nextPutAll: '/f { findfont exch scalefont setfont } bind def\n';
 	nextPutAll: '/s { show } bind def\n';
