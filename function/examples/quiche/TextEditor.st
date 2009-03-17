@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 16:56:39 by piumarta on emilia
+  Last edited: 2009-03-16 17:08:52 by piumarta on emilia
 "
 
 { import: Box }
@@ -430,12 +430,11 @@ SBox printTextOn: aStream
 [
     | p y h |
     y := 0.
-    h := height - 108.
-    aStream beginDocument: width , height; beginPage: (p := 1).
+    aStream beginDocument: (width + 72) , (height + 108); beginPage: (p := 1).
     self do: [:box |
 	box layOutIn: self.
 	y := y + (box printTextLineOn: aStream).
-	(box nextLink and: [y + box nextLink totalHeight > h])
+	(box nextLink and: [y + box nextLink height > height])
 	    ifTrue:
 	       [aStream endPage: p.
 		StdOut nextPutAll: 'PAGE '; print: p; cr.
