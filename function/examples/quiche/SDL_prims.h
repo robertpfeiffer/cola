@@ -19,4 +19,8 @@ extern int SDL_FillCircle(SDL_Surface *sfc, int x, int y, int radius, Uint32 col
 extern int SDL_DrawPolygon(SDL_Surface *sfc, SDL_Point *vertices, int nVertices, Uint32 colour);
 extern int SDL_FillPolygon(SDL_Surface *sfc, SDL_Point *vertices, int nVertices, Uint32 colour);
 
+extern Uint32 SDL_ReadPixel(SDL_Surface *sfc, int x, int y);
+
+extern SDL_Surface *SDL_ShrinkSurface(SDL_Surface *sfc, int factor);
+
 #endif /* __SDL_prims_h */

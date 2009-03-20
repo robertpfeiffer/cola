@@ -1,6 +1,6 @@
 /* SDL_prims.c -- 2D graphical primitives for SDL
  * 
- * Copyright (c) 2008 Ian Piumarta
+ * Copyright (c) 2008, 2009 Ian Piumarta
  * All rights reserved.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -15,7 +15,7 @@
  * 
  * THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
  * 
- * Last edited: 2009-03-09 21:36:47 by piumarta on emilia
+ * Last edited: 2009-03-20 14:23:34 by piumarta on emilia
  */
 
 #include <stdio.h>
@@ -68,6 +68,15 @@ static inline int DrawPixel16(SDL_Surface *s, int x, int y, Uint32 c)
   return 0;
 }
 
+static inline int DrawPixel24(SDL_Surface *s, int x, int y, Uint32 c)
+{
+  Uint8 *pix= s->pixels + s->pitch * y + x * 3;
+  pix[0]= (c >> 16) & 255;
+  pix[1]= (c >>  8) & 255;
+  pix[2]= (c >>  0) & 255;
+  return 0;
+}
+
 static inline int DrawPixel32(SDL_Surface *s, int x, int y, Uint32 c)
 {
   *((Uint32 *)(s->pixels + s->pitch * y + 4 * x))= (Uint32)c;
@@ -82,10 +91,7 @@ int SDL_DrawPixel(SDL_Surface *s, int x, int y, Uint32 c)
 	{
 	case 1: return DrawPixel8 (s, x, y, c);
 	case 2: return DrawPixel16(s, x, y, c);
-	case 3:
-#	        if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-	        colour <<= 8;
-#	        endif
+	case 3: return DrawPixel24(s, x, y, c);
 	case 4: return DrawPixel32(s, x, y, c);
 	}
     }
@@ -537,4 +543,86 @@ int SDL_FillPolygon(SDL_Surface *s, SDL_Point *v, int n, Uint32 c)
 	SDL_DrawHLine(s, xs[i], y, xs[i+1], c);
     }
   return 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* ReadPixel							    */
+/* ---------------------------------------------------------------- */
+
+static inline Uint32 ReadPixel8(SDL_Surface *s, int x, int y)
+{
+  return *((Uint8 *)(s->pixels + s->pitch * y + x));
+}
+
+static inline Uint32 ReadPixel16(SDL_Surface *s, int x, int y)
+{
+  return *((Uint16 *)(s->pixels + s->pitch * y + 2 * x));
+}
+
+static inline Uint32 ReadPixel24(SDL_Surface *s, int x, int y)
+{
+  Uint8 *pix= s->pixels + s->pitch * y + x * 3;
+  return (pix[0] << 16) + (pix[1] << 8) + (pix[2] << 0);
+}
+
+static inline Uint32 ReadPixel32(SDL_Surface *s, int x, int y)
+{
+  return *((Uint32 *)(s->pixels + s->pitch * y + 4 * x));
+}
+
+Uint32 SDL_ReadPixel(SDL_Surface *s, int x, int y)
+{
+  switch (s->format->BytesPerPixel)
+    {
+    case 1: return ReadPixel8 (s, x, y);
+    case 2: return ReadPixel16(s, x, y);
+    case 3: return ReadPixel24(s, x, y);
+    case 4: return ReadPixel32(s, x, y);
+    }
+  return 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* ShrinkSurface						    */
+/* ---------------------------------------------------------------- */
+
+static inline Uint32 interpolate(Uint32 a, Uint32 b, Uint32 c, Uint32 d, Uint32 e, Uint32 f, Uint32 g, Uint32 h, Uint32 i)
+{
+#define R(x)	(((x) >> 24)      )
+#define G(x)	(((x) >> 16) & 255)
+#define B(x)	(((x) >>  8) & 255)
+#define A(x)	(((x)      ) & 255)
+  unsigned int rp= (R(a) + R(b) + R(c) + R(d) + R(e) + R(f) + R(g) + R(h) + R(i)) / 9;
+  unsigned int gp= (G(a) + G(b) + G(c) + G(d) + G(e) + G(f) + G(g) + G(h) + G(i)) / 9;
+  unsigned int bp= (B(a) + B(b) + B(c) + B(d) + B(e) + B(f) + B(g) + B(h) + B(i)) / 9;
+  unsigned int ap= (A(a) + A(b) + A(c) + A(d) + A(e) + A(f) + A(g) + A(h) + A(i)) / 9;
+#undef R
+#undef G
+#undef B
+#undef A
+  return (rp << 24) + (gp <<16) + (bp << 8) + ap;
+}
+
+SDL_Surface *SDL_ShrinkSurface(SDL_Surface *s, int factor)
+{
+  if (factor < 2) return 0;
+  int w= s->w / factor;
+  int h= s->h / factor;
+  SDL_Surface *d= SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, s->format->BitsPerPixel, 0, 0, 0, 0);
+  int x, y;
+  for (y= 0;  y < h;  ++y) {
+    for (x= 0;  x < w;  ++x) {
+      int p= x * factor, q= y * factor;
+      Uint32 ap, bp, cp, dp, ep, fp, gp, hp, ip;
+      if ((p > 0) && (q > 0) && (p < s->w - 1) && (q < s->h - 1)) {
+	ap= SDL_ReadPixel(s, p-1, q-1);  bp= SDL_ReadPixel(s, p  , q-1);  cp= SDL_ReadPixel(s, p+1, q-1);
+	dp= SDL_ReadPixel(s, p-1, q  );  ep= SDL_ReadPixel(s, p  , q  );  fp= SDL_ReadPixel(s, p+1, q  );
+	gp= SDL_ReadPixel(s, p-1, q+1);  hp= SDL_ReadPixel(s, p  , q+1);  ip= SDL_ReadPixel(s, p+1, q+1);
+      } else {
+	ap= bp= cp= dp= ep= fp= gp= hp= ip= SDL_ReadPixel(s, p, q);
+      }
+      SDL_DrawPixel(d, x, y, interpolate(ap, bp, cp, dp, ep, fp, gp, hp, ip));
+    }
+  }
+  return d;
 }

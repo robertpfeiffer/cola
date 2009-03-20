@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-17 09:11:32 by piumarta on emilia
+  Last edited: 2009-03-20 14:25:53 by piumarta on emilia
 "
 
 { import: Box }
@@ -408,6 +408,7 @@ TextEditor loadBMP: text as: name
     ((name endsWith: '.bmp') or: [name endsWith: '.BMP']) ifFalse: [name := name , '.bmp'].
     surface := Surface fromFile: name.
     surface ifFalse: [^nil].
+    surface := surface shrunkBy: 4.
     (surface asBox propertiesAt: #bmpName put: name; yourself) linkBefore: dot.
     dot container layoutChanged.
 ]
@@ -464,10 +465,7 @@ Box printTextElementOn: aStream
 
 Surface printTextElementOn: aStream at: origin	[ aStream nextPutSurface: self at: origin ]
 
-Glyph printTextElementOn: aStream at: origin
-[
-    aStream ensureFont: font; nextPutUnicode: unicode.
-]
+Glyph printTextElementOn: aStream at: origin	[ aStream ensureFont: font; nextPutUnicode: unicode ]
 
 "----------------"
 

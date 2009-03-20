@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-09 21:37:16 by piumarta on emilia
+  Last edited: 2009-03-20 14:21:11 by piumarta on emilia
 "
 
 { import: Geometry }
@@ -25,9 +25,10 @@
 
 { SDL_Init(SDL_INIT_VIDEO); }
 
-Surface : Object ( _surface )
+Surface : Object ( _surface fileName modified )
 
 Surface _surface	[ ^_surface ]
+Surface modified	[ ^modified ]
 
 Surface width		{ _return (oop)(((SDL_Surface *)self->v__surface)->w  << 1 | 1); }
 Surface height		{ _return (oop)(((SDL_Surface *)self->v__surface)->h  << 1 | 1); }
@@ -52,18 +53,43 @@ Surface withExtent: aPoint
   }.
 ]
 
-Surface fromFile: fileName
+Surface fromFile: path
 [
     | _path |
     self := self new.
-    _path := fileName _stringValue.
+    _path := path _stringValue.
     {
       SDL_Surface *surface= SDL_LoadBMP((const char *)v__path);
       if (!surface) { _return(0); }
       SDL_SetColorKey(surface, SDL_SRCCOLORKEY, SDL_MapRGB(surface->format, 255, 0, 255));
       self->v__surface= (oop)surface;
     }.
+    fileName := path.
 ]
+
+ModifiedSurface : Surface ()
+
+ModifiedSurface withFileName: path
+[
+    self := self new.
+    fileName := path.
+]
+
+Surface shrunkBy: factor
+[
+    | _sfc _factor |
+    _sfc    := _surface.
+    _factor := factor _integerValue.
+    self := ModifiedSurface withFileName: fileName.
+    {
+      SDL_Surface *shrunk= SDL_ShrinkSurface((SDL_Surface *)v__sfc, (long)v__factor);
+      if (!shrunk) { _return(0); }
+      self->v__surface= (oop)shrunk;
+    }.
+]
+
+Surface atFullResolution		[ ^self ]
+ModifiedSurface atFullResolution	[ ^fileName ifTrue: [Surface fromFile: fileName] ifFalse: [self] ]
 
 Surface clear
 {
@@ -250,6 +276,16 @@ Surface flush
 }
 
 Surface destroy { SDL_FreeSurface((SDL_Surface *)self->v__surface); }
+
+Surface printOn: aStream
+[
+    super printOn: aStream.
+    aStream
+	nextPut: $(;
+	print: self width; nextPut: $,; print: self height; space;
+	print: fileName;
+	nextPut: $)
+]
 
 "----------------"
 

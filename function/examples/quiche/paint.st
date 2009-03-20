@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 18:57:30 by piumarta on emilia
+  Last edited: 2009-03-20 14:22:38 by piumarta on emilia
 "
 
 { import: TextEditor }
@@ -114,7 +114,7 @@ Box paletteColorAt: aPoint inExtent: extent
 Box saveAllSurfacesAsBmp
 [
     | name |
-    (surface and: [name := self propertiesAt: #bmpName])
+    (surface and: [surface modified and: [name := self propertiesAt: #bmpName]])
 	ifTrue: [surface toFile: name.
 		 StdOut nextPutAll: 'saved: '; nextPutAll: name; cr.].
     self do: [:box | box saveAllSurfacesAsBmp].
@@ -200,12 +200,13 @@ Surface drawLoopFrom: start to: stop put: aSurface
 		   (P := P - py) <= 0 ifTrue: 
 		       [destX := destX + dx.
 			P := P + px]]].
+    modified := true.
 ]
 
-Surface toFile: fileName
+Surface toFile: path
 [
     | _file |
-    _file := fileName _stringValue.
+    _file := path _stringValue.
     {
       /* We need to convert to 24 bit format explicitly because SDL_SaveBMP
          does not keep the bitpattern if it is 32 bit (bug?) */
@@ -306,6 +307,7 @@ TextEditor loadBMP: text as: name
     ((name endsWith: '.bmp') or: [name endsWith: '.BMP']) ifFalse: [name := name , '.bmp'].
     surface := Surface fromFile: name.
     surface ifFalse: [^nil].
+    surface := surface shrunkBy: 4.
     (surface asBox bePaintable propertiesAt: #bmpName put: name; yourself) linkBefore: dot.
     dot container layoutChanged.
 ]

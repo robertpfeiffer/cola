@@ -32,6 +32,8 @@ paint : paint.st $(LIBS) $(SOLIBS) sampletext.st
 %.so : %.st
 	$(IDC) $(IDC_FLAGS) -s $<
 
+Surface.o : SDL_prims.h SDL_prims.c
+
 run: main
 	./main
 

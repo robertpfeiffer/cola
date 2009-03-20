@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-16 20:28:29 by piumarta on emilia
+  Last edited: 2009-03-20 14:12:59 by piumarta on emilia
 "
 
 { import: Stream }
@@ -463,24 +463,26 @@ PostScriptStream nextPutCharacter: code	[ self nextPutAll: '(\\'; print: code ba
 
 PostScriptStream nextPutSurface: aSurface at: origin
 [
-    | w h |
-    w := aSurface width.
-    h := aSurface height.
+    | sfc dw dh sw sh |
+    sfc := aSurface atFullResolution.
+    dw := aSurface width.   sw := sfc width.
+    dh := aSurface height.  sh := sfc height.
     self
 	nextPutAll: 'save\n';
 	print: origin x; space; print: origin y; space; nextPutAll: ' t\n';
-	nextPutAll: '/rpicstr '; print: w; nextPutAll: ' string def\n';
-	nextPutAll: '/gpicstr '; print: w; nextPutAll: ' string def\n';
-	nextPutAll: '/bpicstr '; print: w; nextPutAll: ' string def\n';
-	print: w; space; print: h; nextPutAll: ' scale ';
-	print: w; space; print: h; nextPutAll: ' 8 [ ';
-	print: w; nextPutAll: ' 0 0 '; print: h negated; nextPutAll: ' 0 '; print: h; nextPutAll: ']'; cr;
+	nextPutAll: '/rpicstr '; print: sw; nextPutAll: ' string def\n';
+	nextPutAll: '/gpicstr '; print: sw; nextPutAll: ' string def\n';
+	nextPutAll: '/bpicstr '; print: sw; nextPutAll: ' string def\n';
+	print: dw; space; print: dh; nextPutAll: ' scale ';
+	print: sw; space; print: sh; nextPutAll: ' 8 [ ';
+	print: sw; nextPutAll: ' 0 0 '; print: sh negated; nextPutAll: ' 0 '; print: sh; nextPutAll: ']'; cr;
 	nextPutAll: '{ rpicstr readstring } { gpicstr readstring } { bpicstr readstring } true 3 colorimage\n'.
-    0 to: h - 1 do: [:y |
-	0 to: w - 1 do: [:x | self nextPutHex8: (aSurface redAt:   x at: y)].  self cr.
-	0 to: w - 1 do: [:x | self nextPutHex8: (aSurface greenAt: x at: y)].  self cr.
-	0 to: w - 1 do: [:x | self nextPutHex8: (aSurface blueAt:  x at: y)].  self cr].
+    0 to: sh - 1 do: [:y |
+	0 to: sw - 1 do: [:x | self nextPutHex8: (sfc redAt:   x at: y)].  self cr.
+	0 to: sw - 1 do: [:x | self nextPutHex8: (sfc greenAt: x at: y)].  self cr.
+	0 to: sw - 1 do: [:x | self nextPutHex8: (sfc blueAt:  x at: y)].  self cr].
     self nextPutAll: 'restore\n'.
+    sfc == aSurface ifFalse: [sfc destroy].
 ]
 
 PostScriptStream nextPutHex8: anInteger	[ anInteger printOn: self base: 16 width: 2 padded: $0 ]
