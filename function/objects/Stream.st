@@ -15,7 +15,7 @@
 
   THE SOFTWARE IS PROVIDED 'AS IS'.  USE ENTIRELY AT YOUR OWN RISK.
 
-  Last edited: 2009-03-07 20:02:27 by piumarta on emilia
+  Last edited: 2009-03-24 15:43:31 by piumarta on emilia
 "
 
 { import: Objects }
@@ -86,6 +86,15 @@ ReadStream grow: count
     newCollection := collection new: collectionSize + count.
     newCollection replaceFrom: 0 to: collectionSize - 1 with: collection startingAt: 0.
     collection := newCollection.
+]
+
+ReadStream upTo: anObject
+[
+    | out element |
+    out := WriteStream on: (collection new: 32).
+    [self atEnd or: [(element := self next) = anObject]]
+	whileFalse: [out nextPut: element].
+    ^out contents
 ]
 
 ReadStream matchAny
