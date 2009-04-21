@@ -1047,6 +1047,9 @@ struct __libid *_libid_init(int *argcp, char ***argvp, char ***envpp)
 #if USE_GC
   GC_INIT();
 #endif
+#if defined(EMBEDDED)
+  asm("fninit");
+#endif
 
   if (argcp)
     {
